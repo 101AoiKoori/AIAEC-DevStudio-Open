@@ -1,0 +1,69 @@
+schema_version: 3
+task_id: plate
+model_key: plate_detection
+version: v2
+task: detect
+data: datasets/exports/plate/provincial_synthetic/round2_multi_car/dataset.yaml
+model: models/weights/yolo_v8/yolov8n.pt
+output_root: runs/smoke_versions/training_iterations_20261111/plate_detection_v2/runs
+imgsz: 320
+epochs: 2
+batch: 8
+workers: 0
+patience: 30
+seed: 42
+device: '0'
+optimizer: SGD
+lr0: 0.005
+lrf: 0.01
+weight_decay: 0.0005
+warmup_epochs: 0.0
+cos_lr: true
+close_mosaic: 0
+amp: false
+deterministic: true
+max_det: 100
+diagnostic_conf: 0.25
+match_iou: 0.5
+preview_limit: 48
+evaluate_after_training: true
+augment:
+  degrees: 3.0
+  translate: 0.05
+  scale: 0.2
+  shear: 0.0
+  perspective: 0.0
+  flipud: 0.0
+  fliplr: 0.0
+  mosaic: 0.3
+  mixup: 0.0
+  copy_paste: 0.0
+  hsv_h: 0.01
+  hsv_s: 0.2
+  hsv_v: 0.2
+source_notes:
+- Prepared candidate labels; source lineage and generation methods are documented
+  in datasets/README.md.
+- Shared-source splits are allowed; results do not establish independent acquisition
+  performance.
+data_overrides:
+  train:
+  - images: datasets/exports/plate/provincial_synthetic/round2_multi_car/images/train
+    labels: datasets/exports/plate/provincial_synthetic/round2_multi_car/labels/train
+    source_group: provincial_round2
+  - images: datasets/exports/plate/provincial_synthetic/synthetic_train/detector/images/train
+    labels: datasets/exports/plate/provincial_synthetic/synthetic_train/detector/labels/train
+    source_group: provincial_synthetic
+  val:
+  - images: datasets/exports/plate/provincial_synthetic/round2_multi_car/images/val
+    labels: datasets/exports/plate/provincial_synthetic/round2_multi_car/labels/val
+    source_group: provincial_round2
+  - images: datasets/exports/plate/provincial_synthetic/synthetic_train/detector/images/val
+    labels: datasets/exports/plate/provincial_synthetic/synthetic_train/detector/labels/val
+    source_group: provincial_synthetic
+  test:
+  - images: datasets/exports/plate/provincial_ccpd/detection/images/test
+    labels: datasets/exports/plate/provincial_ccpd/detection/labels/test
+    source_group: ccpd_road_photos
+train_limit: 50
+eval_limit: null

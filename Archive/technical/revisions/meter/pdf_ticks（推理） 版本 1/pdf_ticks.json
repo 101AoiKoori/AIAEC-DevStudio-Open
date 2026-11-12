@@ -1,0 +1,1596 @@
+{
+  "source": "page15-005.jpg",
+  "image_size": [
+    641,
+    672
+  ],
+  "note": "PDF example only: automatically proposed tick marks, all unverified; ranges and positions must not be treated as competition calibration.",
+  "temperature": [
+    {
+      "index": 0,
+      "start": [
+        111.3,
+        454.1
+      ],
+      "end": [
+        92.4,
+        463.1
+      ],
+      "source": "local dark-run candidate; unverified"
+    },
+    {
+      "index": 1,
+      "start": [
+        106.2,
+        445.0
+      ],
+      "end": [
+        86.8,
+        453.2
+      ],
+      "source": "local dark-run candidate; unverified"
+    },
+    {
+      "index": 2,
+      "start": [
+        101.9,
+        434.2
+      ],
+      "end": [
+        82.2,
+        441.3
+      ],
+      "source": "local dark-run candidate; unverified"
+    },
+    {
+      "index": 3,
+      "start": [
+        98.5,
+        423.9
+      ],
+      "end": [
+        78.4,
+        430.1
+      ],
+      "source": "local dark-run candidate; unverified"
+    },
+    {
+      "index": 4,
+      "start": [
+        94.3,
+        412.9
+      ],
+      "end": [
+        74.0,
+        418.2
+      ],
+      "source": "local dark-run candidate; unverified"
+    },
+    {
+      "index": 5,
+      "start": [
+        90.9,
+        402.6
+      ],
+      "end": [
+        71.3,
+        406.7
+      ],
+      "source": "local dark-run candidate; unverified"
+    },
+    {
+      "index": 6,
+      "start": [
+        88.8,
+        391.0
+      ],
+      "end": [
+        68.0,
+        394.3
+      ],
+      "source": "local dark-run candidate; unverified"
+    },
+    {
+      "index": 7,
+      "start": [
+        86.3,
+        367.6
+      ],
+      "end": [
+        56.4,
+        369.2
+      ],
+      "source": "local dark-run candidate; unverified"
+    },
+    {
+      "index": 8,
+      "start": [
+        86.3,
+        367.6
+      ],
+      "end": [
+        56.4,
+        369.2
+      ],
+      "source": "local dark-run candidate; unverified"
+    },
+    {
+      "index": 9,
+      "start": [
+        86.1,
+        347.8
+      ],
+      "end": [
+        64.1,
+        347.1
+      ],
+      "source": "local dark-run candidate; unverified"
+    },
+    {
+      "index": 10,
+      "start": [
+        85.7,
+        336.8
+      ],
+      "end": [
+        64.8,
+        335.2
+      ],
+      "source": "local dark-run candidate; unverified"
+    },
+    {
+      "index": 11,
+      "start": [
+        86.9,
+        325.5
+      ],
+      "end": [
+        66.0,
+        322.8
+      ],
+      "source": "local dark-run candidate; unverified"
+    },
+    {
+      "index": 12,
+      "start": [
+        88.4,
+        315.0
+      ],
+      "end": [
+        67.7,
+        311.5
+      ],
+      "source": "local dark-run candidate; unverified"
+    },
+    {
+      "index": 13,
+      "start": [
+        90.0,
+        302.0
+      ],
+      "end": [
+        69.6,
+        297.3
+      ],
+      "source": "local dark-run candidate; unverified"
+    },
+    {
+      "index": 14,
+      "start": [
+        92.7,
+        291.4
+      ],
+      "end": [
+        72.5,
+        285.7
+      ],
+      "source": "local dark-run candidate; unverified"
+    },
+    {
+      "index": 15,
+      "start": [
+        96.0,
+        280.8
+      ],
+      "end": [
+        76.0,
+        274.2
+      ],
+      "source": "local dark-run candidate; unverified"
+    },
+    {
+      "index": 16,
+      "start": [
+        99.4,
+        271.2
+      ],
+      "end": [
+        79.7,
+        263.8
+      ],
+      "source": "local dark-run candidate; unverified"
+    },
+    {
+      "index": 17,
+      "start": [
+        103.3,
+        259.1
+      ],
+      "end": [
+        74.9,
+        246.6
+      ],
+      "source": "local dark-run candidate; unverified"
+    },
+    {
+      "index": 18,
+      "start": [
+        107.4,
+        250.2
+      ],
+      "end": [
+        88.6,
+        240.9
+      ],
+      "source": "local dark-run candidate; unverified"
+    },
+    {
+      "index": 19,
+      "start": [
+        113.2,
+        239.3
+      ],
+      "end": [
+        94.9,
+        229.0
+      ],
+      "source": "local dark-run candidate; unverified"
+    },
+    {
+      "index": 20,
+      "start": [
+        119.5,
+        228.7
+      ],
+      "end": [
+        101.7,
+        217.5
+      ],
+      "source": "local dark-run candidate; unverified"
+    },
+    {
+      "index": 21,
+      "start": [
+        125.8,
+        219.2
+      ],
+      "end": [
+        107.8,
+        206.6
+      ],
+      "source": "local dark-run candidate; unverified"
+    },
+    {
+      "index": 22,
+      "start": [
+        133.1,
+        209.2
+      ],
+      "end": [
+        115.8,
+        195.7
+      ],
+      "source": "local dark-run candidate; unverified"
+    },
+    {
+      "index": 23,
+      "start": [
+        140.2,
+        199.1
+      ],
+      "end": [
+        123.6,
+        184.6
+      ],
+      "source": "local dark-run candidate; unverified"
+    },
+    {
+      "index": 24,
+      "start": [
+        148.5,
+        190.0
+      ],
+      "end": [
+        132.7,
+        174.7
+      ],
+      "source": "local dark-run candidate; unverified"
+    },
+    {
+      "index": 25,
+      "start": [
+        156.9,
+        180.3
+      ],
+      "end": [
+        142.6,
+        164.9
+      ],
+      "source": "local dark-run candidate; unverified"
+    },
+    {
+      "index": 26,
+      "start": [
+        166.2,
+        173.3
+      ],
+      "end": [
+        152.0,
+        156.5
+      ],
+      "source": "local dark-run candidate; unverified"
+    },
+    {
+      "index": 27,
+      "start": [
+        174.2,
+        166.9
+      ],
+      "end": [
+        148.4,
+        133.7
+      ],
+      "source": "local dark-run candidate; unverified"
+    },
+    {
+      "index": 28,
+      "start": [
+        184.5,
+        159.4
+      ],
+      "end": [
+        172.0,
+        141.3
+      ],
+      "source": "local dark-run candidate; unverified"
+    },
+    {
+      "index": 29,
+      "start": [
+        194.0,
+        151.9
+      ],
+      "end": [
+        182.9,
+        134.1
+      ],
+      "source": "local dark-run candidate; unverified"
+    },
+    {
+      "index": 30,
+      "start": [
+        204.0,
+        146.1
+      ],
+      "end": [
+        193.8,
+        127.7
+      ],
+      "source": "local dark-run candidate; unverified"
+    },
+    {
+      "index": 31,
+      "start": [
+        215.3,
+        141.2
+      ],
+      "end": [
+        205.7,
+        121.5
+      ],
+      "source": "local dark-run candidate; unverified"
+    },
+    {
+      "index": 32,
+      "start": [
+        226.2,
+        135.2
+      ],
+      "end": [
+        217.6,
+        114.9
+      ],
+      "source": "local dark-run candidate; unverified"
+    },
+    {
+      "index": 33,
+      "start": [
+        238.1,
+        130.5
+      ],
+      "end": [
+        230.9,
+        110.7
+      ],
+      "source": "local dark-run candidate; unverified"
+    },
+    {
+      "index": 34,
+      "start": [
+        249.9,
+        126.5
+      ],
+      "end": [
+        243.8,
+        106.4
+      ],
+      "source": "local dark-run candidate; unverified"
+    },
+    {
+      "index": 35,
+      "start": [
+        261.5,
+        123.3
+      ],
+      "end": [
+        256.3,
+        102.9
+      ],
+      "source": "local dark-run candidate; unverified"
+    },
+    {
+      "index": 36,
+      "start": [
+        273.2,
+        120.6
+      ],
+      "end": [
+        269.1,
+        100.0
+      ],
+      "source": "local dark-run candidate; unverified"
+    },
+    {
+      "index": 37,
+      "start": [
+        284.0,
+        117.7
+      ],
+      "end": [
+        278.1,
+        78.2
+      ],
+      "source": "local dark-run candidate; unverified"
+    },
+    {
+      "index": 38,
+      "start": [
+        296.9,
+        117.1
+      ],
+      "end": [
+        294.9,
+        96.2
+      ],
+      "source": "local dark-run candidate; unverified"
+    },
+    {
+      "index": 39,
+      "start": [
+        309.7,
+        116.2
+      ],
+      "end": [
+        308.8,
+        95.2
+      ],
+      "source": "local dark-run candidate; unverified"
+    },
+    {
+      "index": 40,
+      "start": [
+        322.5,
+        116.0
+      ],
+      "end": [
+        322.7,
+        95.0
+      ],
+      "source": "local dark-run candidate; unverified"
+    },
+    {
+      "index": 41,
+      "start": [
+        335.3,
+        116.5
+      ],
+      "end": [
+        336.6,
+        95.5
+      ],
+      "source": "local dark-run candidate; unverified"
+    },
+    {
+      "index": 42,
+      "start": [
+        347.8,
+        116.6
+      ],
+      "end": [
+        350.1,
+        96.7
+      ],
+      "source": "local dark-run candidate; unverified"
+    },
+    {
+      "index": 43,
+      "start": [
+        361.4,
+        118.6
+      ],
+      "end": [
+        364.8,
+        98.9
+      ],
+      "source": "local dark-run candidate; unverified"
+    },
+    {
+      "index": 44,
+      "start": [
+        362.1,
+        118.7
+      ],
+      "end": [
+        365.6,
+        99.0
+      ],
+      "source": "local dark-run candidate; unverified"
+    },
+    {
+      "index": 45,
+      "start": [
+        374.2,
+        123.3
+      ],
+      "end": [
+        379.2,
+        101.8
+      ],
+      "source": "local dark-run candidate; unverified"
+    },
+    {
+      "index": 46,
+      "start": [
+        386.2,
+        126.4
+      ],
+      "end": [
+        392.1,
+        106.2
+      ],
+      "source": "local dark-run candidate; unverified"
+    },
+    {
+      "index": 47,
+      "start": [
+        397.6,
+        130.0
+      ],
+      "end": [
+        404.4,
+        110.1
+      ],
+      "source": "local dark-run candidate; unverified"
+    },
+    {
+      "index": 48,
+      "start": [
+        408.8,
+        134.2
+      ],
+      "end": [
+        424.5,
+        95.2
+      ],
+      "source": "local dark-run candidate; unverified"
+    },
+    {
+      "index": 49,
+      "start": [
+        420.5,
+        138.2
+      ],
+      "end": [
+        428.9,
+        120.0
+      ],
+      "source": "local dark-run candidate; unverified"
+    },
+    {
+      "index": 50,
+      "start": [
+        426.5,
+        153.4
+      ],
+      "end": [
+        440.5,
+        126.9
+      ],
+      "source": "local dark-run candidate; unverified"
+    },
+    {
+      "index": 51,
+      "start": [
+        441.9,
+        150.6
+      ],
+      "end": [
+        452.7,
+        132.6
+      ],
+      "source": "local dark-run candidate; unverified"
+    },
+    {
+      "index": 52,
+      "start": [
+        453.4,
+        157.9
+      ],
+      "end": [
+        465.2,
+        140.5
+      ],
+      "source": "local dark-run candidate; unverified"
+    },
+    {
+      "index": 53,
+      "start": [
+        463.5,
+        166.4
+      ],
+      "end": [
+        476.9,
+        148.9
+      ],
+      "source": "local dark-run candidate; unverified"
+    },
+    {
+      "index": 54,
+      "start": [
+        473.1,
+        174.1
+      ],
+      "end": [
+        486.7,
+        158.1
+      ],
+      "source": "local dark-run candidate; unverified"
+    },
+    {
+      "index": 55,
+      "start": [
+        481.9,
+        183.3
+      ],
+      "end": [
+        497.7,
+        166.6
+      ],
+      "source": "local dark-run candidate; unverified"
+    },
+    {
+      "index": 56,
+      "start": [
+        491.3,
+        191.2
+      ],
+      "end": [
+        506.5,
+        176.7
+      ],
+      "source": "local dark-run candidate; unverified"
+    },
+    {
+      "index": 57,
+      "start": [
+        499.1,
+        201.3
+      ],
+      "end": [
+        515.1,
+        187.7
+      ],
+      "source": "local dark-run candidate; unverified"
+    },
+    {
+      "index": 58,
+      "start": [
+        505.5,
+        210.8
+      ],
+      "end": [
+        540.3,
+        183.8
+      ],
+      "source": "local dark-run candidate; unverified"
+    },
+    {
+      "index": 59,
+      "start": [
+        513.0,
+        221.0
+      ],
+      "end": [
+        530.3,
+        209.0
+      ],
+      "source": "local dark-run candidate; unverified"
+    },
+    {
+      "index": 60,
+      "start": [
+        520.2,
+        231.9
+      ],
+      "end": [
+        538.0,
+        220.9
+      ],
+      "source": "local dark-run candidate; unverified"
+    },
+    {
+      "index": 61,
+      "start": [
+        525.6,
+        243.3
+      ],
+      "end": [
+        544.1,
+        233.3
+      ],
+      "source": "local dark-run candidate; unverified"
+    },
+    {
+      "index": 62,
+      "start": [
+        531.6,
+        255.2
+      ],
+      "end": [
+        550.6,
+        246.2
+      ],
+      "source": "local dark-run candidate; unverified"
+    },
+    {
+      "index": 63,
+      "start": [
+        531.6,
+        255.1
+      ],
+      "end": [
+        551.5,
+        245.7
+      ],
+      "source": "local dark-run candidate; unverified"
+    },
+    {
+      "index": 64,
+      "start": [
+        536.8,
+        266.9
+      ],
+      "end": [
+        557.2,
+        258.7
+      ],
+      "source": "local dark-run candidate; unverified"
+    },
+    {
+      "index": 65,
+      "start": [
+        541.2,
+        278.7
+      ],
+      "end": [
+        561.1,
+        271.9
+      ],
+      "source": "local dark-run candidate; unverified"
+    },
+    {
+      "index": 66,
+      "start": [
+        544.1,
+        291.3
+      ],
+      "end": [
+        565.3,
+        285.3
+      ],
+      "source": "local dark-run candidate; unverified"
+    },
+    {
+      "index": 67,
+      "start": [
+        547.1,
+        302.7
+      ],
+      "end": [
+        568.5,
+        297.7
+      ],
+      "source": "local dark-run candidate; unverified"
+    },
+    {
+      "index": 68,
+      "start": [
+        548.8,
+        316.3
+      ],
+      "end": [
+        571.4,
+        312.5
+      ],
+      "source": "local dark-run candidate; unverified"
+    },
+    {
+      "index": 69,
+      "start": [
+        550.3,
+        326.6
+      ],
+      "end": [
+        575.1,
+        323.6
+      ],
+      "source": "local dark-run candidate; unverified"
+    },
+    {
+      "index": 70,
+      "start": [
+        551.5,
+        340.2
+      ],
+      "end": [
+        573.5,
+        338.8
+      ],
+      "source": "local dark-run candidate; unverified"
+    },
+    {
+      "index": 71,
+      "start": [
+        552.0,
+        353.1
+      ],
+      "end": [
+        573.0,
+        352.9
+      ],
+      "source": "local dark-run candidate; unverified"
+    },
+    {
+      "index": 72,
+      "start": [
+        549.8,
+        365.0
+      ],
+      "end": [
+        572.8,
+        366.0
+      ],
+      "source": "local dark-run candidate; unverified"
+    },
+    {
+      "index": 73,
+      "start": [
+        548.8,
+        378.5
+      ],
+      "end": [
+        570.7,
+        380.8
+      ],
+      "source": "local dark-run candidate; unverified"
+    },
+    {
+      "index": 74,
+      "start": [
+        547.2,
+        390.8
+      ],
+      "end": [
+        568.9,
+        394.2
+      ],
+      "source": "local dark-run candidate; unverified"
+    },
+    {
+      "index": 75,
+      "start": [
+        546.8,
+        393.5
+      ],
+      "end": [
+        568.4,
+        397.2
+      ],
+      "source": "local dark-run candidate; unverified"
+    },
+    {
+      "index": 76,
+      "start": [
+        543.7,
+        404.1
+      ],
+      "end": [
+        566.1,
+        409.1
+      ],
+      "source": "local dark-run candidate; unverified"
+    },
+    {
+      "index": 77,
+      "start": [
+        541.2,
+        417.9
+      ],
+      "end": [
+        562.4,
+        424.0
+      ],
+      "source": "local dark-run candidate; unverified"
+    },
+    {
+      "index": 78,
+      "start": [
+        536.6,
+        429.4
+      ],
+      "end": [
+        558.3,
+        436.8
+      ],
+      "source": "local dark-run candidate; unverified"
+    },
+    {
+      "index": 79,
+      "start": [
+        531.7,
+        439.8
+      ],
+      "end": [
+        553.0,
+        448.3
+      ],
+      "source": "local dark-run candidate; unverified"
+    },
+    {
+      "index": 80,
+      "start": [
+        527.1,
+        450.3
+      ],
+      "end": [
+        567.1,
+        468.7
+      ],
+      "source": "local dark-run candidate; unverified"
+    }
+  ],
+  "humidity": [
+    {
+      "index": 0,
+      "start": [
+        381.8,
+        431.1
+      ],
+      "end": [
+        389.0,
+        422.8
+      ],
+      "source": "local dark-run candidate; unverified"
+    },
+    {
+      "index": 1,
+      "start": [
+        383.7,
+        436.9
+      ],
+      "end": [
+        392.0,
+        428.3
+      ],
+      "source": "geometric estimate; unverified"
+    },
+    {
+      "index": 2,
+      "start": [
+        389.1,
+        442.7
+      ],
+      "end": [
+        398.2,
+        434.9
+      ],
+      "source": "geometric estimate; unverified"
+    },
+    {
+      "index": 3,
+      "start": [
+        399.6,
+        444.9
+      ],
+      "end": [
+        403.7,
+        442.1
+      ],
+      "source": "local dark-run candidate; unverified"
+    },
+    {
+      "index": 4,
+      "start": [
+        404.8,
+        455.3
+      ],
+      "end": [
+        410.1,
+        452.5
+      ],
+      "source": "local dark-run candidate; unverified"
+    },
+    {
+      "index": 5,
+      "start": [
+        396.2,
+        465.2
+      ],
+      "end": [
+        412.6,
+        457.8
+      ],
+      "source": "geometric estimate; unverified"
+    },
+    {
+      "index": 6,
+      "start": [
+        409.7,
+        466.5
+      ],
+      "end": [
+        415.3,
+        464.5
+      ],
+      "source": "local dark-run candidate; unverified"
+    },
+    {
+      "index": 7,
+      "start": [
+        407.7,
+        477.4
+      ],
+      "end": [
+        418.4,
+        474.9
+      ],
+      "source": "local dark-run candidate; unverified"
+    },
+    {
+      "index": 8,
+      "start": [
+        413.4,
+        486.8
+      ],
+      "end": [
+        419.4,
+        486.1
+      ],
+      "source": "local dark-run candidate; unverified"
+    },
+    {
+      "index": 9,
+      "start": [
+        413.0,
+        496.5
+      ],
+      "end": [
+        419.0,
+        496.5
+      ],
+      "source": "local dark-run candidate; unverified"
+    },
+    {
+      "index": 10,
+      "start": [
+        402.9,
+        500.9
+      ],
+      "end": [
+        420.9,
+        501.9
+      ],
+      "source": "geometric estimate; unverified"
+    },
+    {
+      "index": 11,
+      "start": [
+        412.3,
+        508.2
+      ],
+      "end": [
+        418.2,
+        509.0
+      ],
+      "source": "local dark-run candidate; unverified"
+    },
+    {
+      "index": 12,
+      "start": [
+        409.5,
+        517.6
+      ],
+      "end": [
+        416.3,
+        519.2
+      ],
+      "source": "local dark-run candidate; unverified"
+    },
+    {
+      "index": 13,
+      "start": [
+        403.5,
+        523.9
+      ],
+      "end": [
+        413.9,
+        527.4
+      ],
+      "source": "local dark-run candidate; unverified"
+    },
+    {
+      "index": 14,
+      "start": [
+        403.8,
+        533.8
+      ],
+      "end": [
+        409.3,
+        536.3
+      ],
+      "source": "local dark-run candidate; unverified"
+    },
+    {
+      "index": 15,
+      "start": [
+        399.3,
+        542.2
+      ],
+      "end": [
+        404.5,
+        545.3
+      ],
+      "source": "local dark-run candidate; unverified"
+    },
+    {
+      "index": 16,
+      "start": [
+        392.9,
+        549.8
+      ],
+      "end": [
+        398.4,
+        554.1
+      ],
+      "source": "local dark-run candidate; unverified"
+    },
+    {
+      "index": 17,
+      "start": [
+        386.5,
+        554.2
+      ],
+      "end": [
+        395.3,
+        562.3
+      ],
+      "source": "geometric estimate; unverified"
+    },
+    {
+      "index": 18,
+      "start": [
+        383.2,
+        557.5
+      ],
+      "end": [
+        391.6,
+        566.2
+      ],
+      "source": "geometric estimate; unverified"
+    },
+    {
+      "index": 19,
+      "start": [
+        377.5,
+        560.0
+      ],
+      "end": [
+        384.6,
+        568.4
+      ],
+      "source": "local dark-run candidate; unverified"
+    },
+    {
+      "index": 20,
+      "start": [
+        366.2,
+        563.2
+      ],
+      "end": [
+        375.7,
+        578.5
+      ],
+      "source": "geometric estimate; unverified"
+    },
+    {
+      "index": 21,
+      "start": [
+        364.0,
+        571.4
+      ],
+      "end": [
+        369.6,
+        582.0
+      ],
+      "source": "geometric estimate; unverified"
+    },
+    {
+      "index": 22,
+      "start": [
+        356.7,
+        574.8
+      ],
+      "end": [
+        361.3,
+        585.9
+      ],
+      "source": "geometric estimate; unverified"
+    },
+    {
+      "index": 23,
+      "start": [
+        348.4,
+        578.7
+      ],
+      "end": [
+        350.4,
+        585.4
+      ],
+      "source": "local dark-run candidate; unverified"
+    },
+    {
+      "index": 24,
+      "start": [
+        340.2,
+        575.6
+      ],
+      "end": [
+        342.4,
+        587.3
+      ],
+      "source": "local dark-run candidate; unverified"
+    },
+    {
+      "index": 25,
+      "start": [
+        331.4,
+        574.7
+      ],
+      "end": [
+        332.9,
+        592.7
+      ],
+      "source": "geometric estimate; unverified"
+    },
+    {
+      "index": 26,
+      "start": [
+        323.4,
+        581.0
+      ],
+      "end": [
+        323.2,
+        593.0
+      ],
+      "source": "geometric estimate; unverified"
+    },
+    {
+      "index": 27,
+      "start": [
+        314.9,
+        580.4
+      ],
+      "end": [
+        313.5,
+        592.3
+      ],
+      "source": "geometric estimate; unverified"
+    },
+    {
+      "index": 28,
+      "start": [
+        310.3,
+        579.7
+      ],
+      "end": [
+        308.2,
+        591.5
+      ],
+      "source": "geometric estimate; unverified"
+    },
+    {
+      "index": 29,
+      "start": [
+        302.6,
+        577.9
+      ],
+      "end": [
+        299.3,
+        589.5
+      ],
+      "source": "geometric estimate; unverified"
+    },
+    {
+      "index": 30,
+      "start": [
+        297.9,
+        573.3
+      ],
+      "end": [
+        294.5,
+        582.7
+      ],
+      "source": "local dark-run candidate; unverified"
+    },
+    {
+      "index": 31,
+      "start": [
+        287.8,
+        572.3
+      ],
+      "end": [
+        282.5,
+        583.1
+      ],
+      "source": "geometric estimate; unverified"
+    },
+    {
+      "index": 32,
+      "start": [
+        280.9,
+        568.5
+      ],
+      "end": [
+        274.6,
+        578.7
+      ],
+      "source": "geometric estimate; unverified"
+    },
+    {
+      "index": 33,
+      "start": [
+        274.3,
+        564.0
+      ],
+      "end": [
+        267.1,
+        573.6
+      ],
+      "source": "geometric estimate; unverified"
+    },
+    {
+      "index": 34,
+      "start": [
+        268.2,
+        560.3
+      ],
+      "end": [
+        263.5,
+        565.5
+      ],
+      "source": "local dark-run candidate; unverified"
+    },
+    {
+      "index": 35,
+      "start": [
+        265.4,
+        551.9
+      ],
+      "end": [
+        256.6,
+        560.0
+      ],
+      "source": "local dark-run candidate; unverified"
+    },
+    {
+      "index": 36,
+      "start": [
+        257.7,
+        547.2
+      ],
+      "end": [
+        248.0,
+        554.4
+      ],
+      "source": "geometric estimate; unverified"
+    },
+    {
+      "index": 37,
+      "start": [
+        253.2,
+        540.6
+      ],
+      "end": [
+        243.0,
+        546.9
+      ],
+      "source": "geometric estimate; unverified"
+    },
+    {
+      "index": 38,
+      "start": [
+        257.0,
+        530.9
+      ],
+      "end": [
+        242.6,
+        538.0
+      ],
+      "source": "local dark-run candidate; unverified"
+    },
+    {
+      "index": 39,
+      "start": [
+        246.3,
+        526.4
+      ],
+      "end": [
+        235.1,
+        530.6
+      ],
+      "source": "geometric estimate; unverified"
+    },
+    {
+      "index": 40,
+      "start": [
+        246.2,
+        519.6
+      ],
+      "end": [
+        234.6,
+        522.9
+      ],
+      "source": "local dark-run candidate; unverified"
+    },
+    {
+      "index": 41,
+      "start": [
+        242.2,
+        511.2
+      ],
+      "end": [
+        230.4,
+        513.2
+      ],
+      "source": "geometric estimate; unverified"
+    },
+    {
+      "index": 42,
+      "start": [
+        241.2,
+        503.3
+      ],
+      "end": [
+        229.3,
+        504.2
+      ],
+      "source": "geometric estimate; unverified"
+    },
+    {
+      "index": 43,
+      "start": [
+        241.0,
+        495.4
+      ],
+      "end": [
+        229.0,
+        495.2
+      ],
+      "source": "geometric estimate; unverified"
+    },
+    {
+      "index": 44,
+      "start": [
+        240.9,
+        484.7
+      ],
+      "end": [
+        231.0,
+        483.2
+      ],
+      "source": "local dark-run candidate; unverified"
+    },
+    {
+      "index": 45,
+      "start": [
+        239.2,
+        477.4
+      ],
+      "end": [
+        233.4,
+        476.0
+      ],
+      "source": "local dark-run candidate; unverified"
+    },
+    {
+      "index": 46,
+      "start": [
+        239.8,
+        471.3
+      ],
+      "end": [
+        234.0,
+        469.6
+      ],
+      "source": "local dark-run candidate; unverified"
+    },
+    {
+      "index": 47,
+      "start": [
+        243.1,
+        459.7
+      ],
+      "end": [
+        237.6,
+        457.2
+      ],
+      "source": "local dark-run candidate; unverified"
+    },
+    {
+      "index": 48,
+      "start": [
+        250.3,
+        456.5
+      ],
+      "end": [
+        239.7,
+        450.7
+      ],
+      "source": "local dark-run candidate; unverified"
+    },
+    {
+      "index": 49,
+      "start": [
+        250.6,
+        446.4
+      ],
+      "end": [
+        245.6,
+        443.0
+      ],
+      "source": "local dark-run candidate; unverified"
+    },
+    {
+      "index": 50,
+      "start": [
+        256.2,
+        439.0
+      ],
+      "end": [
+        250.8,
+        434.5
+      ],
+      "source": "local dark-run candidate; unverified"
+    }
+  ]
+}

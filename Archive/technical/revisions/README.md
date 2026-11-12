@@ -1,6 +1,6 @@
 # 技术版本入口
 
-> 本文提及的部分本地素材、数据和历史运行产物未随本仓库提供；相关名称保留用于说明来源和实验背景。
+> 本仓库包含索引所列技术脚本、配置快照及 V1/V2 来源与环境元数据；数据、模型、图片与运行产物未包含。来源提交属于原开发仓库，不能在本仓库直接通过 Git 查询。
 
 这里收录有明确迭代边界的数据集、脚本、模型及技术配置。每个版本记录原路径、来源和状态；代码历史以 Git 为依据。
 
@@ -10,15 +10,15 @@
 
 | 模型 | V1 | V2 |
 | --- | --- | --- |
-| 人物 | person_yolo_v1 | person_yolo_v2 |
-| 电动车 | e_bike_yolo_v1 | e_bike_yolo_v2 |
-| 火焰纸贴 | fire_sticker_yolo_v1 | fire_sticker_yolo_v2 |
-| 楼名纸条 | building_name_paper_yolo_v1 | building_name_paper_yolo_v2 |
-| 禁行牌 | sign_yolo_v1 | sign_yolo_v2 |
-| 桶开闭 | waste_bin_state_yolo_v1 | waste_bin_state_yolo_v2 |
-| 垃圾贴纸 | waste_sticker_yolo_v1 | waste_sticker_yolo_v2 |
-| 仪表 | meter_yolo_v1 | meter_yolo_v2 |
-| 车牌检测 | plate_detection_yolo_v1 | plate_detection_yolo_v2 |
+| 人物 | [person_yolo_v1](person/person_yolo_v1/) | [person_yolo_v2](person/person_yolo_v2/) |
+| 电动车 | [e_bike_yolo_v1](e_bike/e_bike_yolo_v1/) | [e_bike_yolo_v2](e_bike/e_bike_yolo_v2/) |
+| 火焰纸贴 | [fire_sticker_yolo_v1](fire/fire_sticker_yolo_v1/) | [fire_sticker_yolo_v2](fire/fire_sticker_yolo_v2/) |
+| 楼名纸条 | [building_name_paper_yolo_v1](fire/building_name_paper_yolo_v1/) | [building_name_paper_yolo_v2](fire/building_name_paper_yolo_v2/) |
+| 禁行牌 | [sign_yolo_v1](sign/sign_yolo_v1/) | [sign_yolo_v2](sign/sign_yolo_v2/) |
+| 桶开闭 | [waste_bin_state_yolo_v1](waste_bin/waste_bin_state_yolo_v1/) | [waste_bin_state_yolo_v2](waste_bin/waste_bin_state_yolo_v2/) |
+| 垃圾贴纸 | [waste_sticker_yolo_v1](waste_bin/waste_sticker_yolo_v1/) | [waste_sticker_yolo_v2](waste_bin/waste_sticker_yolo_v2/) |
+| 仪表 | [meter_yolo_v1](meter/meter_yolo_v1/) | [meter_yolo_v2](meter/meter_yolo_v2/) |
+| 车牌检测 | [plate_detection_yolo_v1](plate/plate_detection_yolo_v1/) | [plate_detection_yolo_v2](plate/plate_detection_yolo_v2/) |
 
 每版保存冻结的 `scripts/`、`config/train.yaml` 和独立 `runs/`；权重、日志、TensorBoard、数据清单、逐图预测、验证／测试指标和样本图均在该版本的 `runs/smoke/`。代码、小配置和来源元数据纳入 Git，图片、权重和批量运行产物仅在本机归档。图表未生成项由独立 `postprocessing/` 清单与说明图记录，原始指标和图表保留。
 

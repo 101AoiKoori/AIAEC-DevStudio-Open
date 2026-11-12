@@ -1,0 +1,50 @@
+schema_version: 3
+task_id: fire
+model_key: fire_sticker
+version: v1
+task: detect
+data: datasets/exports/fire/fire_detection_candidates_4240_20261110/data.yaml
+model: models/weights/yolo_v8/yolov8n.pt
+output_root: runs/smoke_versions/training_iterations_20261111/fire_sticker_v1/runs
+imgsz: 320
+epochs: 1
+batch: 8
+workers: 0
+patience: 30
+seed: 42
+device: '0'
+optimizer: SGD
+lr0: 0.01
+lrf: 0.01
+weight_decay: 0.0005
+warmup_epochs: 0.0
+cos_lr: true
+close_mosaic: 0
+amp: false
+deterministic: true
+max_det: 100
+diagnostic_conf: 0.25
+match_iou: 0.5
+preview_limit: 48
+evaluate_after_training: true
+augment:
+  degrees: 3.0
+  translate: 0.05
+  scale: 0.2
+  shear: 0.0
+  perspective: 0.0
+  flipud: 0.0
+  fliplr: 0.0
+  mosaic: 0.3
+  mixup: 0.0
+  copy_paste: 0.0
+  hsv_h: 0.01
+  hsv_s: 0.2
+  hsv_v: 0.2
+source_notes:
+- Prepared candidate labels; source lineage and generation methods are documented
+  in datasets/README.md.
+- Shared-source splits are allowed; results do not establish independent acquisition
+  performance.
+train_limit: 50
+eval_limit: null

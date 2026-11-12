@@ -1,0 +1,27 @@
+{
+  "device": "cpu",
+  "detector": {
+    "weights": "models/plate_detector_best.pt",
+    "image_size": 960,
+    "confidence": 0.35,
+    "iou": 0.70,
+    "max_detections": 10,
+    "crop_padding": 0.08
+  },
+  "cnn": {
+    "weights": "models/plate_ocr_best.pt",
+    "charset": "config/plate/charset.json"
+  },
+  "paddle": {
+    "model_dir": "models",
+    "model_name": "PP-OCRv4_mobile_rec",
+    "min_confidence": 0.70
+  },
+  "arbitration": {
+    "policy": "agreement_only"
+  },
+  "confirmation": {
+    "sample_window": 1,
+    "required_matches": 1
+  }
+}
