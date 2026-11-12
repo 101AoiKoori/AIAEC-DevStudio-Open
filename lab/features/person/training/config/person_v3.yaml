@@ -1,0 +1,61 @@
+schema_version: 3
+task_id: person
+model_key: person
+version: v3
+task: detect
+data: datasets/exports/person/yolo_scene_candidates_4400_20261110/data.yaml
+model: models/weights/yolo_v8/yolov8n.pt
+output_root: runs/person
+imgsz: 640
+epochs: 150
+batch: 16
+workers: 0
+patience: 30
+seed: 42
+device: '0'
+optimizer: AdamW
+lr0: 0.001
+lrf: 0.01
+weight_decay: 0.0005
+warmup_epochs: 3.0
+cos_lr: true
+close_mosaic: 10
+amp: false
+deterministic: true
+max_det: 100
+diagnostic_conf: 0.25
+match_iou: 0.5
+preview_limit: 48
+evaluate_after_training: true
+augment:
+  degrees: 3.0
+  translate: 0.05
+  scale: 0.2
+  shear: 0.0
+  perspective: 0.0
+  flipud: 0.0
+  fliplr: 0.0
+  mosaic: 0.3
+  mixup: 0.0
+  copy_paste: 0.0
+  hsv_h: 0.01
+  hsv_s: 0.2
+  hsv_v: 0.2
+source_notes:
+- Prepared candidate labels; source lineage and generation methods are documented
+  in datasets/README.md.
+- Shared-source splits are allowed; results do not establish independent acquisition
+  performance.
+data_overrides:
+  train:
+  - images: datasets/exports/person/yolo_scene_candidates_4400_20261110/images/train
+    labels: datasets/exports/person/yolo_scene_candidates_4400_20261110/labels/train
+    source_group: datasets/exports/person/yolo_scene_candidates_4400_20261110/data.yaml
+  val:
+  - images: datasets/exports/person/yolo_scene_candidates_4400_20261110/images/val
+    labels: datasets/exports/person/yolo_scene_candidates_4400_20261110/labels/val
+    source_group: datasets/exports/person/yolo_scene_candidates_4400_20261110/data.yaml
+  test:
+  - images: datasets/exports/person/yolo_scene_candidates_4400_20261110/images/test
+    labels: datasets/exports/person/yolo_scene_candidates_4400_20261110/labels/test
+    source_group: datasets/exports/person/yolo_scene_candidates_4400_20261110/data.yaml

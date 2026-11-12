@@ -1,0 +1,37 @@
+{
+  "architecture": "spatial_v2",
+  "weights": "ws/src/aec_vision/models/plate_ocr_best.pt",
+  "charset": "ws/src/aec_vision/config/plate/charset.json",
+  "train_sources": {
+    "ccpd": "datasets/exports/plate/provincial_ccpd/ocr-recognition/train.txt",
+    "synthetic": "datasets/exports/plate/provincial_synthetic/synthetic_train/ocr/train_annotations.json"
+  },
+  "val_sources": {
+    "ccpd": "datasets/exports/plate/provincial_ccpd/ocr-recognition/val.txt",
+    "synthetic": "datasets/exports/plate/provincial_synthetic/synthetic_train/ocr/val_annotations.json"
+  },
+  "test_sources": {
+    "ccpd_test": "datasets/exports/plate/provincial_ccpd/ocr-recognition/test.txt",
+    "detector_crop_test": "datasets/exports/plate/provincial_ccpd/detection/ocr_external/yolo_crop/labels.txt"
+  },
+  "output": "lab/features/plate/training/runs/spatial_v2_20261106/best.pt",
+  "epochs": 12,
+  "max_minutes": 25,
+  "batch_size": 64,
+  "workers": 2,
+  "cpu_threads": 4,
+  "learning_rate": 0.0001,
+  "weight_decay": 0.0001,
+  "warmup_epochs": 2,
+  "early_stopping_patience": 4,
+  "gradient_clip": 5.0,
+  "seed": 20261106,
+  "device": "cuda:0",
+  "augmentation": {
+    "rotation_degrees": 1.0,
+    "brightness": 0.1,
+    "contrast": 0.1,
+    "blur_probability": 0.1,
+    "jpeg_probability": 0.1
+  }
+}

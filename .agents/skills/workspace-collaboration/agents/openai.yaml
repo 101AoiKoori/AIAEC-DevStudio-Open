@@ -1,0 +1,6 @@
+interface:
+  display_name: "多窗口与子代理协作"
+  short_description: "协调多个聊天与窗口内子代理，管理授权、分工、异步进展和共享文件"
+  default_prompt: "使用 $workspace-collaboration 按我的授权范围组织多窗口与子代理协作。"
+policy:
+  allow_implicit_invocation: true

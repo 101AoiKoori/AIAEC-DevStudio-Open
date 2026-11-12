@@ -1,0 +1,19 @@
+{
+  "version": 1,
+  "tasks": {
+    "traffic_light": {"enabled": false},
+    "person": {"enabled": false},
+    "sign": {"enabled": false},
+    "waste_bin": {"enabled": false},
+    "fire": {"enabled": false},
+    "thermal": {"enabled": false},
+    "meter": {"enabled": false},
+    "plate": {"enabled": false},
+    "e_bike": {"enabled": false}
+  },
+  "selected_route": null,
+  "routes": {
+    "route_a": {"description": "候选路线 A；现场确认后填写", "waypoints": []},
+    "route_b": {"description": "候选路线 B；现场确认后填写", "waypoints": []}
+  }
+}

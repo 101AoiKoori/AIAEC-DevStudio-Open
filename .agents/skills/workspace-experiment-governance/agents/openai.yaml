@@ -1,0 +1,6 @@
+interface:
+  display_name: "数据与实验管理"
+  short_description: "复用实验流程，检查数据来源、分组泄漏、运行边界和结论证据"
+  default_prompt: "使用 $workspace-experiment-governance 检查本次数据与实验方案并执行适用流程。"
+policy:
+  allow_implicit_invocation: true

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Workspace File Governance"
+  short_description: "Keep workspace files in their appropriate locations"
+  default_prompt: "Use $workspace-file-governance to assess these workspace files and their proper locations."

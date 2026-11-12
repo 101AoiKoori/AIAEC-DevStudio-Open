@@ -1,0 +1,9 @@
+#!/bin/sh
+set -eu
+if python -c 'import sys; sys.exit(sys.version_info < (3, 8))' >/dev/null 2>&1; then
+    py=python
+else
+    py=python3
+fi
+"$py" tools/sync_docs.py --stage
+"$py" .agents/skills/workspace-file-governance/scripts/check_layout.py --staged

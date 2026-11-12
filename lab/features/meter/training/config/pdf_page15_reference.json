@@ -1,0 +1,16 @@
+{
+  "source": "国赛规则说明.pdf page 15, embedded image 005; one photographed meter",
+  "status": "approximate points from prior PDF experiment; not manually verified or approved for training",
+  "image_size": [641, 672],
+  "bbox_xyxy": [0, 30, 641, 660],
+  "keypoints": [
+    {"name": "temperature_pivot", "x": 320.0, "y": 355.0, "visibility": 2},
+    {"name": "temperature_tip", "x": 423.0, "y": 157.2, "visibility": 2},
+    {"name": "humidity_pivot", "x": 325.0, "y": 497.0, "visibility": 2},
+    {"name": "humidity_tip", "x": 247.3, "y": 538.3, "visibility": 2},
+    {"name": "temperature_min", "x": 93.1, "y": 491.9, "visibility": 2},
+    {"name": "temperature_max", "x": 557.1, "y": 466.6, "visibility": 2},
+    {"name": "humidity_min", "x": 388.9, "y": 423.8, "visibility": 2},
+    {"name": "humidity_max", "x": 254.2, "y": 430.8, "visibility": 2}
+  ]
+}

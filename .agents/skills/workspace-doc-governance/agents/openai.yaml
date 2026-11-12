@@ -1,0 +1,4 @@
+interface:
+  display_name: "Workspace Doc Governance"
+  short_description: "Keep workspace docs current, concise, and authoritative"
+  default_prompt: "Use $workspace-doc-governance to reconcile these documentation changes with the workspace's source of truth."

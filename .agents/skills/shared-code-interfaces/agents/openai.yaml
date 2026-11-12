@@ -1,0 +1,6 @@
+interface:
+  display_name: "共享代码与接口维护"
+  short_description: "先检查现有能力与调用契约，复用稳定代码并避免重复实现和过度抽象"
+  default_prompt: "使用 $shared-code-interfaces 先检查可复用能力和接口影响，再实现本次需求。"
+policy:
+  allow_implicit_invocation: true

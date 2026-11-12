@@ -1,0 +1,13 @@
+# Python 3.9-3.12. Install the matching PyTorch wheel first; examples:
+# NVIDIA CUDA 12.1: python -m pip install torch==2.2.2 torchvision==0.17.2 --index-url https://download.pytorch.org/whl/cu121
+# NVIDIA CUDA 11.8: python -m pip install torch==2.2.2 torchvision==0.17.2 --index-url https://download.pytorch.org/whl/cu118
+# CPU: python -m pip install torch==2.2.2 torchvision==0.17.2 --index-url https://download.pytorch.org/whl/cpu
+# Select a wheel compatible with the target GPU and driver before installing this file.
+torch==2.2.2
+torchvision==0.17.2
+numpy==1.26.4
+matplotlib>=3.3,<4
+ultralytics==8.2.103
+tensorboard==2.14.1
+PyYAML>=6.0,<7
+setuptools>=65.5,<76

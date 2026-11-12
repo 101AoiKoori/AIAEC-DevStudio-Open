@@ -1,0 +1,6 @@
+interface:
+  display_name: "离线交付与目标机验收"
+  short_description: "评估部署影响，核对离线交付内容并按实际环境和证据完成验收"
+  default_prompt: "使用 $workspace-offline-delivery 评估本次变更的交付影响和目标机验收条件。"
+policy:
+  allow_implicit_invocation: true

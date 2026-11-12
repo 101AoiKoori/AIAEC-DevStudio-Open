@@ -1,0 +1,16 @@
+工作空间来源	归档位置	文件数	字节数	排除文档数	状态
+datasets/exports/waste_bin/archive/synthetic_train_v1	Archive/technical/datasets/垃圾贴纸/合成 版本 1	531	31948597	0	中途停止
+datasets/exports/waste_bin/archive/synthetic_train_v2	Archive/technical/datasets/垃圾贴纸/合成 版本 2	1514	89597255	0	首轮候选
+datasets/exports/waste_bin/archive/stickers_synthetic_v3	Archive/technical/datasets/垃圾贴纸/合成 版本 3	2817	160611535	0	中途停止
+datasets/exports/waste_bin/stickers_synthetic_v4	Archive/technical/datasets/垃圾贴纸/合成 版本 4	6028	345705016	0	当前选用；验证与训练同源
+datasets/exports/waste_bin/archive/synthetic_smoke_20261106	Archive/technical/datasets/垃圾贴纸/流程冒烟	115	8721942	0	流程试验
+datasets/annotated/meter/rendered_base_v1	Archive/technical/datasets/仪表/渲染底图 版本 1	180	97966235	0	渲染底图，标注仍需核验
+datasets/exports/meter/opencv_rendered_meter_v1	Archive/technical/datasets/仪表/透视增强 版本 1	2016	831560957	0	同源增强数据
+datasets/exports/fire/blender_probe_20261110	Archive/technical/datasets/fire/blender_probe_20261110	4	145491	0	实例通道解码检查失败，completed=0，保留首帧与失败记录
+datasets/exports/fire/blender_probe_fixed_20261110	Archive/technical/datasets/fire/blender_probe_fixed_20261110	42	1269870	0	10 张旧候选；遮挡纸边误作火焰正框，不用于训练
+datasets/exports/waste_bin/bin_coverage_20261110	Archive/technical/datasets/waste_bin/bin_coverage_20261110	61	21576031	0	旧模型姿态与构图覆盖检查失败
+datasets/exports/waste_bin/bin_coverage_v2_20261110	Archive/technical/datasets/waste_bin/bin_coverage_v2_20261110	68	21471403	0	10 张旧候选；竖直开盖与盖板框语义不用于当前训练
+datasets/exports/waste_bin/bin_coverage_v2_yolo_candidates_20261110	Archive/technical/datasets/waste_bin/bin_coverage_v2_yolo_candidates_20261110	15	6755925	0	旧 v2 导出 7 张、28 个盖板框；不用于当前训练，来源路径已更新
+datasets/exports/person/real_ground_probe_20261110	Archive/technical/datasets/person/real_ground_probe_20261110	80	6188341	0	10 张旧预览；同源背景与人物、电动车素材；生成期间代码变更，精确代码版本未知
+datasets/exports/person/real_ground_probe_v2_20261110	Archive/technical/datasets/person/real_ground_probe_v2_20261110	80	6358527	0	10 张旧预览；同源背景地面局部裁切，缺少场景语境；精确代码版本未知
+datasets/exports/person/real_scene_probe_v3_20261110	Archive/technical/datasets/person/real_scene_probe_v3_20261110	68	5550602	0	10 张旧预览；同源背景，场景与明暗调度耦合；精确代码版本未知

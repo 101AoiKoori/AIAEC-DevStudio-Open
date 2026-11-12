@@ -1,0 +1,100 @@
+{
+  "items": {
+    "塑料瓶": {
+      "name": "塑料瓶",
+      "category": "recyclable"
+    },
+    "易拉罐": {
+      "name": "易拉罐",
+      "category": "recyclable"
+    },
+    "玻璃瓶": {
+      "name": "玻璃瓶",
+      "category": "recyclable"
+    },
+    "报纸": {
+      "name": "报纸/纸张",
+      "category": "recyclable"
+    },
+    "纸箱": {
+      "name": "纸箱",
+      "category": "recyclable"
+    },
+    "旧衣服": {
+      "name": "旧衣物",
+      "category": "recyclable"
+    },
+    "剩饭": {
+      "name": "剩饭",
+      "category": "food"
+    },
+    "菜叶": {
+      "name": "菜叶",
+      "category": "food"
+    },
+    "苹果": {
+      "name": "果核",
+      "category": "food"
+    },
+    "茶渣": {
+      "name": "茶渣",
+      "category": "food"
+    },
+    "面包": {
+      "name": "面包",
+      "category": "food"
+    },
+    "鱼骨": {
+      "name": "鱼骨",
+      "category": "food"
+    },
+    "纽扣电池": {
+      "name": "纽扣电池",
+      "category": "hazardous"
+    },
+    "荧光灯": {
+      "name": "荧光灯",
+      "category": "hazardous"
+    },
+    "水银温度计": {
+      "name": "水银温度计",
+      "category": "hazardous"
+    },
+    "药片": {
+      "name": "药片",
+      "category": "hazardous"
+    },
+    "油漆": {
+      "name": "油漆",
+      "category": "hazardous"
+    },
+    "废胶卷": {
+      "name": "废胶卷",
+      "category": "hazardous"
+    },
+    "烟头": {
+      "name": "烟头",
+      "category": "residual"
+    },
+    "用过纸巾": {
+      "name": "用过纸巾",
+      "category": "residual"
+    },
+    "用过的一次性筷子": {
+      "name": "用过的一次性筷子",
+      "category": "residual"
+    },
+    "破陶瓷": {
+      "name": "破陶瓷",
+      "category": "residual"
+    },
+    "贝壳": {
+      "name": "贝壳",
+      "category": "residual"
+    },
+    "废弃眼镜": {
+      "name": "废弃眼镜",
+      "category": "residual"
+    }
+  }
+}

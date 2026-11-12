@@ -1,0 +1,5 @@
+{
+  "image_size": [641, 672],
+  "temperature": {"center": [320, 355], "search_radius": [40, 210], "angle_range_deg": [-210, 30], "angle_step_deg": 0.5, "dark_threshold": 80, "min_support": 0.6, "max_tip_radius": 255},
+  "humidity": {"center": [325, 497], "search_radius": [25, 83], "angle_range_deg": [-40, 220], "angle_step_deg": 0.5, "dark_threshold": 80, "min_support": 0.6, "max_tip_radius": 102}
+}
