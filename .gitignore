@@ -42,5 +42,3 @@ Archive/Assets/
 /lab/training_common/portable_env/bundles/
 /lab/training_common/portable_env/runs/*
 !/runs/.gitkeep
-
-/github-release/
