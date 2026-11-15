@@ -1,0 +1,968 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <title>全任务数据集设计｜V4 组合采样与贝叶斯演示</title>
+  <style>
+    :root {
+      --paper: #edf3f6;
+      --white: #fff;
+      --ink: #10283c;
+      --muted: #486071;
+      --line: #cddde5;
+      --dark: #0c2335;
+      --teal: #006f66;
+      --mint: #92eed5;
+      --amber: #ffbd77;
+      --blue: #435ba9;
+      --shadow: 0 14px 38px #10283c0b;
+      font-family: "Inter", "Microsoft YaHei UI", "PingFang SC", sans-serif;
+    }
+    *, *::before, *::after { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body { margin: 0; color: var(--ink); background: var(--paper); line-height: 1.65; }
+    button, input { font: inherit; }
+    button { cursor: pointer; color: inherit; }
+    a { color: var(--teal); text-underline-offset: .2em; }
+    a:hover { text-decoration-thickness: 2px; }
+    :focus-visible { outline: 3px solid #a85415; outline-offset: 3px; }
+    p { margin: 0; }
+    h1, h2, h3 { margin: 0; line-height: 1.24; }
+    .wrap { width: min(1220px, calc(100% - 72px)); margin-inline: auto; }
+    .mono, output { font-family: "IBM Plex Mono", Consolas, monospace; font-variant-numeric: tabular-nums; }
+    .muted { color: var(--muted); }
+    .small { font-size: .875rem; }
+    .header { border-bottom: 1px solid #294257; background: var(--dark); color: #eff7fb; }
+    .header .wrap { min-height: 68px; display: flex; justify-content: space-between; align-items: center; gap: 18px; }
+    .brand { font-size: .875rem; font-weight: 700; display: flex; align-items: center; gap: 10px; }
+    .mark { width: 20px; height: 20px; display: inline-block; border: 1px solid var(--mint); position: relative; }
+    .mark::before { content: ''; position: absolute; inset: 5px; border-radius: 50%; background: var(--mint); }
+    nav { display: flex; flex-wrap: wrap; gap: 10px 24px; font-size: .84rem; }
+    nav a { color: #d8e9f2; text-decoration: none; }
+    nav a:hover { color: var(--mint); }
+    .hero { color: #f2f9ff; background: radial-gradient(ellipse at 85% 65%, #183c50 0, var(--dark) 68%); }
+    .hero-inner { display: grid; grid-template-columns: 1fr 1.08fr; align-items: center; gap: 56px; padding-block: 50px 58px; }
+    .eyebrow { color: var(--teal); font-size: .84rem; font-weight: 750; letter-spacing: .12em; }
+    .hero .eyebrow { color: var(--mint); margin-bottom: 18px; }
+    h1 { font-size: clamp(2.3rem, 4.35vw, 4.65rem); letter-spacing: -.062em; font-weight: 780; }
+    h1 span { color: var(--mint); }
+    .intro { max-width: 28em; margin-top: 22px; color: #cbdde8; font-size: clamp(.95rem, 1.45vw, 1.12rem); }
+    .hero-link { display: inline-flex; align-items: center; gap: 12px; margin-top: 23px; background: var(--mint); color: var(--dark); font-size: .9rem; font-weight: 750; border-radius: 5px; padding: 9px 15px; text-decoration: none; }
+    .hero-link:hover { background: #bdf7e6; }
+    figure { margin: 0; min-width: 0; }
+    .selector { border: 1px solid #557584; border-radius: 12px; padding: 16px; background: #102b3c; box-shadow: 0 25px 50px #040c145c; }
+    .selector h2 { font-size: 1.15rem; letter-spacing: 0; }
+    .selector p { margin: 4px 0 12px; color: #c1dae5; }
+    .selector button { display: flex; justify-content: space-between; align-items: center; gap: 5px; text-align: left; min-height: 39px; padding: 6px 8px; border: 1px solid #446372; border-radius: 5px; color: #eef9fc; background: #183949; font-size: .81rem; }
+    .selector button:hover { background: #245164; }
+    .selector button[aria-pressed="true"] { color: var(--dark); background: var(--mint); border-color: var(--mint); font-weight: 750; }
+    .selector button:focus-visible { outline-color: var(--amber); }
+    .selector button small { color: #bfdae6; font-size: .66rem; white-space: nowrap; }
+    .selector button[aria-pressed="true"] small { color: #254b53; }
+    #scenario-buttons { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; }
+    .scenario-panel { margin-bottom: 14px; border-left: 4px solid var(--teal); }
+    .scenario-panel h3 { font-size: 1.24rem; }
+    .scenario-heading { display: flex; flex-wrap: wrap; gap: 8px 14px; align-items: center; justify-content: space-between; margin-bottom: 5px; }
+    .scenario-heading select { margin-left: 5px; }
+    .factor-list { display: flex; flex-wrap: wrap; gap: 7px; margin-block: 12px; }
+    .factor-list span { background: #e9f3f4; border: 1px solid #c6dfe0; border-radius: 5px; padding: 4px 8px; font-size: .79rem; }
+    .facts { background: #e0eef0; border-bottom: 1px solid #bcd3d9; }
+    .facts .wrap { display: grid; grid-template-columns: repeat(3, 1fr); }
+    .fact { min-width: 0; padding: 19px 22px; border-left: 1px solid #bcd3d9; }
+    .fact:last-child { border-right: 1px solid #bcd3d9; }
+    .fact b { display: block; line-height: 1.2; font-size: 1.16rem; }
+    .fact span { color: var(--muted); font-size: .82rem; }
+    main section { padding-top: 64px; scroll-margin-top: 16px; }
+    .section-head { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 17px; align-items: start; margin-bottom: 21px; }
+    .index { color: var(--teal); font: 650 1.05rem/1.4 "IBM Plex Mono", Consolas, monospace; border-top: 2px solid var(--teal); padding: 6px 1px 0; }
+    h2 { font-size: clamp(1.65rem, 3.25vw, 2.75rem); letter-spacing: -.055em; }
+    .section-head p { color: var(--muted); margin-top: 8px; max-width: 69ch; }
+    h3 { font-size: 1.1rem; }
+    .card { background: var(--white); border: 1px solid var(--line); border-radius: 10px; padding: 22px; box-shadow: var(--shadow); min-width: 0; }
+    .card h3 + p { margin-top: 8px; }
+    .workbench { display: grid; grid-template-columns: 290px minmax(0, 1fr); gap: 14px; align-items: start; }
+    .control { margin-top: 17px; }
+    .control label { font-size: .84rem; font-weight: 700; }
+    .control-top { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
+    .control output { font-size: .95rem; color: var(--teal); font-weight: 700; white-space: nowrap; }
+    input[type="range"] { display: block; width: 100%; height: 25px; margin: 4px 0 0; accent-color: var(--teal); cursor: pointer; }
+    .control-note { margin-top: 16px; padding-top: 12px; border-top: 1px solid var(--line); }
+    .quiet-button { padding: 6px 10px; font-size: .83rem; border-radius: 5px; background: #f2f7fb; border: 1px solid var(--line); }
+    .quiet-button:hover { background: #e0eef2; }
+    .controls-end { margin-top: 13px; display: flex; gap: 7px; flex-wrap: wrap; }
+    .results { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 14px 0 16px; }
+    .result { padding: 10px 12px; border: 1px solid var(--line); border-radius: 6px; background: #f4f8fc; text-align: left; }
+    .result[aria-pressed="true"] { background: #e3f3ee; border-color: #4d9a8c; box-shadow: inset 0 -3px #4d9a8c; }
+    .result strong { display: block; font-size: .87rem; }
+    .result .score { font-size: clamp(1.15rem, 2.2vw, 1.7rem); font-weight: 700; line-height: 1.3; display: block; margin-block: 3px; }
+    .result small { color: var(--muted); font-size: .74rem; }
+    .matrix-wrap { overflow-x: auto; padding: 3px; margin: -3px; }
+    .matrix { width: 100%; min-width: 470px; table-layout: fixed; border-spacing: 4px; font-size: .78rem; text-align: center; }
+    .matrix th { font-weight: 650; }
+    .matrix th:first-child { width: 44px; }
+    .matrix thead tr:first-child th { border-bottom: 1px solid var(--line); color: var(--muted); }
+    .matrix td { padding: 0; }
+    .cell { width: 100%; min-height: 40px; border: 1px solid #a9c7c3; background: var(--cell-fill, #edf4f8); border-radius: 4px; font-size: .94rem; }
+    .cell[aria-pressed="true"] { border-color: var(--ink); box-shadow: inset 0 0 0 1px var(--ink); font-weight: 700; }
+    .cell:hover { border-color: var(--ink); }
+    .cell-note { margin-top: 11px; background: #edf5f5; border-left: 3px solid #54a397; padding: 9px 11px; min-height: 3.1em; }
+    .two { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; margin-top: 14px; }
+    .formula { margin-block: 10px; padding: 8px 10px; background: #edf4f8; border-radius: 4px; color: #193651; overflow-wrap: anywhere; }
+    .notice { padding: 9px 12px; background: #fff2e2; border-left: 3px solid #bb6d30; color: #5c3c20; }
+    .prob-table { width: 100%; border-collapse: collapse; text-align: right; margin-block: 8px; font-size: .85rem; }
+    .prob-table th:first-child, .prob-table td:first-child { text-align: left; }
+    .prob-table th, .prob-table td { padding: 5px 4px; border-bottom: 1px solid var(--line); }
+    .prob-table .focus { color: var(--teal); font-weight: 750; }
+    .inline { display: flex; flex-wrap: wrap; gap: 10px 16px; align-items: baseline; }
+    .sample-chance { color: var(--teal); font-size: 2rem; font-weight: 720; line-height: 1.3; }
+    .beta { display: grid; grid-template-columns: 280px minmax(0, 1fr); gap: 14px; align-items: start; }
+    .beta-top { display: grid; grid-template-columns: 1.1fr .8fr 1.45fr; gap: 10px; margin-block: 12px; }
+    .stat { background: #edf5f5; border-radius: 5px; padding: 8px 10px; }
+    .stat span { color: var(--muted); display: block; font-size: .76rem; }
+    .stat strong { font-size: clamp(.82rem, 1.65vw, 1.18rem); }
+    #posterior-chart { width: 100%; height: 236px; display: block; }
+    .legend { display: flex; flex-wrap: wrap; gap: 5px 18px; align-items: center; font-size: .78rem; color: var(--muted); }
+    .legend i { display: inline-block; width: 14px; height: 3px; vertical-align: middle; margin-right: 4px; background: var(--teal); }
+    .legend .prior { background: var(--blue); }
+    .legend .credible { background: #abdacc; height: 9px; }
+    .bars { display: grid; gap: 8px; margin-block: 11px; }
+    .bar-row { display: grid; grid-template-columns: 90px 1fr 66px; align-items: center; gap: 7px; font-size: .81rem; }
+    .track { height: 9px; border-radius: 3px; background: #dce9ef; overflow: hidden; }
+    .track span { display: block; height: 100%; width: 0; background: var(--teal); }
+    .track .alt { background: var(--blue); }
+    details { border: 1px solid var(--line); background: #f8fbfc; padding: 10px 13px; margin-top: 11px; border-radius: 5px; }
+    summary { cursor: pointer; font-weight: 650; font-size: .87rem; }
+    details p { margin-top: 8px; }
+    .steps { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-top: 14px; }
+    .steps .card { padding: 15px; }
+    .steps h3 { font-size: .95rem; margin-bottom: 6px; }
+    .recipe-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px 25px; }
+    .recipe-grid dt { color: var(--teal); font-size: .82rem; font-weight: 750; }
+    .recipe-grid dd { margin: 2px 0 0; }
+    footer { margin-top: 63px; border-top: 1px solid var(--line); background: #e0eef0; }
+    footer .wrap { padding-block: 23px; }
+    footer p + p { margin-top: 7px; }
+    @media (max-width: 920px) {
+      .wrap { width: calc(100% - 48px); }
+      .hero-inner { gap: 25px; }
+      .workbench, .beta { grid-template-columns: 220px minmax(0, 1fr); gap: 10px; }
+      .card { padding: 16px; }
+    }
+    @media (max-width: 700px) {
+      .wrap { width: calc(100% - 32px); }
+      .header .wrap { align-items: flex-start; flex-direction: column; justify-content: center; gap: 6px; padding-block: 9px; }
+      .hero-inner { grid-template-columns: 1fr; padding-block: 34px; }
+      h1 { letter-spacing: -.045em; }
+      .fact { padding: 12px 8px; }
+      .fact b { font-size: .97rem; }
+      .fact span { font-size: .72rem; }
+      main section { padding-top: 43px; }
+      .section-head { gap: 10px; }
+      .workbench, .beta, .two, .recipe-grid { grid-template-columns: 1fr; }
+      .matrix { min-width: 285px; border-spacing: 2px; font-size: .7rem; }
+      .matrix th:first-child { width: 29px; }
+      .cell { min-height: 42px; padding: 0; font-size: .79rem; }
+      .steps { grid-template-columns: 1fr 1fr; }
+    }
+    @media (max-width: 390px) { #scenario-buttons { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+    @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+    @media print {
+      .hero { background: var(--dark); }
+      .header, .hero-link, button.quiet-button { display: none; }
+      .wrap { width: 100%; }
+      .card { box-shadow: none; break-inside: avoid; }
+      .matrix { min-width: 0; }
+      * { print-color-adjust: exact; }
+    }
+  </style>
+</head>
+<body>
+  <header class="header">
+    <div class="wrap">
+      <div class="brand"><span class="mark" aria-hidden="true"></span>AIAEC · V4 数据集设计</div>
+      <nav aria-label="章节"><a href="#sampling">状态与采样</a><a href="#bayes">贝叶斯更新</a><a href="#production">制作与验收</a></nav>
+    </div>
+  </header>
+  <div class="hero">
+    <div class="wrap hero-inner">
+      <div>
+        <p class="eyebrow">同场地 · 车载视觉</p>
+        <h1>每个识别任务<br><span>都有一张状态表</span></h1>
+        <p class="intro">以新车载实拍的真实外观、机位和成像为核心，混合旧素材与合成状态。切换人物、车牌、灯色等环节，查看怎样覆盖易错组合，并用可核对的观察更新失败率。</p>
+        <a class="hero-link" href="#sampling">试试组合采样 <span aria-hidden="true">↓</span></a>
+      </div>
+      <div class="selector">
+        <h2>选择识别环节</h2>
+        <p class="small">切换后同步更新覆盖矩阵、失败事件和制作细则。</p>
+        <div id="scenario-buttons" role="group" aria-label="识别环节"></div>
+      </div>
+    </div>
+  </div>
+  <div class="facts">
+    <div class="wrap">
+      <div class="fact"><b>9 个 YOLO 模型</b><span>检测与关键点</span></div>
+      <div class="fact"><b>2 条规则链路</b><span>红绿灯与热异常</span></div>
+      <div class="fact"><b>文字与关联</b><span>OCR、桶色与投放归属</span></div>
+    </div>
+  </div>
+  <main class="wrap">
+    <section id="sampling" aria-labelledby="sampling-title">
+      <div class="section-head"><span class="index">01</span><div><h2 id="sampling-title">先画状态空间，再花样本预算</h2><p>每个状态是一张图、一个焦点实例或一段时序的条件组合。多个完整状态可以共同覆盖一对因素。</p></div></div>
+      <p class="small">本页是五因素的假设演示，未单列低饱和度；九个模型的训练、验证和测试均需按<a href="research/DATASET_COVERAGE_TRAINING.md#九任务偏暗低饱和与组合预算">实际暗色与低饱和设计</a>补充覆盖和审核，不能把演示覆盖率当成数据集结果。</p>
+      <div class="card scenario-panel" aria-live="polite">
+        <div class="scenario-heading"><h3 id="scenario-title"></h3><label class="small" for="scenario-select">切换环节<select id="scenario-select" class="quiet-button"></select></label></div>
+        <p id="scenario-evidence" class="small muted"></p>
+        <p class="small muted">下列旧候选的像素范围和 V3 诊断保留原批次口径；新车载批次逐任务审核后单独计分。滑块概率是演示假设，不由视频帧数直接推定。</p>
+        <div id="scenario-factors" class="factor-list" aria-label="当前因素"></div>
+        <p id="scenario-constraint" class="small"></p>
+      </div>
+      <div class="workbench">
+        <aside class="card" aria-label="采样参数">
+          <h3>设置演示分布</h3>
+          <p class="muted small">滑块调节假设分布 P。制作分布 Q 可以给困难组合更多预算。</p>
+          <div class="control"><div class="control-top"><label for="budget">样本预算</label><output id="budget-value" for="budget"></output></div><input id="budget" type="range" min="6" max="160" value="32"></div>
+          <div class="control"><div class="control-top"><label id="condition-label" for="condition"></label><output id="condition-value" for="condition"></output></div><input id="condition" type="range" min="5" max="95" value="30"></div>
+          <div class="control"><div class="control-top"><label id="adverse-case-label" for="adverse-case"></label><output id="adverse-case-value" for="adverse-case"></output></div><input id="adverse-case" type="range" min="1" max="90" value="50"></div>
+          <div class="control"><div class="control-top"><label id="adverse-base-label" for="adverse-base"></label><output id="adverse-base-value" for="adverse-base"></output></div><input id="adverse-base" type="range" min="1" max="90" value="10"></div>
+          <p class="small muted control-note"><b id="state-space" class="mono"></b>。约束后有 <b id="valid-count" class="mono"></b> 个有效格。</p>
+          <div class="controls-end"><button id="resample" class="quiet-button" type="button">换随机种子</button><button id="reset-sampling" class="quiet-button" type="button">恢复默认</button></div>
+        </aside>
+        <div class="card">
+          <h3>同等预算下，样本去了哪里</h3>
+          <p class="small muted">点击策略切换矩阵。格子显示当前前三个因素下，已抽到的完整状态数／可行状态数。</p>
+          <div class="results" role="group" aria-label="采样策略">
+            <button id="random-mode" class="result" type="button" aria-pressed="false"><strong>按现场假设随机抽</strong><span id="random-score" class="score mono"></span><small id="random-detail"></small></button>
+            <button id="coverage-mode" class="result" type="button" aria-pressed="true"><strong>先配额，再补双因素</strong><span id="coverage-score" class="score mono"></span><small id="coverage-detail"></small></button>
+          </div>
+          <div class="matrix-wrap" role="region" aria-label="组合覆盖矩阵" tabindex="0">
+            <table class="matrix">
+              <thead id="matrix-head"></thead>
+              <tbody id="state-matrix"></tbody>
+            </table>
+          </div>
+          <p class="cell-note small" id="cell-note" aria-live="polite"></p>
+          <details><summary>配额和双因素覆盖是怎么排的</summary><p id="mandatory-examples" class="small"></p><p class="small">每次挑能补最多未覆盖因素对的有效状态。同分时优先现场假设频率较高的状态。有效因素对来自有效整行的投影。覆盖完按 65% 现场假设分布与 35% 有效格等权的混合分布抽样。双因素全覆盖仍会漏掉一些完整状态，关键组合单列配额。</p></details>
+          <details><summary>五个因素怎样联合抽样</summary><p id="joint-factorization" class="small"></p><p class="small">先抽前缀，再在符合约束的后续档位中归一化抽取。每个环节的三项滑块均为演示假设，真实权重需要按采集和使用场景另行估计。</p></details>
+        </div>
+      </div>
+      <div class="two">
+        <article class="card">
+          <h3>两个因素可能相关</h3>
+          <p id="joint-formula" class="formula small mono"></p>
+          <table class="prob-table" aria-label="两个事件的联合概率"><thead><tr><th scope="col">联合概率</th><th id="not-adverse" scope="col"></th><th id="is-adverse" scope="col"></th></tr></thead><tbody id="joint-table"></tbody></table>
+          <p id="joint-note" class="small" aria-live="polite"></p>
+        </article>
+        <article class="card">
+          <h3>稀有组合很容易抽空</h3>
+          <div class="control"><div class="control-top"><label for="rare">某个有效组合的假设频率</label><output id="rare-value" for="rare"></output></div><input id="rare" type="range" min="0.1" max="20" step="0.1" value="2"></div>
+          <p class="formula small mono">P(至少出现一次) = 1 − (1 − p)<sup>N</sup></p>
+          <p class="inline"><output id="rare-chance" class="sample-chance"></output><span id="rare-note" class="small muted"></span></p>
+          <p class="small muted">同一段视频的邻帧往往重复状态。公式采用独立、同概率抽样，真实素材先按路线、区段和物料分组。可制作的高代价组合直接占位。</p>
+        </article>
+      </div>
+    </section>
+
+    <section id="bayes" aria-labelledby="bayes-title">
+      <div class="section-head"><span class="index">02</span><div><h2 id="bayes-title">用少量证据更新失败率</h2><p id="bayes-event"></p></div></div>
+      <div class="beta">
+        <aside class="card" aria-label="后验参数">
+          <h3>同一状态的观察</h3>
+          <div class="control"><div class="control-top"><label for="groups">独立来源组</label><output id="groups-value" for="groups"></output></div><input id="groups" type="range" min="0" max="60" value="10"></div>
+          <div class="control"><div class="control-top"><label for="failures">其中失败组</label><output id="failures-value" for="failures"></output></div><input id="failures" type="range" min="0" max="10" value="3"></div>
+          <div class="control"><div class="control-top"><label for="prior">先验设定</label></div><select id="prior" class="quiet-button" style="width:100%;margin-top:6px"><option value="regular" selected>Beta(2, 8) · 初始均值 20%</option><option value="flat">Beta(1, 1) · 均匀先验</option><option value="strong">Beta(8, 32) · 更强的 20% 先验</option></select></div>
+          <p class="small muted control-note">先固定组内规则。例如每组取预定的一张代表帧评分。一个视频的相邻帧保留作同组的细节。</p>
+        </aside>
+        <article class="card">
+          <h3>失败率 θ 的后验分布</h3>
+          <div class="beta-top" aria-live="polite">
+            <div class="stat"><span>后验参数</span><strong id="posterior-parameters" class="mono"></strong></div>
+            <div class="stat"><span>后验均值</span><strong id="posterior-mean" class="mono"></strong></div>
+            <div class="stat"><span>95% 等尾可信区间</span><strong id="posterior-interval" class="mono"></strong></div>
+          </div>
+          <canvas id="posterior-chart" role="img" aria-label="失败率的先验和后验密度"></canvas>
+          <div class="legend"><span><i class="prior"></i>先验密度</span><span><i></i>后验密度</span><span><i class="credible"></i>95% 后验可信区间</span></div>
+          <p id="beta-formula" class="formula small mono"></p>
+          <p class="small muted">在模型和先验假设下，区间包含 95% 的后验概率。更换先验可查看结论的敏感度。真实失败率需要可解释的分组和采样依据。</p>
+        </article>
+      </div>
+      <div class="two">
+        <article class="card">
+          <h3>实战风险按现场分布加权</h3>
+          <p id="risk-description" class="small muted"></p>
+          <label class="small"><input id="use-posterior" type="checkbox"> 用上方后验均值更新最后一层</label>
+          <div class="bars">
+            <div class="bar-row"><span>现场假设</span><div class="track" aria-hidden="true"><span id="site-bar"></span></div><output id="site-risk" class="mono"></output></div>
+            <div class="bar-row"><span>四层等权</span><div class="track" aria-hidden="true"><span id="equal-bar" class="alt"></span></div><output id="equal-risk" class="mono"></output></div>
+          </div>
+          <p class="formula small mono">R = Σ P(状态) × E[失败率 | 状态数据]</p>
+          <p class="small muted">覆盖集用来找薄弱条件，现场加权用来估计使用风险。现场权重缺失时，保留每层指标与分母，给出明确标注的假设对照。</p>
+        </article>
+        <article class="card">
+          <h3>报出目标后，真有目标的概率</h3>
+          <p class="small muted">举例设检测召回率 90%，无目标时误报率 10%。移动现场目标出现率，观察误报如何影响确认质量。</p>
+          <div class="control"><div class="control-top"><label for="presence">现场目标出现率</label><output id="presence-value" for="presence"></output></div><input id="presence" type="range" min="1" max="99" value="10"></div>
+          <p class="formula small mono">P(真有 | 报出) = rπ ÷ [rπ + f(1−π)]</p>
+          <p class="inline"><output id="ppv" class="sample-chance"></output><span id="ppv-note" class="small muted"></span></p>
+          <p class="small muted">π 为出现率，r 为召回率，f 为负例误报率。实际决策还要依据各任务的可见性、时效和有效状态。</p>
+        </article>
+      </div>
+    </section>
+
+    <section id="production" aria-labelledby="production-title">
+      <div class="section-head"><span class="index">03</span><div><h2 id="production-title">把组合变成可制作、可验收的图</h2><p>先判物理可行，再判目标存在和标签可见性。一个可行但没有拍到的格是覆盖缺口。目标存在但真值不可确认时进入复核或拒识评估。</p></div></div>
+      <div class="card" aria-live="polite">
+        <h3 id="recipe-title"></h3>
+        <dl class="recipe-grid">
+          <div><dt>怎么做</dt><dd id="recipe-make"></dd></div>
+          <div><dt>必做对照</dt><dd id="recipe-pair"></dd></div>
+          <div><dt>标签和未知状态</dt><dd id="recipe-label"></dd></div>
+          <div><dt>验收和失败代价</dt><dd id="recipe-check"></dd></div>
+        </dl>
+        <p><a id="recipe-link" href="DATASET_PRODUCTION.md">查看该环节的完整制作细则</a></p>
+      </div>
+      <div class="steps">
+        <article class="card"><h3>按连续片段混合</h3><p class="small muted">新车载已提供逐帧序列与抽样子集。先审核来源，再按片段分配训练、验证和测试。同一视频可跨集合；重复帧与派生保持关联，窗内时序保留。<a href="DATASET_PRODUCTION.md#多原件取样与场景混合">制作与审计细则</a></p></article>
+        <article class="card"><h3>优先排困难对照</h3><p class="small muted">常见正例保底，高代价组合强制占位，剩余预算补有效因素对。</p></article>
+        <article class="card"><h3>按原尺寸逐张审</h3><p class="small muted">看接地、反射、局部遮挡与标签。正常和困难图并排，负例确认画面确无当前模型的目标。同图用于多个模型时，分别保存标签。</p></article>
+        <article class="card"><h3>按用途评估</h3><p class="small muted">开发验证用于选模。固定实拍回归保持原图与匹配口径。新测试片段不参与选模，同视频多片段不计作独立来源。</p></article>
+      </div>
+    </section>
+  </main>
+  <footer>
+    <div class="wrap small muted">
+      <p><b>项目依据</b>　<a href="DATASET_PRODUCTION.md">V4 制作细则</a> · <a href="research/FIELD_EVALUATION_V3_20261112.md">V3 实拍诊断</a> · <a href="../datasets/CAR_REAL_CAPTURE_20261112.md">新车载核心来源</a> · <a href="../datasets/SITE_CAPTURE_20261112.md">旧批次与模糊估计</a></p>
+      <p><b>方法资料</b>　<a href="https://csrc.nist.gov/pubs/sp/800/142/final">NIST 组合覆盖</a> · <a href="https://www-users.york.ac.uk/~bp787/Bayes_notes.html">Beta–二项更新讲义</a></p>
+    </div>
+  </footer>
+  <noscript><p class="wrap notice">启用浏览器 JavaScript 可使用滑块、覆盖矩阵和后验曲线。制作方案正文可直接阅读。</p></noscript>
+  <script>
+    'use strict';
+    const byId = id => document.getElementById(id);
+    const text = (id, value) => { byId(id).textContent = value; };
+    const number = id => Number(byId(id).value);
+    const percent = (value, digits = 1) => `${(100 * value).toFixed(digits)}%`;
+    const scenarios = [
+      {
+        id: 'person', title: '人物立牌', kind: '重训', anchor: '人物立牌', priors: [32, 50, 12],
+        factors: [['人数', ['单人', '2–3 人', '4–8 人']], ['视面', ['近距正面', '近距正面轻斜']], ['成像', ['清晰', '拖影', '低反差']], ['遮挡', ['无遮挡', '立牌挡', '车辆挡']], ['入镜', ['完整', '截断']]],
+        exclude: [[[0, 0], [3, 1]]], keys: ['00000', '21220', '11111'],
+        evidence: '车载适配的 8 个候选框高约 139–190 px。只标近距正面可辨目标，白背面作为不标框的硬负例。',
+        constraint: '立牌互挡需要画面中至少两个人物立牌。白背面、空街、真人和相似牌用负例队列覆盖；混合画面仍标合格正面人物。',
+        make: '在 A/B 街实拍底图标落地区，按脚点和深度摆放近距离、正面可辨裁片，白背作为硬负背景，合成接触影和前景遮挡。',
+        pair: '同背景轮换类别与前后排，再做无遮挡、前车挡人、倒伏车挡人和边缘截断。',
+        label: '仅给近距正面可辨立牌出框，另记身份、街区和跨帧实例；白背、侧背、远处及不可判者不标正例，不借邻帧身份补标。',
+        check: '分两类报告近距正面漏检、误报，单列白背硬负例误报。用具备真值的整段检查逐街漏计、重复计数和非社区位置。',
+        event: '一张图漏掉预先指定、近距离正面可辨的焦点人物。'
+      },
+      {
+        id: 'e-bike', title: '电动车', kind: '微调', anchor: '电动车', priors: [36, 51, 16],
+        factors: [['车数', ['单车', '2–3 辆', '4 辆以上']], ['机位', ['常规', '低机位']], ['成像', ['清晰', '偏暗', '低反差']], ['构图', ['无遮挡', '车车重叠', '近边截断']], ['姿态', ['直立', '倒伏']]],
+        exclude: [[[0, 0], [3, 1]]], keys: ['00000', '21211', '11121'],
+        evidence: '12 个车载候选框跨 82–206 × 52–170 px，包含部分标注。现有诊断中有低视点三车全漏。',
+        constraint: '车车重叠需要至少两辆车。倒伏和直立各自使用真实视角资产。',
+        make: '按直立轮胎与倒伏车身分别建落点和掩膜，在停车区分排。生成低视点、前景人物和真实画外裁切。',
+        pair: '同车位依次用直立、倒伏和无人车的背景，增加车遮人与人遮车，检查相邻实例。',
+        label: '保存可见框、姿态、街区和车辆 ID。汽车立牌与空停车区核实后用作负例。',
+        check: '按姿态和低视点查漏检、错类。分别检查两街违停有无与停车区总数、倒伏数。',
+        event: '预定可辨车辆漏检或被报成相反姿态。'
+      },
+      {
+        id: 'plate-detection', title: '车牌检测', kind: '微调', anchor: '车牌检测', priors: [30, 52, 10],
+        factors: [['车数', ['单车', '双车', '三车']], ['视面', ['近正', '斜视']], ['成像', ['清晰', '拖影', '强反光']], ['遮挡', ['无遮挡', '邻车挡', '边缘裁切']], ['尺度', ['近中', '远小']]],
+        exclude: [[[0, 0], [3, 1]]], keys: ['00000', '21211', '11120'],
+        evidence: '9 个冻结车载候选框宽 30–104 px、高 10–42 px。部分约 29–30 px 宽的适配牌可以定位，字符不可读。',
+        constraint: '邻车遮住牌面需要至少两辆车。远小牌可具备检测真值；可读性独立登记。',
+        make: '按车体原牌四角透视贴牌，保留背景、车体和接触影，按整帧模拟反光、清晰度与裁切。',
+        pair: '同一车位保留清晰、强反光、邻车遮挡和确认空位的配对。用相似蓝矩形补误报检查。',
+        label: '原图框、四角、物理牌、已核车位及可读状态分字段保存。空位需确认观察区域。',
+        check: '按尺寸、视角和负例类型报召回、误报。车位归属按已核真值单独验证。',
+        event: '一个预先确认可定位的焦点车牌没有匹配框。'
+      },
+      {
+        id: 'plate-ocr', title: '车牌 OCR', kind: '微调', anchor: '七位车牌-ocr', priors: [31, 55, 14],
+        factors: [['牌宽', ['25–40 px', '45–75 px', '85–110 px']], ['视面', ['近正', '斜视']], ['成像', ['清晰', '拖影', '强反光']], ['字位遮挡', ['无挡字', '挡一位', '挡多位']], ['可读性', ['整串可核', '不可读']]],
+        exclude: [[[3, 1], [4, 0]], [[3, 2], [4, 0]]], keys: ['20000', '01101', '21211'],
+        evidence: '现有约 85–95 px 宽适配牌有可读示例。三张物理牌及重复裁剪要按来源组计数。',
+        constraint: '完整字符被遮住时，整串可核状态无效。可读样本与拒识样本各有分母。',
+        make: '按七位置字符表生成合法串，先做整帧退化，再从同图派生真值框、校正四角和检测框三种裁剪。',
+        pair: '同串同机位只遮一位，比较可读与拒识，再换字符保持几何和高光，检查形近字。',
+        label: '保存七位字符串、字符可读性、物理牌和原图映射。用原始字符作为合成真值追溯。',
+        check: '逐裁剪类型报整串正确、逐位混淆和不可读误接纳。实拍按独立物理牌和车位分组。',
+        event: '一个已核样本的 OCR 输出状态不正确。可读时要求整串正确，不可读时要求拒识。'
+      },
+      {
+        id: 'fire', title: '火焰贴纸', kind: '微调', anchor: '火焰贴纸检测', priors: [33, 42, 13],
+        factors: [['纸宽', ['14–20 px', '21–27 px', '28–35 px']], ['楼面', ['近正', '斜视']], ['背景', ['常态', '偏暗', '红黄干扰']], ['分布', ['单贴', '同楼多贴', '多楼多贴']], ['前楼遮挡', ['无', '有']]],
+        exclude: [[[3, 0], [4, 1]], [[3, 1], [4, 1]]], keys: ['20000', '01221', '11110'],
+        evidence: '车载 11 个候选框宽 14–35 px。诊断有红灯、黄灯误报以及单贴重复框。',
+        constraint: '本分支的前楼遮挡仅在多楼入画时有效。无贴楼面和只有红黄灯的画面单独作负例。',
+        make: '沿指定面和洞孔行贴 2.5 × 3.5 cm 纸片。用真实楼面透视或 Blender 对象 ID 图处理多楼、邻贴、遮挡。',
+        pair: '同楼面做零贴、单贴、邻近双贴和多楼组合，再分别加入红黄灯和斜视小贴。',
+        label: '保存每贴可见框、指定楼面、楼号和实例 ID。指定面未充分观察时计数未知。',
+        check: '分层报告漏贴、假框、重复框及逐楼计数。有贴和无贴使用各自分母。',
+        event: '预定楼面图上的可辨火焰贴纸集合漏报、错报或重复。'
+      },
+      {
+        id: 'building-paper', title: '楼名纸条', kind: '微调', anchor: '楼名纸条检测', priors: [38, 49, 19],
+        factors: [['纸宽', ['约 50 px', '约 80 px', '约 110 px']], ['楼面', ['近正', '斜视']], ['成像', ['清晰', '偏暗', '拖影']], ['遮挡', ['无遮挡', '挡纸边', '遮整字']], ['定位证据', ['可定位', '待核']]],
+        exclude: [[[1, 0], [2, 0], [3, 0], [4, 1]]], keys: ['20000', '01210', '11121'],
+        evidence: '三个车载候选框宽 51–114 px，高 32–38 px。实拍斜视和软化出现漏检与框偏。',
+        constraint: '本例中清晰近正且无遮挡的合规纸条有定位真值。遮字主要影响 OCR，框保留独立判定。',
+        make: '按楼面四角贴纸，纸张和楼体共享透视与局部光线。用白条、火焰白底和窗格做干扰。',
+        pair: '同纸同尺度做近正、斜视、轻拖影和纸边裁切，加入仅相似窗格的负例。',
+        label: '纸条框、四角、楼号、全文及可读性分开保存。可定位但不可读的纸条仍可参加检测。',
+        check: '按尺度与斜视统计框召回和空图误报，逐楼全文由 OCR 分支另验。',
+        event: '可定位纸条没有匹配框，或定位待核画面被误确认为确定目标。'
+      },
+      {
+        id: 'building-ocr', title: '楼名 OCR', kind: '链路', anchor: '楼名中文-ocr', priors: [34, 55, 17],
+        factors: [['纸宽', ['约 50 px', '约 80 px', '约 110 px']], ['纸面', ['近正', '斜视']], ['成像', ['清晰', '偏暗', '拖影']], ['文字遮挡', ['无挡字', '挡字边', '遮整字']], ['可读性', ['全文可核', '不可读']]],
+        exclude: [[[3, 2], [4, 0]]], keys: ['20000', '01201', '11121'],
+        evidence: '楼面视频中两张相近尺度画面因软化与斜视表现不同。纸条检测与全文识别需要分开验收。',
+        constraint: '完整字形被遮住时，当前图像的全文不可核。纸条原始全文可保存在来源记录。',
+        make: '沿纸面四角校正 ROI，保存整条文字、字符区域和图像条件。覆盖已知名称及按实际版式生成的未见名称。',
+        pair: '同字号和背景替换全文，再固定全文只改变斜视、拖影或局部遮挡。',
+        label: '按原样转写全文。当前画面证据不足时标记不可读，并保留楼号来源。',
+        check: '分别测真值裁剪和检测裁剪的整串正确率、漏字及误确认，最后核对楼号关联。',
+        event: '一个已核楼名样本的全文输出或拒识状态不符合真值。'
+      },
+      {
+        id: 'sign', title: '禁行牌具', kind: '微调', anchor: '禁行牌具', priors: [28, 53, 11],
+        factors: [['尺度', ['远', '中', '近']], ['视面', ['近正', '侧背']], ['背景', ['常态', '偏暗', '白墙低反差']], ['可见范围', ['完整', '局部遮挡', '近边截断']], ['清晰度', ['清晰', '拖影']]],
+        exclude: [[[0, 0], [3, 2]], [[0, 1], [3, 2]]], keys: ['10000', '21221', '01110'],
+        evidence: '六个车载候选框高 179–295 px。补录视频中有白墙低对比背面和近景截断失效。',
+        constraint: '近边截断是本例近尺度分层。空岔口、相似牌和倒影用于负例评估。',
+        make: '从牌具旋转视频选正侧背，按道路落点组合牌面、立柱和底座，匹配接触影。',
+        pair: '同牌背换白墙与深色背景，再配栏杆遮柱、近裁切及只留倒影。',
+        label: '保存牌具可见框和观察位置。路线分支及其可靠状态按现场映射另存。',
+        check: '同时报告检测、摆位和路线判定。未知按约定停车并记录。',
+        event: '固定观察窗口的已核牌具没有被定位，或输出的摆位状态不符真值。'
+      },
+      {
+        id: 'bin-state', title: '垃圾桶开闭', kind: '微调', anchor: '桶开闭检测', priors: [37, 48, 13],
+        factors: [['桶高', ['约 130 px', '约 150 px', '约 170 px']], ['机位', ['常规', '低视点']], ['盖板证据', ['清晰', '侧光', '全挡住']], ['实体状态', ['关盖', '后垂开', '竖盖开']], ['可判性', ['可判', '未知']]],
+        exclude: [[[2, 2], [4, 0]]], keys: ['10000', '11211', '21120'],
+        evidence: '16 个车载候选框高 126–171 px。14 个漏配中 7 个与相反开闭类框高重叠。',
+        constraint: '桶口和盖板证据均被遮住时，当前画面开闭未知。保留实体状态用于追溯。',
+        make: '用四色桶资产和已有视频对齐盖板形态。固定机位逐桶开闭，覆盖四桶 16 种状态和低视点。',
+        pair: '同色同位只改变盖板，再做后垂、竖盖、邻桶挡盖及侧光对照。',
+        label: '可见桶框、实体状态、盖板证据和当前可判性分别记录，过渡状态保留待核。',
+        check: '按桶色和视点查开闭混淆、未知强报、逐桶关联，空区误报单列。',
+        event: '预定桶的开闭输出与已核状态不一致，或在未知时强报开闭。'
+      },
+      {
+        id: 'waste-sticker', title: '垃圾贴纸', kind: '微调', anchor: '垃圾贴纸识别与投放归属', priors: [35, 52, 14],
+        factors: [['贴纸数', ['无贴', '单贴', '多贴']], ['桶面', ['近正', '斜视']], ['成像', ['清晰', '偏暗', '局部高光']], ['物品关系', ['只有类别图标', '正确投放', '含错投']], ['关联', ['可核', '待核']]],
+        exclude: [[[0, 0], [3, 1]], [[0, 0], [3, 2]], [[0, 1], [3, 0]], [[0, 2], [3, 0]]], keys: ['00000', '11220', '21111'],
+        evidence: '新车载素材已包含贴物品图片的垃圾桶，逐物品核类、框与归属后评正例召回。旧冻结诊断的 5 张只测桶类别图标负例。',
+        constraint: '无物品贴时图标作为干扰。存在物品贴才有投放真值，错投保留为可行状态。',
+        make: '把 24 类图案轮换到四种桶色，沿桶面四角投影，补缺贴、遮挡、多桶和错误投放。',
+        pair: '同贴换桶色应仍识别同一物品，同桶换贴应随图案改变。保留只显示桶分类图标的对照。',
+        label: '分别记物品贴框、物品类、桶 ID、可见性及归属。贴纸未知时保留投放未知。',
+        check: '按新车载已审实拍正负例、旧实拍与合成分层报告逐类召回、同屏全检和误报，端到端另核归属。',
+        event: '一个预定桶的物品状态、已核类别或贴纸归属输出错误。'
+      },
+      {
+        id: 'bin-assignment', title: '桶色与投放', kind: '链路', anchor: '桶色识别与投放关联', priors: [32, 46, 18],
+        factors: [['有效桶数', ['单桶', '双桶', '3–4 桶']], ['机位', ['近正', '斜视']], ['桶体颜色', ['常态', '暗部', '高光偏色']], ['贴纸', ['确认缺贴', '可见物品贴', '贴纸待核']], ['输出依据', ['足够', '待核']]],
+        exclude: [[[3, 2], [4, 0]]], keys: ['00000', '21210', '11121'],
+        evidence: '现有设计用桶体颜色映射桶类别，独立识别 24 类物品贴，按类别规则判断投放。',
+        constraint: '贴纸待核时投放依据不足。确认缺贴是独立状态，可核验其输出。',
+        make: '同桶色交叉物品类别，控制局部曝光和相邻桶边界，保留同光照下的不同桶色。',
+        pair: '固定物品换桶色与桶位，再固定桶换物品，检验颜色、类别与空间关联各自的影响。',
+        label: '桶色、物品、桶 ID、配对关系和投放状态分字段。局部高光使桶色未知时保留证据。',
+        check: '分别报桶色混淆、贴纸错归属、投放错判及未知处理。',
+        event: '预定桶的颜色类别、投放状态或应保留的未知状态输出错误。'
+      },
+      {
+        id: 'meter', title: '温湿度表', kind: '微调', anchor: '温湿度表与数显电表', priors: [30, 50, 10],
+        factors: [['尺度', ['远', '中', '近']], ['视面', ['近正', '斜视']], ['光线', ['均衡', '偏暗', '强反光']], ['遮挡', ['无遮挡', '局部挡住', '近边截断']], ['清晰度', ['清晰', '拖影']]],
+        exclude: [[[0, 0], [3, 2]], [[0, 1], [3, 2]]], keys: ['21221', '01210', '10000'],
+        evidence: '六张车载参考的表盘宽约 87–133 px。V3 在冻结诊断的四个候选正例上全漏。',
+        constraint: '近边截断仅用于近尺度。本分支是表盘正例，只有数显电表可用于表盘负例。',
+        make: '站房 Blender 对齐后仰角、车载投影和顶灯与侧窗，保留温湿双针和八个固定点。',
+        pair: '固定读数与机位，移动高光覆盖刻度、针尖或数显窗，再做无表盘对照。',
+        label: '表盘框、八点可见性、配准及温湿读数分别保存。两项读数可独立为未知。',
+        check: '先检查实拍表框、负例，再查可见点误差、配准和双针读数。',
+        event: '预定正例的表盘没有匹配框。'
+      },
+      {
+        id: 'power-ocr', title: '数显电表 OCR', kind: '链路', anchor: '数显电表-roi-与-ocr-制作', priors: [29, 52, 15],
+        factors: [['ROI 位移', ['居中', '轻偏', '近边']], ['窗面', ['近正', '斜视']], ['光线', ['清晰', '偏暗', '局部过曝']], ['数字', ['完整入镜', '遮一位', '边缘裁切']], ['可读性', ['可核', '不可读']]],
+        exclude: [[[3, 1], [4, 0]]], keys: ['00000', '21221', '11111'],
+        evidence: '新版站房原型有独立数显窗角点和示例数字。现场 ROI 可用范围与读数仍待核验。',
+        constraint: '完整数字位被遮住时整串不可读。画外窗口保留缺失状态。',
+        make: '用窗口自身四角透视校正，加入实际字符段、小数点和前导零，独立改变显示窗光学条件。',
+        pair: '固定表盘与站房，只改变显示窗反光、位移或裁切，再改变数字检查误识。',
+        label: '保存 ROI 四角、原始字符串、单位来源、遮挡与可读状态。',
+        check: '按窗定位、字符整串、小数点与拒识分别验收，实拍只用可核数字。',
+        event: '预定显示窗的整串读数或拒识状态与已核真值不一致。'
+      },
+      {
+        id: 'traffic', title: '红绿灯', kind: '规则', anchor: '红绿灯-hsv-与时序标定', priors: [43, 45, 21],
+        factors: [['灯色真值', ['红', '黄', '绿']], ['灯位', ['灯位 1', '灯位 2']], ['干扰', ['常态', '阴影', '强反光']], ['观察窗', ['稳定', '切换', '整窗断流']], ['帧时效', ['新鲜', '过期']]],
+        exclude: [[[3, 2], [4, 0]]], keys: ['00000', '11221', '21110'],
+        evidence: '使用现有场景视频确认两处灯位和 ROI。灯色阈值与完整切换、断流覆盖需由开发片段核验。',
+        constraint: '整窗断流时没有新鲜帧。物理灯色与输出未知分开记录。',
+        make: '保持视频时序与灯位，按同一 ROI 做红、黄、绿、过渡、遮挡、过曝和断流。',
+        pair: '同灯同观察窗比稳定绿与残留旧绿，再加入红黄灯背景和反光干扰。',
+        label: '标物理灯色、变化时刻、帧到达时间、可见性及有效状态。',
+        check: '按两灯位验收红黄误放行、失效撤销及识别延迟。Windows 上用离线片段检查。',
+        event: '一个已核观察窗的输出状态不符真值，包括红黄或过期画面错误放行。'
+      },
+      {
+        id: 'thermal', title: 'D 楼热异常', kind: '规则', anchor: 'd-楼热异常与逐层判定', priors: [35, 50, 20],
+        factors: [['热源真值', ['冷态', '单层', '多层']], ['视角', ['近正', '偏斜']], ['背景温度', ['稳定', '整体升温', '局部热干扰']], ['热区位置', ['层内／无热', '贴层界', '跨层']], ['数据状态', ['有效', '缺帧']]],
+        exclude: [[[0, 0], [3, 1]], [[0, 0], [3, 2]], [[0, 1], [3, 2]]], keys: ['00000', '11210', '21121'],
+        evidence: '新车载 RGB 提供楼体外观与视角依据；温度通道、配准及独立温度真值另行核验。以下组合演示几何与判定逻辑。',
+        constraint: '冷态无异常带。单层真值不能同时是已核跨层异常。缺帧状态用于检查未知输出。',
+        make: '按三列四层布局设计冷态、单层、多层与局部环境热干扰的配对片段，保留设备和配准条件。',
+        pair: '在合成配准对照中让热区接近层界，实拍按固定热源和楼层记录比较冷态、稳定升温及缺帧回放。',
+        label: '温度真值由独立仪器与楼层记录给出。保存有效性、时间戳、配准和真值来源。',
+        check: '以独立轮次报告楼层集合正确性、误报、漏报、边界及未知。伪彩样例用于检查逻辑。',
+        event: '一个已核轮次的异常楼层集合或未知状态输出错误。'
+      }
+    ];
+    const groupKey = (first, second, third) => `${first}${second}${third}`;
+    let current;
+    let levels;
+    let states;
+    let allPairs;
+    let mandatoryStates;
+    let prefixSupports;
+    let cellGroups;
+    let mode = 'coverage';
+    let selectedCell;
+    let seed = 20261112;
+    let samplingRuns;
+    let probabilities;
+    let posterior;
+    const taskControls = ['condition', 'adverse-case', 'adverse-base'];
+    const taskButtons = new Map();
+
+    function describe(values) {
+      return values.map((choice, index) => levels[index][choice]).join(' · ');
+    }
+
+    function setTaskPriors() {
+      taskControls.forEach((id, index) => { byId(id).value = current.priors[index]; });
+    }
+
+    function chooseTask(scenario) {
+      current = scenario;
+      levels = scenario.factors.map(([, options]) => options);
+      const assignments = levels.reduce((rows, choices) =>
+        rows.flatMap(row => choices.map((_, value) => [...row, value])), [[]]);
+      states = assignments.filter(values => !scenario.exclude.some(rule =>
+        rule.every(([axis, choice]) => values[axis] === choice)))
+        .map((values, index) => {
+          const pairs = [];
+          for (let a = 0; a < values.length; a++) {
+            for (let b = a + 1; b < values.length; b++) pairs.push(`${a}:${values[a]}|${b}:${values[b]}`);
+          }
+          return { values, index, pairs };
+        });
+      allPairs = new Set(states.flatMap(state => state.pairs));
+      mandatoryStates = scenario.keys.map(key => states.find(state => state.values.join('') === key));
+      prefixSupports = new Map();
+      for (const { values } of states) {
+        values.forEach((choice, index) => {
+          const prefix = values.slice(0, index).join('');
+          if (!prefixSupports.has(prefix)) prefixSupports.set(prefix, new Set());
+          prefixSupports.get(prefix).add(choice);
+        });
+      }
+      for (const [id, button] of taskButtons) button.setAttribute('aria-pressed', String(id === scenario.id));
+      byId('scenario-select').value = scenario.id;
+      selectedCell = groupKey(...mandatoryStates[1].values.slice(0, 3));
+      setTaskPriors();
+      text('scenario-title', scenario.title);
+      text('scenario-evidence', scenario.evidence);
+      text('scenario-constraint', scenario.constraint);
+      const factors = byId('scenario-factors');
+      factors.replaceChildren();
+      for (const [name, options] of scenario.factors) {
+        const factor = document.createElement('span');
+        factor.textContent = `${name} · ${options.join('／')}`;
+        factors.appendChild(factor);
+      }
+      const [base, condition] = levels[1];
+      const adverse = levels[2][2];
+      text('condition-label', `${condition}占比`);
+      text('adverse-case-label', `${condition}时「${adverse}」占比`);
+      text('adverse-base-label', `${base}时「${adverse}」占比`);
+      text('state-space', `${levels.map(choices => choices.length).join(' × ')} = ${assignments.length} 个原始格`);
+      text('valid-count', states.length);
+      text('joint-formula', `P(${condition} ∩ ${adverse}) = P(${condition}) × P(${adverse} | ${condition})`);
+      text('not-adverse', `其余${scenario.factors[2][0]}状态`);
+      text('is-adverse', adverse);
+      text('mandatory-examples', `本环节预留 ${mandatoryStates.length} 个状态。${mandatoryStates.map(item => describe(item.values)).join('。')}。`);
+      const [a, b, c, d, e] = scenario.factors.map(([name]) => name);
+      text('joint-factorization', `P(${a}) × P(${b}) × P(${c} | ${b}) × P(${d} | 前三项) × P(${e} | 前四项)`);
+      text('bayes-event', `当前环节的失败定义为${scenario.event}下方用假设的独立来源组演示更新。`);
+      text('recipe-title', scenario.title);
+      for (const key of ['make', 'pair', 'label', 'check']) text(`recipe-${key}`, scenario[key]);
+      byId('recipe-link').href = `DATASET_PRODUCTION.md#${scenario.anchor}`;
+      makeMatrix();
+      renderSampling();
+    }
+
+    function randomFromSeed(initialSeed) {
+      let state = initialSeed >>> 0;
+      return () => {
+        state = (Math.imul(state, 1664525) + 1013904223) >>> 0;
+        return state / 4294967296;
+      };
+    }
+
+    function weightedDraw(weights, nextRandom) {
+      const boundaries = [];
+      let total = 0;
+      for (const weight of weights) {
+        total += weight;
+        boundaries.push(total);
+      }
+      return () => {
+        const point = nextRandom() * total;
+        return states[boundaries.findIndex(boundary => point < boundary)];
+      };
+    }
+
+    function jointProbabilities() {
+      const [condition, adverseCase, adverseBase] = taskControls.map(id => number(id) / 100);
+      return [(1 - condition) * (1 - adverseBase), (1 - condition) * adverseBase,
+        condition * (1 - adverseCase), condition * adverseCase];
+    }
+
+    function stateProbabilities() {
+      const [condition, adverseCase, adverseBase] = taskControls.map(id => number(id) / 100);
+      const byCondition = [adverseBase, adverseCase].map(p => [.78 * (1 - p), .22 * (1 - p), p]);
+      return states.map(({ values }) => values.reduce((product, choice, index) => {
+        const weights = [[.25, .50, .25], [1 - condition, condition], byCondition[values[1]], [.64, .22, .14], [.76, .24]][index];
+        const allowed = prefixSupports.get(values.slice(0, index).join(''));
+        const total = [...allowed].reduce((sum, option) => sum + weights[option], 0);
+        return product * weights[choice] / total;
+      }, 1));
+    }
+
+    function makeCoverageRun(budget, weights) {
+      const plan = [...mandatoryStates];
+      const missing = new Set(allPairs);
+      for (const state of plan) state.pairs.forEach(pair => missing.delete(pair));
+      while (plan.length < budget && missing.size) {
+        let best = null;
+        let bestGain = 0;
+        for (const state of states) {
+          const gain = state.pairs.filter(pair => missing.has(pair)).length;
+          if (gain > bestGain || (gain === bestGain && best && weights[state.index] > weights[best.index])) {
+            best = state;
+            bestGain = gain;
+          }
+        }
+        if (!best) break;
+        plan.push(best);
+        best.pairs.forEach(pair => missing.delete(pair));
+      }
+      const mix = weights.map(weight => .65 * weight + .35 / states.length);
+      const draw = weightedDraw(mix, randomFromSeed(seed + 1));
+      while (plan.length < budget) plan.push(draw());
+      return plan;
+    }
+
+    function summarize(plan) {
+      return {
+        seen: new Set(plan.map(state => state.index)),
+        pairCount: new Set(plan.flatMap(state => state.pairs)).size,
+        mandatoryCount: mandatoryStates.filter(state => plan.includes(state)).length
+      };
+    }
+
+    function makeMatrix() {
+      const table = byId('state-matrix');
+      const head = byId('matrix-head');
+      head.replaceChildren();
+      table.replaceChildren();
+      cellGroups = [];
+      const upper = head.insertRow();
+      const lower = head.insertRow();
+      const header = (row, label, scope) => {
+        const item = document.createElement('th');
+        item.textContent = label;
+        item.scope = scope;
+        row.appendChild(item);
+        return item;
+      };
+      header(upper, current.factors[0][0], 'col').rowSpan = 2;
+      for (const group of levels[1]) {
+        header(upper, group, 'colgroup').colSpan = levels[2].length;
+        for (const option of levels[2]) header(lower, option, 'col');
+      }
+      for (let size = 0; size < levels[0].length; size++) {
+        const row = table.insertRow();
+        header(row, levels[0][size], 'row');
+        for (let view = 0; view < levels[1].length; view++) {
+          for (let light = 0; light < levels[2].length; light++) {
+            const key = groupKey(size, view, light);
+            const button = document.createElement('button');
+            button.type = 'button';
+            button.className = 'cell mono';
+            button.addEventListener('click', () => { selectedCell = key; renderMatrix(); });
+            row.insertCell().appendChild(button);
+            cellGroups.push({ key, button, title: [levels[0][size], levels[1][view], levels[2][light]].join(' · '),
+              states: states.filter(state => groupKey(...state.values.slice(0, 3)) === key) });
+          }
+        }
+      }
+    }
+
+    function renderMatrix() {
+      const run = samplingRuns[mode];
+      for (const group of cellGroups) {
+        const hits = group.states.filter(state => run.seen.has(state.index)).length;
+        const total = group.states.length;
+        group.button.textContent = `${hits}/${total}`;
+        group.button.style.setProperty('--cell-fill', `hsl(165 36% ${97 - 24 * hits / total}%)`);
+        group.button.setAttribute('aria-label', `${group.title}，覆盖 ${hits} 个，共 ${total} 个`);
+        group.button.setAttribute('aria-pressed', String(group.key === selectedCell));
+        if (group.key === selectedCell) {
+          const mass = group.states.reduce((sum, state) => sum + probabilities[state.index], 0);
+          const missed = group.states.filter(state => !run.seen.has(state.index));
+          const example = missed.length
+            ? `可补一组 ${levels[3][missed[0].values[3]]}＋${levels[4][missed[0].values[4]]}。`
+            : '该格的完整状态已覆盖。';
+          text('cell-note', `${group.title}｜假设频率 ${percent(mass, 2)}，覆盖 ${hits}/${total}。${example}`);
+        }
+      }
+      for (const name of ['random', 'coverage']) byId(`${name}-mode`).setAttribute('aria-pressed', String(mode === name));
+    }
+
+    function renderJoint() {
+      const weights = jointProbabilities();
+      const adverse = weights[1] + weights[3];
+      const condition = weights[2] + weights[3];
+      const rows = [[levels[1][0], weights[0], weights[1]], [levels[1][1], weights[2], weights[3]],
+        ['合计', 1 - adverse, adverse]];
+      const body = byId('joint-table');
+      body.replaceChildren();
+      for (const [label, noGlare, strongGlare] of rows) {
+        const row = body.insertRow();
+        const header = document.createElement('th');
+        header.scope = 'row';
+        header.textContent = label;
+        row.appendChild(header);
+        row.insertCell().textContent = percent(noGlare);
+        const strong = row.insertCell();
+        strong.textContent = percent(strongGlare);
+        if (label === levels[1][1]) strong.className = 'focus';
+      }
+      text('joint-note', `「${levels[1][1]}」与「${levels[2][2]}」同时出现的概率为 ${percent(weights[3])}。在独立假设下，边际相乘为 ${percent(condition * adverse)}。已见「${levels[2][2]}」时，「${levels[1][1]}」的条件概率为 ${percent(weights[3] / adverse)}。`);
+      renderRisk(weights);
+    }
+
+    function renderRisk(weights = jointProbabilities()) {
+      const adverseRisk = byId('use-posterior').checked && posterior
+        ? posterior.a / (posterior.a + posterior.b) : .35;
+      const risk = [.05, .20, .15, adverseRisk];
+      const site = weights.reduce((sum, weight, index) => sum + weight * risk[index], 0);
+      const equal = risk.reduce((sum, value) => sum + value / risk.length, 0);
+      text('risk-description', `示例失败率依次为 5%、20%、15%、${percent(adverseRisk, 2)}。四层顺序与联合表一致，最后一层是「${levels[1][1]}＋${levels[2][2]}」。`);
+      text('site-risk', percent(site, 2));
+      text('equal-risk', percent(equal, 2));
+      byId('site-bar').style.width = percent(site);
+      byId('equal-bar').style.width = percent(equal);
+    }
+
+    function renderRare() {
+      const budget = number('budget');
+      const probability = number('rare') / 100;
+      const chance = -Math.expm1(budget * Math.log1p(-probability));
+      text('rare-value', percent(probability));
+      text('rare-chance', percent(chance, 2));
+      text('rare-note', `独立抽 ${budget} 个样本，至少出现一次的概率`);
+    }
+
+    function renderSampling() {
+      const budget = number('budget');
+      text('budget-value', `${budget} 个`);
+      for (const id of taskControls) text(`${id}-value`, `${number(id)}%`);
+      probabilities = stateProbabilities();
+      const draw = weightedDraw(probabilities, randomFromSeed(seed));
+      samplingRuns = {
+        random: summarize(Array.from({ length: budget }, draw)),
+        coverage: summarize(makeCoverageRun(budget, probabilities))
+      };
+      for (const [name, run] of Object.entries(samplingRuns)) {
+        text(`${name}-score`, `${run.pairCount}/${allPairs.size} 对`);
+        text(`${name}-detail`, `完整状态 ${run.seen.size}/${states.length} · 重点 ${run.mandatoryCount}/${mandatoryStates.length}`);
+      }
+      renderMatrix();
+      renderJoint();
+      renderRare();
+    }
+
+    const logFactorial = [0];
+    for (let n = 1; n <= 100; n++) logFactorial[n] = logFactorial[n - 1] + Math.log(n);
+
+    function betaCdf(x, a, b) {
+      if (x <= 0) return 0;
+      if (x >= 1) return 1;
+      const n = a + b - 1;
+      const logX = Math.log(x);
+      const logRest = Math.log1p(-x);
+      let sum = 0;
+      for (let k = a; k <= n; k++) {
+        sum += Math.exp(logFactorial[n] - logFactorial[k] - logFactorial[n - k] + k * logX + (n - k) * logRest);
+      }
+      return Math.min(1, sum);
+    }
+
+    function betaQuantile(probability, a, b) {
+      let low = 0;
+      let high = 1;
+      for (let step = 0; step < 44; step++) {
+        const middle = (low + high) / 2;
+        if (betaCdf(middle, a, b) < probability) low = middle;
+        else high = middle;
+      }
+      return (low + high) / 2;
+    }
+
+    function betaDensity(x, a, b) {
+      const value = Math.max(1e-9, Math.min(1 - 1e-9, x));
+      const logNorm = logFactorial[a + b - 1] - logFactorial[a - 1] - logFactorial[b - 1];
+      return Math.exp(logNorm + (a - 1) * Math.log(value) + (b - 1) * Math.log1p(-value));
+    }
+
+    function drawPosterior() {
+      const canvas = byId('posterior-chart');
+      const width = canvas.clientWidth;
+      const height = canvas.clientHeight;
+      if (!width || !height || !posterior) return;
+      const ratio = window.devicePixelRatio || 1;
+      canvas.width = Math.round(width * ratio);
+      canvas.height = Math.round(height * ratio);
+      const context = canvas.getContext('2d');
+      context.scale(ratio, ratio);
+      const { a, b, priorA, priorB, low, high } = posterior;
+      const samples = Array.from({ length: 241 }, (_, index) => {
+        const x = index / 240;
+        return [x, betaDensity(x, priorA, priorB), betaDensity(x, a, b)];
+      });
+      const max = 1.06 * Math.max(...samples.flatMap(sample => sample.slice(1)));
+      const left = 27;
+      const top = 12;
+      const bottom = height - 24;
+      const span = width - left - 21;
+      const mapX = value => left + span * value;
+      const mapY = value => bottom - (bottom - top) * value / max;
+      context.fillStyle = '#e0f2eb';
+      context.fillRect(mapX(low), top, span * (high - low), bottom - top);
+      context.font = '11px Consolas, monospace';
+      context.textAlign = 'center';
+      for (let i = 0; i <= 5; i++) {
+        const x = mapX(i / 5);
+        context.strokeStyle = '#d4e0e7';
+        context.beginPath();
+        context.moveTo(x, top);
+        context.lineTo(x, bottom);
+        context.stroke();
+        context.fillStyle = '#486071';
+        context.fillText(`${i * 20}%`, x, bottom + 16);
+      }
+      context.strokeStyle = '#89a2b0';
+      context.beginPath();
+      context.moveTo(left, bottom);
+      context.lineTo(left + span, bottom);
+      context.stroke();
+      for (const [column, color] of [[1, '#435ba9'], [2, '#006f66']]) {
+        context.beginPath();
+        samples.forEach((sample, index) => {
+          const x = mapX(sample[0]);
+          const y = mapY(sample[column]);
+          if (index) context.lineTo(x, y);
+          else context.moveTo(x, y);
+        });
+        context.strokeStyle = color;
+        context.lineWidth = 2.5;
+        context.setLineDash(column === 1 ? [6, 4] : []);
+        context.stroke();
+      }
+    }
+
+    function renderBayes() {
+      const groups = number('groups');
+      const failures = Math.min(groups, number('failures'));
+      byId('failures').max = groups;
+      byId('failures').value = failures;
+      byId('failures').disabled = groups === 0;
+      const [priorA, priorB] = { regular: [2, 8], flat: [1, 1], strong: [8, 32] }[byId('prior').value];
+      const a = priorA + failures;
+      const b = priorB + groups - failures;
+      const low = betaQuantile(.025, a, b);
+      const high = betaQuantile(.975, a, b);
+      posterior = { a, b, priorA, priorB, low, high };
+      text('groups-value', `${groups} 组`);
+      text('failures-value', `${failures} 组`);
+      text('posterior-parameters', `Beta(${a}, ${b})`);
+      text('posterior-mean', percent(a / (a + b), 2));
+      text('posterior-interval', `${percent(low, 2)}–${percent(high, 2)}`);
+      text('beta-formula', `Beta(${priorA}, ${priorB}) + ${failures} 个失败、${groups - failures} 个成功 → Beta(${a}, ${b})`);
+      drawPosterior();
+      renderRisk();
+    }
+
+    function renderPpv() {
+      const prior = number('presence') / 100;
+      const truePositive = .90 * prior;
+      const falsePositive = .10 * (1 - prior);
+      text('presence-value', percent(prior, 0));
+      text('ppv', percent(truePositive / (truePositive + falsePositive), 2));
+      text('ppv-note', `每千次观察，期望真报 ${Math.round(1000 * truePositive)} 次，误报 ${Math.round(1000 * falsePositive)} 次。`);
+    }
+
+    for (const scenario of scenarios) {
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.dataset.task = scenario.id;
+      button.setAttribute('aria-pressed', 'false');
+      const name = document.createElement('span');
+      name.textContent = scenario.title;
+      const kind = document.createElement('small');
+      kind.textContent = scenario.kind;
+      button.append(name, kind);
+      button.addEventListener('click', () => chooseTask(scenario));
+      taskButtons.set(scenario.id, button);
+      byId('scenario-buttons').appendChild(button);
+      byId('scenario-select').add(new Option(scenario.title, scenario.id));
+    }
+    byId('scenario-select').addEventListener('change', event => {
+      chooseTask(scenarios.find(scenario => scenario.id === event.target.value));
+    });
+    for (const id of ['budget', ...taskControls]) byId(id).addEventListener('input', renderSampling);
+    byId('rare').addEventListener('input', renderRare);
+    byId('resample').addEventListener('click', () => { seed += 1; renderSampling(); });
+    byId('reset-sampling').addEventListener('click', () => {
+      byId('budget').value = 32;
+      byId('rare').value = 2;
+      setTaskPriors();
+      seed = 20261112;
+      mode = 'coverage';
+      selectedCell = groupKey(...mandatoryStates[1].values.slice(0, 3));
+      renderSampling();
+    });
+    for (const name of ['random', 'coverage']) {
+      byId(`${name}-mode`).addEventListener('click', () => { mode = name; renderMatrix(); });
+    }
+    for (const id of ['groups', 'failures']) byId(id).addEventListener('input', renderBayes);
+    byId('prior').addEventListener('change', renderBayes);
+    byId('use-posterior').addEventListener('change', () => renderRisk());
+    byId('presence').addEventListener('input', renderPpv);
+    window.addEventListener('resize', drawPosterior);
+    chooseTask(scenarios[0]);
+    renderBayes();
+    renderPpv();
+  </script>
+</body>
+</html>

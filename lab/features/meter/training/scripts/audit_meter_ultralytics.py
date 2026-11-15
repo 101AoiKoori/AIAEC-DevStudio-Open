@@ -5,6 +5,7 @@ No weights, full training, dataset caches, network access, or model downloads.
 import argparse
 import copy
 import json
+import sys
 from pathlib import Path
 
 import torch
@@ -15,6 +16,10 @@ from ultralytics.data.augment import v8_transforms
 from ultralytics.data.utils import verify_image_label
 from ultralytics.utils.loss import v8PoseLoss
 
+
+ROOT=Path(__file__).resolve().parents[5]
+sys.path.insert(0,str(ROOT))
+from lab.training_common.production_guard import generation_guard
 
 class _CaptureMask:
     def __init__(self):
@@ -61,10 +66,7 @@ def validate_dataset_header(data, root):
         raise RuntimeError('Dataset YAML root, keypoint shape, or class mismatch')
 
 
-def main():
-    parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('dataset', type=Path)
-    args = parser.parse_args()
+def _execute(args, images):
     root = args.dataset.resolve()
     data = yaml.safe_load((root / 'data.yaml').read_text(encoding='utf8'))
     validate_dataset_header(data, root)
@@ -72,7 +74,7 @@ def main():
     for split in ('train', 'val', 'test'):
         if data[split] != 'images/' + split:
             raise RuntimeError('Unexpected split path in YAML')
-        paths = sorted((root / 'images' / split).glob('*.png'))
+        paths = [path for path in images if path.parent.name == split]
         if not paths:
             raise RuntimeError('Empty split ' + split)
         for path in paths:
@@ -90,6 +92,23 @@ def main():
               'scope': 'installed pair verifier and loss-mask/augmentation unit checks; no model training'}
     (root / 'audit_ultralytics.json').write_text(json.dumps(report, indent=2) + '\n', encoding='utf8')
     print('ULTRALYTICS_COMPATIBILITY_OK', json.dumps(report))
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('dataset', type=Path)
+    args = parser.parse_args(); args.dataset=args.dataset.resolve(); root=args.dataset
+    images=sorted((root/'images').rglob('*.png'))
+    labels=[root/'labels'/p.parent.name/(p.stem+'.txt') for p in images]
+    output=root/'audit_ultralytics.json'
+    with generation_guard('meter.audit_ultralytics:'+root.relative_to(ROOT).as_posix(),
+                          images, [output], {}, code_paths=[Path(__file__)],
+                          procedural_inputs=[root/'data.yaml',*labels], root=ROOT) as run:
+        if run.reused:
+            print('REUSED', output); return
+        if sorted((root/'images').rglob('*.png')) != images:
+            raise RuntimeError('image set changed before execution')
+        _execute(args, images)
 
 
 if __name__ == '__main__':

@@ -1,0 +1,498 @@
+task: person
+status: configured_artwork_and_selected_role_records_consumed_by_planned_scene_entry
+person_artwork_root: datasets/raw/person/team_assets
+role_records:
+  foreground_texture: datasets/annotated/person/v4_whiteborder_textures_20261113/manifest.json
+  vehicle_occluder: datasets/annotated/person/v4_vehicle_occluders_20261113/manifest.json
+  annotated_real_background: datasets/annotated/person/v4_vehicle_sequence_review_20261112/review_manifest.json
+  annotated_real_reference:
+  - datasets/annotated/person/v4_multivideo_review_20261112/review_manifest.json
+  - datasets/annotated/person/v4_full_scene_diverse_review_20261112/review_manifest.json
+  direct_real_annotation_layers: datasets/scripts/person/config/direct_annotation_layers_20261115.json
+  synthetic_labeled_selection: datasets/annotated/person/mixed_detection_candidates_v2_20261110/manifest.jsonl
+  background_candidates: datasets/annotated/person/background_source_manifest.jsonl
+  placement_regions: datasets/annotated/person/placement_ground_visual_manifest.jsonl
+  material_candidates: datasets/annotated/person/person_material_visual_manifest.jsonl
+  shared_background: datasets/annotated/mixed_scene/v4_compositing_backgrounds_20261113/manifest.json
+  reviewed_background: datasets/scripts/person/config/background_dispatch.json
+  cross_task_review: datasets/annotated/site_capture_20261112/person_vehicle_v4_review/source_gate_manifest.json
+databases:
+  media_query: datasets/annotated/media_index/query_cache.sqlite3
+  blender_registry: datasets/blender_source_registry.sqlite3
+roots:
+- datasets/raw/person/team_assets
+- datasets/raw/e_bike/archive_assets_legacy
+- datasets/raw/car_real_capture_20261112
+- datasets/assets/blender
+records:
+- datasets/annotated/person/background_source_manifest.jsonl
+selection: 查询现有数据库和清单，按任务、集合、角色及父来源选取；跨任务背景允许复用。
+blender_original_scene: datasets/assets/blender/shared/arena_4m2_pbr_20261112/arena_indoor_detailed.blend
+blender_master_scene: datasets/assets/blender/shared/arena_4m2_pbr_20261112/arena_master_user_20261113.blend
+blender_working_scene: datasets/assets/blender/person/arena_person_user_master_working_20261113.blend
+real_capture_root: datasets/raw/car_real_capture_20261112
+production_plan: datasets/scripts/person/config/production_plan.json
+current_selection:
+  budget: 36
+  candidate_states: 54
+  identity_region_basis: AI visual design regions on the existing whiteborder textures;
+    includes head and upper clothing. Not measured identity features or model verification.
+  foregrounds:
+  - record_index: 0
+    identity_region_xyxy:
+    - 18
+    - 12
+    - 118
+    - 170
+    identity: '1'
+    image: datasets/annotated/person/v4_whiteborder_textures_20261113/community_1.png
+    manifest: datasets/annotated/person/v4_whiteborder_textures_20261113/manifest.json
+  - record_index: 17
+    identity_region_xyxy:
+    - 26
+    - 8
+    - 148
+    - 168
+    identity: F2
+    image: datasets/annotated/person/v4_whiteborder_textures_20261113/noncommunity_F2.png
+    manifest: datasets/annotated/person/v4_whiteborder_textures_20261113/manifest.json
+  backgrounds:
+  - record_index: 2
+    foot_xy:
+    - 468
+    - 323
+    ground_polygon:
+    - - 390
+      - 255
+    - - 580
+      - 255
+    - - 580
+      - 350
+    - - 390
+      - 350
+    image: datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_001201.png
+    manifest: datasets/annotated/person/v4_vehicle_sequence_review_20261112/review_manifest.json
+    timestamp_seconds: 40.0
+    parent_video: datasets/raw/site_capture_20261112/videos/full_scene.mp4
+  - record_index: 7
+    foot_xy:
+    - 270
+    - 339
+    ground_polygon:
+    - - 236
+      - 260
+    - - 316
+      - 260
+    - - 316
+      - 354
+    - - 236
+      - 354
+    image: datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_007951.png
+    manifest: datasets/annotated/person/v4_vehicle_sequence_review_20261112/review_manifest.json
+    timestamp_seconds: 265.213056
+    parent_video: datasets/raw/site_capture_20261112/videos/full_scene.mp4
+  - record_index: 10
+    foot_xy:
+    - 332
+    - 324
+    ground_polygon:
+    - - 220
+      - 240
+    - - 470
+      - 240
+    - - 470
+      - 350
+    - - 220
+      - 350
+    image: datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_008551.png
+    manifest: datasets/annotated/person/v4_vehicle_sequence_review_20261112/review_manifest.json
+    timestamp_seconds: 285.213056
+    parent_video: datasets/raw/site_capture_20261112/videos/full_scene.mp4
+  vehicle_occluders:
+  - manifest: datasets/annotated/person/v4_vehicle_occluders_20261113/manifest.json
+    record_index: 2
+    source_video: datasets/raw/e_bike/archive_assets_legacy/视频/浅色背景单辆直立车_平视旋转_009.mp4
+  - manifest: datasets/annotated/person/v4_vehicle_occluders_20261113/manifest.json
+    record_index: 0
+    source_video: datasets/raw/e_bike/archive_assets_legacy/视频/浅色背景单辆倒伏车_平视旋转_008.mp4
+  source_counts:
+    background_images: 3
+    background_parent_videos: 1
+    person_artworks: 2
+    vehicle_parent_videos: 2
+  excluded_records:
+  - manifest: datasets/annotated/person/v4_vehicle_sequence_review_20261112/review_manifest.json
+    record_index: 0
+    image: datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_000451.png
+    reason: incomplete_labels
+  - manifest: datasets/annotated/person/v4_vehicle_sequence_review_20261112/review_manifest.json
+    record_index: 1
+    image: datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_000601.png
+    reason: incomplete_labels
+  - manifest: datasets/annotated/person/v4_vehicle_sequence_review_20261112/review_manifest.json
+    record_index: 3
+    image: datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_002851.png
+    reason: incomplete_labels
+  - manifest: datasets/annotated/person/v4_vehicle_sequence_review_20261112/review_manifest.json
+    record_index: 4
+    image: datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_003001.png
+    reason: regression_reserved
+  - manifest: datasets/annotated/person/v4_vehicle_sequence_review_20261112/review_manifest.json
+    record_index: 5
+    image: datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_007651.png
+    reason: incomplete_labels
+  - manifest: datasets/annotated/person/v4_vehicle_sequence_review_20261112/review_manifest.json
+    record_index: 6
+    image: datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_007801.png
+    reason: incomplete_labels
+  - manifest: datasets/annotated/person/v4_vehicle_sequence_review_20261112/review_manifest.json
+    record_index: 8
+    image: datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_008251.png
+    reason: incomplete_labels
+  - manifest: datasets/annotated/person/v4_multivideo_review_20261112/review_manifest.json
+    record_index: 0
+    image: images/person_000201.png
+    reason: regression_reserved
+  - manifest: datasets/annotated/person/v4_multivideo_review_20261112/review_manifest.json
+    record_index: 1
+    image: images/person_000401.png
+    reason: regression_reserved
+  - manifest: datasets/annotated/person/v4_multivideo_review_20261112/review_manifest.json
+    record_index: 2
+    image: images/person_000601.png
+    reason: regression_reserved
+  - manifest: datasets/annotated/person/v4_multivideo_review_20261112/review_manifest.json
+    record_index: 3
+    image: images/person_000701.png
+    reason: incomplete_labels
+  - manifest: datasets/annotated/person/v4_multivideo_review_20261112/review_manifest.json
+    record_index: 4
+    image: images/person_000901.png
+    reason: regression_reserved
+  - manifest: datasets/annotated/person/v4_multivideo_review_20261112/review_manifest.json
+    record_index: 5
+    image: images/person_001001.png
+    reason: regression_reserved
+  - manifest: datasets/annotated/person/v4_multivideo_review_20261112/review_manifest.json
+    record_index: 6
+    image: images/person_001201.png
+    reason: regression_reserved
+  - manifest: datasets/annotated/person/v4_multivideo_review_20261112/review_manifest.json
+    record_index: 7
+    image: images/person_001501.png
+    reason: regression_reserved
+  - manifest: datasets/annotated/person/v4_full_scene_diverse_review_20261112/review_manifest.json
+    record_index: 0
+    image: datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_000751.png
+    reason: incomplete_labels
+  - manifest: datasets/annotated/person/v4_full_scene_diverse_review_20261112/review_manifest.json
+    record_index: 2
+    image: datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_002911.png
+    reason: incomplete_labels
+  - manifest: datasets/annotated/person/v4_full_scene_diverse_review_20261112/review_manifest.json
+    record_index: 5
+    image: datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_008701.png
+    reason: incomplete_labels
+  other_complete_records: Not selected for this bounded batch; original labels retained.
+  remaining_target: This is a bounded restart plan, not the complete 3000-image training
+    target.
+  status: source_and_alpha_geometry_contract_passed_production_paused
+  contract_scope: Existing source and label reads, Bayesian allocation, foreground
+    alpha placement/contact/visibility checks only. No composite RGB image, sample,
+    render, database write or training.
+  restart_command: .venv/Scripts/python.exe -B datasets/scripts/person/compose_planned_ground_person.py
+    --production-plan datasets/scripts/person/config/production_plan.json --output
+    datasets/samples/person
+  output: datasets/samples/person
+  historical_exposure:
+    selected_backgrounds: unknown
+    reason: historical_exposure_incomplete
+    regression_matches: 0
+    meaning: Existing deleted history remains incomplete; no independence or unseen-data
+      claim.
+candidate_pool:
+  inventory: datasets/annotated/person/v4_source_gate_candidate_20261113.json
+  samples: 7772
+  availability_checked: '2026-11-15'
+  present_paths: 3389
+  missing_paths: 4383
+  missing_paths_note: 缺失项指向已不存在的 datasets/exports/person 旧批次（如 real_scene_candidates_3500_20261110、v4_combined_with_real_negatives_candidate_20261113）；候选池用于查询发现，不按声明数计算可用量。
+  declared_purpose: review_queue_not_training_export
+  parent_videos: 4
+  background_audit: datasets/annotated/person/mixed_detection_candidates_20261110/background_visual_audit.json
+  background_candidates: 281
+  blocking_review: full-image semantic review per frame (confirm no unlabelled person target before the frame is used as a background), near-duplicate grouping and parent assignment; entries stay unassigned until that review is recorded.
+pairing:
+  schema_version: 1
+  status: draft
+  composition_policy:
+    target_source: digital_artwork
+    blender_priority: background_only
+    target_components: [team_assets_digital_person]
+    background_components: [arena_scene, real_backgrounds]
+    note: 用户 2026-11-15 指定目标数据源为 team_assets 数字图片；Blender 只作背景
+  policy:
+    parent_classes: [task_real, background]
+    split_unit: parent_group
+    train_parent_cap: 0.8
+    val_test_mode: reserve_only
+    derived_inherits_parent_split: true
+    cross_task_duplicates: allowed_with_separate_labels
+    same_source_splits: record_and_report
+  task_real:
+    - id: tr_person_standees
+      class: task_real
+      kind: parent_video
+      paths: [datasets/raw/site_capture_20261112/videos/person_standees.mp4]
+      evidence:
+        - {manifest: datasets/annotated/person/v4_multivideo_review_20261112/review_manifest.json}
+      capture_session: unknown
+      labels: {status: auto_validated_with_pending, note: 8 帧审查：auto_validated 6、human semantic 3、human box/absence 0、training admitted 0、pending partial 2}
+      roles: [direct_target, composite_target]
+      split: {primary: train, status: proposed, action: to_label}
+      plan: null
+    - id: tr_full_scene_person
+      class: task_real
+      kind: parent_video
+      paths: [datasets/raw/site_capture_20261112/videos/full_scene.mp4]
+      evidence:
+        - {manifest: datasets/annotated/person/v4_vehicle_sequence_review_20261112/review_manifest.json}
+      capture_session: unknown
+      labels: {status: auto_validated_with_pending, note: 三个清单合计 19 个审查帧：auto_validated 10（5 正、5 负）、pending partial 9；5 帧正例共 14 框}
+      roles: [direct_target, composite_target]
+      split: {primary: train, status: proposed, action: to_label}
+      plan: null
+    - id: tr_scan_012
+      class: task_real
+      kind: parent_video
+      paths: [datasets/raw/e_bike/archive_assets_legacy/视频/人物立牌正背面_电动车直立_倒伏和遮挡_场地扫描_012.mp4]
+      evidence:
+        - {manifest: datasets/annotated/e_bike/video_review_20261110/manifest.json, record_index: 4}
+      capture_session: unknown
+      labels: {status: partial, note: 49 审核帧，待人物标注}
+      roles: [direct_target, composite_target]
+      split: {primary: val, status: proposed, action: to_label}
+      plan: null
+    - id: tr_car_real_person
+      class: task_real
+      kind: parent_video
+      paths: [datasets/raw/car_real_capture_20261112/V_20261112_152304.mp4]
+      evidence:
+        - {manifest: datasets/annotated/car_real_capture_20261112/segments_v1/segments.csv}
+      capture_session: unknown
+      labels: {status: auto_validated_with_pending_candidates, note: 2 帧 auto_validated 正例共 5 框；序列清单另 132 个候选父帧、343 框，其中 325 框类别未知，均 pending}
+      roles: [direct_target, composite_target]
+      split: {primary: test, status: proposed, action: to_label}
+      plan: null
+    - id: tr_crowd_photos
+      class: task_real
+      kind: parent_photo_batch
+      paths: [datasets/raw/person/archive_assets_legacy/密集人群]
+      evidence:
+        - {manifest: datasets/annotated/raw_source_classification_manifest_20261114.jsonl}
+      capture_session: unknown
+      labels: {status: unknown, note: 人群照片，人物类别与完整性待审}
+      roles: [direct_target]
+      split: {primary: test, status: proposed, action: to_label}
+      plan: null
+    - id: tr_site_person
+      class: task_real
+      kind: parent_photo_batch
+      paths: [datasets/raw/site_capture_20261112/onboard_camera_images]
+      evidence:
+        - {manifest: datasets/annotated/site_capture_20261112/target_instances_manifest.jsonl}
+      capture_session: unknown
+      labels: {status: candidate_pending, note: 68 张记录、152 个 person 候选框；34 框有类别、118 框未知，全部未穷举，未判 rejected/excluded}
+      roles: [direct_target, composite_target]
+      split: {primary: val, status: proposed, action: to_label}
+      plan: null
+  backgrounds:
+    - id: bg_full_scene
+      class: background
+      kind: parent_video
+      paths: [datasets/raw/site_capture_20261112/videos/full_scene.mp4]
+      evidence:
+        - {manifest: datasets/annotated/mixed_scene/v4_compositing_backgrounds_20261113/manifest.json}
+      review: {state: candidate_empty, method: contact_sheet, accepted_by: null, note: 与 tr_full_scene_person 同一父视频，同属 train；candidate_empty 未确认空场}
+      labels: {status: unknown}
+      roles: [composite_background]
+      split: {primary: train, status: proposed, action: to_review}
+      plan: null
+    - id: bg_001
+      class: background
+      kind: parent_video
+      paths: [datasets/raw/site_archive_legacy/场景/综合视频/空场与场景物料_001.mp4]
+      evidence:
+        - {manifest: datasets/annotated/person/background_source_manifest.jsonl}
+      review: {state: candidate_empty, method: thumbnail, accepted_by: null, note: 缩略图 AI 候选，未逐帧确认空场}
+      labels: {status: unknown, note: 281 帧；父链部分未核}
+      roles: [composite_background]
+      split: {primary: train, status: proposed, action: to_review}
+      plan: null
+    - id: bg_site_009
+      class: background
+      kind: parent_video
+      paths: [datasets/raw/site_archive_legacy/场景/三楼与场地视频/三栋楼侧向扫描_009.mp4]
+      evidence:
+        - {manifest: datasets/annotated/mixed_scene/v4_compositing_backgrounds_20261113/manifest.json}
+      review: {state: candidate_empty, method: contact_sheet, accepted_by: null}
+      labels: {status: unknown}
+      roles: [composite_background]
+      split: {primary: train, status: proposed}
+      plan: null
+    - id: bg_site_003
+      class: background
+      kind: parent_video
+      paths: [datasets/raw/site_archive_legacy/场景/三楼与场地视频/三栋楼_垃圾桶与路口_003.mp4]
+      evidence:
+        - {manifest: datasets/annotated/mixed_scene/v4_compositing_backgrounds_20261113/manifest.json}
+      review: {state: candidate_empty, method: contact_sheet, accepted_by: null}
+      labels: {status: unknown}
+      roles: [composite_background]
+      split: {primary: val, status: proposed}
+      plan: null
+    - id: bg_site_005
+      class: background
+      kind: parent_video
+      paths: [datasets/raw/site_archive_legacy/场景/三楼与场地视频/三栋楼_路口及垃圾桶_005.mp4]
+      evidence:
+        - {manifest: datasets/annotated/mixed_scene/v4_compositing_backgrounds_20261113/manifest.json}
+      review: {state: candidate_empty, method: contact_sheet, accepted_by: null}
+      labels: {status: unknown}
+      roles: [composite_background]
+      split: {primary: val, status: proposed}
+      plan: null
+    - id: bg_ebike_003
+      class: background
+      kind: parent_video
+      paths: [datasets/raw/e_bike/archive_assets_legacy/视频/场地多辆电动车_直立与倒伏混合_较低视角_003.mp4]
+      evidence:
+        - {manifest: datasets/annotated/e_bike/video_review_20261110/manifest.json, record_index: 3}
+      review: {state: contains_target, method: contact_sheet, accepted_by: null, note: 画面可能有电动车；作为人物背景须先确认人物目标完整性}
+      labels: {status: unknown}
+      roles: [composite_background]
+      split: {primary: test, status: proposed}
+      plan: null
+    - id: bg_waste_004
+      class: background
+      kind: parent_video
+      paths: [datasets/raw/waste_bin/archive_assets_legacy/视频/四色桶较低视角_灰绿闭盖_红蓝开盖_004.mp4]
+      evidence:
+        - {manifest: datasets/annotated/mixed_scene/v4_compositing_backgrounds_20261113/manifest.json}
+      review: {state: unknown, method: contact_sheet, accepted_by: null, note: 人物 5 帧在 b3 被判 geometry_rejected}
+      labels: {status: unknown}
+      roles: [composite_background]
+      split: {primary: test, status: proposed}
+      plan: null
+    - id: bg_car_real
+      class: background
+      kind: parent_video
+      paths: [datasets/raw/car_real_capture_20261112/V_20261112_152304.mp4]
+      evidence:
+        - {manifest: datasets/annotated/car_real_capture_20261112/inventory.json}
+      review: {state: candidate_empty, method: contact_sheet, accepted_by: null}
+      labels: {status: unknown}
+      roles: [composite_background]
+      split: {primary: test, status: proposed}
+      plan: null
+    - id: occl_008
+      class: background
+      kind: parent_video
+      paths: [datasets/raw/e_bike/archive_assets_legacy/视频/浅色背景单辆倒伏车_平视旋转_008.mp4]
+      evidence:
+        - {manifest: datasets/annotated/person/v4_vehicle_occluders_20261113/manifest.json, record_index: 0}
+        - {manifest: datasets/annotated/person/v4_vehicle_occluders_20261113/manifest.json, record_index: 1}
+      review: {state: contains_target, method: alpha_review, accepted_by: null, note: 车辆遮挡物，不是空背景}
+      labels: {status: partial, note: 掩膜待人工复核}
+      roles: [occluder]
+      split: {primary: train, status: proposed}
+      plan: null
+    - id: occl_009
+      class: background
+      kind: parent_video
+      paths: [datasets/raw/e_bike/archive_assets_legacy/视频/浅色背景单辆直立车_平视旋转_009.mp4]
+      evidence:
+        - {manifest: datasets/annotated/person/v4_vehicle_occluders_20261113/manifest.json, record_index: 2}
+        - {manifest: datasets/annotated/person/v4_vehicle_occluders_20261113/manifest.json, record_index: 3}
+      review: {state: contains_target, method: alpha_review, accepted_by: null, note: 车辆遮挡物，不是空背景}
+      labels: {status: partial, note: 掩膜待人工复核}
+      roles: [occluder]
+      split: {primary: train, status: proposed}
+      plan: null
+    - id: occl_005
+      class: background
+      kind: parent_video
+      paths: [datasets/raw/e_bike/archive_assets_legacy/视频/单辆直立电动车_低视角环绕_005.mp4]
+      evidence:
+        - {manifest: datasets/annotated/e_bike/video_review_20261110/manifest.json, record_index: 2}
+      review: {state: contains_target, method: contact_sheet, accepted_by: null, note: 待提遮挡掩膜}
+      labels: {status: unknown}
+      roles: [occluder]
+      split: {primary: val, status: proposed, action: to_extract}
+      plan: null
+    - id: occl_006
+      class: background
+      kind: parent_video
+      paths: [datasets/raw/e_bike/archive_assets_legacy/视频/单辆倒伏电动车_俯角环绕_006.mp4]
+      evidence:
+        - {note: e_bike video_review manifest 未登记 006；提掩膜前需补证据}
+      review: {state: unknown, method: none, accepted_by: null, note: 待提遮挡掩膜；无 manifest 记录}
+      labels: {status: unknown}
+      roles: [occluder]
+      split: {primary: val, status: proposed, action: to_extract}
+      plan: null
+  data_sources:
+    - id: ds_identity_18
+      kind: fixed_artwork
+      paths:
+        - datasets/raw/person/team_assets/社区人员
+        - datasets/raw/person/team_assets/非社区人员
+      parent_group: null
+      roles: [target_foreground]
+      split: {primary: shared, status: confirmed}
+    - id: ds_occluder_masks_008
+      kind: mask
+      path: datasets/annotated/person/v4_vehicle_occluders_20261113
+      parent_group: occl_008
+      roles: [occluder]
+      split: {primary: inherit, status: confirmed}
+    - id: ds_occluder_masks_009
+      kind: mask
+      path: datasets/annotated/person/v4_vehicle_occluders_20261113
+      parent_group: occl_009
+      roles: [occluder]
+      split: {primary: inherit, status: confirmed}
+    - id: ds_occluder_masks_005
+      kind: mask
+      path: datasets/annotated/e_bike/video_review_20261110
+      parent_group: occl_005
+      roles: [occluder]
+      split: {primary: inherit, status: proposed, action: to_extract}
+    - id: ds_occluder_masks_006
+      kind: mask
+      path: datasets/annotated/e_bike/video_review_20261110
+      parent_group: occl_006
+      roles: [occluder]
+      split: {primary: inherit, status: proposed, action: to_extract}
+  blender:
+    - id: bl_arena_master
+      kind: blender_scene
+      path: datasets/assets/blender/shared/arena_4m2_pbr_20261112/arena_master_user_20261113.blend
+      role: background_scene
+      priority: background_only
+      split: {primary: shared, status: confirmed, same_source_note: 多任务共享母场景}
+    - id: bl_arena_detailed
+      kind: blender_scene
+      path: datasets/assets/blender/shared/arena_4m2_pbr_20261112/arena_indoor_detailed.blend
+      role: background_scene
+      priority: background_only
+      split: {primary: shared, status: confirmed, same_source_note: 人物默认场景；与 calibrated 有来源链}
+  captures: []
+  plan_bindings:
+    train: [datasets/scripts/person/config/production_plan.json]
+    val: []
+    test: []
+  plan_alignment:
+    status: aligned
+    note: 用户确认 occl_009 改为 train；现有 train production_plan 的 upright 分支与之对齐。val/test 仍待 005/006 掩膜或同源预留。
+    conflicts: []

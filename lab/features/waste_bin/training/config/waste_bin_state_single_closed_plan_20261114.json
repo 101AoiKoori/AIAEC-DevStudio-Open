@@ -1,0 +1,1911 @@
+{
+  "schema_version": 1,
+  "purpose": "Prepare one blue closed-bin foreground candidate; structure and scene inspected without rendering.",
+  "model_key": "waste_bin_state",
+  "target_split": "train",
+  "budget": 1,
+  "independence_basis": "one fitted PBR bin scene; no independent scene or capture claim",
+  "uncertainty_weight": 0,
+  "constraints": {
+    "resolution": [
+      640,
+      480
+    ],
+    "label_mode": "candidate",
+    "min_visibility": 0.7,
+    "min_visible_pixels": 24
+  },
+  "strata": [
+    {
+      "id": "wbs_closed_pbr_blue_001",
+      "failure_event": "closed bin body or lid evidence unavailable",
+      "conditions": [],
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "observations": [],
+      "background": {
+        "scene": "datasets/assets/blender/waste_bin/blender_pbr_v2_20261110/waste_bin_pbr.blend",
+        "floor_gray": 0.12,
+        "backdrop_gray": 0.34
+      },
+      "target": {
+        "bins": {
+          "blue": "closed"
+        },
+        "open_pose": "upright"
+      },
+      "labels": {
+        "mode": "candidate",
+        "open": 0,
+        "closed": 1
+      },
+      "augmentation": {
+        "mode": "none"
+      },
+      "sources": [
+        "datasets/assets/blender/waste_bin/blender_pbr_v2_20261110/waste_bin_pbr.blend"
+      ],
+      "parameters": {
+        "camera_location": [
+          -1.68,
+          -5.4,
+          1.35
+        ],
+        "camera_aim": [
+          -1.68,
+          0,
+          0.78
+        ],
+        "yaw_degrees": 0,
+        "lens_mm": 35,
+        "key_energy": 900,
+        "fill_energy": 500,
+        "color_factor": 1.0,
+        "roughness_delta": 0.0
+      }
+    }
+  ],
+  "handoff": {
+    "scope": "One prospective standalone foreground; not a complete dataset, a training approval, or a rendered sample.",
+    "scene_registry": "datasets/blender_source_registry.sqlite3",
+    "asset_classification": "active_in_use task_model_parent; fitted from photographs; geometry not field-calibrated",
+    "instance_id": "wbs_pbr_v2_blue",
+    "instance_binding": {
+      "plan_state_id": "wbs_closed_pbr_blue_001",
+      "renderer_bin_key": "blue",
+      "identity_scope": "instance in this scene; no cross-scene physical identity inferred"
+    },
+    "position": {
+      "source": "existing scene geometry; no repositioning",
+      "scene_units": "one unit approximately 10 cm; approximate construction",
+      "body_bbox_center_approx": [
+        -1.68,
+        0,
+        0.57
+      ]
+    },
+    "state_evidence": "Closed state requires visible lid components and body; renderer derives the visible and isolated state masks and rejects ineligible labels. Evidence pixels and quality are unknown until an authorized render.",
+    "projected_geometry": "Read-only Blender scene inspection projects the unrendered blue component bounds inside the 640x480 frame; projection is not evidence of visibility, label correctness, or realism.",
+    "entry": "lab/features/waste_bin/training/scripts/render_blender_waste_bin.py",
+    "example_future_output": "datasets/exports/waste_bin/v4_single_closed_blue_20261114",
+    "future_entry_parameters": {
+      "device": "OPTIX",
+      "width": 640,
+      "height": 480,
+      "min_visibility": 0.7,
+      "min_visible_pixels": 24
+    },
+    "id_output_limit": "Renderer emits plan_state_id and bin color in sample records; it does not emit instance_id. Bind via the mapping above; no shared surface or sticker contract is implied.",
+    "open_and_other_gaps": [
+      "This declaration includes closed only; existing arena open-state suppression remains unchanged.",
+      "No state masks or rendered image were produced.",
+      "Standalone renderer can declare hanging_back or upright open poses, but visual state evidence has not been established by this plan.",
+      "The grouped real-background compositor requires a completed source render manifest and candidate masks, which do not exist yet.",
+      "Arena photo-markings sidecar cites a missing historical source_scene path.",
+      "Sticker face geometry and multi-parent background coverage are separate pending branches."
+    ],
+    "image_task_relations": [
+      {
+        "image": "datasets/annotated/sign/v4_training_backgrounds_20261112/images/background_01.png",
+        "image_size": [
+          640,
+          480
+        ],
+        "original_record": {
+          "manifest": "datasets/annotated/waste_bin/v4_grounded_backgrounds_20261112/backgrounds.json",
+          "json_pointer": "/frames/0",
+          "record_index": 0
+        },
+        "parent_image": "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_000163.png",
+        "parent_video": "datasets/raw/site_capture_20261112/videos/full_scene.mp4",
+        "source_time_seconds": 5.4,
+        "source_group": "datasets/raw/site_capture_20261112/videos/full_scene.mp4",
+        "task_use_status": [
+          {
+            "task": "waste_bin_state",
+            "split": "train",
+            "split_basis": "historical background split; planned role only",
+            "role": "background",
+            "status": "candidate",
+            "evidence": {
+              "manifest": "datasets/annotated/waste_bin/v4_grounded_backgrounds_20261112/backgrounds.json",
+              "json_pointer": "/frames/0"
+            },
+            "region": {
+              "coordinate_space": "image_pixels_640x480",
+              "ground_polygon_xy": [
+                [
+                  20,
+                  300
+                ],
+                [
+                  465,
+                  300
+                ],
+                [
+                  615,
+                  440
+                ],
+                [
+                  615,
+                  470
+                ],
+                [
+                  20,
+                  470
+                ]
+              ],
+              "status": "visually_reviewed_conservative_region_candidate"
+            },
+            "existing_targets": "AI visual review: no visible bins or waste-item stickers",
+            "target_scope": "AI visual observation only; not complete ground truth",
+            "source_exposure_role": "unknown",
+            "source_exposure_reason": "historical_exposure_incomplete",
+            "limitations": [
+              "No complete foreground render or state mask currently exists.",
+              "Actual placement extent, depth and any existing bin labels must be established.",
+              "Unknown source exposure is not training approval."
+            ],
+            "source_exposure_evidence": {
+              "method": "source_role with build_queue; read-only",
+              "code_paths": [
+                "lab/training_common/camera_tone.py",
+                "lab/scripts/data/v4_source_gate.py"
+              ],
+              "code_state": "both files had pre-existing uncommitted modifications when checked",
+              "result_scope": "historical exposure classification only, not task-label approval"
+            }
+          },
+          {
+            "task": "waste_bin_state",
+            "split": "train",
+            "role": "background_geometry_input",
+            "status": "ready",
+            "readiness_scope": "Image bytes and declared ground polygon can be loaded as inputs by grouped compositor; this is not whole-image training approval or proof that an intended object placement is feasible.",
+            "evidence": {
+              "manifest": "datasets/annotated/waste_bin/v4_grounded_backgrounds_20261112/backgrounds.json",
+              "json_pointer": "/frames/0",
+              "record_index": 0,
+              "checks": [
+                "file exists",
+                "OpenCV decoded BGR 640x480",
+                "polygon points in image and positive area",
+                "11x11-eroded polygon nonempty",
+                "parent image and video exist"
+              ]
+            },
+            "geometry": {
+              "coordinate_space": "image_pixels_640x480",
+              "ground_polygon_xy": [
+                [
+                  20,
+                  300
+                ],
+                [
+                  465,
+                  300
+                ],
+                [
+                  615,
+                  440
+                ],
+                [
+                  615,
+                  470
+                ],
+                [
+                  20,
+                  470
+                ]
+              ],
+              "eroded_polygon_pixels": 83776,
+              "original_status": "visually_reviewed_conservative_region_candidate"
+            },
+            "exposure": {
+              "role": "unknown",
+              "reason": "historical_exposure_incomplete",
+              "entry_rule": "Current grouped compositor rejects regression; unknown is not rejected by that check. Role must be recalculated at actual execution.",
+              "code_state": "camera_tone.py and lab/scripts/data/v4_source_gate.py have pre-existing uncommitted changes"
+            },
+            "limitations": [
+              "No full-image target truth, physical clearance or valid planned support is asserted.",
+              "No foreground image or state mask currently exists for the bounded closed-bin combination.",
+              "This narrow input readiness does not authorize full training supervision or bypass the production guard."
+            ]
+          }
+        ]
+      },
+      {
+        "image": "datasets/annotated/sign/v4_training_backgrounds_20261112/images/background_03.png",
+        "image_size": [
+          640,
+          480
+        ],
+        "original_record": {
+          "manifest": "datasets/annotated/waste_bin/v4_grounded_backgrounds_20261112/backgrounds.json",
+          "json_pointer": "/frames/1",
+          "record_index": 1
+        },
+        "parent_image": "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_005751.png",
+        "parent_video": "datasets/raw/site_capture_20261112/videos/full_scene.mp4",
+        "source_time_seconds": 191.820633,
+        "source_group": "datasets/raw/site_capture_20261112/videos/full_scene.mp4",
+        "task_use_status": [
+          {
+            "task": "waste_bin_state",
+            "split": "train",
+            "split_basis": "historical background split; planned role only",
+            "role": "background",
+            "status": "candidate",
+            "evidence": {
+              "manifest": "datasets/annotated/waste_bin/v4_grounded_backgrounds_20261112/backgrounds.json",
+              "json_pointer": "/frames/1"
+            },
+            "region": {
+              "coordinate_space": "image_pixels_640x480",
+              "ground_polygon_xy": [
+                [
+                  5,
+                  260
+                ],
+                [
+                  70,
+                  260
+                ],
+                [
+                  290,
+                  470
+                ],
+                [
+                  5,
+                  470
+                ]
+              ],
+              "status": "visually_reviewed_conservative_region_candidate"
+            },
+            "existing_targets": "AI visual review: no visible bins or waste-item stickers",
+            "target_scope": "AI visual observation only; not complete ground truth",
+            "source_exposure_role": "unknown",
+            "source_exposure_reason": "historical_exposure_incomplete",
+            "limitations": [
+              "No complete foreground render or state mask currently exists.",
+              "Actual placement extent, depth and any existing bin labels must be established.",
+              "Unknown source exposure is not training approval."
+            ],
+            "source_exposure_evidence": {
+              "method": "source_role with build_queue; read-only",
+              "code_paths": [
+                "lab/training_common/camera_tone.py",
+                "lab/scripts/data/v4_source_gate.py"
+              ],
+              "code_state": "both files had pre-existing uncommitted modifications when checked",
+              "result_scope": "historical exposure classification only, not task-label approval"
+            }
+          },
+          {
+            "task": "waste_bin_state",
+            "split": "train",
+            "role": "background_geometry_input",
+            "status": "ready",
+            "readiness_scope": "Image bytes and declared ground polygon can be loaded as inputs by grouped compositor; this is not whole-image training approval or proof that an intended object placement is feasible.",
+            "evidence": {
+              "manifest": "datasets/annotated/waste_bin/v4_grounded_backgrounds_20261112/backgrounds.json",
+              "json_pointer": "/frames/1",
+              "record_index": 1,
+              "checks": [
+                "file exists",
+                "OpenCV decoded BGR 640x480",
+                "polygon points in image and positive area",
+                "11x11-eroded polygon nonempty",
+                "parent image and video exist"
+              ]
+            },
+            "geometry": {
+              "coordinate_space": "image_pixels_640x480",
+              "ground_polygon_xy": [
+                [
+                  5,
+                  260
+                ],
+                [
+                  70,
+                  260
+                ],
+                [
+                  290,
+                  470
+                ],
+                [
+                  5,
+                  470
+                ]
+              ],
+              "eroded_polygon_pixels": 32321,
+              "original_status": "visually_reviewed_conservative_region_candidate"
+            },
+            "exposure": {
+              "role": "unknown",
+              "reason": "historical_exposure_incomplete",
+              "entry_rule": "Current grouped compositor rejects regression; unknown is not rejected by that check. Role must be recalculated at actual execution.",
+              "code_state": "camera_tone.py and lab/scripts/data/v4_source_gate.py have pre-existing uncommitted changes"
+            },
+            "limitations": [
+              "No full-image target truth, physical clearance or valid planned support is asserted.",
+              "No foreground image or state mask currently exists for the bounded closed-bin combination.",
+              "This narrow input readiness does not authorize full training supervision or bypass the production guard."
+            ]
+          }
+        ]
+      },
+      {
+        "image": "datasets/annotated/sign/v4_training_backgrounds_20261112/images/background_seq_000091.png",
+        "image_size": [
+          640,
+          480
+        ],
+        "original_record": {
+          "manifest": "datasets/annotated/waste_bin/v4_grounded_backgrounds_20261112/backgrounds.json",
+          "json_pointer": "/frames/2",
+          "record_index": 2
+        },
+        "parent_image": "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_000091.png",
+        "parent_video": "datasets/raw/site_capture_20261112/videos/full_scene.mp4",
+        "source_time_seconds": 3.0,
+        "source_group": "datasets/raw/site_capture_20261112/videos/full_scene.mp4",
+        "task_use_status": [
+          {
+            "task": "waste_bin_state",
+            "split": "train",
+            "split_basis": "historical background split; planned role only",
+            "role": "background",
+            "status": "candidate",
+            "evidence": {
+              "manifest": "datasets/annotated/waste_bin/v4_grounded_backgrounds_20261112/backgrounds.json",
+              "json_pointer": "/frames/2"
+            },
+            "region": {
+              "coordinate_space": "image_pixels_640x480",
+              "ground_polygon_xy": [
+                [
+                  80,
+                  270
+                ],
+                [
+                  500,
+                  270
+                ],
+                [
+                  620,
+                  425
+                ],
+                [
+                  620,
+                  470
+                ],
+                [
+                  20,
+                  470
+                ]
+              ],
+              "status": "visually_reviewed_conservative_region_candidate"
+            },
+            "existing_targets": "AI visual review: no visible bins or waste-item stickers",
+            "target_scope": "AI visual observation only; not complete ground truth",
+            "source_exposure_role": "unknown",
+            "source_exposure_reason": "historical_exposure_incomplete",
+            "limitations": [
+              "No complete foreground render or state mask currently exists.",
+              "Actual placement extent, depth and any existing bin labels must be established.",
+              "Unknown source exposure is not training approval."
+            ],
+            "source_exposure_evidence": {
+              "method": "source_role with build_queue; read-only",
+              "code_paths": [
+                "lab/training_common/camera_tone.py",
+                "lab/scripts/data/v4_source_gate.py"
+              ],
+              "code_state": "both files had pre-existing uncommitted modifications when checked",
+              "result_scope": "historical exposure classification only, not task-label approval"
+            }
+          },
+          {
+            "task": "waste_bin_state",
+            "split": "train",
+            "role": "background_geometry_input",
+            "status": "ready",
+            "readiness_scope": "Image bytes and declared ground polygon can be loaded as inputs by grouped compositor; this is not whole-image training approval or proof that an intended object placement is feasible.",
+            "evidence": {
+              "manifest": "datasets/annotated/waste_bin/v4_grounded_backgrounds_20261112/backgrounds.json",
+              "json_pointer": "/frames/2",
+              "record_index": 2,
+              "checks": [
+                "file exists",
+                "OpenCV decoded BGR 640x480",
+                "polygon points in image and positive area",
+                "11x11-eroded polygon nonempty",
+                "parent image and video exist"
+              ]
+            },
+            "geometry": {
+              "coordinate_space": "image_pixels_640x480",
+              "ground_polygon_xy": [
+                [
+                  80,
+                  270
+                ],
+                [
+                  500,
+                  270
+                ],
+                [
+                  620,
+                  425
+                ],
+                [
+                  620,
+                  470
+                ],
+                [
+                  20,
+                  470
+                ]
+              ],
+              "eroded_polygon_pixels": 97514,
+              "original_status": "visually_reviewed_conservative_region_candidate"
+            },
+            "exposure": {
+              "role": "unknown",
+              "reason": "historical_exposure_incomplete",
+              "entry_rule": "Current grouped compositor rejects regression; unknown is not rejected by that check. Role must be recalculated at actual execution.",
+              "code_state": "camera_tone.py and lab/scripts/data/v4_source_gate.py have pre-existing uncommitted changes"
+            },
+            "limitations": [
+              "No full-image target truth, physical clearance or valid planned support is asserted.",
+              "No foreground image or state mask currently exists for the bounded closed-bin combination.",
+              "This narrow input readiness does not authorize full training supervision or bypass the production guard."
+            ]
+          }
+        ]
+      },
+      {
+        "image": "datasets/annotated/sign/v4_training_backgrounds_20261112/images/background_seq_002188.png",
+        "image_size": [
+          640,
+          480
+        ],
+        "original_record": {
+          "manifest": "datasets/annotated/waste_bin/v4_grounded_backgrounds_20261112/backgrounds.json",
+          "json_pointer": "/frames/3",
+          "record_index": 3
+        },
+        "parent_image": "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_002188.png",
+        "parent_video": "datasets/raw/site_capture_20261112/videos/full_scene.mp4",
+        "source_time_seconds": 72.993467,
+        "source_group": "datasets/raw/site_capture_20261112/videos/full_scene.mp4",
+        "task_use_status": [
+          {
+            "task": "waste_bin_state",
+            "split": "train",
+            "split_basis": "historical background split; planned role only",
+            "role": "background",
+            "status": "candidate",
+            "evidence": {
+              "manifest": "datasets/annotated/waste_bin/v4_grounded_backgrounds_20261112/backgrounds.json",
+              "json_pointer": "/frames/3"
+            },
+            "region": {
+              "coordinate_space": "image_pixels_640x480",
+              "ground_polygon_xy": [
+                [
+                  25,
+                  330
+                ],
+                [
+                  620,
+                  330
+                ],
+                [
+                  620,
+                  470
+                ],
+                [
+                  25,
+                  470
+                ]
+              ],
+              "status": "visually_reviewed_conservative_region_candidate"
+            },
+            "existing_targets": "AI visual review: no visible bins or waste-item stickers",
+            "target_scope": "AI visual observation only; not complete ground truth",
+            "source_exposure_role": "unknown",
+            "source_exposure_reason": "historical_exposure_incomplete",
+            "limitations": [
+              "No complete foreground render or state mask currently exists.",
+              "Actual placement extent, depth and any existing bin labels must be established.",
+              "Unknown source exposure is not training approval."
+            ],
+            "source_exposure_evidence": {
+              "method": "source_role with build_queue; read-only",
+              "code_paths": [
+                "lab/training_common/camera_tone.py",
+                "lab/scripts/data/v4_source_gate.py"
+              ],
+              "code_state": "both files had pre-existing uncommitted modifications when checked",
+              "result_scope": "historical exposure classification only, not task-label approval"
+            }
+          },
+          {
+            "task": "waste_bin_state",
+            "split": "train",
+            "role": "background_geometry_input",
+            "status": "ready",
+            "readiness_scope": "Image bytes and declared ground polygon can be loaded as inputs by grouped compositor; this is not whole-image training approval or proof that an intended object placement is feasible.",
+            "evidence": {
+              "manifest": "datasets/annotated/waste_bin/v4_grounded_backgrounds_20261112/backgrounds.json",
+              "json_pointer": "/frames/3",
+              "record_index": 3,
+              "checks": [
+                "file exists",
+                "OpenCV decoded BGR 640x480",
+                "polygon points in image and positive area",
+                "11x11-eroded polygon nonempty",
+                "parent image and video exist"
+              ]
+            },
+            "geometry": {
+              "coordinate_space": "image_pixels_640x480",
+              "ground_polygon_xy": [
+                [
+                  25,
+                  330
+                ],
+                [
+                  620,
+                  330
+                ],
+                [
+                  620,
+                  470
+                ],
+                [
+                  25,
+                  470
+                ]
+              ],
+              "eroded_polygon_pixels": 76766,
+              "original_status": "visually_reviewed_conservative_region_candidate"
+            },
+            "exposure": {
+              "role": "unknown",
+              "reason": "historical_exposure_incomplete",
+              "entry_rule": "Current grouped compositor rejects regression; unknown is not rejected by that check. Role must be recalculated at actual execution.",
+              "code_state": "camera_tone.py and lab/scripts/data/v4_source_gate.py have pre-existing uncommitted changes"
+            },
+            "limitations": [
+              "No full-image target truth, physical clearance or valid planned support is asserted.",
+              "No foreground image or state mask currently exists for the bounded closed-bin combination.",
+              "This narrow input readiness does not authorize full training supervision or bypass the production guard."
+            ]
+          }
+        ]
+      },
+      {
+        "image": "datasets/annotated/sign/v4_training_backgrounds_20261112/images/background_seq_005277.png",
+        "image_size": [
+          640,
+          480
+        ],
+        "original_record": {
+          "manifest": "datasets/annotated/waste_bin/v4_grounded_backgrounds_20261112/backgrounds.json",
+          "json_pointer": "/frames/4",
+          "record_index": 4
+        },
+        "parent_image": "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_005277.png",
+        "parent_video": "datasets/raw/site_capture_20261112/videos/full_scene.mp4",
+        "source_time_seconds": 176.000533,
+        "source_group": "datasets/raw/site_capture_20261112/videos/full_scene.mp4",
+        "task_use_status": [
+          {
+            "task": "waste_bin_state",
+            "split": "train",
+            "split_basis": "historical background split; planned role only",
+            "role": "background",
+            "status": "candidate",
+            "evidence": {
+              "manifest": "datasets/annotated/waste_bin/v4_grounded_backgrounds_20261112/backgrounds.json",
+              "json_pointer": "/frames/4"
+            },
+            "region": {
+              "coordinate_space": "image_pixels_640x480",
+              "ground_polygon_xy": [
+                [
+                  180,
+                  310
+                ],
+                [
+                  625,
+                  310
+                ],
+                [
+                  625,
+                  470
+                ],
+                [
+                  180,
+                  470
+                ]
+              ],
+              "status": "visually_reviewed_conservative_region_candidate"
+            },
+            "existing_targets": "AI visual review: no visible bins or waste-item stickers",
+            "target_scope": "AI visual observation only; not complete ground truth",
+            "source_exposure_role": "unknown",
+            "source_exposure_reason": "historical_exposure_incomplete",
+            "limitations": [
+              "No complete foreground render or state mask currently exists.",
+              "Actual placement extent, depth and any existing bin labels must be established.",
+              "Unknown source exposure is not training approval."
+            ],
+            "source_exposure_evidence": {
+              "method": "source_role with build_queue; read-only",
+              "code_paths": [
+                "lab/training_common/camera_tone.py",
+                "lab/scripts/data/v4_source_gate.py"
+              ],
+              "code_state": "both files had pre-existing uncommitted modifications when checked",
+              "result_scope": "historical exposure classification only, not task-label approval"
+            }
+          },
+          {
+            "task": "waste_bin_state",
+            "split": "train",
+            "role": "background_geometry_input",
+            "status": "ready",
+            "readiness_scope": "Image bytes and declared ground polygon can be loaded as inputs by grouped compositor; this is not whole-image training approval or proof that an intended object placement is feasible.",
+            "evidence": {
+              "manifest": "datasets/annotated/waste_bin/v4_grounded_backgrounds_20261112/backgrounds.json",
+              "json_pointer": "/frames/4",
+              "record_index": 4,
+              "checks": [
+                "file exists",
+                "OpenCV decoded BGR 640x480",
+                "polygon points in image and positive area",
+                "11x11-eroded polygon nonempty",
+                "parent image and video exist"
+              ]
+            },
+            "geometry": {
+              "coordinate_space": "image_pixels_640x480",
+              "ground_polygon_xy": [
+                [
+                  180,
+                  310
+                ],
+                [
+                  625,
+                  310
+                ],
+                [
+                  625,
+                  470
+                ],
+                [
+                  180,
+                  470
+                ]
+              ],
+              "eroded_polygon_pixels": 65836,
+              "original_status": "visually_reviewed_conservative_region_candidate"
+            },
+            "exposure": {
+              "role": "unknown",
+              "reason": "historical_exposure_incomplete",
+              "entry_rule": "Current grouped compositor rejects regression; unknown is not rejected by that check. Role must be recalculated at actual execution.",
+              "code_state": "camera_tone.py and lab/scripts/data/v4_source_gate.py have pre-existing uncommitted changes"
+            },
+            "limitations": [
+              "No full-image target truth, physical clearance or valid planned support is asserted.",
+              "No foreground image or state mask currently exists for the bounded closed-bin combination.",
+              "This narrow input readiness does not authorize full training supervision or bypass the production guard."
+            ]
+          }
+        ]
+      },
+      {
+        "image": "datasets/annotated/sign/v4_training_backgrounds_20261112/images/background_seq_005996.png",
+        "image_size": [
+          640,
+          480
+        ],
+        "original_record": {
+          "manifest": "datasets/annotated/waste_bin/v4_grounded_backgrounds_20261112/backgrounds.json",
+          "json_pointer": "/frames/5",
+          "record_index": 5
+        },
+        "parent_image": "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_005996.png",
+        "parent_video": "datasets/raw/site_capture_20261112/videos/full_scene.mp4",
+        "source_time_seconds": 199.9873,
+        "source_group": "datasets/raw/site_capture_20261112/videos/full_scene.mp4",
+        "task_use_status": [
+          {
+            "task": "waste_bin_state",
+            "split": "train",
+            "split_basis": "historical background split; planned role only",
+            "role": "background",
+            "status": "candidate",
+            "evidence": {
+              "manifest": "datasets/annotated/waste_bin/v4_grounded_backgrounds_20261112/backgrounds.json",
+              "json_pointer": "/frames/5"
+            },
+            "region": {
+              "coordinate_space": "image_pixels_640x480",
+              "ground_polygon_xy": [
+                [
+                  130,
+                  380
+                ],
+                [
+                  500,
+                  380
+                ],
+                [
+                  605,
+                  470
+                ],
+                [
+                  90,
+                  470
+                ]
+              ],
+              "status": "visually_reviewed_conservative_region_candidate"
+            },
+            "existing_targets": "AI visual review: no visible bins or waste-item stickers",
+            "target_scope": "AI visual observation only; not complete ground truth",
+            "source_exposure_role": "unknown",
+            "source_exposure_reason": "historical_exposure_incomplete",
+            "limitations": [
+              "No complete foreground render or state mask currently exists.",
+              "Actual placement extent, depth and any existing bin labels must be established.",
+              "Unknown source exposure is not training approval."
+            ],
+            "source_exposure_evidence": {
+              "method": "source_role with build_queue; read-only",
+              "code_paths": [
+                "lab/training_common/camera_tone.py",
+                "lab/scripts/data/v4_source_gate.py"
+              ],
+              "code_state": "both files had pre-existing uncommitted modifications when checked",
+              "result_scope": "historical exposure classification only, not task-label approval"
+            }
+          },
+          {
+            "task": "waste_bin_state",
+            "split": "train",
+            "role": "background_geometry_input",
+            "status": "ready",
+            "readiness_scope": "Image bytes and declared ground polygon can be loaded as inputs by grouped compositor; this is not whole-image training approval or proof that an intended object placement is feasible.",
+            "evidence": {
+              "manifest": "datasets/annotated/waste_bin/v4_grounded_backgrounds_20261112/backgrounds.json",
+              "json_pointer": "/frames/5",
+              "record_index": 5,
+              "checks": [
+                "file exists",
+                "OpenCV decoded BGR 640x480",
+                "polygon points in image and positive area",
+                "11x11-eroded polygon nonempty",
+                "parent image and video exist"
+              ]
+            },
+            "geometry": {
+              "coordinate_space": "image_pixels_640x480",
+              "ground_polygon_xy": [
+                [
+                  130,
+                  380
+                ],
+                [
+                  500,
+                  380
+                ],
+                [
+                  605,
+                  470
+                ],
+                [
+                  90,
+                  470
+                ]
+              ],
+              "eroded_polygon_pixels": 34467,
+              "original_status": "visually_reviewed_conservative_region_candidate"
+            },
+            "exposure": {
+              "role": "unknown",
+              "reason": "historical_exposure_incomplete",
+              "entry_rule": "Current grouped compositor rejects regression; unknown is not rejected by that check. Role must be recalculated at actual execution.",
+              "code_state": "camera_tone.py and lab/scripts/data/v4_source_gate.py have pre-existing uncommitted changes"
+            },
+            "limitations": [
+              "No full-image target truth, physical clearance or valid planned support is asserted.",
+              "No foreground image or state mask currently exists for the bounded closed-bin combination.",
+              "This narrow input readiness does not authorize full training supervision or bypass the production guard."
+            ]
+          }
+        ]
+      },
+      {
+        "image": "datasets/annotated/sign/v4_training_backgrounds_20261112/images/background_seq_006236.png",
+        "image_size": [
+          640,
+          480
+        ],
+        "original_record": {
+          "manifest": "datasets/annotated/waste_bin/v4_grounded_backgrounds_20261112/backgrounds.json",
+          "json_pointer": "/frames/6",
+          "record_index": 6
+        },
+        "parent_image": "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_006236.png",
+        "parent_video": "datasets/raw/site_capture_20261112/videos/full_scene.mp4",
+        "source_time_seconds": 207.9873,
+        "source_group": "datasets/raw/site_capture_20261112/videos/full_scene.mp4",
+        "task_use_status": [
+          {
+            "task": "waste_bin_state",
+            "split": "train",
+            "split_basis": "historical background split; planned role only",
+            "role": "background",
+            "status": "candidate",
+            "evidence": {
+              "manifest": "datasets/annotated/waste_bin/v4_grounded_backgrounds_20261112/backgrounds.json",
+              "json_pointer": "/frames/6"
+            },
+            "region": {
+              "coordinate_space": "image_pixels_640x480",
+              "ground_polygon_xy": [
+                [
+                  10,
+                  300
+                ],
+                [
+                  630,
+                  300
+                ],
+                [
+                  630,
+                  470
+                ],
+                [
+                  10,
+                  470
+                ]
+              ],
+              "status": "visually_reviewed_conservative_region_candidate"
+            },
+            "existing_targets": "AI visual review: no visible bins or waste-item stickers",
+            "target_scope": "AI visual observation only; not complete ground truth",
+            "source_exposure_role": "unknown",
+            "source_exposure_reason": "historical_exposure_incomplete",
+            "limitations": [
+              "No complete foreground render or state mask currently exists.",
+              "Actual placement extent, depth and any existing bin labels must be established.",
+              "Unknown source exposure is not training approval."
+            ],
+            "source_exposure_evidence": {
+              "method": "source_role with build_queue; read-only",
+              "code_paths": [
+                "lab/training_common/camera_tone.py",
+                "lab/scripts/data/v4_source_gate.py"
+              ],
+              "code_state": "both files had pre-existing uncommitted modifications when checked",
+              "result_scope": "historical exposure classification only, not task-label approval"
+            }
+          },
+          {
+            "task": "waste_bin_state",
+            "split": "train",
+            "role": "background_geometry_input",
+            "status": "ready",
+            "readiness_scope": "Image bytes and declared ground polygon can be loaded as inputs by grouped compositor; this is not whole-image training approval or proof that an intended object placement is feasible.",
+            "evidence": {
+              "manifest": "datasets/annotated/waste_bin/v4_grounded_backgrounds_20261112/backgrounds.json",
+              "json_pointer": "/frames/6",
+              "record_index": 6,
+              "checks": [
+                "file exists",
+                "OpenCV decoded BGR 640x480",
+                "polygon points in image and positive area",
+                "11x11-eroded polygon nonempty",
+                "parent image and video exist"
+              ]
+            },
+            "geometry": {
+              "coordinate_space": "image_pixels_640x480",
+              "ground_polygon_xy": [
+                [
+                  10,
+                  300
+                ],
+                [
+                  630,
+                  300
+                ],
+                [
+                  630,
+                  470
+                ],
+                [
+                  10,
+                  470
+                ]
+              ],
+              "eroded_polygon_pixels": 98371,
+              "original_status": "visually_reviewed_conservative_region_candidate"
+            },
+            "exposure": {
+              "role": "unknown",
+              "reason": "historical_exposure_incomplete",
+              "entry_rule": "Current grouped compositor rejects regression; unknown is not rejected by that check. Role must be recalculated at actual execution.",
+              "code_state": "camera_tone.py and lab/scripts/data/v4_source_gate.py have pre-existing uncommitted changes"
+            },
+            "limitations": [
+              "No full-image target truth, physical clearance or valid planned support is asserted.",
+              "No foreground image or state mask currently exists for the bounded closed-bin combination.",
+              "This narrow input readiness does not authorize full training supervision or bypass the production guard."
+            ]
+          }
+        ]
+      },
+      {
+        "image": "datasets/annotated/sign/v4_training_backgrounds_20261112/images/background_seq_007045.png",
+        "image_size": [
+          640,
+          480
+        ],
+        "original_record": {
+          "manifest": "datasets/annotated/waste_bin/v4_grounded_backgrounds_20261112/backgrounds.json",
+          "json_pointer": "/frames/7",
+          "record_index": 7
+        },
+        "parent_image": "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_007045.png",
+        "parent_video": "datasets/raw/site_capture_20261112/videos/full_scene.mp4",
+        "source_time_seconds": 234.992733,
+        "source_group": "datasets/raw/site_capture_20261112/videos/full_scene.mp4",
+        "task_use_status": [
+          {
+            "task": "waste_bin_state",
+            "split": "train",
+            "split_basis": "historical background split; planned role only",
+            "role": "background",
+            "status": "candidate",
+            "evidence": {
+              "manifest": "datasets/annotated/waste_bin/v4_grounded_backgrounds_20261112/backgrounds.json",
+              "json_pointer": "/frames/7"
+            },
+            "region": {
+              "coordinate_space": "image_pixels_640x480",
+              "ground_polygon_xy": [
+                [
+                  15,
+                  420
+                ],
+                [
+                  625,
+                  420
+                ],
+                [
+                  625,
+                  470
+                ],
+                [
+                  15,
+                  470
+                ]
+              ],
+              "status": "visually_reviewed_conservative_region_candidate"
+            },
+            "existing_targets": "AI visual review: no visible bins or waste-item stickers",
+            "target_scope": "AI visual observation only; not complete ground truth",
+            "source_exposure_role": "unknown",
+            "source_exposure_reason": "historical_exposure_incomplete",
+            "limitations": [
+              "No complete foreground render or state mask currently exists.",
+              "Actual placement extent, depth and any existing bin labels must be established.",
+              "Unknown source exposure is not training approval."
+            ],
+            "source_exposure_evidence": {
+              "method": "source_role with build_queue; read-only",
+              "code_paths": [
+                "lab/training_common/camera_tone.py",
+                "lab/scripts/data/v4_source_gate.py"
+              ],
+              "code_state": "both files had pre-existing uncommitted modifications when checked",
+              "result_scope": "historical exposure classification only, not task-label approval"
+            }
+          },
+          {
+            "task": "waste_bin_state",
+            "split": "train",
+            "role": "background_geometry_input",
+            "status": "ready",
+            "readiness_scope": "Image bytes and declared ground polygon can be loaded as inputs by grouped compositor; this is not whole-image training approval or proof that an intended object placement is feasible.",
+            "evidence": {
+              "manifest": "datasets/annotated/waste_bin/v4_grounded_backgrounds_20261112/backgrounds.json",
+              "json_pointer": "/frames/7",
+              "record_index": 7,
+              "checks": [
+                "file exists",
+                "OpenCV decoded BGR 640x480",
+                "polygon points in image and positive area",
+                "11x11-eroded polygon nonempty",
+                "parent image and video exist"
+              ]
+            },
+            "geometry": {
+              "coordinate_space": "image_pixels_640x480",
+              "ground_polygon_xy": [
+                [
+                  15,
+                  420
+                ],
+                [
+                  625,
+                  420
+                ],
+                [
+                  625,
+                  470
+                ],
+                [
+                  15,
+                  470
+                ]
+              ],
+              "eroded_polygon_pixels": 24641,
+              "original_status": "visually_reviewed_conservative_region_candidate"
+            },
+            "exposure": {
+              "role": "unknown",
+              "reason": "historical_exposure_incomplete",
+              "entry_rule": "Current grouped compositor rejects regression; unknown is not rejected by that check. Role must be recalculated at actual execution.",
+              "code_state": "camera_tone.py and lab/scripts/data/v4_source_gate.py have pre-existing uncommitted changes"
+            },
+            "limitations": [
+              "No full-image target truth, physical clearance or valid planned support is asserted.",
+              "No foreground image or state mask currently exists for the bounded closed-bin combination.",
+              "This narrow input readiness does not authorize full training supervision or bypass the production guard."
+            ]
+          }
+        ]
+      },
+      {
+        "image": "datasets/annotated/sign/v4_training_backgrounds_20261112/images/background_seq_008185.png",
+        "image_size": [
+          640,
+          480
+        ],
+        "original_record": {
+          "manifest": "datasets/annotated/waste_bin/v4_grounded_backgrounds_20261112/backgrounds.json",
+          "json_pointer": "/frames/8",
+          "record_index": 8
+        },
+        "parent_image": "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_008185.png",
+        "parent_video": "datasets/raw/site_capture_20261112/videos/full_scene.mp4",
+        "source_time_seconds": 273.013056,
+        "source_group": "datasets/raw/site_capture_20261112/videos/full_scene.mp4",
+        "task_use_status": [
+          {
+            "task": "waste_bin_state",
+            "split": "train",
+            "split_basis": "historical background split; planned role only",
+            "role": "background",
+            "status": "candidate",
+            "evidence": {
+              "manifest": "datasets/annotated/waste_bin/v4_grounded_backgrounds_20261112/backgrounds.json",
+              "json_pointer": "/frames/8"
+            },
+            "region": {
+              "coordinate_space": "image_pixels_640x480",
+              "ground_polygon_xy": [
+                [
+                  15,
+                  300
+                ],
+                [
+                  625,
+                  300
+                ],
+                [
+                  625,
+                  470
+                ],
+                [
+                  15,
+                  470
+                ]
+              ],
+              "status": "visually_reviewed_conservative_region_candidate"
+            },
+            "existing_targets": "AI visual review: no visible bins or waste-item stickers",
+            "target_scope": "AI visual observation only; not complete ground truth",
+            "source_exposure_role": "unknown",
+            "source_exposure_reason": "historical_exposure_incomplete",
+            "limitations": [
+              "No complete foreground render or state mask currently exists.",
+              "Actual placement extent, depth and any existing bin labels must be established.",
+              "Unknown source exposure is not training approval."
+            ],
+            "source_exposure_evidence": {
+              "method": "source_role with build_queue; read-only",
+              "code_paths": [
+                "lab/training_common/camera_tone.py",
+                "lab/scripts/data/v4_source_gate.py"
+              ],
+              "code_state": "both files had pre-existing uncommitted modifications when checked",
+              "result_scope": "historical exposure classification only, not task-label approval"
+            }
+          },
+          {
+            "task": "waste_bin_state",
+            "split": "train",
+            "role": "background_geometry_input",
+            "status": "ready",
+            "readiness_scope": "Image bytes and declared ground polygon can be loaded as inputs by grouped compositor; this is not whole-image training approval or proof that an intended object placement is feasible.",
+            "evidence": {
+              "manifest": "datasets/annotated/waste_bin/v4_grounded_backgrounds_20261112/backgrounds.json",
+              "json_pointer": "/frames/8",
+              "record_index": 8,
+              "checks": [
+                "file exists",
+                "OpenCV decoded BGR 640x480",
+                "polygon points in image and positive area",
+                "11x11-eroded polygon nonempty",
+                "parent image and video exist"
+              ]
+            },
+            "geometry": {
+              "coordinate_space": "image_pixels_640x480",
+              "ground_polygon_xy": [
+                [
+                  15,
+                  300
+                ],
+                [
+                  625,
+                  300
+                ],
+                [
+                  625,
+                  470
+                ],
+                [
+                  15,
+                  470
+                ]
+              ],
+              "eroded_polygon_pixels": 96761,
+              "original_status": "visually_reviewed_conservative_region_candidate"
+            },
+            "exposure": {
+              "role": "unknown",
+              "reason": "historical_exposure_incomplete",
+              "entry_rule": "Current grouped compositor rejects regression; unknown is not rejected by that check. Role must be recalculated at actual execution.",
+              "code_state": "camera_tone.py and lab/scripts/data/v4_source_gate.py have pre-existing uncommitted changes"
+            },
+            "limitations": [
+              "No full-image target truth, physical clearance or valid planned support is asserted.",
+              "No foreground image or state mask currently exists for the bounded closed-bin combination.",
+              "This narrow input readiness does not authorize full training supervision or bypass the production guard."
+            ]
+          }
+        ]
+      },
+      {
+        "image": "datasets/annotated/sign/v4_training_backgrounds_20261112/images/background_seq_008485.png",
+        "image_size": [
+          640,
+          480
+        ],
+        "original_record": {
+          "manifest": "datasets/annotated/waste_bin/v4_grounded_backgrounds_20261112/backgrounds.json",
+          "json_pointer": "/frames/9",
+          "record_index": 9
+        },
+        "parent_image": "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_008485.png",
+        "parent_video": "datasets/raw/site_capture_20261112/videos/full_scene.mp4",
+        "source_time_seconds": 283.013056,
+        "source_group": "datasets/raw/site_capture_20261112/videos/full_scene.mp4",
+        "task_use_status": [
+          {
+            "task": "waste_bin_state",
+            "split": "train",
+            "split_basis": "historical background split; planned role only",
+            "role": "background",
+            "status": "candidate",
+            "evidence": {
+              "manifest": "datasets/annotated/waste_bin/v4_grounded_backgrounds_20261112/backgrounds.json",
+              "json_pointer": "/frames/9"
+            },
+            "region": {
+              "coordinate_space": "image_pixels_640x480",
+              "ground_polygon_xy": [
+                [
+                  95,
+                  340
+                ],
+                [
+                  610,
+                  340
+                ],
+                [
+                  610,
+                  470
+                ],
+                [
+                  95,
+                  470
+                ]
+              ],
+              "status": "visually_reviewed_conservative_region_candidate"
+            },
+            "existing_targets": "AI visual review: no visible bins or waste-item stickers",
+            "target_scope": "AI visual observation only; not complete ground truth",
+            "source_exposure_role": "unknown",
+            "source_exposure_reason": "historical_exposure_incomplete",
+            "limitations": [
+              "No complete foreground render or state mask currently exists.",
+              "Actual placement extent, depth and any existing bin labels must be established.",
+              "Unknown source exposure is not training approval."
+            ],
+            "source_exposure_evidence": {
+              "method": "source_role with build_queue; read-only",
+              "code_paths": [
+                "lab/training_common/camera_tone.py",
+                "lab/scripts/data/v4_source_gate.py"
+              ],
+              "code_state": "both files had pre-existing uncommitted modifications when checked",
+              "result_scope": "historical exposure classification only, not task-label approval"
+            }
+          },
+          {
+            "task": "waste_bin_state",
+            "split": "train",
+            "role": "background_geometry_input",
+            "status": "ready",
+            "readiness_scope": "Image bytes and declared ground polygon can be loaded as inputs by grouped compositor; this is not whole-image training approval or proof that an intended object placement is feasible.",
+            "evidence": {
+              "manifest": "datasets/annotated/waste_bin/v4_grounded_backgrounds_20261112/backgrounds.json",
+              "json_pointer": "/frames/9",
+              "record_index": 9,
+              "checks": [
+                "file exists",
+                "OpenCV decoded BGR 640x480",
+                "polygon points in image and positive area",
+                "11x11-eroded polygon nonempty",
+                "parent image and video exist"
+              ]
+            },
+            "geometry": {
+              "coordinate_space": "image_pixels_640x480",
+              "ground_polygon_xy": [
+                [
+                  95,
+                  340
+                ],
+                [
+                  610,
+                  340
+                ],
+                [
+                  610,
+                  470
+                ],
+                [
+                  95,
+                  470
+                ]
+              ],
+              "eroded_polygon_pixels": 61226,
+              "original_status": "visually_reviewed_conservative_region_candidate"
+            },
+            "exposure": {
+              "role": "unknown",
+              "reason": "historical_exposure_incomplete",
+              "entry_rule": "Current grouped compositor rejects regression; unknown is not rejected by that check. Role must be recalculated at actual execution.",
+              "code_state": "camera_tone.py and lab/scripts/data/v4_source_gate.py have pre-existing uncommitted changes"
+            },
+            "limitations": [
+              "No full-image target truth, physical clearance or valid planned support is asserted.",
+              "No foreground image or state mask currently exists for the bounded closed-bin combination.",
+              "This narrow input readiness does not authorize full training supervision or bypass the production guard."
+            ]
+          }
+        ]
+      },
+      {
+        "image": "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_002311.png",
+        "original_record": {
+          "manifest": "datasets/annotated/waste_bin/v4_review_20261112/review_manifest.json",
+          "json_pointer": "/images/0",
+          "record_index": 0
+        },
+        "parent_video": "datasets/raw/site_capture_20261112/videos/full_scene.mp4",
+        "source_group": "site_capture_20261112_full_scene",
+        "source_time_seconds": 77.093467,
+        "task_use_status": [
+          {
+            "task": "waste_bin_state",
+            "split": "train",
+            "split_basis": "proposed; original split unassigned",
+            "role": "direct_sample",
+            "status": "candidate",
+            "evidence": {
+              "manifest": "datasets/annotated/waste_bin/v4_review_20261112/review_manifest.json",
+              "json_pointer": "/images/0/tasks/waste_bin_state"
+            },
+            "label": "datasets/annotated/waste_bin/v4_review_20261112/labels/waste_bin_state/frame_002311.txt",
+            "label_status": "candidate_complete_positive",
+            "human_accepted": false,
+            "candidate_boxes": [
+              [
+                1,
+                [
+                  91,
+                  153,
+                  176,
+                  265
+                ]
+              ],
+              [
+                0,
+                [
+                  175,
+                  158,
+                  250,
+                  260
+                ]
+              ],
+              [
+                0,
+                [
+                  257,
+                  156,
+                  332,
+                  260
+                ]
+              ],
+              [
+                1,
+                [
+                  341,
+                  148,
+                  419,
+                  255
+                ]
+              ]
+            ],
+            "source_exposure_role": "unknown",
+            "source_exposure_reason": "historical_exposure_incomplete",
+            "limitations": [
+              "Existing candidate labels are not training acceptance; image-wide truth and intended use remain to be resolved."
+            ],
+            "source_exposure_evidence": {
+              "method": "source_role with build_queue; read-only",
+              "code_paths": [
+                "lab/training_common/camera_tone.py",
+                "lab/scripts/data/v4_source_gate.py"
+              ],
+              "code_state": "both files had pre-existing uncommitted modifications when checked",
+              "result_scope": "historical exposure classification only, not task-label approval"
+            }
+          }
+        ]
+      },
+      {
+        "image": "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_002701.png",
+        "original_record": {
+          "manifest": "datasets/annotated/waste_bin/v4_review_20261112/review_manifest.json",
+          "json_pointer": "/images/3",
+          "record_index": 3
+        },
+        "parent_video": "datasets/raw/site_capture_20261112/videos/full_scene.mp4",
+        "source_group": "site_capture_20261112_full_scene",
+        "source_time_seconds": 90.093467,
+        "task_use_status": [
+          {
+            "task": "waste_bin_state",
+            "split": "train",
+            "split_basis": "proposed; original split unassigned",
+            "role": "direct_sample",
+            "status": "candidate",
+            "evidence": {
+              "manifest": "datasets/annotated/waste_bin/v4_review_20261112/review_manifest.json",
+              "json_pointer": "/images/3/tasks/waste_bin_state"
+            },
+            "label": "datasets/annotated/waste_bin/v4_review_20261112/labels/waste_bin_state/frame_002701.txt",
+            "label_status": "candidate_complete_negative",
+            "human_accepted": false,
+            "candidate_boxes": [],
+            "source_exposure_role": "unknown",
+            "source_exposure_reason": "historical_exposure_incomplete",
+            "limitations": [
+              "Existing candidate labels are not training acceptance; image-wide truth and intended use remain to be resolved."
+            ],
+            "source_exposure_evidence": {
+              "method": "source_role with build_queue; read-only",
+              "code_paths": [
+                "lab/training_common/camera_tone.py",
+                "lab/scripts/data/v4_source_gate.py"
+              ],
+              "code_state": "both files had pre-existing uncommitted modifications when checked",
+              "result_scope": "historical exposure classification only, not task-label approval"
+            }
+          }
+        ]
+      },
+      {
+        "image": "datasets/raw/car_real_capture_20261112/P22_TRASH.png",
+        "original_record": {
+          "manifest": "datasets/annotated/waste_bin/v4_review_20261112/review_manifest.json",
+          "json_pointer": "/images/4",
+          "record_index": 4
+        },
+        "parent_image": "Archive/Assets/CarRealPicture/P22_TRASH.png",
+        "source_group": "car_real_capture_20261112",
+        "task_use_status": [
+          {
+            "task": "waste_bin_state",
+            "split": "regression",
+            "split_basis": "existing diagnostic use",
+            "role": "direct_sample",
+            "status": "reserved",
+            "evidence": {
+              "manifest": "datasets/annotated/waste_bin/v4_review_20261112/review_manifest.json",
+              "json_pointer": "/images/4/tasks/waste_bin_state"
+            },
+            "label": "datasets/annotated/waste_bin/v4_review_20261112/labels/waste_bin_state/P22_TRASH.txt",
+            "label_status": "candidate_complete_positive",
+            "human_accepted": false,
+            "limitations": [
+              "Prior diagnostic image and known derivatives excluded from this planned train selection."
+            ]
+          }
+        ]
+      },
+      {
+        "image": "datasets/annotated/waste_bin/v4_real_asset_review_20261112/images/0020.png",
+        "original_record": {
+          "manifest": "datasets/annotated/waste_bin/v4_real_asset_review_20261112/review_manifest.json",
+          "json_pointer": "/samples/6",
+          "record_index": 6
+        },
+        "parent_video": "datasets/raw/waste_bin/archive_assets_legacy/视频/灰桶开盖_多面及桶内近景_006.mp4",
+        "historical_source_group": "Archive/Assets/垃圾桶/视频/灰桶开盖_多面及桶内近景_006.mp4",
+        "task_use_status": [
+          {
+            "task": "waste_bin_state",
+            "split": "future_reserved",
+            "split_basis": "whole parent video reserved in current combination plan",
+            "role": "direct_sample",
+            "status": "reserved",
+            "evidence": {
+              "manifest": "datasets/annotated/waste_bin/v4_real_asset_review_20261112/review_manifest.json",
+              "json_pointer": "/samples/6/tasks/waste_bin_state"
+            },
+            "label": "datasets/annotated/waste_bin/v4_real_asset_review_20261112/labels/waste_bin_state/0020.txt",
+            "label_status": "candidate_complete_positive",
+            "human_accepted": false,
+            "existing_role": "regression",
+            "limitations": [
+              "Parent video 006 and known derivatives are excluded from the planned train selection.",
+              "Source-session and physical-bin independence remain unknown."
+            ]
+          }
+        ]
+      },
+      {
+        "image": "datasets/raw/site_capture_20261112/onboard_camera_images/vehicle_0003.png",
+        "original_record": {
+          "manifest": "datasets/annotated/site_capture_20261112/ground_geometry_manifest.jsonl",
+          "record_index": 2
+        },
+        "source_group": "vehicle_camera_delivery_session_unverified",
+        "task_use_status": [
+          {
+            "task": "waste_bin_state",
+            "split": "future_reserved",
+            "split_basis": "source group reserved in current combination plan",
+            "role": "background",
+            "status": "reserved",
+            "evidence": {
+              "manifest": "datasets/annotated/site_capture_20261112/ground_geometry_manifest.jsonl",
+              "record_index": 2
+            },
+            "region": {
+              "coordinate_space": "original_pixels_640x480",
+              "status": "candidate_not_verified_for_full_object_extent_or_task_label"
+            },
+            "label_status": "waste_bin_state_unknown",
+            "limitations": [
+              "Entire recorded parent group and known derivatives excluded from planned train.",
+              "Group relation to other captures unknown."
+            ]
+          }
+        ]
+      },
+      {
+        "image": "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_004801.png",
+        "original_record": {
+          "manifest": "datasets/annotated/waste_bin/v4_review_20261112/review_manifest.json",
+          "json_pointer": "/images/6",
+          "record_index": 6
+        },
+        "parent_video": "datasets/raw/site_capture_20261112/videos/full_scene.mp4",
+        "source_group": "site_capture_20261112_full_scene",
+        "task_use_status": [
+          {
+            "task": "waste_bin_state",
+            "split": "train",
+            "split_basis": "eligibility check only; original role regression",
+            "role": "direct_sample",
+            "status": "blocked",
+            "evidence": {
+              "manifest": "datasets/annotated/waste_bin/v4_review_20261112/review_manifest.json",
+              "json_pointer": "/images/6/tasks/waste_bin_state"
+            },
+            "label_status": "candidate_partial",
+            "label": null,
+            "candidate_boxes": [
+              [
+                1,
+                [
+                  184,
+                  0,
+                  298,
+                  156
+                ]
+              ],
+              [
+                0,
+                [
+                  313,
+                  0,
+                  429,
+                  150
+                ]
+              ],
+              [
+                0,
+                [
+                  425,
+                  0,
+                  555,
+                  146
+                ]
+              ]
+            ],
+            "limitations": [
+              "Prior diagnostic role and incomplete labels block this direct training use."
+            ]
+          }
+        ]
+      }
+    ],
+    "bounded_image_selection": {
+      "scope": "Selected real on-disk image paths and explicit per-image task/use relations only; not a complete catalog.",
+      "relation_schema": "Each image has task_use_status records; task, split, role and status belong to the same record.",
+      "counts": {
+        "unit": "one image-use relation; same image may have multiple distinct role relations",
+        "unique_images": 16,
+        "relations": 26,
+        "ready": 10,
+        "candidate": 12,
+        "reserved": 3,
+        "blocked": 1,
+        "ready_scope": "background_geometry_input only; no complete training images claimed"
+      },
+      "reverse_lookup": "Filter each image_task_relations item then its task_use_status elements; keep task, split, role and status from the same element.",
+      "index_boundary": "Nested handoff.image_task_relations in this training config are not guaranteed to be expanded by media_index; use read-only JSON lookup. Do not present observed_tasks or region_role as assigned training use.",
+      "bounded_branch": {
+        "combination_id": "one_blue_closed_foreground_and_real_background",
+        "planned_train_images": 1,
+        "actual_produced_images": 0,
+        "background_pool": {
+          "images": 10,
+          "parent_groups": 1,
+          "source_group": "datasets/raw/site_capture_20261112/videos/full_scene.mp4",
+          "planned_parent_share": 1,
+          "status": "candidate_for_full_composite; ready_for_image_and_polygon_input_only",
+          "role": "background",
+          "source_selection": "explicit image list only; exact background not selected",
+          "geometry_input_ready_images": 10
+        },
+        "foreground_pool": {
+          "eligible_image_count": 0,
+          "eligible_state_masks": 0,
+          "parent_asset": "datasets/assets/blender/waste_bin/blender_pbr_v2_20261110/waste_bin_pbr.blend",
+          "asset_is_image": false,
+          "desired_bin_id": "wbs_pbr_v2_blue",
+          "status": "blocked"
+        },
+        "compatibility": "Background coordinates are candidates; source must include candidate_label, visible bin mask, visible state mask and an eligible closed state; final supports must fit.",
+        "current_eligible_combinations": 0,
+        "max_current_producible_images": 0,
+        "conditional_cartesian_upper_bound": "10 candidate backgrounds × 1 future foreground × 1 stated layout = at most 10 combinations if every input becomes compatible; currently neither training qualification nor those pairings is established.",
+        "sampling": {
+          "kind": "single explicit state; no randomized image selected",
+          "render_seed": "42 (renderer default, not run)",
+          "background_seed": null,
+          "background_selection": "not yet selected; no random draw executed"
+        },
+        "entry": "lab/features/waste_bin/training/scripts/generate_waste_v4_grouped.py",
+        "upstream_entry": "lab/features/waste_bin/training/scripts/render_blender_waste_bin.py",
+        "label_rule": "Whole visible bin with visible closed-lid evidence, class 1; any unresolved visible bin precludes ordinary complete supervision.",
+        "gaps": [
+          "No rendered image, candidate label, visible bin mask or visible closed-state mask exists for the prospective PBR scene.",
+          "All ten backgrounds are ready as image/polygon input; historical exposure remains unknown and planned placement clearance is not yet established.",
+          "A second real-background parent group is needed for the complete dataset, beyond this one bounded prospective combination."
+        ],
+        "current_eligible_combinations_scope": "Complete background plus eligible foreground image plus state/instance masks plus labels; not background geometry component readiness."
+      }
+    },
+    "full_combination_plan_linkage": {
+      "plan": {
+        "path": "datasets/annotated/waste_bin/v4_grounded_backgrounds_20261112/backgrounds.json",
+        "json_pointer": "/v4_20261114_combination_selection",
+        "scope": "full task allocation and parent-share plan; values are design targets, not achieved sample counts"
+      },
+      "pool_reference": {
+        "path": "lab/features/waste_bin/training/config/waste_bin_state_single_closed_plan_20261114.json",
+        "json_pointer": "/handoff/image_task_relations",
+        "image_indices": "0..9",
+        "role": "background_geometry_input",
+        "source_group": "datasets/raw/site_capture_20261112/videos/full_scene.mp4",
+        "actual_on_disk_images": 10,
+        "distinct_parent_videos": 1,
+        "ready_scope": "image decode and candidate polygon input only"
+      },
+      "branches": [
+        {
+          "id": "R4",
+          "full_branch_target": 800,
+          "linked_parent_group": "full_scene",
+          "linked_group_target": 400,
+          "other_group_target": 400,
+          "use_of_pool": "Candidate backgrounds for four-bin state combinations; individual target supports and labels still need establishing.",
+          "current_component_capacity": {
+            "background_geometry_inputs": 10,
+            "eligible_foreground_images_with_masks": 0
+          },
+          "complete_output_capacity_now": 0,
+          "gap_to_linked_group_target_now": 400,
+          "conditional_upper_bound": "10 backgrounds × 16 assumed state layouts × 2 valid arrangements = 320; if all compatible, at least 80 below group share and at least 3 more backgrounds required. These are hypothetical, not actual available labelled images.",
+          "all_parent_shares": {
+            "full_scene": 400,
+            "car_batch": 400
+          },
+          "full_plan_record_pointer": "/v4_20261114_combination_selection/combinations/3"
+        },
+        {
+          "id": "Rfew",
+          "full_branch_target": 400,
+          "linked_parent_group": "full_scene",
+          "linked_group_target": 200,
+          "other_group_target": 200,
+          "use_of_pool": "Candidate backgrounds for 1–3 bins; single blue closed state is only a prospective subset.",
+          "current_component_capacity": {
+            "background_geometry_inputs": 10,
+            "eligible_foreground_images_with_masks": 0
+          },
+          "complete_output_capacity_now": 0,
+          "gap_to_linked_group_target_now": 200,
+          "conditional_upper_bound": "Assume 8+24+32 bin/color/state choices and 2 valid arrangements, giving up to 1280 tuples; compatibility and masks currently absent.",
+          "all_parent_shares": {
+            "full_scene": 200,
+            "car_batch": 200
+          },
+          "full_plan_record_pointer": "/v4_20261114_combination_selection/combinations/4"
+        },
+        {
+          "id": "Rocc",
+          "full_branch_target": 200,
+          "linked_parent_group": "full_scene",
+          "linked_group_target": 100,
+          "other_group_target": 100,
+          "use_of_pool": "Candidate backgrounds for adjacent-bin occlusion while closed/open evidence remains visible.",
+          "current_component_capacity": {
+            "background_geometry_inputs": 10,
+            "eligible_foreground_images_with_masks": 0
+          },
+          "complete_output_capacity_now": 0,
+          "gap_to_linked_group_target_now": 100,
+          "conditional_upper_bound": "10 backgrounds × 16 assumed layouts × 2 allowed arrangements = 320 at most; geometry, non-obscured state evidence and sources remain unconfirmed.",
+          "all_parent_shares": {
+            "full_scene": 100,
+            "car_batch": 100
+          },
+          "full_plan_record_pointer": "/v4_20261114_combination_selection/combinations/5"
+        },
+        {
+          "id": "D4",
+          "full_branch_target": 800,
+          "linked_parent_group": "full_scene",
+          "linked_group_target": 300,
+          "use_of_pool": "frame_002311 direct candidate; see image_task_relations[10].",
+          "current_component_capacity": {
+            "direct_label_candidates": 1,
+            "complete_training_images_confirmed": 0
+          },
+          "gap_to_linked_group_target_now": 300,
+          "limitations": [
+            "Existing source split unassigned and historical exposure unknown; candidate labels do not establish complete training truth."
+          ],
+          "all_parent_shares": {
+            "full_scene": 300,
+            "bin_videos": 400,
+            "bin_photos": 100
+          },
+          "full_plan_record_pointer": "/v4_20261114_combination_selection/combinations/0"
+        },
+        {
+          "id": "Dneg",
+          "full_branch_target": 100,
+          "linked_parent_group": "full_scene",
+          "linked_group_target": 100,
+          "use_of_pool": "frame_002701 direct negative candidate; see image_task_relations[11].",
+          "current_component_capacity": {
+            "direct_negative_candidates": 1,
+            "confirmed_training_negatives": 0
+          },
+          "gap_to_linked_group_target_now": 100,
+          "limitations": [
+            "Candidate negative is not a confirmed empty label for training."
+          ],
+          "all_parent_shares": {
+            "full_scene": 100,
+            "bin_videos": 0,
+            "bin_photos": 0
+          },
+          "full_plan_record_pointer": "/v4_20261114_combination_selection/combinations/2"
+        },
+        {
+          "id": "Dfew",
+          "full_branch_target": 150,
+          "linked_parent_group": "full_scene",
+          "linked_group_target": 50,
+          "use_of_pool": "frame_004801 is recorded as blocked because its prior role is regression and labels are partial.",
+          "current_component_capacity": {
+            "blocked_images": 1,
+            "complete_training_images_confirmed": 0
+          },
+          "gap_to_linked_group_target_now": 50,
+          "all_parent_shares": {
+            "full_scene": 50,
+            "bin_videos": 50,
+            "bin_photos": 50
+          },
+          "full_plan_record_pointer": "/v4_20261114_combination_selection/combinations/1"
+        }
+      ],
+      "other_full_plan_branches": {
+        "ids": [
+          "B4",
+          "Bfew",
+          "Bocc"
+        ],
+        "scope": "Blender scene branches and shares remain in the linked full plan; this image relation list supplies no rendered background images for them. Standalone PBR blue-bin scene is a parent asset, not a ready image.",
+        "branches": [
+          {
+            "id": "B4",
+            "target": 600,
+            "parent_shares": {
+              "arena_master": 350,
+              "arena_detailed": 250
+            },
+            "full_plan_record_pointer": "/v4_20261114_combination_selection/combinations/6",
+            "actual_usable_background_images_in_this_relation_pool": 0,
+            "actual_image_role_status": "not materialized; scene files are assets only",
+            "ready_role_scope": "PBR scene is an existing standalone bin model parent; no ready rendered image, and scene compatibility/labels for the complete arena branch remain conditional."
+          },
+          {
+            "id": "Bfew",
+            "target": 300,
+            "parent_shares": {
+              "arena_master": 150,
+              "arena_detailed": 150
+            },
+            "full_plan_record_pointer": "/v4_20261114_combination_selection/combinations/7",
+            "actual_usable_background_images_in_this_relation_pool": 0,
+            "actual_image_role_status": "not materialized; scene files are assets only",
+            "ready_role_scope": "PBR scene is an existing standalone bin model parent; no ready rendered image, and scene compatibility/labels for the complete arena branch remain conditional."
+          },
+          {
+            "id": "Bocc",
+            "target": 150,
+            "parent_shares": {
+              "arena_master": 100,
+              "arena_detailed": 50
+            },
+            "full_plan_record_pointer": "/v4_20261114_combination_selection/combinations/8",
+            "actual_usable_background_images_in_this_relation_pool": 0,
+            "actual_image_role_status": "not materialized; scene files are assets only",
+            "ready_role_scope": "PBR scene is an existing standalone bin model parent; no ready rendered image, and scene compatibility/labels for the complete arena branch remain conditional."
+          }
+        ]
+      },
+      "sampling": {
+        "recorded_full_plan_parent_shares": "fixed in linked plan; planned full_scene real-composite shares are 400/200/100",
+        "current_grouped_entry": "explicit concrete state, background ID and placement; no background image is randomly selected by the entry",
+        "seed": "No full-plan background draw or seed has been selected; the standalone renderer default 42 is recorded for a future run only.",
+        "limits": "Do not infer capacity from extra random seeds or unverified compatibility."
+      },
+      "scope_of_current_gaps": "Per-branch complete output capacity and shortfall are relative to the currently enumerated compatible inputs, not proof that every component has zero role-specific availability; no samples have been produced."
+    },
+    "asset_task_relations": [
+      {
+        "asset": "datasets/assets/blender/waste_bin/blender_pbr_v2_20261110/waste_bin_pbr.blend",
+        "asset_kind": "blender_scene_not_image",
+        "registry": "datasets/blender_source_registry.sqlite3",
+        "registry_classification": "task_model_parent",
+        "registry_state": "active_in_use",
+        "task_use_status": [
+          {
+            "task": "waste_bin_state",
+            "split": "train",
+            "role": "blender_scene",
+            "status": "ready",
+            "evidence": "Blender 5.2.3 read-only source structure check; not rendered",
+            "limitations": [
+              "Geometry only; labels and physical scene fit remain unknown."
+            ]
+          }
+        ]
+      },
+      {
+        "asset": "datasets/assets/blender/waste_bin/blender_pbr_v3_20261110/waste_bin_pbr.blend",
+        "asset_kind": "blender_scene_not_image",
+        "registry": "datasets/blender_source_registry.sqlite3",
+        "registry_classification": "unresolved_model_candidate",
+        "registry_state": "review_pending",
+        "task_use_status": [
+          {
+            "task": "waste_bin_state",
+            "split": "train",
+            "role": "blender_scene",
+            "status": "candidate",
+            "evidence": "Blender 5.2.3 read-only source structure check; not rendered",
+            "limitations": [
+              "Registry lifecycle remains review_pending; not visually approved.",
+              "Physical source relation to v2 and independent provenance unknown."
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

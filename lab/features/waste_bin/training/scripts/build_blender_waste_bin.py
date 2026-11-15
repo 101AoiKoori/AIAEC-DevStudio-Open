@@ -188,7 +188,7 @@ def look_at(obj, target):
     obj.rotation_euler=(Vector(target)-obj.location).to_track_quat('-Z','Y').to_euler()
 
 
-def main():
+def _generate():
     global PART_Z_SCALE
     parser=argparse.ArgumentParser()
     parser.add_argument('output')
@@ -256,6 +256,48 @@ def main():
     look_at(camera,(-.56,0,1.05))
     scene.render.filepath=str(out/'preview_detail.png')
     bpy.ops.render.render(write_still=True)
+
+
+def main():
+    raw=sys.argv[sys.argv.index('--')+1:] if '--' in sys.argv else []
+    parser=argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('output')
+    parser.add_argument('--decals',type=Path)
+    args,_=parser.parse_known_args(raw)
+    if bpy.data.is_dirty:
+        raise ValueError('save or discard scene changes before producing a guarded copy')
+    workspace=Path(__file__).resolve().parents[5]
+    output=Path(args.output).resolve()
+    media=set() if args.decals is None else {(args.decals/(name+'.png')).resolve()
+                                              for name in ('blue','red','green','gray')}
+    for image in bpy.data.images:
+        if image.source == 'FILE':
+            if not image.filepath:
+                raise ValueError('scene image source path is missing')
+            path=Path(bpy.path.abspath(image.filepath)).resolve()
+            if not path.is_file():
+                raise ValueError('scene image source missing: '+str(path))
+            media.add(path)
+    attribution=[]
+    if args.decals is not None and (args.decals/'attribution.json').is_file():
+        attribution=[(args.decals/'attribution.json').resolve()]
+    if bpy.data.filepath:
+        attribution.append(Path(bpy.data.filepath).resolve())
+        scene_source='loaded_blend'
+    else:
+        if '--factory-startup' not in sys.argv:
+            raise ValueError('an untitled scene requires --factory-startup for a reproducible source')
+        scene_source='factory_startup'
+    sys.path.insert(0,str(workspace))
+    from lab.training_common.production_guard import generation_guard
+    with generation_guard('waste_bin.build_scene:'+str(output.relative_to(workspace)),
+                          sorted(media),[output],{'argv':raw,'blender_version':bpy.app.version_string,
+                                                 'scene_source':scene_source},
+                          code_paths=[Path(__file__).resolve()],
+                          procedural_inputs=attribution or [Path(__file__).resolve()],root=workspace) as run:
+        if run.reused:
+            return
+        _generate()
 
 
 if __name__=='__main__':

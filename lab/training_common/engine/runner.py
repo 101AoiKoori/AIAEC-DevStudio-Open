@@ -6,6 +6,7 @@ import json
 import math
 import shutil
 import time
+import uuid
 import yaml
 from .config import TRAIN_KEYS, load_config, resolve, validate
 from .config import read_yaml
@@ -29,7 +30,7 @@ def _training_options(config, data_path, run_dir):
     options = {'data': str(data_path), 'imgsz': config['imgsz'], 'epochs': config['epochs'],
                'batch': config['batch'], 'workers': config.get('workers', 0),
                'patience': config.get('patience', 30), 'seed': config.get('seed', 42),
-               'device': config.get('device', 'cpu'), 'project': str(run_dir), 'name': 'training',
+               'device': config.get('device', '0'), 'project': str(run_dir), 'name': 'training',
                'exist_ok': False, 'plots': True, 'save': True, 'cache': False,
                'amp': config.get('amp', False), 'max_det': config.get('max_det', 300),
                'val': True, 'verbose': True}
@@ -91,7 +92,7 @@ def _evaluate_loaded(model, config, run_dir, data_path, split, name):
     if destination.exists(): raise FileExistsError('Evaluation already exists: ' + str(destination))
     options = {'data': str(data_path), 'split': split, 'imgsz': config['imgsz'],
                'batch': config['batch'], 'workers': config.get('workers', 0),
-               'device': config.get('device', 'cpu'), 'conf': .001, 'max_det': config.get('max_det', 300),
+               'device': config.get('device', '0'), 'conf': .001, 'max_det': config.get('max_det', 300),
                'iou': config.get('nms_iou', .7),
                'plots': True, 'save_json': True, 'save_txt': True, 'save_conf': True,
                'project': str(Path(run_dir) / 'evaluation'), 'name': name, 'exist_ok': False}
@@ -102,8 +103,8 @@ def _evaluate_loaded(model, config, run_dir, data_path, split, name):
     summary, class_rows = metric_report(metrics, data_path, split, config, actual)
     diagnostic = diagnostics(model, data_path, split, config, actual)
     summary['diagnostics'] = diagnostic
-    summary['data_selection'] = json.loads((Path(run_dir) / 'data/selection.json').read_text(encoding='utf-8'))
-    selected_records = json.loads((Path(run_dir) / 'data/samples.json').read_text(encoding='utf-8'))
+    summary['data_selection'] = json.loads((Path(data_path).parent / 'selection.json').read_text(encoding='utf-8'))
+    selected_records = json.loads((Path(data_path).parent / 'samples.json').read_text(encoding='utf-8'))
     summary['evaluation_sources'] = sorted(row.get('workspace_image', row['image']) for row in selected_records if row['split'] == split)
     summary['evaluation_config'] = {'imgsz': config['imgsz'], 'class_names': config.get('class_names'),
                                     'diagnostic_conf': config.get('diagnostic_conf', .25), 'match_iou': config.get('match_iou', .5)}
@@ -158,6 +159,8 @@ def resume_configuration(root, requested, run_dir, checkpoint):
 
 def train_run(root, config, run_name=None, resume=None):
     root = Path(root).resolve(); config = validate(deepcopy(config))
+    if config['version'].lower() == 'v4' and resume:
+        raise ValueError('V4 resume with per-step accounting is not implemented')
     model_path = resolve(root, resume or config['model'])
     if not model_path.is_file() or model_path.suffix.lower() != '.pt':
         raise ValueError('Local model/checkpoint missing: ' + str(model_path))
@@ -170,6 +173,8 @@ def train_run(root, config, run_name=None, resume=None):
         run_dir = new_run(root, config, run_name)
     print('RUN_DIR:', run_dir, flush=True)
     with run_context(root, config, run_dir, 'resume' if resume else 'train'):
+        if config['version'].lower() == 'v4':
+            write_json(run_dir / 'metadata/final_test_status.json', {'status': 'not_executed'})
         if resume:
             data_path = relocate_staged_data(run_dir)
             write_json(run_dir / 'metadata/resume_mapping.json', resume_mapping)
@@ -192,6 +197,11 @@ def train_run(root, config, run_name=None, resume=None):
         writer = _attach_tensorboard(model, run_dir)
         options = _training_options(config, data_path, run_dir)
         write_json(run_dir / 'config/framework_options.json', options)
+        recorder = None
+        if config['version'].lower() == 'v4':
+            from .telemetry import attach_update_recorder
+            recorder = attach_update_recorder(model, run_dir, config['epochs'])
+        reason = 'failed'
         try:
             if resume:
                 if config['task'] == 'pose':
@@ -209,7 +219,22 @@ def train_run(root, config, run_name=None, resume=None):
                 model.train(resume=True, trainer=RelocatedResumeTrainer, **options)
             else:
                 model.train(**options)
+            if recorder is not None:
+                if not recorder.registered:
+                    raise RuntimeError('Training returned without an optimizer-step recorder')
+                if recorder.steps == 0:
+                    reason = 'zero_optimizer_updates'
+                    raise RuntimeError('Training completed without any optimizer updates')
+                trainer = getattr(model, 'trainer', None)
+                completed_epoch = getattr(trainer, 'epoch', -1) + 1
+                reason = ('completed_epoch_budget' if completed_epoch >= config['epochs']
+                          else 'framework_stopped_early_reason_unconfirmed')
+        except KeyboardInterrupt:
+            reason = 'interrupted'
+            raise
         finally:
+            if recorder is not None:
+                recorder.close(reason, getattr(model, 'trainer', None))
             writer.close()
         best = run_dir / 'training/weights/best.pt'
         if not best.is_file(): raise RuntimeError('Training completed without best.pt')
@@ -225,6 +250,8 @@ def train_run(root, config, run_name=None, resume=None):
 def evaluate_run(root, config, weights, split='val', run_dir=None, name=None):
     if split not in ('val', 'test'): raise ValueError('Evaluation split must be val or test')
     root = Path(root).resolve(); config = validate(deepcopy(config))
+    if config['version'].lower() == 'v4' and split == 'test':
+        return evaluate_frozen_test(root, config, weights, run_dir, name)
     weight_path = resolve(root, weights, allow_absolute=True)
     if not weight_path.is_file(): raise ValueError('Evaluation checkpoint missing: ' + str(weight_path))
     if run_dir is None:
@@ -234,14 +261,88 @@ def evaluate_run(root, config, weights, split='val', run_dir=None, name=None):
         if 'runs' not in run_dir.relative_to(root).parts:
             raise ValueError('Evaluation run must be inside runs')
     name = name or split
+    if Path(name).name != name or name in {'.', '..'}:
+        raise ValueError('Invalid evaluation name')
+    if config['version'].lower() == 'v4' and (
+            (run_dir / 'evaluation' / name).exists() or
+            (run_dir / 'metadata/evaluation_inputs' / name).exists()):
+        raise FileExistsError('V4 evaluation name already used: ' + name)
     with run_context(root, config, run_dir, 'evaluate_' + name):
         data_path = run_dir / 'data/data.yaml'
         if not data_path.exists(): data_path, _ = stage_dataset(root, config, run_dir)
         else: data_path = relocate_staged_data(run_dir)
         YOLO = prepare_ultralytics(run_dir)
-        result = _evaluate_loaded(YOLO(str(weight_path), task=config['task']), config, run_dir, data_path, split, name)
+        snapshot = None
+        dataset_snapshot = None
+        if config['version'].lower() == 'v4' and split == 'val':
+            snapshot_dir = run_dir / 'metadata/evaluation_inputs' / name
+            snapshot_dir.mkdir(parents=True, exist_ok=False)
+            snapshot = snapshot_dir / 'checkpoint.pt'
+            with weight_path.open('rb') as source, snapshot.open('xb') as target:
+                shutil.copyfileobj(source, target)
+            shutil.copytree(run_dir / 'data', snapshot_dir / 'data', ignore=shutil.ignore_patterns('*.cache'))
+            dataset_snapshot = relocate_staged_data(snapshot_dir)
+            data_path = dataset_snapshot
+        result = _evaluate_loaded(YOLO(str(snapshot or weight_path), task=config['task']), config, run_dir, data_path, split, name)
         result['checkpoint'] = weight_path.relative_to(root).as_posix()
+        if snapshot is not None:
+            result['checkpoint_snapshot'] = snapshot.relative_to(root).as_posix()
+            result['dataset_snapshot'] = dataset_snapshot.relative_to(root).as_posix()
         write_json(run_dir / 'evaluation' / name / 'summary.json', result)
+    return run_dir
+
+
+def evaluate_frozen_test(root, config, weights, run_dir, name=None):
+    """Evaluate the frozen V4 selection once, retaining rejection and failure state."""
+    from .freeze_gate import frozen_dataset_path
+
+    root = Path(root).resolve()
+    if run_dir is None:
+        raise ValueError('V4 final test requires the run containing a frozen selection')
+    run_dir = resolve(root, run_dir, allow_absolute=True)
+    if 'runs' not in run_dir.relative_to(root).parts or not run_dir.is_dir():
+        raise ValueError('V4 final test run must be an existing run inside runs')
+    name = name or 'test'
+    if Path(name).name != name or name in {'.', '..'}:
+        raise ValueError('Invalid evaluation name')
+    status_path = run_dir / 'metadata/final_test_status.json'
+    attempts = run_dir / 'metadata/final_test_attempts'
+    attempts.mkdir(parents=True, exist_ok=True)
+    attempt_path = attempts / (uuid.uuid4().hex + '.json')
+    previous = json.loads(status_path.read_text(encoding='utf-8')) if status_path.is_file() else {}
+    if (run_dir / 'evaluation' / name).exists() or (run_dir / 'metadata/evaluation_inputs' / name).exists():
+        write_json(attempt_path, {'status': 'rejected', 'reason': 'Evaluation name already used'})
+        raise FileExistsError('V4 evaluation name already used: ' + name)
+    if previous.get('status') in ('complete', 'running'):
+        write_json(attempt_path, {'status': 'rejected', 'reason': 'Final test already completed or running'})
+        raise ValueError('Final test already completed or running')
+    try:
+        if config.get('test_unavailable'):
+            raise ValueError('Final test is unavailable; add an audited test set before testing')
+        data_path = frozen_dataset_path(root, config, run_dir, weights)
+    except BaseException as error:
+        write_json(attempt_path, {'status': 'rejected', 'error': f'{type(error).__name__}: {error}'})
+        if not status_path.exists():
+            write_json(status_path, {'status': 'not_executed'})
+        raise
+    state = {'status': 'running', 'evaluation': 'evaluation/' + name,
+             'selection': 'frozen_selection/record.json'}
+    write_json(status_path, state); write_json(attempt_path, state)
+    try:
+        with run_context(root, config, run_dir, 'evaluate_' + name):
+            YOLO = prepare_ultralytics(run_dir)
+            selected = resolve(root, weights, allow_absolute=True)
+            result = _evaluate_loaded(YOLO(str(selected), task=config['task']), config, run_dir, data_path, 'test', name)
+            result['checkpoint'] = selected.relative_to(root).as_posix()
+            result['selection'] = 'frozen_selection/record.json'
+            write_json(run_dir / 'evaluation' / name / 'summary.json', result)
+    except BaseException as error:
+        state.update(status='interrupted' if isinstance(error, KeyboardInterrupt) else 'failed',
+                     error=f'{type(error).__name__}: {error}')
+        write_json(status_path, state); write_json(attempt_path, state)
+        raise
+    state['status'] = 'complete'
+    write_json(status_path, state); write_json(attempt_path, state)
     return run_dir
 
 
@@ -307,6 +408,73 @@ def _mark_budget_exhausted(run_dir, phase):
     state.update(status='budget_exhausted', error='Parent wall-clock deadline stopped the owned process tree')
     write_json(path, state)
     write_json(Path(run_dir) / 'metadata/status.json', state)
+
+
+def _record_abrupt_training_stop(run_dir, status, message):
+    """Record forced termination without claiming a complete optimizer-step count."""
+    run_dir = Path(run_dir)
+    path = run_dir / 'metadata/train_status.json'
+    state = json.loads(path.read_text(encoding='utf-8')) if path.exists() else {'phase': 'train'}
+    if state.get('status') not in ('complete', 'failed', 'interrupted', 'budget_exhausted'):
+        state.update(status=status, error=message)
+        write_json(path, state)
+        write_json(run_dir / 'metadata/status.json', state)
+    update_log = run_dir / 'metadata/optimizer_updates.jsonl'
+    if not (run_dir / 'metadata/optimization_summary.json').exists():
+        recorded = 0
+        if update_log.is_file():
+            for line in update_log.read_text(encoding='utf-8').splitlines():
+                try:
+                    json.loads(line)
+                except json.JSONDecodeError:
+                    break
+                recorded += 1
+        write_json(run_dir / 'metadata/optimization_summary.json',
+                   {'status': status, 'recorded_optimizer_steps': recorded,
+                    'actual_optimizer_steps': None,
+                    'step_log': 'optimizer_updates.jsonl' if update_log.is_file() else None,
+                    'scope': 'An abrupt stop can interrupt recording; completed records are a lower bound.'})
+    if not (run_dir / 'metadata/final_test_status.json').exists():
+        write_json(run_dir / 'metadata/final_test_status.json', {'status': 'not_executed'})
+
+
+def bounded_train(root, config, config_path, wall_seconds, run_name=None):
+    """Enforce an external deadline without changing framework scheduler settings."""
+    root = Path(root).resolve(); validate(config)
+    seconds = float(wall_seconds)
+    if not math.isfinite(seconds) or seconds <= 0:
+        raise ValueError('wall_seconds must be finite and positive')
+    name = run_name or (config['version'] + '_' + uuid.uuid4().hex)
+    if Path(name).name != name or name in {'.', '..'}:
+        raise ValueError('run-name must be one directory name')
+    output = resolve(root, config['output_root'])
+    run_dir = output / name
+    if run_dir.exists():
+        raise FileExistsError('Run already exists: ' + str(run_dir))
+    controller = output / '_controllers' / uuid.uuid4().hex
+    controller.mkdir(parents=True, exist_ok=False)
+    state = {'phase': 'train_controller', 'status': 'running', 'wall_seconds': seconds,
+             'run': run_dir.relative_to(root).as_posix(), 'elapsed_seconds': None}
+    write_json(controller / 'status.json', state)
+    started = time.monotonic()
+    try:
+        arguments = child_command('train', root, config_path, run_name=name)
+        run_bounded(arguments, started + seconds, controller / 'child.log', root)
+        state['status'] = 'complete'
+    except BudgetExhausted as error:
+        state.update(status='budget_exhausted', error=str(error))
+        _record_abrupt_training_stop(run_dir, 'budget_exhausted', str(error))
+        raise
+    except BaseException as error:
+        state.update(status='interrupted' if isinstance(error, KeyboardInterrupt) else 'failed',
+                     error=f'{type(error).__name__}: {error}')
+        if config['version'].lower() == 'v4':
+            _record_abrupt_training_stop(run_dir, state['status'], state['error'])
+        raise
+    finally:
+        state['elapsed_seconds'] = time.monotonic() - started
+        write_json(controller / 'status.json', state)
+    return run_dir
 
 
 def tune_thresholds(root, config, weights, run_name=None):

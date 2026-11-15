@@ -1,0 +1,32 @@
+{
+  "scope": "Archive/Assets 原件到 datasets/raw 工作副本的路径映射；前缀下相对路径保持不变",
+  "copy_date": "2026-11-14",
+  "relationship": "working_copy_of",
+  "per_file_manifest": "datasets/source_copy_manifest.jsonl",
+  "path_conversion": {".ppm": ".png"},
+  "bytes_meaning": "各映射的 bytes 是 Archive 原件字节数；PNG 转换后字节数会改变",
+  "verification": "非 PPM 文件逐字节一致；19 张 PPM 转成 PNG 后逐张比较解码 RGB 像素一致；原件保留原位",
+  "mappings": [
+    {"archive_prefix": "Archive/Assets/CarRealPicture/", "raw_prefix": "datasets/raw/car_real_capture_20261112/", "files": 3309, "bytes": 218650242},
+    {"archive_prefix": "Archive/Assets/电动车与人物/", "raw_prefix": "datasets/raw/e_bike/archive_assets_legacy/", "files": 19, "bytes": 1246528518},
+    {"archive_prefix": "Archive/Assets/楼宇/", "raw_prefix": "datasets/raw/fire/archive_assets_legacy/楼宇/", "files": 77, "bytes": 603410620},
+    {"archive_prefix": "Archive/Assets/火焰纸片/", "raw_prefix": "datasets/raw/fire/archive_assets_legacy/火焰纸片/", "files": 1, "bytes": 89158},
+    {"archive_prefix": "Archive/Assets/垃圾桶/", "raw_prefix": "datasets/raw/waste_bin/archive_assets_legacy/", "files": 9, "bytes": 260356166},
+    {"archive_prefix": "Archive/Assets/禁止直行牌/", "raw_prefix": "datasets/raw/sign/archive_assets_legacy/", "files": 1, "bytes": 46962637},
+    {"archive_prefix": "Archive/Assets/红绿灯/", "raw_prefix": "datasets/raw/traffic_light/archive_assets_legacy/", "files": 1, "bytes": 921615},
+    {"archive_prefix": "Archive/Assets/仪表/", "raw_prefix": "datasets/raw/meter/archive_assets_legacy/", "files": 2, "bytes": 4008170},
+    {"archive_prefix": "Archive/Assets/车牌/", "raw_prefix": "datasets/raw/plate/archive_assets_legacy/", "files": 1, "bytes": 921615},
+    {"archive_prefix": "Archive/Assets/场景/", "raw_prefix": "datasets/raw/site_archive_legacy/场景/", "files": 10, "bytes": 544191651},
+    {"archive_prefix": "Archive/Assets/密集人群/", "raw_prefix": "datasets/raw/person/archive_assets_legacy/密集人群/", "files": 5, "bytes": 4608075}
+  ],
+  "not_copied": [
+    {"path": "Archive/Assets/pics.zip", "reason": "原始压缩包保留；其中 14 张 PPM 的分类副本已包含在上述映射"},
+    {"path": "Archive/Assets/PIC/", "reason": "空目录"},
+    {"path": "Archive/Assets/ros小车实拍照片/", "reason": "空目录"},
+    {"path": "Archive/Assets/数据采集/", "reason": "空目录"}
+  ],
+  "known_duplicates": [
+    "CarRealPicture/train/ 的 516 张 JPEG 与 CarRealPicture/frames_20261112_152304/ 同号文件为逐字节相同的抽样副本，不计为新采集",
+    "密集人群/ 的 5 张 PPM 与 pics.zip 中的已分类照片重复；raw PNG 工作图不计为新采集"
+  ]
+}

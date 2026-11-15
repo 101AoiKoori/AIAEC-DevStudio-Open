@@ -3,9 +3,14 @@
 The output is an unreviewed train candidate set, not a name/OCR dataset or an
 independent evaluation set. Source files and earlier exports are never changed.
 """
+
+if __name__ == "__main__":
+    raise SystemExit("Legacy dataset CLI is retired; use datasets/scripts/fire/. Production remains paused.")
+
 import argparse
 import json
 import shutil
+import sys
 from collections import Counter
 from pathlib import Path
 
@@ -14,6 +19,8 @@ from fire_blender_labels import fire_label_suppression, yolo_row
 
 ROOT = Path.cwd().resolve()
 FIRE_EXPORT_ROOT = ROOT / 'datasets/exports/fire'
+sys.path.insert(0, str(ROOT))
+from lab.training_common.production_guard import generation_guard
 
 
 def child_file(root, value):
@@ -89,7 +96,7 @@ def plan_source(source):
     return included, excluded
 
 
-def export(source, output):
+def _export_impl(source, output):
     source, output = source.resolve(), output.resolve()
     if not source.is_relative_to(FIRE_EXPORT_ROOT) or not output.is_relative_to(FIRE_EXPORT_ROOT):
         raise ValueError('来源和输出必须位于 datasets/exports/fire 中')
@@ -120,6 +127,28 @@ def export(source, output):
     finally:
         (output / 'run.json').write_text(json.dumps(metadata, ensure_ascii=False, indent=2), encoding='utf-8')
     return len(included), len(excluded)
+
+
+def export(source, output):
+    source, output = Path(source).resolve(), Path(output).resolve()
+    included, excluded = plan_source(source)
+    media = [image for image, _, _ in included]
+    # Excluded inputs influence the output manifest too.
+    media += [child_file(source, row['source_image']) for row in excluded]
+    procedural = [source / 'run.json', source / 'manifest.jsonl'] + [label for _, label, _ in included]
+    with generation_guard('fire.export_blender_candidates/' + output.relative_to(ROOT).as_posix(), media + procedural, [output],
+                          {}, code_paths=[Path(__file__), Path(__file__).with_name('fire_blender_labels.py'),
+                                          ROOT / 'datasets/scripts/common/annotations.py'],
+                          procedural_inputs=procedural, root=ROOT) as run:
+        if run.reused:
+            metadata = json.loads((output / 'run.json').read_text(encoding='utf-8'))
+            return metadata['included'], metadata['excluded']
+        result = _export_impl(source, output)
+        metadata_path = output / 'run.json'
+        metadata = json.loads(metadata_path.read_text(encoding='utf-8'))
+        metadata['source_refs'] = run.source_refs
+        metadata_path.write_text(json.dumps(metadata, ensure_ascii=False, indent=2), encoding='utf-8')
+        return result
 
 
 def main():

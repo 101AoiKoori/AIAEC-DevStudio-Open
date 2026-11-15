@@ -9,10 +9,21 @@ import subprocess
 import sys
 
 ROOT = Path(__file__).resolve().parents[4]
-ROOT_DIRS = {'.agents', '.githooks', '.git', '.venv', '.vscode', 'Archive', 'config',
-             'datasets', 'docs', 'lab', 'models', 'refs', 'tmp', 'tools', 'ws'}
+CONTRACTS = ROOT / 'lab/scripts/contracts'
+if str(CONTRACTS) not in sys.path:
+    sys.path.insert(0, str(CONTRACTS))
+ROOT_DIRS = {'.agents', '.claude', '.codex', '.githooks', '.git', '.venv', '.vscode', 'AIAEC-DevStudio-Open',
+             'Archive', 'config', 'datasets', 'docs', 'lab', 'models', 'refs', 'runs', 'tmp',
+             'training_packages', 'ws'}
 ROOT_FILES = {'.gitignore', 'AGENTS.md', 'README.md', '国赛规则说明.pdf'}
 WEIGHTS = {'.pt', '.pth', '.onnx', '.engine', '.pdparams', '.pdiparams'}
+DATASET_KINDS = {'dataset-script', 'dataset-config', 'dataset-annotation', 'dataset-sample',
+                 'dataset-export', 'dataset-shared-script', 'dataset-shared-annotation'}
+PACKAGE_KIND = 'ros-package'
+SUGGEST_KINDS = ['training-script', 'training-config', 'training-test',
+                 'inference-script', 'inference-config', 'inference-test', 'shared-core',
+                 'package-test', 'navigation', 'integration', 'repo-tool', 'temporary',
+                 PACKAGE_KIND] + sorted(DATASET_KINDS)
 
 
 def git_paths(root, *args):
@@ -44,7 +55,7 @@ def classify(path, indexed):
         return 'error', '路径必须位于工作区内'
     top, name = parts[0], parts[-1]
     if (top in {'.venv', 'tmp'} or '__pycache__' in parts or name.endswith('.pyc')
-            or path.startswith(('datasets/raw/', 'datasets/annotated/', 'datasets/exports/',
+            or path.startswith(('datasets/raw/', 'datasets/annotated/', 'datasets/exports/', 'datasets/samples/',
                                 'models/weights/', 'Archive/Assets/', 'ws/build/', 'ws/devel/',
                                 'ws/install/', 'ws/log/'))
             or path.startswith('ws/src/aec_vision/models/')
@@ -66,8 +77,11 @@ def classify(path, indexed):
             return 'review', 'ws/src 下的包名称或外部包需核实'
         if 'ws/src/{}/package.xml'.format(package) not in indexed:
             return 'error', 'ws/src 包缺少已跟踪或已暂存的 package.xml'
-    if top == 'lab' and len(parts) > 1 and parts[1] not in {'README.md', 'features', 'navigation', 'integration'}:
+    if top == 'lab' and len(parts) > 1 and parts[1] not in {'README.md', 'features', 'navigation', 'integration', 'training_common', 'scripts'}:
         return 'review', '实验区子目录职责未登记'
+    if top == 'lab' and len(parts) > 2 and parts[1] == 'scripts' and parts[2] not in {
+            'README.md', '__init__.py', 'contracts', 'media', 'blender', 'data', 'audit', 'common'}:
+        return 'review', '全局脚本分类未登记'
     if top == 'lab' and len(parts) > 3 and parts[1] == 'features' and parts[3] not in {'.gitkeep', 'README.md', 'training', 'inference'}:
         return 'review', '任务实验子目录职责需核实'
     if (top == 'lab' and len(parts) > 4 and parts[1] == 'features'
@@ -77,7 +91,11 @@ def classify(path, indexed):
     return 'ok', ''
 
 
-def suggest(root, kind, task):
+def suggest(root, kind, task, name=None):
+    if kind in DATASET_KINDS or kind == PACKAGE_KIND:
+        import workspace_layout
+        contract = workspace_layout.load_contract(root / 'config/workspace_layout.yaml')
+        return workspace_layout.suggest(contract, kind, task=task, name=name, root=root)
     if kind.startswith(('training-', 'inference-')):
         if not task:
             raise ValueError('识别实验需要 --task 指定任务 ID')
@@ -90,7 +108,7 @@ def suggest(root, kind, task):
         raise ValueError('--task 仅用于识别训练或推理实验')
     return {'shared-core': 'ws/src/aec_vision/src/aec_vision',
             'package-test': 'ws/src/aec_vision/tests', 'navigation': 'lab/navigation',
-            'integration': 'lab/integration', 'repo-tool': 'tools',
+            'integration': 'lab/integration', 'repo-tool': 'lab/scripts',
             'temporary': 'tmp'}[kind]
 
 
@@ -99,15 +117,16 @@ def main():
     mode = parser.add_mutually_exclusive_group()
     mode.add_argument('--staged', action='store_true', help='检查暂存变化及受影响包')
     mode.add_argument('--path', help='评估拟使用的工作区相对路径；不读取或创建该路径')
-    mode.add_argument('--suggest', choices=['training-script', 'training-config', 'training-test',
-                      'inference-script', 'inference-config', 'inference-test', 'shared-core',
-                      'package-test', 'navigation', 'integration', 'repo-tool', 'temporary'],
+    mode.add_argument('--suggest', choices=SUGGEST_KINDS,
                       help='按任务类型建议目录；不会创建文件')
-    parser.add_argument('--task', help='识别任务 ID，仅与识别实验的 --suggest 配合')
+    parser.add_argument('--task', help='识别或数据任务 ID，仅与 --suggest 配合')
+    parser.add_argument('--name', help='ROS 包名，仅与 --suggest ros-package 配合')
     args = parser.parse_args()
     try:
         if args.suggest:
-            print('建议目录: {}'.format(suggest(ROOT, args.suggest, args.task)))
+            suggestions = suggest(ROOT, args.suggest, args.task, args.name)
+            for item in ([suggestions] if isinstance(suggestions, str) else suggestions):
+                print('建议目录: {}'.format(item))
             print('请结合用途、权威目录说明和具体文件再次判断；该建议不会创建目录。')
             return 0
         if args.task:

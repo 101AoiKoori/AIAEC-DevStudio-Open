@@ -2,11 +2,16 @@
 import argparse
 import json
 import math
+import sys
 from collections import defaultdict
 from pathlib import Path
 
 import cv2
 import numpy as np
+
+ROOT = Path(__file__).resolve().parents[5]
+sys.path.insert(0, str(ROOT))
+from lab.training_common.production_guard import generation_guard
 
 
 def main():
@@ -14,9 +19,20 @@ def main():
     parser.add_argument('directory',type=Path)
     parser.add_argument('--out',type=Path,required=True)
     args=parser.parse_args()
-    if args.out.exists():
-        raise FileExistsError(args.out)
-    manifest=json.loads((args.directory/'manifest.json').read_text(encoding='utf8'))
+    manifest_path = args.directory / 'manifest.json'
+    items = select_items(json.loads(manifest_path.read_text(encoding='utf8')))
+    directory = args.directory.resolve()
+    out = args.out.resolve()
+    media = list(dict.fromkeys(directory / item['image'] for item in items))
+    with generation_guard('make_bin_review_sheet:' + out.relative_to(ROOT).as_posix(),
+                          media, [out], {}, code_paths=[__file__],
+                          procedural_inputs=[manifest_path]) as run:
+        if run.reused:
+            return
+        _render(args.directory, args.out, items)
+
+
+def select_items(manifest):
     groups=defaultdict(list)
     for item in manifest['samples']:
         groups[item['group']].append(item)
@@ -28,10 +44,14 @@ def main():
                 items.append(match)
     if not items:
         raise ValueError('no all-open or all-closed frames')
+    return items
+
+
+def _render(directory, out, items):
     tile=512; columns=4
     sheet=np.full((math.ceil(len(items)/columns)*tile,columns*tile,3),35,np.uint8)
     for index,sample in enumerate(items):
-        image=cv2.imdecode(np.fromfile(str(args.directory/sample['image']),np.uint8),cv2.IMREAD_COLOR)
+        image=cv2.imdecode(np.fromfile(str(directory/sample['image']),np.uint8),cv2.IMREAD_COLOR)
         if image is None:
             raise ValueError('cannot read '+sample['image'])
         height,width=image.shape[:2]
@@ -49,8 +69,8 @@ def main():
     ok,encoded=cv2.imencode('.png',sheet)
     if not ok:
         raise RuntimeError('cannot encode review sheet')
-    encoded.tofile(str(args.out))
-    print(f'Wrote {len(items)} sample views to {args.out}')
+    encoded.tofile(str(out))
+    print(f'Wrote {len(items)} sample views to {out}')
 
 
 if __name__=='__main__':

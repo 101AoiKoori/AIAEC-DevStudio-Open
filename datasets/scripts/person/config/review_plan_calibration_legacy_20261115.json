@@ -1,0 +1,269 @@
+{
+  "schema_version": 1,
+  "task": "person",
+  "batch": "v4_review_calibration_legacy_20261115",
+  "purpose": "Additional legacy background measurements used only to fill the bounded 24-frame clean/clutter/geometry_failed calibration set. Parent-video links remain unresolved and are carried into every result.",
+  "frames": [
+    {
+      "path": "datasets/raw/person/teammate_submission_20261110/dataset/backgrounds/bg_00001_f00004.jpg",
+      "parent_video": "Archive/Assets/场景/综合视频/空场与场景物料_001.mp4",
+      "timestamp_seconds": null,
+      "record_index": 4,
+      "source_group": "legacy_empty_site",
+      "parent_link_verified": false,
+      "role": "background",
+      "existing_targets": []
+    },
+    {
+      "path": "datasets/raw/person/teammate_submission_20261110/dataset/backgrounds/bg_00017_f00064.jpg",
+      "parent_video": "Archive/Assets/场景/综合视频/空场与场景物料_001.mp4",
+      "timestamp_seconds": null,
+      "record_index": 64,
+      "source_group": "legacy_empty_site",
+      "parent_link_verified": false,
+      "role": "background",
+      "existing_targets": []
+    },
+    {
+      "path": "datasets/raw/person/teammate_submission_20261110/dataset/backgrounds/bg_00032_f00117.jpg",
+      "parent_video": "Archive/Assets/场景/综合视频/空场与场景物料_001.mp4",
+      "timestamp_seconds": null,
+      "record_index": 117,
+      "source_group": "legacy_empty_site",
+      "parent_link_verified": false,
+      "role": "background",
+      "existing_targets": []
+    },
+    {
+      "path": "datasets/raw/person/teammate_submission_20261110/dataset/backgrounds/bg_00049_f00179.jpg",
+      "parent_video": "Archive/Assets/场景/综合视频/空场与场景物料_001.mp4",
+      "timestamp_seconds": null,
+      "record_index": 179,
+      "source_group": "legacy_empty_site",
+      "parent_link_verified": false,
+      "role": "background",
+      "existing_targets": []
+    },
+    {
+      "path": "datasets/raw/person/teammate_submission_20261110/dataset/backgrounds/bg_00066_f00245.jpg",
+      "parent_video": "Archive/Assets/场景/综合视频/空场与场景物料_001.mp4",
+      "timestamp_seconds": null,
+      "record_index": 245,
+      "source_group": "legacy_empty_site",
+      "parent_link_verified": false,
+      "role": "background",
+      "existing_targets": []
+    },
+    {
+      "path": "datasets/raw/person/teammate_submission_20261110/dataset/backgrounds/bg_00082_f00336.jpg",
+      "parent_video": "Archive/Assets/场景/综合视频/空场与场景物料_001.mp4",
+      "timestamp_seconds": null,
+      "record_index": 336,
+      "source_group": "legacy_empty_site",
+      "parent_link_verified": false,
+      "role": "background",
+      "existing_targets": []
+    },
+    {
+      "path": "datasets/raw/person/teammate_submission_20261110/dataset/backgrounds/bg_00099_f00461.jpg",
+      "parent_video": "Archive/Assets/场景/综合视频/空场与场景物料_001.mp4",
+      "timestamp_seconds": null,
+      "record_index": 461,
+      "source_group": "legacy_empty_site",
+      "parent_link_verified": false,
+      "role": "background",
+      "existing_targets": []
+    },
+    {
+      "path": "datasets/raw/person/teammate_submission_20261110/dataset/backgrounds/bg_00115_f00527.jpg",
+      "parent_video": "Archive/Assets/场景/综合视频/空场与场景物料_001.mp4",
+      "timestamp_seconds": null,
+      "record_index": 527,
+      "source_group": "legacy_empty_site",
+      "parent_link_verified": false,
+      "role": "background",
+      "existing_targets": []
+    },
+    {
+      "path": "datasets/raw/person/teammate_submission_20261110/dataset/backgrounds/bg_00132_f00703.jpg",
+      "parent_video": "Archive/Assets/场景/综合视频/空场与场景物料_001.mp4",
+      "timestamp_seconds": null,
+      "record_index": 703,
+      "source_group": "legacy_empty_site",
+      "parent_link_verified": false,
+      "role": "background",
+      "existing_targets": []
+    },
+    {
+      "path": "datasets/raw/person/teammate_submission_20261110/dataset/backgrounds/bg_00149_f00759.jpg",
+      "parent_video": "Archive/Assets/场景/综合视频/空场与场景物料_001.mp4",
+      "timestamp_seconds": null,
+      "record_index": 759,
+      "source_group": "legacy_empty_site",
+      "parent_link_verified": false,
+      "role": "background",
+      "existing_targets": []
+    },
+    {
+      "path": "datasets/raw/person/teammate_submission_20261110/dataset/backgrounds/bg_00166_f00935.jpg",
+      "parent_video": "Archive/Assets/场景/综合视频/空场与场景物料_001.mp4",
+      "timestamp_seconds": null,
+      "record_index": 935,
+      "source_group": "legacy_empty_site",
+      "parent_link_verified": false,
+      "role": "background",
+      "existing_targets": []
+    },
+    {
+      "path": "datasets/raw/person/teammate_submission_20261110/dataset/backgrounds/bg_00182_f01036.jpg",
+      "parent_video": "Archive/Assets/场景/综合视频/空场与场景物料_001.mp4",
+      "timestamp_seconds": null,
+      "record_index": 1036,
+      "source_group": "legacy_empty_site",
+      "parent_link_verified": false,
+      "role": "background",
+      "existing_targets": []
+    },
+    {
+      "path": "datasets/raw/person/teammate_submission_20261110/dataset/backgrounds/bg_00198_f01163.jpg",
+      "parent_video": "Archive/Assets/场景/综合视频/空场与场景物料_001.mp4",
+      "timestamp_seconds": null,
+      "record_index": 1163,
+      "source_group": "legacy_empty_site",
+      "parent_link_verified": false,
+      "role": "background",
+      "existing_targets": []
+    },
+    {
+      "path": "datasets/raw/person/teammate_submission_20261110/dataset/backgrounds/bg_00214_f01223.jpg",
+      "parent_video": "Archive/Assets/场景/综合视频/空场与场景物料_001.mp4",
+      "timestamp_seconds": null,
+      "record_index": 1223,
+      "source_group": "legacy_empty_site",
+      "parent_link_verified": false,
+      "role": "background",
+      "existing_targets": []
+    },
+    {
+      "path": "datasets/raw/person/teammate_submission_20261110/dataset/backgrounds/bg_00230_f01283.jpg",
+      "parent_video": "Archive/Assets/场景/综合视频/空场与场景物料_001.mp4",
+      "timestamp_seconds": null,
+      "record_index": 1283,
+      "source_group": "legacy_empty_site",
+      "parent_link_verified": false,
+      "role": "background",
+      "existing_targets": []
+    },
+    {
+      "path": "datasets/raw/person/teammate_submission_20261110/dataset/backgrounds/bg_00248_f01347.jpg",
+      "parent_video": "Archive/Assets/场景/综合视频/空场与场景物料_001.mp4",
+      "timestamp_seconds": null,
+      "record_index": 1347,
+      "source_group": "legacy_empty_site",
+      "parent_link_verified": false,
+      "role": "background",
+      "existing_targets": []
+    },
+    {
+      "path": "datasets/raw/person/teammate_submission_20261110/dataset/backgrounds/bg_00263_f01397.jpg",
+      "parent_video": "Archive/Assets/场景/综合视频/空场与场景物料_001.mp4",
+      "timestamp_seconds": null,
+      "record_index": 1397,
+      "source_group": "legacy_empty_site",
+      "parent_link_verified": false,
+      "role": "background",
+      "existing_targets": []
+    },
+    {
+      "path": "datasets/raw/person/teammate_submission_20261110/dataset/backgrounds/bg_00279_f01470.jpg",
+      "parent_video": "Archive/Assets/场景/综合视频/空场与场景物料_001.mp4",
+      "timestamp_seconds": null,
+      "record_index": 1470,
+      "source_group": "legacy_empty_site",
+      "parent_link_verified": false,
+      "role": "background",
+      "existing_targets": []
+    }
+  ],
+  "thresholds": {
+    "ground_min_area_ratio": 0.02,
+    "emptiness_required": false,
+    "suspect_min_score": 0.62,
+    "near_duplicate_phash_max": 8,
+    "near_duplicate_ssim_min": 0.95,
+    "require_two_duplicate_signals": true,
+    "ground_min_plane_support": 0.3
+  },
+  "placement": {
+    "required": true,
+    "target": {
+      "height_fraction": 0.3,
+      "aspect": 0.42
+    },
+    "params": {
+      "rectified_size": 512,
+      "canny_low": 50,
+      "canny_high": 150,
+      "close_kernel": 7,
+      "close_iterations": 2,
+      "dilate_kernel": 5,
+      "vertical_threshold": 80.0,
+      "min_component_area_ratio": 0.01,
+      "marking_aspect_min": 5.0,
+      "marking_vertical_max": 0.2,
+      "floor_grid": 8,
+      "floor_sample_fraction": 0.5,
+      "floor_mahalanobis_max": 5.0,
+      "grid_rows": 9,
+      "grid_cols": 15,
+      "target_body_free_min": 0.95,
+      "edge_density_win": 24,
+      "edge_density_max": 0.06,
+      "stability_probes": 2
+    },
+    "thresholds": {
+      "max_object_ratio": 0.1,
+      "max_object_component_ratio": 0.08,
+      "max_vertical_ratio": 0.008,
+      "min_largest_free_rect_ratio": 0.5,
+      "min_valid_footpoint_ratio": 0.05,
+      "max_body_obstacle_ratio": 0.05,
+      "clutter_exclude_ratio": 0.15,
+      "confidence_min": 0.6,
+      "borderline_margin": 0.1
+    },
+    "verdict": {
+      "cluttered": "excluded",
+      "uncertain": "unknown"
+    },
+    "calibration": "discovery_with_current_design_assumptions"
+  },
+  "emptiness": {
+    "params": {
+      "suspect_min_score": 0.62,
+      "mask_margin_px": 8,
+      "nms_iou": 0.3
+    },
+    "spec": {
+      "min_height_fraction": 0.28,
+      "back_side": "hard_negative",
+      "below_min_scale": "not_a_target"
+    }
+  },
+  "geometry": {
+    "ransac_iters": 200,
+    "seed": 1918
+  },
+  "overlays": {
+    "enabled": true,
+    "verdicts": [
+      "ready",
+      "unknown",
+      "excluded"
+    ]
+  },
+  "outputs": {
+    "selection": "datasets/annotated/common/review/person/v4_review_calibration_legacy_20261115/selection.json",
+    "metrics_dir": "datasets/annotated/common/review/person/v4_review_calibration_legacy_20261115"
+  }
+}

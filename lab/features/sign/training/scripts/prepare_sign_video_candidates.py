@@ -14,7 +14,7 @@ import cv2
 import numpy as np
 
 ROOT = Path(__file__).resolve().parents[5]
-DEFAULT_SOURCE = ROOT / 'Archive/Assets/禁止直行牌/视频/禁止直行牌视频.mp4'
+DEFAULT_SOURCE = ROOT / 'datasets/raw/sign/archive_assets_legacy/视频/禁止直行牌视频.mp4'
 OUTPUT_ROOT = ROOT / 'datasets/annotated/sign'
 
 
@@ -61,20 +61,15 @@ def yolo_line(box, width=1080, height=1920):
     return f'0 {(x1+x2)/(2*width):.6f} {(y1+y2)/(2*height):.6f} {(x2-x1)/width:.6f} {(y2-y1)/height:.6f}'
 
 
-def main():
-    parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--source', type=Path, default=DEFAULT_SOURCE)
-    parser.add_argument('--out', type=Path, required=True)
-    parser.add_argument('--fps', type=float, default=2)
-    args = parser.parse_args()
+def _run(args):
     source = (ROOT / args.source).resolve()
     out = (ROOT / args.out).resolve()
     if source != DEFAULT_SOURCE.resolve() or not source.is_file():
-        parser.error('该颜色阈值只针对用户提供的禁止直行牌视频')
+        raise ValueError('该颜色阈值只针对用户提供的禁止直行牌视频')
     if not out.is_relative_to(OUTPUT_ROOT.resolve()) or out == OUTPUT_ROOT.resolve() or out.exists():
-        parser.error('输出须是 datasets/annotated/sign 下不存在的目录')
+        raise ValueError('输出须是 datasets/annotated/sign 下不存在的目录')
     if not 0 < args.fps <= 4:
-        parser.error('抽帧 fps 必须大于 0 且不超过 4')
+        raise ValueError('抽帧 fps 必须大于 0 且不超过 4')
     capture = cv2.VideoCapture(str(source))
     if not capture.isOpened():
         raise RuntimeError('无法打开视频')
@@ -134,6 +129,10 @@ def main():
     print(json.dumps({'count': len(report['samples']),
                       'labels_candidate': sum(x['candidate_label'] is not None for x in report['samples']),
                       'output': out.relative_to(ROOT).as_posix()}, ensure_ascii=False))
+
+
+def main():
+    raise RuntimeError("Retired production entry; use the task scripts in datasets/scripts with its source.yaml")
 
 
 if __name__ == '__main__':

@@ -1,0 +1,253 @@
+task: waste_bin_state
+status: configured_inputs_consumed_by_canonical_entry
+databases:
+  media_query: datasets/annotated/media_index/query_cache.sqlite3
+  blender_registry: datasets/blender_source_registry.sqlite3
+roots:
+- datasets/raw/waste_bin
+- datasets/raw/car_real_capture_20261112
+- datasets/assets/blender/waste_bin
+records:
+- datasets/annotated/waste_bin_state/v4_source_provenance_20261113.json
+selection: 查询现有数据库和清单，按任务、集合、角色及父来源选取；跨任务背景允许复用。
+background_manifest: datasets/annotated/waste_bin/v4_grounded_backgrounds_20261112/backgrounds.json
+standalone_scene: datasets/assets/blender/waste_bin/blender_pbr_v2_20261110/waste_bin_pbr.blend
+render_input: datasets/samples/waste_bin_state
+arena_scene: datasets/assets/blender/shared/arena_4m2_pbr_20261112/arena_master_user_20261113.blend
+arena_bin_asset: datasets/assets/blender/waste_bin/blender_photo_markings_v4/waste_bin_photo_markings.blend
+asset_parent_scene: datasets/assets/blender/waste_bin/blender_pbr_v2_20261110/waste_bin_pbr.blend
+asset_parent_manifest_path: datasets/annotated/waste_bin/blender_pbr_v2_20261110/waste_bin_pbr.blend
+render_plan: datasets/scripts/waste_bin_state/config/render_plan.json
+production_plan: datasets/scripts/waste_bin_state/config/production_plan.json
+current_selection:
+  scope: current_train_batch_only
+  background_ids:
+  - train_000163
+  - train_005751
+  - train_000091
+  - train_002188
+  - train_005277
+  - train_005996
+  - train_006236
+  - train_007045
+  - train_008185
+  - train_008485
+  excluded_background_ids:
+  - id: val_007795
+    reason: reserved_val
+  - id: test_011125
+    reason: reserved_test
+  - id: val_000433
+    reason: reserved_val
+  - id: test_008695
+    reason: reserved_test
+  render_scene: datasets/assets/blender/waste_bin/blender_pbr_v2_20261110/waste_bin_pbr.blend
+  render_manifest: datasets/samples/waste_bin_state/manifest.json
+  render_status: not_produced_production_paused
+  composition_plan_status: compile_after_actual_render_and_index_refresh
+candidate_pool:
+  inventory: datasets/annotated/waste_bin_state/v4_combined_source_gate_20261113.json
+  samples: 5063
+  parent_videos: 2
+  supplemental:
+    - {file: datasets/annotated/waste_bin_state/v4_source_gate_candidates_20261113.json, samples: 4713, purpose: production_candidate_source_queue_not_approved_export}
+    - {file: datasets/annotated/waste_bin_state/v4_resume_source_gate_20261113.json, samples: 350}
+  blocking_review: bin mask and bin-level open/closed truth per frame; candidates are not approved exports and the composition plan still needs the rendered masks.
+pairing:
+  schema_version: 1
+  status: draft
+  composition_policy:
+    target_source: blender_primary
+    blender_priority: increased
+    blender_share_target: 0.40
+    target_components: [bin_model]
+    background_components: [arena_scene]
+    note: 用户 2026-11-15 确认采用 20/40/40；桶模型可覆盖四色开闭
+  policy:
+    parent_classes: [task_real, background]
+    split_unit: parent_group
+    train_parent_cap: 0.8
+    val_test_mode: reserve_only
+    derived_inherits_parent_split: true
+    cross_task_duplicates: allowed_with_separate_labels
+    same_source_splits: record_and_report
+  task_real:
+    - id: tr_bin_001
+      class: task_real
+      kind: parent_video
+      paths: [datasets/raw/waste_bin/archive_assets_legacy/视频/四色桶_灰绿开盖_红蓝闭盖_001.mp4]
+      evidence:
+        - {manifest: datasets/annotated/waste_bin/real_review_candidates_20261110/manifest.json}
+      capture_session: unknown
+      labels: {status: partial, note: 四色桶开闭组合，逐桶真值待标}
+      roles: [direct_target, composite_target]
+      split: {primary: train, status: proposed}
+      plan: null
+    - id: tr_bin_003
+      class: task_real
+      kind: parent_video
+      paths: [datasets/raw/waste_bin/archive_assets_legacy/视频/四色桶_灰绿闭盖_红蓝开盖_003.mp4]
+      evidence:
+        - {manifest: datasets/annotated/waste_bin/real_review_candidates_20261110/manifest.json}
+      capture_session: unknown
+      labels: {status: partial, note: 四色桶开闭组合，逐桶真值待标}
+      roles: [direct_target, composite_target]
+      split: {primary: train, status: proposed}
+      plan: null
+    - id: tr_bin_005
+      class: task_real
+      kind: parent_video
+      paths: [datasets/raw/waste_bin/archive_assets_legacy/视频/灰桶关盖_多面与桶盖近景_005.mp4]
+      evidence:
+        - {manifest: datasets/annotated/waste_bin/real_review_candidates_20261110/manifest.json}
+      capture_session: unknown
+      labels: {status: partial, note: 灰桶闭盖近景，逐桶真值待标}
+      roles: [direct_target, composite_target]
+      split: {primary: train, status: proposed}
+      plan: null
+    - id: tr_bin_004
+      class: task_real
+      kind: parent_video
+      paths: [datasets/raw/waste_bin/archive_assets_legacy/视频/四色桶较低视角_灰绿闭盖_红蓝开盖_004.mp4]
+      evidence:
+        - {manifest: datasets/annotated/waste_bin/real_review_candidates_20261110/manifest.json}
+      capture_session: unknown
+      labels: {status: partial, note: 低视角四色桶，逐桶真值待标}
+      roles: [direct_target, composite_target]
+      split: {primary: val, status: proposed}
+      plan: null
+    - id: tr_bin_006
+      class: task_real
+      kind: parent_video
+      paths: [datasets/raw/waste_bin/archive_assets_legacy/视频/灰桶开盖_多面及桶内近景_006.mp4]
+      evidence:
+        - {manifest: datasets/annotated/waste_bin/real_review_candidates_20261110/manifest.json}
+      capture_session: unknown
+      labels: {status: partial, note: 灰桶开盖近景，逐桶真值待标}
+      roles: [direct_target, composite_target]
+      split: {primary: val, status: proposed}
+      plan: null
+    - id: tr_bin_007
+      class: task_real
+      kind: parent_video
+      paths: [datasets/raw/waste_bin/archive_assets_legacy/视频/浅色地面四色桶_灰绿闭盖_红蓝开盖_007.mp4]
+      evidence:
+        - {manifest: datasets/annotated/waste_bin/real_review_candidates_20261110/manifest.json}
+      capture_session: unknown
+      labels: {status: partial, note: 四色桶开闭组合，逐桶真值待标}
+      roles: [direct_target, composite_target]
+      split: {primary: test, status: proposed}
+      plan: null
+    - id: tr_user_photos
+      class: task_real
+      kind: parent_photo_batch
+      paths: [datasets/raw/waste_bin]
+      evidence:
+        - {manifest: datasets/annotated/waste_bin/bin_reference_geometry_manifest.jsonl}
+      capture_session: unknown
+      labels: {status: partial, note: 用户多视角桶照片 14 张，开闭/颜色真值待标}
+      roles: [direct_target, geometry_reference]
+      split: {primary: test, status: proposed}
+      plan: null
+    - id: tr_motion_video
+      class: task_real
+      kind: parent_video
+      paths: [datasets/raw/waste_bin/运动方式.mp4]
+      evidence:
+        - {manifest: datasets/annotated/waste_bin/real_review_candidates_20261110/manifest.json}
+      capture_session: unknown
+      labels: {status: partial, note: 桶盖动作原片，开合过渡事件待标}
+      roles: [direct_target]
+      split: {primary: test, status: proposed}
+      plan: null
+  backgrounds:
+    - id: bg_full_scene
+      class: background
+      kind: parent_video
+      paths: [datasets/raw/site_capture_20261112/videos/full_scene.mp4]
+      evidence:
+        - {manifest: datasets/annotated/waste_bin/v4_grounded_backgrounds_20261112/backgrounds.json}
+      review: {state: candidate_empty, method: contact_sheet, accepted_by: null, note: 14 帧审后背景，10 train + 2 val + 2 test；未确认空场，不得作空负例}
+      labels: {status: unknown}
+      roles: [composite_background]
+      split: {primary: train, status: proposed, same_source_allowed_in: [val, test], action: to_review}
+      plan: null
+    - id: bg_site_003
+      class: background
+      kind: parent_video
+      paths: [datasets/raw/site_archive_legacy/场景/三楼与场地视频/三栋楼_垃圾桶与路口_003.mp4]
+      evidence:
+        - {manifest: datasets/annotated/mixed_scene/v4_compositing_backgrounds_20261113/manifest.json}
+      review: {state: candidate_empty, method: contact_sheet, accepted_by: null}
+      labels: {status: unknown}
+      roles: [composite_background]
+      split: {primary: val, status: proposed}
+      plan: null
+    - id: bg_site_005
+      class: background
+      kind: parent_video
+      paths: [datasets/raw/site_archive_legacy/场景/三楼与场地视频/三栋楼_路口及垃圾桶_005.mp4]
+      evidence:
+        - {manifest: datasets/annotated/mixed_scene/v4_compositing_backgrounds_20261113/manifest.json}
+      review: {state: candidate_empty, method: contact_sheet, accepted_by: null}
+      labels: {status: unknown}
+      roles: [composite_background]
+      split: {primary: val, status: proposed}
+      plan: null
+    - id: bg_site_009
+      class: background
+      kind: parent_video
+      paths: [datasets/raw/site_archive_legacy/场景/三楼与场地视频/三栋楼侧向扫描_009.mp4]
+      evidence:
+        - {manifest: datasets/annotated/mixed_scene/v4_compositing_backgrounds_20261113/manifest.json}
+      review: {state: candidate_empty, method: contact_sheet, accepted_by: null}
+      labels: {status: unknown}
+      roles: [composite_background]
+      split: {primary: test, status: proposed}
+      plan: null
+    - id: bg_site_012
+      class: background
+      kind: parent_video
+      paths: [datasets/raw/e_bike/archive_assets_legacy/视频/人物立牌正背面_电动车直立_倒伏和遮挡_场地扫描_012.mp4]
+      evidence:
+        - {manifest: datasets/annotated/mixed_scene/v4_compositing_backgrounds_20261113/manifest.json}
+      review: {state: candidate_empty, method: contact_sheet, accepted_by: null}
+      labels: {status: unknown}
+      roles: [composite_background]
+      split: {primary: test, status: proposed}
+      plan: null
+    - id: bg_ebike_003
+      class: background
+      kind: parent_video
+      paths: [datasets/raw/e_bike/archive_assets_legacy/视频/场地多辆电动车_直立与倒伏混合_较低视角_003.mp4]
+      evidence:
+        - {manifest: datasets/annotated/mixed_scene/v4_compositing_backgrounds_20261113/manifest.json}
+      review: {state: candidate_empty, method: contact_sheet, accepted_by: null}
+      labels: {status: unknown}
+      roles: [composite_background]
+      split: {primary: test, status: proposed}
+      plan: null
+  data_sources: []
+  blender:
+    - id: bl_waste_bin_pbr
+      kind: blender_scene
+      path: datasets/assets/blender/waste_bin/blender_pbr_v2_20261110/waste_bin_pbr.blend
+      role: target_scene
+      priority: primary
+      split: {primary: shared, status: confirmed, same_source_note: 四色桶目标/背景；与垃圾贴纸场景同谱系}
+    - id: bl_arena_master
+      kind: blender_scene
+      path: datasets/assets/blender/shared/arena_4m2_pbr_20261112/arena_master_user_20261113.blend
+      role: background_scene
+      priority: primary
+      split: {primary: shared, status: confirmed, same_source_note: 多任务共享母场景}
+  captures: []
+  plan_bindings:
+    train: [datasets/scripts/waste_bin_state/config/render_plan.json]
+    val: []
+    test: []
+  plan_alignment:
+    status: stale
+    note: backgrounds.json 已有 10 train/2 val/2 test，全部同属 full_scene.mp4；pairing 只登记 train 主 split 并记 same_source_allowed_in，val/test 不是独立父组；编译前需确认同源口径。
+    conflicts:
+      - {parent: bg_full_scene, plan: datasets/scripts/waste_bin_state/config/render_plan.json, pairing_split: train, plan_use: train+val+test same source}

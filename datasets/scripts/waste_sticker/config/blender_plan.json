@@ -1,0 +1,1548 @@
+{
+  "schema_version": 1,
+  "model_key": "waste_sticker",
+  "target_split": "test",
+  "purpose": "Current front and oblique arena states using existing animation frames covering all 24 classes",
+  "budget": 26,
+  "uncertainty_weight": 0,
+  "independence_basis": "one shared arena and fixed artwork classes; test split is synthetic and shares source artwork, not independent capture",
+  "constraints": {
+    "resolution": [
+      640,
+      480
+    ],
+    "labels": "visible_paper_yolo_candidate",
+    "min_visible_fraction": 0.7,
+    "min_visible_pixels": 24
+  },
+  "strata": [
+    {
+      "id": "arena_view0_frame001",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 2,
+        "beta": 8
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "failure_event": "render_or_visible_label_incomplete",
+      "background": {
+        "scene": "datasets/assets/blender/shared/arena_4m2_pbr_20261112/arena_master_user_20261113.blend"
+      },
+      "target": {
+        "asset": "datasets/assets/blender/waste_bin/waste_sticker_animated_v4.blend",
+        "frame": 1
+      },
+      "labels": {
+        "format": "yolo_detection",
+        "visibility": "visible_paper_candidate"
+      },
+      "augmentation": {
+        "exposure_ev": 0.279,
+        "saturation": 1.021,
+        "blur_pixels": 2,
+        "occluder_color": null,
+        "paper_width_ratio": 0.4344,
+        "paper_aspect": 0.9011
+      },
+      "parameters": {
+        "frame": 1,
+        "camera_location": [
+          -0.0218,
+          0.64214,
+          0.19718
+        ],
+        "camera_aim": [
+          0.0,
+          1.0,
+          0.075
+        ],
+        "exposure_ev": 0.279,
+        "saturation": 1.021,
+        "blur_pixels": 2,
+        "occluder_color": null,
+        "paper_width_ratio": 0.4344,
+        "paper_aspect": 0.9011
+      },
+      "sources": [
+        "datasets/assets/blender/shared/arena_4m2_pbr_20261112/arena_master_user_20261113.blend",
+        "datasets/assets/blender/waste_bin/waste_sticker_animated_v4.blend"
+      ],
+      "conditions": [
+        "design_group_front"
+      ]
+    },
+    {
+      "id": "arena_view0_frame002",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 2,
+        "beta": 8
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "failure_event": "render_or_visible_label_incomplete",
+      "background": {
+        "scene": "datasets/assets/blender/shared/arena_4m2_pbr_20261112/arena_master_user_20261113.blend"
+      },
+      "target": {
+        "asset": "datasets/assets/blender/waste_bin/waste_sticker_animated_v4.blend",
+        "frame": 2
+      },
+      "labels": {
+        "format": "yolo_detection",
+        "visibility": "visible_paper_candidate"
+      },
+      "augmentation": {
+        "exposure_ev": -0.061,
+        "saturation": 1.14,
+        "blur_pixels": 1,
+        "occluder_color": "red",
+        "paper_width_ratio": 0.4017,
+        "paper_aspect": 1.0352
+      },
+      "parameters": {
+        "frame": 2,
+        "camera_location": [
+          0.00027,
+          0.62516,
+          0.16098
+        ],
+        "camera_aim": [
+          0.0,
+          1.0,
+          0.075
+        ],
+        "exposure_ev": -0.061,
+        "saturation": 1.14,
+        "blur_pixels": 1,
+        "occluder_color": "red",
+        "paper_width_ratio": 0.4017,
+        "paper_aspect": 1.0352
+      },
+      "sources": [
+        "datasets/assets/blender/shared/arena_4m2_pbr_20261112/arena_master_user_20261113.blend",
+        "datasets/assets/blender/waste_bin/waste_sticker_animated_v4.blend"
+      ],
+      "conditions": [
+        "design_group_front"
+      ]
+    },
+    {
+      "id": "arena_view0_frame003",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 2,
+        "beta": 8
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "failure_event": "render_or_visible_label_incomplete",
+      "background": {
+        "scene": "datasets/assets/blender/shared/arena_4m2_pbr_20261112/arena_master_user_20261113.blend"
+      },
+      "target": {
+        "asset": "datasets/assets/blender/waste_bin/waste_sticker_animated_v4.blend",
+        "frame": 3
+      },
+      "labels": {
+        "format": "yolo_detection",
+        "visibility": "visible_paper_candidate"
+      },
+      "augmentation": {
+        "exposure_ev": 0.455,
+        "saturation": 1.0,
+        "blur_pixels": 2,
+        "occluder_color": null,
+        "paper_width_ratio": 0.4509,
+        "paper_aspect": 0.9738
+      },
+      "parameters": {
+        "frame": 3,
+        "camera_location": [
+          0.01416,
+          0.62946,
+          0.19885
+        ],
+        "camera_aim": [
+          0.0,
+          1.0,
+          0.075
+        ],
+        "exposure_ev": 0.455,
+        "saturation": 1.0,
+        "blur_pixels": 2,
+        "occluder_color": null,
+        "paper_width_ratio": 0.4509,
+        "paper_aspect": 0.9738
+      },
+      "sources": [
+        "datasets/assets/blender/shared/arena_4m2_pbr_20261112/arena_master_user_20261113.blend",
+        "datasets/assets/blender/waste_bin/waste_sticker_animated_v4.blend"
+      ],
+      "conditions": [
+        "design_group_front"
+      ]
+    },
+    {
+      "id": "arena_view0_frame004",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 2,
+        "beta": 8
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "failure_event": "render_or_visible_label_incomplete",
+      "background": {
+        "scene": "datasets/assets/blender/shared/arena_4m2_pbr_20261112/arena_master_user_20261113.blend"
+      },
+      "target": {
+        "asset": "datasets/assets/blender/waste_bin/waste_sticker_animated_v4.blend",
+        "frame": 4
+      },
+      "labels": {
+        "format": "yolo_detection",
+        "visibility": "visible_paper_candidate"
+      },
+      "augmentation": {
+        "exposure_ev": -0.309,
+        "saturation": 0.815,
+        "blur_pixels": 1,
+        "occluder_color": "gray",
+        "paper_width_ratio": 0.4064,
+        "paper_aspect": 0.9213
+      },
+      "parameters": {
+        "frame": 4,
+        "camera_location": [
+          -0.01731,
+          0.65395,
+          0.1933
+        ],
+        "camera_aim": [
+          0.0,
+          1.0,
+          0.075
+        ],
+        "exposure_ev": -0.309,
+        "saturation": 0.815,
+        "blur_pixels": 1,
+        "occluder_color": "gray",
+        "paper_width_ratio": 0.4064,
+        "paper_aspect": 0.9213
+      },
+      "sources": [
+        "datasets/assets/blender/shared/arena_4m2_pbr_20261112/arena_master_user_20261113.blend",
+        "datasets/assets/blender/waste_bin/waste_sticker_animated_v4.blend"
+      ],
+      "conditions": [
+        "design_group_front"
+      ]
+    },
+    {
+      "id": "arena_view0_frame005",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 2,
+        "beta": 8
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "failure_event": "render_or_visible_label_incomplete",
+      "background": {
+        "scene": "datasets/assets/blender/shared/arena_4m2_pbr_20261112/arena_master_user_20261113.blend"
+      },
+      "target": {
+        "asset": "datasets/assets/blender/waste_bin/waste_sticker_animated_v4.blend",
+        "frame": 5
+      },
+      "labels": {
+        "format": "yolo_detection",
+        "visibility": "visible_paper_candidate"
+      },
+      "augmentation": {
+        "exposure_ev": -0.242,
+        "saturation": 1.138,
+        "blur_pixels": 1,
+        "occluder_color": null,
+        "paper_width_ratio": 0.395,
+        "paper_aspect": 0.9958
+      },
+      "parameters": {
+        "frame": 5,
+        "camera_location": [
+          0.00768,
+          0.6416,
+          0.17588
+        ],
+        "camera_aim": [
+          0.0,
+          1.0,
+          0.075
+        ],
+        "exposure_ev": -0.242,
+        "saturation": 1.138,
+        "blur_pixels": 1,
+        "occluder_color": null,
+        "paper_width_ratio": 0.395,
+        "paper_aspect": 0.9958
+      },
+      "sources": [
+        "datasets/assets/blender/shared/arena_4m2_pbr_20261112/arena_master_user_20261113.blend",
+        "datasets/assets/blender/waste_bin/waste_sticker_animated_v4.blend"
+      ],
+      "conditions": [
+        "design_group_front"
+      ]
+    },
+    {
+      "id": "arena_view0_frame006",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 2,
+        "beta": 8
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "failure_event": "render_or_visible_label_incomplete",
+      "background": {
+        "scene": "datasets/assets/blender/shared/arena_4m2_pbr_20261112/arena_master_user_20261113.blend"
+      },
+      "target": {
+        "asset": "datasets/assets/blender/waste_bin/waste_sticker_animated_v4.blend",
+        "frame": 6
+      },
+      "labels": {
+        "format": "yolo_detection",
+        "visibility": "visible_paper_candidate"
+      },
+      "augmentation": {
+        "exposure_ev": -0.383,
+        "saturation": 1.057,
+        "blur_pixels": 1,
+        "occluder_color": "red",
+        "paper_width_ratio": 0.4549,
+        "paper_aspect": 0.935
+      },
+      "parameters": {
+        "frame": 6,
+        "camera_location": [
+          -0.01144,
+          0.62955,
+          0.16598
+        ],
+        "camera_aim": [
+          0.0,
+          1.0,
+          0.075
+        ],
+        "exposure_ev": -0.383,
+        "saturation": 1.057,
+        "blur_pixels": 1,
+        "occluder_color": "red",
+        "paper_width_ratio": 0.4549,
+        "paper_aspect": 0.935
+      },
+      "sources": [
+        "datasets/assets/blender/shared/arena_4m2_pbr_20261112/arena_master_user_20261113.blend",
+        "datasets/assets/blender/waste_bin/waste_sticker_animated_v4.blend"
+      ],
+      "conditions": [
+        "design_group_front"
+      ]
+    },
+    {
+      "id": "arena_view0_frame007",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 2,
+        "beta": 8
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "failure_event": "render_or_visible_label_incomplete",
+      "background": {
+        "scene": "datasets/assets/blender/shared/arena_4m2_pbr_20261112/arena_master_user_20261113.blend"
+      },
+      "target": {
+        "asset": "datasets/assets/blender/waste_bin/waste_sticker_animated_v4.blend",
+        "frame": 7
+      },
+      "labels": {
+        "format": "yolo_detection",
+        "visibility": "visible_paper_candidate"
+      },
+      "augmentation": {
+        "exposure_ev": 0.279,
+        "saturation": 1.021,
+        "blur_pixels": 2,
+        "occluder_color": null,
+        "paper_width_ratio": 0.4344,
+        "paper_aspect": 0.9011
+      },
+      "parameters": {
+        "frame": 7,
+        "camera_location": [
+          -0.0218,
+          0.64214,
+          0.19718
+        ],
+        "camera_aim": [
+          0.0,
+          1.0,
+          0.075
+        ],
+        "exposure_ev": 0.279,
+        "saturation": 1.021,
+        "blur_pixels": 2,
+        "occluder_color": null,
+        "paper_width_ratio": 0.4344,
+        "paper_aspect": 0.9011
+      },
+      "sources": [
+        "datasets/assets/blender/shared/arena_4m2_pbr_20261112/arena_master_user_20261113.blend",
+        "datasets/assets/blender/waste_bin/waste_sticker_animated_v4.blend"
+      ],
+      "conditions": [
+        "design_group_front"
+      ]
+    },
+    {
+      "id": "arena_view0_frame008",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 2,
+        "beta": 8
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "failure_event": "render_or_visible_label_incomplete",
+      "background": {
+        "scene": "datasets/assets/blender/shared/arena_4m2_pbr_20261112/arena_master_user_20261113.blend"
+      },
+      "target": {
+        "asset": "datasets/assets/blender/waste_bin/waste_sticker_animated_v4.blend",
+        "frame": 8
+      },
+      "labels": {
+        "format": "yolo_detection",
+        "visibility": "visible_paper_candidate"
+      },
+      "augmentation": {
+        "exposure_ev": -0.061,
+        "saturation": 1.14,
+        "blur_pixels": 1,
+        "occluder_color": "red",
+        "paper_width_ratio": 0.4017,
+        "paper_aspect": 1.0352
+      },
+      "parameters": {
+        "frame": 8,
+        "camera_location": [
+          0.00027,
+          0.62516,
+          0.16098
+        ],
+        "camera_aim": [
+          0.0,
+          1.0,
+          0.075
+        ],
+        "exposure_ev": -0.061,
+        "saturation": 1.14,
+        "blur_pixels": 1,
+        "occluder_color": "red",
+        "paper_width_ratio": 0.4017,
+        "paper_aspect": 1.0352
+      },
+      "sources": [
+        "datasets/assets/blender/shared/arena_4m2_pbr_20261112/arena_master_user_20261113.blend",
+        "datasets/assets/blender/waste_bin/waste_sticker_animated_v4.blend"
+      ],
+      "conditions": [
+        "design_group_front"
+      ]
+    },
+    {
+      "id": "arena_view0_frame009",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 2,
+        "beta": 8
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "failure_event": "render_or_visible_label_incomplete",
+      "background": {
+        "scene": "datasets/assets/blender/shared/arena_4m2_pbr_20261112/arena_master_user_20261113.blend"
+      },
+      "target": {
+        "asset": "datasets/assets/blender/waste_bin/waste_sticker_animated_v4.blend",
+        "frame": 9
+      },
+      "labels": {
+        "format": "yolo_detection",
+        "visibility": "visible_paper_candidate"
+      },
+      "augmentation": {
+        "exposure_ev": 0.455,
+        "saturation": 1.0,
+        "blur_pixels": 2,
+        "occluder_color": null,
+        "paper_width_ratio": 0.4509,
+        "paper_aspect": 0.9738
+      },
+      "parameters": {
+        "frame": 9,
+        "camera_location": [
+          0.01416,
+          0.62946,
+          0.19885
+        ],
+        "camera_aim": [
+          0.0,
+          1.0,
+          0.075
+        ],
+        "exposure_ev": 0.455,
+        "saturation": 1.0,
+        "blur_pixels": 2,
+        "occluder_color": null,
+        "paper_width_ratio": 0.4509,
+        "paper_aspect": 0.9738
+      },
+      "sources": [
+        "datasets/assets/blender/shared/arena_4m2_pbr_20261112/arena_master_user_20261113.blend",
+        "datasets/assets/blender/waste_bin/waste_sticker_animated_v4.blend"
+      ],
+      "conditions": [
+        "design_group_front"
+      ]
+    },
+    {
+      "id": "arena_view0_frame010",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 2,
+        "beta": 8
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "failure_event": "render_or_visible_label_incomplete",
+      "background": {
+        "scene": "datasets/assets/blender/shared/arena_4m2_pbr_20261112/arena_master_user_20261113.blend"
+      },
+      "target": {
+        "asset": "datasets/assets/blender/waste_bin/waste_sticker_animated_v4.blend",
+        "frame": 10
+      },
+      "labels": {
+        "format": "yolo_detection",
+        "visibility": "visible_paper_candidate"
+      },
+      "augmentation": {
+        "exposure_ev": -0.309,
+        "saturation": 0.815,
+        "blur_pixels": 1,
+        "occluder_color": "gray",
+        "paper_width_ratio": 0.4064,
+        "paper_aspect": 0.9213
+      },
+      "parameters": {
+        "frame": 10,
+        "camera_location": [
+          -0.01731,
+          0.65395,
+          0.1933
+        ],
+        "camera_aim": [
+          0.0,
+          1.0,
+          0.075
+        ],
+        "exposure_ev": -0.309,
+        "saturation": 0.815,
+        "blur_pixels": 1,
+        "occluder_color": "gray",
+        "paper_width_ratio": 0.4064,
+        "paper_aspect": 0.9213
+      },
+      "sources": [
+        "datasets/assets/blender/shared/arena_4m2_pbr_20261112/arena_master_user_20261113.blend",
+        "datasets/assets/blender/waste_bin/waste_sticker_animated_v4.blend"
+      ],
+      "conditions": [
+        "design_group_front"
+      ]
+    },
+    {
+      "id": "arena_view0_frame012",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 2,
+        "beta": 8
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "failure_event": "render_or_visible_label_incomplete",
+      "background": {
+        "scene": "datasets/assets/blender/shared/arena_4m2_pbr_20261112/arena_master_user_20261113.blend"
+      },
+      "target": {
+        "asset": "datasets/assets/blender/waste_bin/waste_sticker_animated_v4.blend",
+        "frame": 12
+      },
+      "labels": {
+        "format": "yolo_detection",
+        "visibility": "visible_paper_candidate"
+      },
+      "augmentation": {
+        "exposure_ev": -0.242,
+        "saturation": 1.138,
+        "blur_pixels": 1,
+        "occluder_color": null,
+        "paper_width_ratio": 0.395,
+        "paper_aspect": 0.9958
+      },
+      "parameters": {
+        "frame": 12,
+        "camera_location": [
+          0.00768,
+          0.6416,
+          0.17588
+        ],
+        "camera_aim": [
+          0.0,
+          1.0,
+          0.075
+        ],
+        "exposure_ev": -0.242,
+        "saturation": 1.138,
+        "blur_pixels": 1,
+        "occluder_color": null,
+        "paper_width_ratio": 0.395,
+        "paper_aspect": 0.9958
+      },
+      "sources": [
+        "datasets/assets/blender/shared/arena_4m2_pbr_20261112/arena_master_user_20261113.blend",
+        "datasets/assets/blender/waste_bin/waste_sticker_animated_v4.blend"
+      ],
+      "conditions": [
+        "design_group_front"
+      ]
+    },
+    {
+      "id": "arena_view0_frame016",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 2,
+        "beta": 8
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "failure_event": "render_or_visible_label_incomplete",
+      "background": {
+        "scene": "datasets/assets/blender/shared/arena_4m2_pbr_20261112/arena_master_user_20261113.blend"
+      },
+      "target": {
+        "asset": "datasets/assets/blender/waste_bin/waste_sticker_animated_v4.blend",
+        "frame": 16
+      },
+      "labels": {
+        "format": "yolo_detection",
+        "visibility": "visible_paper_candidate"
+      },
+      "augmentation": {
+        "exposure_ev": -0.383,
+        "saturation": 1.057,
+        "blur_pixels": 1,
+        "occluder_color": "red",
+        "paper_width_ratio": 0.4549,
+        "paper_aspect": 0.935
+      },
+      "parameters": {
+        "frame": 16,
+        "camera_location": [
+          -0.01144,
+          0.62955,
+          0.16598
+        ],
+        "camera_aim": [
+          0.0,
+          1.0,
+          0.075
+        ],
+        "exposure_ev": -0.383,
+        "saturation": 1.057,
+        "blur_pixels": 1,
+        "occluder_color": "red",
+        "paper_width_ratio": 0.4549,
+        "paper_aspect": 0.935
+      },
+      "sources": [
+        "datasets/assets/blender/shared/arena_4m2_pbr_20261112/arena_master_user_20261113.blend",
+        "datasets/assets/blender/waste_bin/waste_sticker_animated_v4.blend"
+      ],
+      "conditions": [
+        "design_group_front"
+      ]
+    },
+    {
+      "id": "arena_view0_frame017",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 2,
+        "beta": 8
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "failure_event": "render_or_visible_label_incomplete",
+      "background": {
+        "scene": "datasets/assets/blender/shared/arena_4m2_pbr_20261112/arena_master_user_20261113.blend"
+      },
+      "target": {
+        "asset": "datasets/assets/blender/waste_bin/waste_sticker_animated_v4.blend",
+        "frame": 17
+      },
+      "labels": {
+        "format": "yolo_detection",
+        "visibility": "visible_paper_candidate"
+      },
+      "augmentation": {
+        "exposure_ev": 0.279,
+        "saturation": 1.021,
+        "blur_pixels": 2,
+        "occluder_color": null,
+        "paper_width_ratio": 0.4344,
+        "paper_aspect": 0.9011
+      },
+      "parameters": {
+        "frame": 17,
+        "camera_location": [
+          -0.0218,
+          0.64214,
+          0.19718
+        ],
+        "camera_aim": [
+          0.0,
+          1.0,
+          0.075
+        ],
+        "exposure_ev": 0.279,
+        "saturation": 1.021,
+        "blur_pixels": 2,
+        "occluder_color": null,
+        "paper_width_ratio": 0.4344,
+        "paper_aspect": 0.9011
+      },
+      "sources": [
+        "datasets/assets/blender/shared/arena_4m2_pbr_20261112/arena_master_user_20261113.blend",
+        "datasets/assets/blender/waste_bin/waste_sticker_animated_v4.blend"
+      ],
+      "conditions": [
+        "design_group_front"
+      ]
+    },
+    {
+      "id": "arena_view1_frame001",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 8,
+        "beta": 2
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "failure_event": "render_or_visible_label_incomplete",
+      "background": {
+        "scene": "datasets/assets/blender/shared/arena_4m2_pbr_20261112/arena_master_user_20261113.blend"
+      },
+      "target": {
+        "asset": "datasets/assets/blender/waste_bin/waste_sticker_animated_v4.blend",
+        "frame": 1
+      },
+      "labels": {
+        "format": "yolo_detection",
+        "visibility": "visible_paper_candidate"
+      },
+      "augmentation": {
+        "exposure_ev": 0.471,
+        "saturation": 0.877,
+        "blur_pixels": 2,
+        "occluder_color": null,
+        "paper_width_ratio": 0.4206,
+        "paper_aspect": 1.0234
+      },
+      "parameters": {
+        "frame": 1,
+        "camera_location": [
+          0.1551,
+          0.63546,
+          0.18875
+        ],
+        "camera_aim": [
+          0.0,
+          1.0,
+          0.075
+        ],
+        "exposure_ev": 0.471,
+        "saturation": 0.877,
+        "blur_pixels": 2,
+        "occluder_color": null,
+        "paper_width_ratio": 0.4206,
+        "paper_aspect": 1.0234
+      },
+      "sources": [
+        "datasets/assets/blender/shared/arena_4m2_pbr_20261112/arena_master_user_20261113.blend",
+        "datasets/assets/blender/waste_bin/waste_sticker_animated_v4.blend"
+      ],
+      "conditions": [
+        "design_group_oblique"
+      ]
+    },
+    {
+      "id": "arena_view1_frame002",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 8,
+        "beta": 2
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "failure_event": "render_or_visible_label_incomplete",
+      "background": {
+        "scene": "datasets/assets/blender/shared/arena_4m2_pbr_20261112/arena_master_user_20261113.blend"
+      },
+      "target": {
+        "asset": "datasets/assets/blender/waste_bin/waste_sticker_animated_v4.blend",
+        "frame": 2
+      },
+      "labels": {
+        "format": "yolo_detection",
+        "visibility": "visible_paper_candidate"
+      },
+      "augmentation": {
+        "exposure_ev": -0.164,
+        "saturation": 1.017,
+        "blur_pixels": 2,
+        "occluder_color": "red",
+        "paper_width_ratio": 0.3929,
+        "paper_aspect": 0.9162
+      },
+      "parameters": {
+        "frame": 2,
+        "camera_location": [
+          -0.14505,
+          0.65695,
+          0.17698
+        ],
+        "camera_aim": [
+          0.0,
+          1.0,
+          0.075
+        ],
+        "exposure_ev": -0.164,
+        "saturation": 1.017,
+        "blur_pixels": 2,
+        "occluder_color": "red",
+        "paper_width_ratio": 0.3929,
+        "paper_aspect": 0.9162
+      },
+      "sources": [
+        "datasets/assets/blender/shared/arena_4m2_pbr_20261112/arena_master_user_20261113.blend",
+        "datasets/assets/blender/waste_bin/waste_sticker_animated_v4.blend"
+      ],
+      "conditions": [
+        "design_group_oblique"
+      ]
+    },
+    {
+      "id": "arena_view1_frame003",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 8,
+        "beta": 2
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "failure_event": "render_or_visible_label_incomplete",
+      "background": {
+        "scene": "datasets/assets/blender/shared/arena_4m2_pbr_20261112/arena_master_user_20261113.blend"
+      },
+      "target": {
+        "asset": "datasets/assets/blender/waste_bin/waste_sticker_animated_v4.blend",
+        "frame": 3
+      },
+      "labels": {
+        "format": "yolo_detection",
+        "visibility": "visible_paper_candidate"
+      },
+      "augmentation": {
+        "exposure_ev": -0.167,
+        "saturation": 1.111,
+        "blur_pixels": 1,
+        "occluder_color": null,
+        "paper_width_ratio": 0.4268,
+        "paper_aspect": 0.9574
+      },
+      "parameters": {
+        "frame": 3,
+        "camera_location": [
+          -0.13853,
+          0.65578,
+          0.1747
+        ],
+        "camera_aim": [
+          0.0,
+          1.0,
+          0.075
+        ],
+        "exposure_ev": -0.167,
+        "saturation": 1.111,
+        "blur_pixels": 1,
+        "occluder_color": null,
+        "paper_width_ratio": 0.4268,
+        "paper_aspect": 0.9574
+      },
+      "sources": [
+        "datasets/assets/blender/shared/arena_4m2_pbr_20261112/arena_master_user_20261113.blend",
+        "datasets/assets/blender/waste_bin/waste_sticker_animated_v4.blend"
+      ],
+      "conditions": [
+        "design_group_oblique"
+      ]
+    },
+    {
+      "id": "arena_view1_frame004",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 8,
+        "beta": 2
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "failure_event": "render_or_visible_label_incomplete",
+      "background": {
+        "scene": "datasets/assets/blender/shared/arena_4m2_pbr_20261112/arena_master_user_20261113.blend"
+      },
+      "target": {
+        "asset": "datasets/assets/blender/waste_bin/waste_sticker_animated_v4.blend",
+        "frame": 4
+      },
+      "labels": {
+        "format": "yolo_detection",
+        "visibility": "visible_paper_candidate"
+      },
+      "augmentation": {
+        "exposure_ev": -0.226,
+        "saturation": 0.866,
+        "blur_pixels": 1,
+        "occluder_color": "gray",
+        "paper_width_ratio": 0.4356,
+        "paper_aspect": 1.025
+      },
+      "parameters": {
+        "frame": 4,
+        "camera_location": [
+          0.1294,
+          0.64629,
+          0.17196
+        ],
+        "camera_aim": [
+          0.0,
+          1.0,
+          0.075
+        ],
+        "exposure_ev": -0.226,
+        "saturation": 0.866,
+        "blur_pixels": 1,
+        "occluder_color": "gray",
+        "paper_width_ratio": 0.4356,
+        "paper_aspect": 1.025
+      },
+      "sources": [
+        "datasets/assets/blender/shared/arena_4m2_pbr_20261112/arena_master_user_20261113.blend",
+        "datasets/assets/blender/waste_bin/waste_sticker_animated_v4.blend"
+      ],
+      "conditions": [
+        "design_group_oblique"
+      ]
+    },
+    {
+      "id": "arena_view1_frame005",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 8,
+        "beta": 2
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "failure_event": "render_or_visible_label_incomplete",
+      "background": {
+        "scene": "datasets/assets/blender/shared/arena_4m2_pbr_20261112/arena_master_user_20261113.blend"
+      },
+      "target": {
+        "asset": "datasets/assets/blender/waste_bin/waste_sticker_animated_v4.blend",
+        "frame": 5
+      },
+      "labels": {
+        "format": "yolo_detection",
+        "visibility": "visible_paper_candidate"
+      },
+      "augmentation": {
+        "exposure_ev": 0.253,
+        "saturation": 0.803,
+        "blur_pixels": 1,
+        "occluder_color": null,
+        "paper_width_ratio": 0.4074,
+        "paper_aspect": 1.0393
+      },
+      "parameters": {
+        "frame": 5,
+        "camera_location": [
+          0.12321,
+          0.64861,
+          0.18306
+        ],
+        "camera_aim": [
+          0.0,
+          1.0,
+          0.075
+        ],
+        "exposure_ev": 0.253,
+        "saturation": 0.803,
+        "blur_pixels": 1,
+        "occluder_color": null,
+        "paper_width_ratio": 0.4074,
+        "paper_aspect": 1.0393
+      },
+      "sources": [
+        "datasets/assets/blender/shared/arena_4m2_pbr_20261112/arena_master_user_20261113.blend",
+        "datasets/assets/blender/waste_bin/waste_sticker_animated_v4.blend"
+      ],
+      "conditions": [
+        "design_group_oblique"
+      ]
+    },
+    {
+      "id": "arena_view1_frame006",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 8,
+        "beta": 2
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "failure_event": "render_or_visible_label_incomplete",
+      "background": {
+        "scene": "datasets/assets/blender/shared/arena_4m2_pbr_20261112/arena_master_user_20261113.blend"
+      },
+      "target": {
+        "asset": "datasets/assets/blender/waste_bin/waste_sticker_animated_v4.blend",
+        "frame": 6
+      },
+      "labels": {
+        "format": "yolo_detection",
+        "visibility": "visible_paper_candidate"
+      },
+      "augmentation": {
+        "exposure_ev": 0.407,
+        "saturation": 0.976,
+        "blur_pixels": 0,
+        "occluder_color": "red",
+        "paper_width_ratio": 0.425,
+        "paper_aspect": 1.0371
+      },
+      "parameters": {
+        "frame": 6,
+        "camera_location": [
+          0.14211,
+          0.63514,
+          0.17468
+        ],
+        "camera_aim": [
+          0.0,
+          1.0,
+          0.075
+        ],
+        "exposure_ev": 0.407,
+        "saturation": 0.976,
+        "blur_pixels": 0,
+        "occluder_color": "red",
+        "paper_width_ratio": 0.425,
+        "paper_aspect": 1.0371
+      },
+      "sources": [
+        "datasets/assets/blender/shared/arena_4m2_pbr_20261112/arena_master_user_20261113.blend",
+        "datasets/assets/blender/waste_bin/waste_sticker_animated_v4.blend"
+      ],
+      "conditions": [
+        "design_group_oblique"
+      ]
+    },
+    {
+      "id": "arena_view1_frame007",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 8,
+        "beta": 2
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "failure_event": "render_or_visible_label_incomplete",
+      "background": {
+        "scene": "datasets/assets/blender/shared/arena_4m2_pbr_20261112/arena_master_user_20261113.blend"
+      },
+      "target": {
+        "asset": "datasets/assets/blender/waste_bin/waste_sticker_animated_v4.blend",
+        "frame": 7
+      },
+      "labels": {
+        "format": "yolo_detection",
+        "visibility": "visible_paper_candidate"
+      },
+      "augmentation": {
+        "exposure_ev": 0.471,
+        "saturation": 0.877,
+        "blur_pixels": 2,
+        "occluder_color": null,
+        "paper_width_ratio": 0.4206,
+        "paper_aspect": 1.0234
+      },
+      "parameters": {
+        "frame": 7,
+        "camera_location": [
+          0.1551,
+          0.63546,
+          0.18875
+        ],
+        "camera_aim": [
+          0.0,
+          1.0,
+          0.075
+        ],
+        "exposure_ev": 0.471,
+        "saturation": 0.877,
+        "blur_pixels": 2,
+        "occluder_color": null,
+        "paper_width_ratio": 0.4206,
+        "paper_aspect": 1.0234
+      },
+      "sources": [
+        "datasets/assets/blender/shared/arena_4m2_pbr_20261112/arena_master_user_20261113.blend",
+        "datasets/assets/blender/waste_bin/waste_sticker_animated_v4.blend"
+      ],
+      "conditions": [
+        "design_group_oblique"
+      ]
+    },
+    {
+      "id": "arena_view1_frame008",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 8,
+        "beta": 2
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "failure_event": "render_or_visible_label_incomplete",
+      "background": {
+        "scene": "datasets/assets/blender/shared/arena_4m2_pbr_20261112/arena_master_user_20261113.blend"
+      },
+      "target": {
+        "asset": "datasets/assets/blender/waste_bin/waste_sticker_animated_v4.blend",
+        "frame": 8
+      },
+      "labels": {
+        "format": "yolo_detection",
+        "visibility": "visible_paper_candidate"
+      },
+      "augmentation": {
+        "exposure_ev": -0.164,
+        "saturation": 1.017,
+        "blur_pixels": 2,
+        "occluder_color": "red",
+        "paper_width_ratio": 0.3929,
+        "paper_aspect": 0.9162
+      },
+      "parameters": {
+        "frame": 8,
+        "camera_location": [
+          -0.14505,
+          0.65695,
+          0.17698
+        ],
+        "camera_aim": [
+          0.0,
+          1.0,
+          0.075
+        ],
+        "exposure_ev": -0.164,
+        "saturation": 1.017,
+        "blur_pixels": 2,
+        "occluder_color": "red",
+        "paper_width_ratio": 0.3929,
+        "paper_aspect": 0.9162
+      },
+      "sources": [
+        "datasets/assets/blender/shared/arena_4m2_pbr_20261112/arena_master_user_20261113.blend",
+        "datasets/assets/blender/waste_bin/waste_sticker_animated_v4.blend"
+      ],
+      "conditions": [
+        "design_group_oblique"
+      ]
+    },
+    {
+      "id": "arena_view1_frame009",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 8,
+        "beta": 2
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "failure_event": "render_or_visible_label_incomplete",
+      "background": {
+        "scene": "datasets/assets/blender/shared/arena_4m2_pbr_20261112/arena_master_user_20261113.blend"
+      },
+      "target": {
+        "asset": "datasets/assets/blender/waste_bin/waste_sticker_animated_v4.blend",
+        "frame": 9
+      },
+      "labels": {
+        "format": "yolo_detection",
+        "visibility": "visible_paper_candidate"
+      },
+      "augmentation": {
+        "exposure_ev": -0.167,
+        "saturation": 1.111,
+        "blur_pixels": 1,
+        "occluder_color": null,
+        "paper_width_ratio": 0.4268,
+        "paper_aspect": 0.9574
+      },
+      "parameters": {
+        "frame": 9,
+        "camera_location": [
+          -0.13853,
+          0.65578,
+          0.1747
+        ],
+        "camera_aim": [
+          0.0,
+          1.0,
+          0.075
+        ],
+        "exposure_ev": -0.167,
+        "saturation": 1.111,
+        "blur_pixels": 1,
+        "occluder_color": null,
+        "paper_width_ratio": 0.4268,
+        "paper_aspect": 0.9574
+      },
+      "sources": [
+        "datasets/assets/blender/shared/arena_4m2_pbr_20261112/arena_master_user_20261113.blend",
+        "datasets/assets/blender/waste_bin/waste_sticker_animated_v4.blend"
+      ],
+      "conditions": [
+        "design_group_oblique"
+      ]
+    },
+    {
+      "id": "arena_view1_frame010",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 8,
+        "beta": 2
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "failure_event": "render_or_visible_label_incomplete",
+      "background": {
+        "scene": "datasets/assets/blender/shared/arena_4m2_pbr_20261112/arena_master_user_20261113.blend"
+      },
+      "target": {
+        "asset": "datasets/assets/blender/waste_bin/waste_sticker_animated_v4.blend",
+        "frame": 10
+      },
+      "labels": {
+        "format": "yolo_detection",
+        "visibility": "visible_paper_candidate"
+      },
+      "augmentation": {
+        "exposure_ev": -0.226,
+        "saturation": 0.866,
+        "blur_pixels": 1,
+        "occluder_color": "gray",
+        "paper_width_ratio": 0.4356,
+        "paper_aspect": 1.025
+      },
+      "parameters": {
+        "frame": 10,
+        "camera_location": [
+          0.1294,
+          0.64629,
+          0.17196
+        ],
+        "camera_aim": [
+          0.0,
+          1.0,
+          0.075
+        ],
+        "exposure_ev": -0.226,
+        "saturation": 0.866,
+        "blur_pixels": 1,
+        "occluder_color": "gray",
+        "paper_width_ratio": 0.4356,
+        "paper_aspect": 1.025
+      },
+      "sources": [
+        "datasets/assets/blender/shared/arena_4m2_pbr_20261112/arena_master_user_20261113.blend",
+        "datasets/assets/blender/waste_bin/waste_sticker_animated_v4.blend"
+      ],
+      "conditions": [
+        "design_group_oblique"
+      ]
+    },
+    {
+      "id": "arena_view1_frame012",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 8,
+        "beta": 2
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "failure_event": "render_or_visible_label_incomplete",
+      "background": {
+        "scene": "datasets/assets/blender/shared/arena_4m2_pbr_20261112/arena_master_user_20261113.blend"
+      },
+      "target": {
+        "asset": "datasets/assets/blender/waste_bin/waste_sticker_animated_v4.blend",
+        "frame": 12
+      },
+      "labels": {
+        "format": "yolo_detection",
+        "visibility": "visible_paper_candidate"
+      },
+      "augmentation": {
+        "exposure_ev": 0.253,
+        "saturation": 0.803,
+        "blur_pixels": 1,
+        "occluder_color": null,
+        "paper_width_ratio": 0.4074,
+        "paper_aspect": 1.0393
+      },
+      "parameters": {
+        "frame": 12,
+        "camera_location": [
+          0.12321,
+          0.64861,
+          0.18306
+        ],
+        "camera_aim": [
+          0.0,
+          1.0,
+          0.075
+        ],
+        "exposure_ev": 0.253,
+        "saturation": 0.803,
+        "blur_pixels": 1,
+        "occluder_color": null,
+        "paper_width_ratio": 0.4074,
+        "paper_aspect": 1.0393
+      },
+      "sources": [
+        "datasets/assets/blender/shared/arena_4m2_pbr_20261112/arena_master_user_20261113.blend",
+        "datasets/assets/blender/waste_bin/waste_sticker_animated_v4.blend"
+      ],
+      "conditions": [
+        "design_group_oblique"
+      ]
+    },
+    {
+      "id": "arena_view1_frame016",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 8,
+        "beta": 2
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "failure_event": "render_or_visible_label_incomplete",
+      "background": {
+        "scene": "datasets/assets/blender/shared/arena_4m2_pbr_20261112/arena_master_user_20261113.blend"
+      },
+      "target": {
+        "asset": "datasets/assets/blender/waste_bin/waste_sticker_animated_v4.blend",
+        "frame": 16
+      },
+      "labels": {
+        "format": "yolo_detection",
+        "visibility": "visible_paper_candidate"
+      },
+      "augmentation": {
+        "exposure_ev": 0.407,
+        "saturation": 0.976,
+        "blur_pixels": 0,
+        "occluder_color": "red",
+        "paper_width_ratio": 0.425,
+        "paper_aspect": 1.0371
+      },
+      "parameters": {
+        "frame": 16,
+        "camera_location": [
+          0.14211,
+          0.63514,
+          0.17468
+        ],
+        "camera_aim": [
+          0.0,
+          1.0,
+          0.075
+        ],
+        "exposure_ev": 0.407,
+        "saturation": 0.976,
+        "blur_pixels": 0,
+        "occluder_color": "red",
+        "paper_width_ratio": 0.425,
+        "paper_aspect": 1.0371
+      },
+      "sources": [
+        "datasets/assets/blender/shared/arena_4m2_pbr_20261112/arena_master_user_20261113.blend",
+        "datasets/assets/blender/waste_bin/waste_sticker_animated_v4.blend"
+      ],
+      "conditions": [
+        "design_group_oblique"
+      ]
+    },
+    {
+      "id": "arena_view1_frame017",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 8,
+        "beta": 2
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "failure_event": "render_or_visible_label_incomplete",
+      "background": {
+        "scene": "datasets/assets/blender/shared/arena_4m2_pbr_20261112/arena_master_user_20261113.blend"
+      },
+      "target": {
+        "asset": "datasets/assets/blender/waste_bin/waste_sticker_animated_v4.blend",
+        "frame": 17
+      },
+      "labels": {
+        "format": "yolo_detection",
+        "visibility": "visible_paper_candidate"
+      },
+      "augmentation": {
+        "exposure_ev": 0.471,
+        "saturation": 0.877,
+        "blur_pixels": 2,
+        "occluder_color": null,
+        "paper_width_ratio": 0.4206,
+        "paper_aspect": 1.0234
+      },
+      "parameters": {
+        "frame": 17,
+        "camera_location": [
+          0.1551,
+          0.63546,
+          0.18875
+        ],
+        "camera_aim": [
+          0.0,
+          1.0,
+          0.075
+        ],
+        "exposure_ev": 0.471,
+        "saturation": 0.877,
+        "blur_pixels": 2,
+        "occluder_color": null,
+        "paper_width_ratio": 0.4206,
+        "paper_aspect": 1.0234
+      },
+      "sources": [
+        "datasets/assets/blender/shared/arena_4m2_pbr_20261112/arena_master_user_20261113.blend",
+        "datasets/assets/blender/waste_bin/waste_sticker_animated_v4.blend"
+      ],
+      "conditions": [
+        "design_group_oblique"
+      ]
+    }
+  ],
+  "planning": {
+    "animation_frames": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      12,
+      16,
+      17
+    ],
+    "artwork_classes": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16,
+      17,
+      18,
+      19,
+      20,
+      21,
+      22,
+      23
+    ],
+    "views": 2,
+    "source_scene": "datasets/assets/blender/shared/arena_4m2_pbr_20261112/arena_master_user_20261113.blend",
+    "production_paused": true
+  }
+}

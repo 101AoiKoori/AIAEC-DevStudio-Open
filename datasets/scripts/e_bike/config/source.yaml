@@ -1,0 +1,368 @@
+task: e_bike
+vehicle_scene_background_root: datasets/raw/person/teammate_submission_20261110/dataset
+vehicle_scene_parent_video: datasets/raw/site_archive_legacy/场景/综合视频/空场与场景物料_001.mp4
+person_occluder_artwork_root: datasets/raw/person/team_assets
+vehicle_scene_selection: datasets/annotated/e_bike/multiview_masks_refined_20261110_v2/selection.json
+status: grounded_background_and_vehicle_selection_consumed
+ground_background_manifest: datasets/annotated/e_bike/v4_complex_backgrounds_20261112/backgrounds.json
+ground_vehicle_selection: datasets/annotated/e_bike/sam2_orbit_candidates_20261110/selection_review_candidate.json
+databases:
+  media_query: datasets/annotated/media_index/query_cache.sqlite3
+  blender_registry: datasets/blender_source_registry.sqlite3
+roots:
+- datasets/raw/e_bike/archive_assets_legacy
+- datasets/raw/car_real_capture_20261112
+- datasets/assets/blender
+records:
+- datasets/annotated/site_capture_20261112/person_vehicle_v4_review/source_gate_manifest.json
+selection: 查询现有数据库和清单，按任务、集合、角色及父来源选取；跨任务背景允许复用。
+blender_design_manifest: datasets/annotated/e_bike/v4_car_sequence_review_20261113/manifest.json
+blender_task_use_manifest: datasets/annotated/e_bike/v4_complex_backgrounds_20261112/image_task_use_manifest_20261114.json
+blender_foreground_manifest: datasets/annotated/person/v4_vehicle_occluders_20261113/manifest.json
+blender_scenes:
+  S_indoor_detailed: datasets/assets/blender/shared/arena_4m2_pbr_20261112/arena_indoor_detailed.blend
+  S_master_candidate: datasets/assets/blender/shared/arena_4m2_pbr_20261112/arena_master_user_20261113.blend
+direct_real_review_manifest: datasets/annotated/e_bike/v4_low_angle_multibike_review_20261112/review_manifest.json
+production_plan: datasets/scripts/e_bike/config/production_plan.json
+direct_real_plan: datasets/scripts/e_bike/config/direct_real_plan.json
+current_selection:
+  status: source_and_alpha_geometry_contract_passed_production_paused
+  composite:
+    candidate_states: 60
+    budget: 40
+    backgrounds:
+    - record_index: 0
+      image: datasets/annotated/e_bike/v4_complex_backgrounds_20261112/background_005751.png
+      parent_video: datasets/raw/site_capture_20261112/videos/full_scene.mp4
+      timestamp_seconds: 191.820633
+    - record_index: 1
+      image: datasets/annotated/e_bike/v4_complex_backgrounds_20261112/background_002850.png
+      parent_video: datasets/raw/site_capture_20261112/videos/full_scene.mp4
+      timestamp_seconds: 95.060133
+    - record_index: 2
+      image: datasets/annotated/e_bike/v4_complex_backgrounds_20261112/background_007000.png
+      parent_video: datasets/raw/site_capture_20261112/videos/full_scene.mp4
+      timestamp_seconds: 233.492733
+    - record_index: 3
+      image: datasets/annotated/e_bike/v4_complex_backgrounds_20261112/background_007045.png
+      parent_video: datasets/raw/site_capture_20261112/videos/full_scene.mp4
+      timestamp_seconds: 234.992733
+    foregrounds:
+    - record_index: 0
+      image: datasets/annotated/e_bike/multiview_masks_refined_20261110_v2/sam2_01_fallen.png
+      posture: fallen
+      parent_video: datasets/raw/e_bike/archive_assets_legacy/视频/浅色背景单辆倒伏车_平视旋转_008.mp4
+    - record_index: 1
+      image: datasets/annotated/e_bike/multiview_masks_refined_20261110_v2/sam2_03_fallen.png
+      posture: fallen
+      parent_video: datasets/raw/e_bike/archive_assets_legacy/视频/浅色背景单辆倒伏车_平视旋转_008.mp4
+    - record_index: 2
+      image: datasets/annotated/e_bike/multiview_masks_refined_20261110_v2/sam2_04_upright.png
+      posture: upright
+      parent_video: datasets/raw/e_bike/archive_assets_legacy/视频/浅色背景单辆直立车_平视旋转_009.mp4
+    - record_index: 3
+      image: datasets/annotated/e_bike/multiview_masks_refined_20261110_v2/sam2_06_upright.png
+      posture: upright
+      parent_video: datasets/raw/e_bike/archive_assets_legacy/视频/浅色背景单辆直立车_平视旋转_009.mp4
+    background_parent_videos: 1
+    foreground_parent_videos: 2
+    not_selected_foreground_records:
+    - 4
+    - 5
+    - 6
+    - 7
+    - 8
+    - 9
+    - 10
+    - 11
+    - 12
+    - 13
+    - 14
+    - 15
+    - 16
+    - 17
+    - 18
+    - 19
+    - 20
+    not_selected_reason: Bounded restart batch uses the four existing refined masks;
+      remaining masks retain candidate status.
+  direct_real:
+    candidate_states: 12
+    budget: 8
+    rows:
+    - 0
+    - 1
+    - 2
+    - 3
+    parent_videos: 1
+    label_status: Existing AI complete label candidates retained; no label regeneration
+      or image generation.
+  excluded_for_missing_labels: 0
+  remaining_target: These are bounded restart plans, not the complete 4000-image training
+    target.
+  output_policy: The first restart command uses only the composite plan in datasets/samples/e_bike.
+    Direct-real is a separate prepared alternative; do not run both into the same
+    nonempty current sample directory.
+  contract_scope: Existing source and label reads, Bayesian allocation, foreground
+    alpha placement/contact/visibility checks only. No composite RGB image, sample,
+    render, database write or training.
+  restart_command: .venv/Scripts/python.exe -B datasets/scripts/e_bike/compose_v4_grounded_train.py
+    --plan datasets/scripts/e_bike/config/production_plan.json --output datasets/samples/e_bike
+  direct_real_alternative_command: .venv/Scripts/python.exe -B datasets/scripts/e_bike/prepare_v4_low_angle_real.py
+    --plan datasets/scripts/e_bike/config/direct_real_plan.json --output datasets/samples/e_bike
+  output: datasets/samples/e_bike
+candidate_pool:
+  inventory: datasets/annotated/e_bike/v4_858_source_20261113/staged_source_gate.json
+  samples: 3492
+  parent_videos: 5
+  supplemental:
+    - datasets/annotated/e_bike/v4_858_source_20261113/distribution_manifest.json
+    - datasets/annotated/e_bike/sam2_orbit_candidates_20261110/selection_review_candidate.json
+  blocking_review: background role and ground contact per frame for composite backgrounds; recorded shared-source and AI candidate views are not independent captures and stay unassigned until review.
+pairing:
+  schema_version: 1
+  status: draft
+  composition_policy:
+    target_source: rotation_video_masks
+    blender_priority: background_only
+    target_components: [rotation_video_masks]
+    background_components: [real_backgrounds, blender_scene]
+    note: 用户 2026-11-15 指定目标数据源为平视/环绕旋转掩膜；Blender 只作背景
+  policy:
+    parent_classes: [task_real, background]
+    split_unit: parent_group
+    train_parent_cap: 0.8
+    val_test_mode: reserve_only
+    derived_inherits_parent_split: true
+    cross_task_duplicates: allowed_with_separate_labels
+    same_source_splits: record_and_report
+  task_real:
+    - id: tr_bike_008
+      class: task_real
+      kind: parent_video
+      paths: [datasets/raw/e_bike/archive_assets_legacy/视频/浅色背景单辆倒伏车_平视旋转_008.mp4]
+      evidence:
+        - {manifest: datasets/annotated/e_bike/video_review_20261110/manifest.json, record_index: 0}
+      capture_session: unknown
+      labels: {status: partial, note: 15 审核帧，待完整姿态标签}
+      roles: [direct_target, composite_target, mask_source]
+      split: {primary: train, status: proposed}
+      plan: null
+    - id: tr_bike_009
+      class: task_real
+      kind: parent_video
+      paths: [datasets/raw/e_bike/archive_assets_legacy/视频/浅色背景单辆直立车_平视旋转_009.mp4]
+      evidence:
+        - {manifest: datasets/annotated/e_bike/video_review_20261110/manifest.json, record_index: 1}
+      capture_session: unknown
+      labels: {status: partial, note: 12 审核帧，待完整姿态标签}
+      roles: [direct_target, composite_target, mask_source]
+      split: {primary: train, status: proposed}
+      plan: null
+    - id: tr_bike_003
+      class: task_real
+      kind: parent_video
+      paths: [datasets/raw/e_bike/archive_assets_legacy/视频/场地多辆电动车_直立与倒伏混合_较低视角_003.mp4]
+      evidence:
+        - {manifest: datasets/annotated/e_bike/video_review_20261110/manifest.json, record_index: 3}
+      capture_session: unknown
+      labels: {status: partial, note: 6 审核帧，多车姿态待标}
+      roles: [direct_target, composite_target]
+      split: {primary: val, status: proposed}
+      plan: null
+    - id: tr_scan_012
+      class: task_real
+      kind: parent_video
+      paths: [datasets/raw/e_bike/archive_assets_legacy/视频/人物立牌正背面_电动车直立_倒伏和遮挡_场地扫描_012.mp4]
+      evidence:
+        - {manifest: datasets/annotated/e_bike/video_review_20261110/manifest.json, record_index: 4}
+      capture_session: unknown
+      labels: {status: partial, note: 49 审核帧，待完整标签}
+      roles: [direct_target, composite_target]
+      split: {primary: test, status: proposed}
+      plan: null
+    - id: tr_car_real_bike
+      class: task_real
+      kind: parent_video
+      paths: [datasets/raw/car_real_capture_20261112/V_20261112_152304.mp4]
+      evidence:
+        - {manifest: datasets/annotated/car_real_capture_20261112/segments_v1/segments.csv}
+      capture_session: unknown
+      labels: {status: partial, note: 16 个 e_bike 片段，直接标签待重建}
+      roles: [direct_target]
+      split: {primary: test, status: proposed}
+      plan: null
+    - id: tr_site_bike
+      class: task_real
+      kind: parent_photo_batch
+      paths: [datasets/raw/site_capture_20261112/onboard_camera_images]
+      evidence:
+        - {manifest: datasets/annotated/site_capture_20261112/target_instances_manifest.jsonl}
+      capture_session: unknown
+      labels: {status: partial, note: 60 条 e_bike 观测，待完整姿态标签}
+      roles: [direct_target]
+      split: {primary: val, status: proposed}
+      plan: null
+    - id: tr_bike_005_006
+      class: task_real
+      kind: parent_video
+      paths:
+        - datasets/raw/e_bike/archive_assets_legacy/视频/单辆直立电动车_低视角环绕_005.mp4
+        - datasets/raw/e_bike/archive_assets_legacy/视频/单辆倒伏电动车_俯角环绕_006.mp4
+      evidence:
+        - {manifest: datasets/annotated/e_bike/video_review_20261110/manifest.json, note: 仅 005 入审核清单，006 未入}
+      capture_session: unknown
+      labels: {status: unknown, note: 待提直立/倒伏掩膜}
+      roles: [mask_source, composite_target]
+      split: {primary: val, status: proposed, action: to_extract}
+      plan: null
+    - id: tr_bike_004_007_010_011
+      class: task_real
+      kind: parent_video
+      paths:
+        - datasets/raw/e_bike/archive_assets_legacy/视频/单辆直立电动车_俯角环绕_004.mp4
+        - datasets/raw/e_bike/archive_assets_legacy/视频/单辆倒伏电动车_俯角环绕_007.mp4
+        - datasets/raw/e_bike/archive_assets_legacy/视频/浅色背景单辆倒伏车_俯角旋转_010.mp4
+        - datasets/raw/e_bike/archive_assets_legacy/视频/浅色背景单辆直立车_俯角旋转_011.mp4
+      evidence:
+        - {manifest: datasets/annotated/e_bike/video_review_20261110/manifest.json, note: 四段视频未入审核清单}
+      capture_session: unknown
+      labels: {status: unknown, note: 待提掩膜与完整标签}
+      roles: [mask_source, composite_target]
+      split: {primary: test, status: proposed, action: to_extract}
+      plan: null
+  backgrounds:
+    - id: bg_full_scene
+      class: background
+      kind: parent_video
+      paths: [datasets/raw/site_capture_20261112/videos/full_scene.mp4]
+      evidence:
+        - {manifest: datasets/annotated/e_bike/v4_complex_backgrounds_20261112/backgrounds.json, record_index: 0}
+      review: {state: candidate_empty, method: visual_review, accepted_by: null, note: 未确认空场，不得作空负例}
+      labels: {status: unknown}
+      roles: [composite_background]
+      split: {primary: train, status: proposed, action: to_review}
+      plan: null
+    - id: bg_car_capture
+      class: background
+      kind: parent_photo_batch
+      paths:
+        - datasets/raw/car_real_capture_20261112/P01_TL1.png
+        - datasets/raw/car_real_capture_20261112/P02_PS1.png
+        - datasets/raw/car_real_capture_20261112/P04_PS2.png
+        - datasets/raw/car_real_capture_20261112/P05_NOENTRY.png
+        - datasets/raw/car_real_capture_20261112/P07_PS3.png
+        - datasets/raw/car_real_capture_20261112/P08_PS4.png
+      evidence:
+        - {manifest: datasets/annotated/e_bike/v4_car_sequence_review_20261113/manifest.json, note: v4_combination_source_plan_20261114/G_car_capture}
+      review: {state: unknown, method: contact_sheet, accepted_by: null, note: 照片与视频父关系未确认}
+      labels: {status: unknown}
+      roles: [composite_background]
+      split: {primary: val, status: proposed}
+      plan: null
+    - id: bg_legacy_001
+      class: background
+      kind: parent_video
+      paths: [datasets/raw/site_archive_legacy/场景/综合视频/空场与场景物料_001.mp4]
+      evidence:
+        - {manifest: datasets/annotated/e_bike/v4_car_sequence_review_20261113/manifest.json, note: v4_combination_source_plan_20261114/G_legacy_scene}
+      review: {state: unknown, method: contact_sheet, accepted_by: null, note: 两帧为近邻候选}
+      labels: {status: unknown}
+      roles: [composite_background]
+      split: {primary: test, status: proposed}
+      plan: null
+    - id: bg_site_003
+      class: background
+      kind: parent_video
+      paths: [datasets/raw/site_archive_legacy/场景/三楼与场地视频/三栋楼_垃圾桶与路口_003.mp4]
+      evidence:
+        - {manifest: datasets/annotated/mixed_scene/v4_compositing_backgrounds_20261113/manifest.json}
+      review: {state: candidate_empty, method: contact_sheet, accepted_by: null}
+      labels: {status: unknown}
+      roles: [composite_background]
+      split: {primary: val, status: proposed}
+      plan: null
+    - id: bg_site_005
+      class: background
+      kind: parent_video
+      paths: [datasets/raw/site_archive_legacy/场景/三楼与场地视频/三栋楼_路口及垃圾桶_005.mp4]
+      evidence:
+        - {manifest: datasets/annotated/mixed_scene/v4_compositing_backgrounds_20261113/manifest.json}
+      review: {state: candidate_empty, method: contact_sheet, accepted_by: null}
+      labels: {status: unknown}
+      roles: [composite_background]
+      split: {primary: val, status: proposed}
+      plan: null
+    - id: bg_site_009
+      class: background
+      kind: parent_video
+      paths: [datasets/raw/site_archive_legacy/场景/三楼与场地视频/三栋楼侧向扫描_009.mp4]
+      evidence:
+        - {manifest: datasets/annotated/mixed_scene/v4_compositing_backgrounds_20261113/manifest.json}
+      review: {state: candidate_empty, method: contact_sheet, accepted_by: null}
+      labels: {status: unknown}
+      roles: [composite_background]
+      split: {primary: val, status: proposed}
+      plan: null
+    - id: bg_waste_004
+      class: background
+      kind: parent_video
+      paths: [datasets/raw/waste_bin/archive_assets_legacy/视频/四色桶较低视角_灰绿闭盖_红蓝开盖_004.mp4]
+      evidence:
+        - {manifest: datasets/annotated/mixed_scene/v4_compositing_backgrounds_20261113/manifest.json}
+      review: {state: unknown, method: contact_sheet, accepted_by: null}
+      labels: {status: unknown}
+      roles: [composite_background]
+      split: {primary: val, status: proposed}
+      plan: null
+  data_sources:
+    - id: ds_mask_008
+      kind: mask
+      path: datasets/annotated/e_bike/multiview_masks_refined_20261110_v2
+      parent_group: tr_bike_008
+      roles: [target_foreground]
+      split: {primary: inherit, status: confirmed}
+    - id: ds_mask_009
+      kind: mask
+      path: datasets/annotated/e_bike/multiview_masks_refined_20261110_v2
+      parent_group: tr_bike_009
+      roles: [target_foreground]
+      split: {primary: inherit, status: confirmed}
+    - id: ds_mask_005_006
+      kind: mask
+      path: datasets/annotated/e_bike/video_review_20261110
+      parent_group: tr_bike_005_006
+      roles: [target_foreground]
+      split: {primary: inherit, status: confirmed}
+    - id: ds_mask_004_007_010_011
+      kind: mask
+      path: datasets/raw/e_bike/archive_assets_legacy/视频
+      parent_group: tr_bike_004_007_010_011
+      roles: [target_foreground]
+      split: {primary: inherit, status: confirmed}
+  blender:
+    - id: bl_arena_master
+      kind: blender_scene
+      path: datasets/assets/blender/shared/arena_4m2_pbr_20261112/arena_master_user_20261113.blend
+      role: background_scene
+      priority: background_only
+      split: {primary: shared, status: confirmed, same_source_note: 多任务共享母场景}
+    - id: bl_arena_detailed
+      kind: blender_scene
+      path: datasets/assets/blender/shared/arena_4m2_pbr_20261112/arena_indoor_detailed.blend
+      role: background_scene
+      priority: background_only
+      split: {primary: shared, status: confirmed, same_source_note: 与 calibrated 有来源链}
+  captures: []
+  plan_bindings:
+    train:
+      - datasets/scripts/e_bike/config/production_plan.json
+      - datasets/scripts/e_bike/config/direct_real_plan.json
+    val: []
+    test: []
+  plan_alignment:
+    status: stale
+    note: 现有组合来源计划给 bg_car_capture、bg_legacy_001 排了 train 份额，而 pairing 将其标为 val/test；这是设计态来源计划，尚未重编译为逐 split production plan。
+    conflicts:
+      - {parent: bg_car_capture, plan: datasets/annotated/e_bike/v4_car_sequence_review_20261113/manifest.json, pairing_split: val, plan_use: train}
+      - {parent: bg_legacy_001, plan: datasets/annotated/e_bike/v4_car_sequence_review_20261113/manifest.json, pairing_split: test, plan_use: train}

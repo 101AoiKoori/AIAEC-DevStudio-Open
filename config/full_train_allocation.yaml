@@ -1,0 +1,140 @@
+# 八任务全量 train 计划设计草案。
+# 这是设计分配，不是已执行计划；当前生产仍使用各任务固定的 production_plan.json。
+# 训练目标见 config/task_targets.yaml，组合轴见 config/combination_axes.yaml。
+# 生成设计文档：python lab/scripts/contracts/full_plan_design.py --write
+# 检查：python lab/scripts/contracts/full_plan_design.py --check
+#
+# 共同假设：
+# - 图片数是 train 目标，不是实际产量；来源容量和父组上限要在编译前核对。
+# - 初始来源组成按 30% 直接实拍、40% 实拍背景合成、30% Blender；
+#   Blender 上限一般 40%，打印/模型目标（垃圾贴纸、温湿度表）可到 50%。
+# - 2026-11-15 用户确认采用：fire、building_name_paper、waste_bin_state 用 20/40/40；
+#   waste_sticker、meter 用 10/40/50；person、e_bike、sign 保持 30/40/30，
+#   目标数据源分别用数字图片、旋转掩膜、视频帧裁片。份额是设计基准，不是实测分布。
+# - 组配额是设计分配，不冒充实测分布、模型效果或已完成数据。
+version: 1
+status: design_draft
+tasks:
+  person:
+    total: 3000
+    source_mix: {direct_real: 0.30, real_composite: 0.40, blender: 0.30}
+    blender_cap: 0.40
+    groups:
+      - {id: empty_scene, target: empty, axes: {vehicle_occlusion: none}, quota: 300}
+      - {id: community_none, target: community, axes: {vehicle_occlusion: none}, quota: 975}
+      - {id: noncommunity_none, target: noncommunity, axes: {vehicle_occlusion: none}, quota: 975}
+      - {id: community_upright, target: community, axes: {vehicle_occlusion: upright}, quota: 188}
+      - {id: noncommunity_upright, target: noncommunity, axes: {vehicle_occlusion: upright}, quota: 187}
+      - {id: community_fallen, target: community, axes: {vehicle_occlusion: fallen}, quota: 187}
+      - {id: noncommunity_fallen, target: noncommunity, axes: {vehicle_occlusion: fallen}, quota: 188}
+    notes: 空场 300；非空 2,700 中 single/multi 各约 1,350；电动车遮挡共 750，直立/倒伏各 375，两类身份各约一半。
+  e_bike:
+    total: 4000
+    source_mix: {direct_real: 0.30, real_composite: 0.40, blender: 0.30}
+    blender_cap: 0.40
+    groups:
+      - {id: upright_empty_street, target: empty, axes: {count: empty, location: street}, quota: 100}
+      - {id: upright_empty_parking, target: empty, axes: {count: empty, location: parking}, quota: 100}
+      - {id: upright_single_street, target: upright, axes: {count: single, location: street}, quota: 400}
+      - {id: upright_single_parking, target: upright, axes: {count: single, location: parking}, quota: 400}
+      - {id: upright_multi_street, target: upright, axes: {count: multi, location: street}, quota: 500}
+      - {id: upright_multi_parking, target: upright, axes: {count: multi, location: parking}, quota: 500}
+      - {id: fallen_empty_street, target: empty, axes: {count: empty, location: street}, quota: 100}
+      - {id: fallen_empty_parking, target: empty, axes: {count: empty, location: parking}, quota: 100}
+      - {id: fallen_single_street, target: fallen, axes: {count: single, location: street}, quota: 400}
+      - {id: fallen_single_parking, target: fallen, axes: {count: single, location: parking}, quota: 400}
+      - {id: fallen_multi_street, target: fallen, axes: {count: multi, location: street}, quota: 500}
+      - {id: fallen_multi_parking, target: fallen, axes: {count: multi, location: parking}, quota: 500}
+    notes: 直立/倒伏各 2,000；零/单/多车约 400/1,600/2,000；街道/停车区各半；人车和车车遮挡在组内轮换，截断约 500；零车组 target=empty，不带姿态类别。
+  fire:
+    total: 3000
+    source_mix: {direct_real: 0.20, real_composite: 0.40, blender: 0.40}
+    blender_cap: 0.40
+    groups:
+      - {id: facade_A_zero, target: fire_sticker, axes: {facade: A, count: zero}, quota: 200}
+      - {id: facade_A_single, target: fire_sticker, axes: {facade: A, count: single}, quota: 400}
+      - {id: facade_A_multi, target: fire_sticker, axes: {facade: A, count: multi}, quota: 400}
+      - {id: facade_B_zero, target: fire_sticker, axes: {facade: B, count: zero}, quota: 200}
+      - {id: facade_B_single, target: fire_sticker, axes: {facade: B, count: single}, quota: 400}
+      - {id: facade_B_multi, target: fire_sticker, axes: {facade: B, count: multi}, quota: 400}
+      - {id: facade_C_zero, target: fire_sticker, axes: {facade: C, count: zero}, quota: 200}
+      - {id: facade_C_single, target: fire_sticker, axes: {facade: C, count: single}, quota: 400}
+      - {id: facade_C_multi, target: fire_sticker, axes: {facade: C, count: multi}, quota: 400}
+    notes: 零/单/多贴约 600/1,200/1,200；三个楼面各 1,000；贴放位置、尺度、偏航、遮挡和成像在组内轮换。
+  building_name_paper:
+    total: 3000
+    source_mix: {direct_real: 0.20, real_composite: 0.40, blender: 0.40}
+    blender_cap: 0.40
+    groups:
+      - {id: no_paper_single_building, target: no_paper, axes: {building_count: single}, quota: 500}
+      - {id: no_paper_multi_building, target: no_paper, axes: {building_count: multi}, quota: 500}
+      - {id: paper_single_name_single_building, target: paper, axes: {building_count: single, name: single}, quota: 600}
+      - {id: paper_single_name_multi_building, target: paper, axes: {building_count: multi, name: single}, quota: 600}
+      - {id: paper_multiple_names_single_building, target: paper, axes: {building_count: single, name: multiple}, quota: 400}
+      - {id: paper_multiple_names_multi_building, target: paper, axes: {building_count: multi, name: multiple}, quota: 400}
+    notes: 无纸 1,000、有纸 2,000；有纸中单名 1,200、多名 800；单楼/多楼各 1,500；OCR 文字由生成字符串或已核记录提供。
+  sign:
+    total: 2500
+    source_mix: {direct_real: 0.30, real_composite: 0.40, blender: 0.30}
+    blender_cap: 0.40
+    groups:
+      - {id: placed_front_none, target: sign_fixture, axes: {view: front, truncation: none}, quota: 750}
+      - {id: placed_front_partial, target: sign_fixture, axes: {view: front, truncation: partial}, quota: 250}
+      - {id: placed_oblique_none, target: sign_fixture, axes: {view: oblique, truncation: none}, quota: 500}
+      - {id: placed_oblique_partial, target: sign_fixture, axes: {view: oblique, truncation: partial}, quota: 200}
+      - {id: placed_side_none, target: sign_fixture, axes: {view: side, truncation: none}, quota: 150}
+      - {id: placed_side_partial, target: sign_fixture, axes: {view: side, truncation: partial}, quota: 50}
+      - {id: placed_back_none, target: sign_fixture, axes: {view: back, truncation: none}, quota: 100}
+      - {id: absent, target: no_sign, axes: {}, quota: 300}
+      - {id: ordinary_pole, target: ordinary_pole, axes: {}, quota: 200}
+    notes: 有牌 2,000、无牌 300、普通立杆 200；有牌中截断 500（仅可辨牌杆约 100），正视面为主，侧背视面保留少量。
+  waste_bin_state:
+    total: 3500
+    source_mix: {direct_real: 0.20, real_composite: 0.40, blender: 0.40}
+    blender_cap: 0.40
+    groups:
+      - {id: empty, target: empty, axes: {}, quota: 300}
+      - {id: blue_open_single, target: open, axes: {color: blue, count: single}, quota: 200}
+      - {id: blue_open_multi, target: open, axes: {color: blue, count: multi}, quota: 200}
+      - {id: blue_closed_single, target: closed, axes: {color: blue, count: single}, quota: 200}
+      - {id: blue_closed_multi, target: closed, axes: {color: blue, count: multi}, quota: 200}
+      - {id: red_open_single, target: open, axes: {color: red, count: single}, quota: 200}
+      - {id: red_open_multi, target: open, axes: {color: red, count: multi}, quota: 200}
+      - {id: red_closed_single, target: closed, axes: {color: red, count: single}, quota: 200}
+      - {id: red_closed_multi, target: closed, axes: {color: red, count: multi}, quota: 200}
+      - {id: green_open_single, target: open, axes: {color: green, count: single}, quota: 200}
+      - {id: green_open_multi, target: open, axes: {color: green, count: multi}, quota: 200}
+      - {id: green_closed_single, target: closed, axes: {color: green, count: single}, quota: 200}
+      - {id: green_closed_multi, target: closed, axes: {color: green, count: multi}, quota: 200}
+      - {id: gray_open_single, target: open, axes: {color: gray, count: single}, quota: 200}
+      - {id: gray_open_multi, target: open, axes: {color: gray, count: multi}, quota: 200}
+      - {id: gray_closed_single, target: closed, axes: {color: gray, count: single}, quota: 200}
+      - {id: gray_closed_multi, target: closed, axes: {color: gray, count: multi}, quota: 200}
+    notes: 空场 300；非空 3,200；四色各 800，开/闭各半，单/多桶各半；低视角、邻桶遮挡和成像在组内轮换。
+  waste_sticker:
+    total: 7200
+    source_mix: {direct_real: 0.10, real_composite: 0.40, blender: 0.50}
+    blender_cap: 0.50
+    grid:
+      class_count: 24
+      colors: [red, blue, green, gray]
+      per_class_color: 75
+    notes: 24 类 × 4 桶色 × 75 张 = 7,200；每类 300 张图、300 个实例，每色 1,800 张；默认单张单贴，后续可加多贴但不抵扣当前每类配额。
+  meter:
+    total: 3500
+    source_mix: {direct_real: 0.10, real_composite: 0.40, blender: 0.50}
+    blender_cap: 0.50
+    groups:
+      - {id: 'needle_0.1_0.25', target: meter_dial, axes: {needle: '0.1:0.25'}, quota: 292}
+      - {id: 'needle_0.1_0.75', target: meter_dial, axes: {needle: '0.1:0.75'}, quota: 292}
+      - {id: 'needle_0.26_0.25', target: meter_dial, axes: {needle: '0.26:0.25'}, quota: 292}
+      - {id: 'needle_0.26_0.75', target: meter_dial, axes: {needle: '0.26:0.75'}, quota: 292}
+      - {id: 'needle_0.42_0.25', target: meter_dial, axes: {needle: '0.42:0.25'}, quota: 292}
+      - {id: 'needle_0.42_0.75', target: meter_dial, axes: {needle: '0.42:0.75'}, quota: 292}
+      - {id: 'needle_0.58_0.25', target: meter_dial, axes: {needle: '0.58:0.25'}, quota: 292}
+      - {id: 'needle_0.58_0.75', target: meter_dial, axes: {needle: '0.58:0.75'}, quota: 292}
+      - {id: 'needle_0.74_0.25', target: meter_dial, axes: {needle: '0.74:0.25'}, quota: 291}
+      - {id: 'needle_0.74_0.75', target: meter_dial, axes: {needle: '0.74:0.75'}, quota: 291}
+      - {id: 'needle_0.9_0.25', target: meter_dial, axes: {needle: '0.9:0.25'}, quota: 291}
+      - {id: 'needle_0.9_0.75', target: meter_dial, axes: {needle: '0.9:0.75'}, quota: 291}
+    notes: 12 个针位各约 291–292 张；反光约 875 张（25%）；距离、视角、背景和成像在组内轮换。

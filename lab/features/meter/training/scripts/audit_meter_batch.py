@@ -1,14 +1,20 @@
 """Check generated dual-needle candidate data and write a few review overlays."""
 import argparse
 import json
+import sys
 from collections import Counter
 from pathlib import Path
 import cv2
 import numpy as np
 
+ROOT = Path(__file__).resolve().parents[5]
+sys.path.insert(0, str(ROOT))
+from lab.training_common.production_guard import generation_guard
 
-def check(root, previews=6):
-    manifest=json.loads((root/'manifest.json').read_text(encoding='utf8'))
+
+def _check(root, previews=6, manifest=None):
+    if manifest is None:
+        manifest=json.loads((root/'manifest.json').read_text(encoding='utf8'))
     samples=manifest['samples']
     count=manifest['count']
     assert len(samples)==count
@@ -65,6 +71,28 @@ def check(root, previews=6):
     return {'splits':dict(Counter(s['split'] for s in samples)),
             'max_near_white_fraction_in_dial':round(brightest_fraction,6),
             'note':'pixel saturation check does not prove every tick is readable'}
+
+
+def check(root, previews=6):
+    root=Path(root).resolve()
+    if previews <= 0:
+        return _check(root, previews)
+    manifest=root/'manifest.json'
+    frozen=json.loads(manifest.read_text(encoding='utf8')); samples=frozen['samples']
+    images=[root/'images'/s['split']/(s['id']+'.png') for s in samples]
+    labels=[root/'labels'/s['split']/(s['id']+'.txt') for s in samples]
+    outputs=[root/'review'/(s['id']+'.png') for s in samples[:previews]]
+    with generation_guard('meter.audit_batch:' + root.relative_to(ROOT).as_posix(), images, outputs,
+                          {'previews':previews}, code_paths=[Path(__file__)],
+                          procedural_inputs=[manifest,*labels], root=ROOT) as run:
+        if run.reused:
+            print('REUSED', root / 'review')
+            return run.value
+        if json.loads(manifest.read_text(encoding='utf8')) != frozen:
+            raise RuntimeError('manifest changed before execution')
+        result = _check(root, previews, frozen)
+        run.set_result(result)
+        return result
 
 
 if __name__=='__main__':

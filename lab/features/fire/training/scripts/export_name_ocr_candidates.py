@@ -3,8 +3,13 @@
 Split membership is inherited, including provisional evaluation status and
 unknown source overlap. Readable-sized crops still require human OCR review.
 """
+
+if __name__ == "__main__":
+    raise SystemExit("Legacy dataset CLI is retired; use datasets/scripts/fire/. Production remains paused.")
+
 import argparse
 import json
+import sys
 from collections import Counter
 from pathlib import Path
 
@@ -13,6 +18,9 @@ import numpy as np
 
 from compose_scene_fire import ROOT, EXPORTS, read_image
 from fire_blender_labels import yolo_row
+
+sys.path.insert(0, str(ROOT))
+from lab.training_common.production_guard import generation_guard
 
 TRAIN = EXPORTS / 'name_varied_candidates_4000_20261110'
 EVAL = EXPORTS / 'scene_eval_candidates_120_per_group_20261110'
@@ -64,7 +72,7 @@ def sample_records(split):
             yield row['id'], root/'name/images'/f"{row['id']}.jpg", root/'name/labels'/f"{row['id']}.txt", objects, [row['source_group']], {'source_image': row['source_image'], 'source_video': row['source_video']}
 
 
-def export(output, limit):
+def _export_impl(output, limit):
     if output.exists() or not output.resolve().is_relative_to(EXPORTS.resolve()):
         raise ValueError('output exists or is outside fire exports')
     output.mkdir(parents=True)
@@ -101,6 +109,35 @@ def export(output, limit):
     summary['status']='complete_candidates';summary['review']='Generated text and boxes matched. Size, edge and contrast filters are automatic; readability and acceptance remain unverified. Val/test source and model-reference overlap unknown.'
     (output/'summary.json').write_text(json.dumps(summary,ensure_ascii=False,indent=2),encoding='utf-8')
     return summary
+
+
+def export(output, limit):
+    output = Path(output).resolve()
+    media, labels = [], []
+    for split in ('train', 'val', 'test'):
+        seen = 0
+        for _, image, label, objects, _, _ in sample_records(split):
+            if limit and seen >= limit:
+                break
+            if not objects:
+                continue
+            seen += 1
+            media.append(image)
+            labels.append(label)
+    procedural = [TRAIN / 'manifest.jsonl', EVAL / 'scene_track/manifest.jsonl',
+                  EVAL / 'scene_tile/manifest.jsonl'] + labels
+    with generation_guard('fire.export_name_ocr_candidates/' + output.relative_to(ROOT).as_posix(), media + procedural, [output],
+                          {'limit_positive_images': limit},
+                          code_paths=[Path(__file__), Path(__file__).with_name('compose_scene_fire.py'),
+                                      Path(__file__).with_name('fire_blender_labels.py'),
+                                      ROOT / 'datasets/scripts/common/images.py', ROOT / 'datasets/scripts/common/annotations.py'],
+                          procedural_inputs=procedural, root=ROOT) as run:
+        if run.reused:
+            return json.loads((output / 'summary.json').read_text(encoding='utf-8'))
+        summary = _export_impl(output, limit)
+        summary['source_refs'] = run.source_refs
+        (output / 'summary.json').write_text(json.dumps(summary, ensure_ascii=False, indent=2), encoding='utf-8')
+        return summary
 
 
 if __name__=='__main__':

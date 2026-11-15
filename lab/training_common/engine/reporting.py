@@ -3,6 +3,7 @@ from pathlib import Path
 from datetime import datetime, timezone
 import csv
 import importlib.util
+from itertools import combinations
 import json
 import math
 import os
@@ -181,6 +182,192 @@ def match_detections(ground_truth, predictions, threshold):
     return matches, [i for i in range(len(ground_truth)) if i not in used_g], [i for i in range(len(predictions)) if i not in used_p]
 
 
+def reviewed_memberships(row, record):
+    """Return this image's reviewed strata and any exclusion reason."""
+    review = record.get('reviewed_strata')
+    if not isinstance(review, dict) or review.get('supervision') != 'complete':
+        return [], 'supervision_not_confirmed'
+    state = review.get('label_state')
+    truth_count = row['ground_truth']
+    if ((state == 'complete_positive' and truth_count <= 0) or
+            (state == 'complete_negative' and truth_count != 0) or
+            state not in ('complete_positive', 'complete_negative')):
+        return [], 'label_state_disagrees_with_staged_label'
+    result = []
+    for dimension in ('source_group', 'source_kind', 'generation_method', 'label_state',
+                      'difficulty', 'conditions', 'target_states'):
+        value = review.get(dimension)
+        if value is None:
+            values = [('unknown', 'missing')]
+        elif isinstance(value, list):
+            values = [(item, 'confirmed') for item in value] if value else [('none', 'confirmed_empty')]
+        else:
+            values = [(value, 'confirmed')]
+        if any(not isinstance(item, str) or not item.strip() for item, _ in values) or len(values) != len(set(values)):
+            raise ValueError('Invalid or duplicated reviewed stratum: ' + dimension)
+        result.extend((dimension, item, status) for item, status in values)
+    return result, None
+
+
+def stratify_image_metrics(rows, records):
+    """Aggregate fixed-threshold image counts using the staged review snapshot.
+
+    A condition list may put one image into multiple groups. An image without
+    complete review is excluded rather than inferred to be a negative.
+    """
+    if len(rows) != len(records):
+        raise ValueError('Each diagnostic image requires one staged record')
+    totals, seen, excluded = {}, set(), []
+    for row, record in zip(rows, records):
+        name = row['image']
+        if name in seen or name != Path(record['run_image']).name:
+            raise ValueError('Duplicate or mismatched diagnostic image identity')
+        seen.add(name)
+        memberships, reason = reviewed_memberships(row, record)
+        if reason:
+            excluded.append({'image': name, 'reason': reason})
+            continue
+        state = record['reviewed_strata']['label_state']
+        for membership in memberships:
+            group = totals.setdefault(membership, {
+                'images': 0, 'ground_truth': 0, 'predictions': 0, 'tp': 0, 'fp': 0, 'fn': 0,
+                'negative_images': 0, 'negative_images_with_false_positives': 0})
+            group['images'] += 1
+            for key, source in (('ground_truth', 'ground_truth'), ('predictions', 'predictions'),
+                                ('tp', 'true_positives'), ('fp', 'false_positives'), ('fn', 'false_negatives')):
+                group[key] += row[source]
+            group['negative_images'] += int(state == 'complete_negative')
+            group['negative_images_with_false_positives'] += int(state == 'complete_negative' and row['false_positives'] > 0)
+    result = []
+    for (dimension, value, status), group in sorted(totals.items()):
+        tp, fp, fn = group['tp'], group['fp'], group['fn']
+        result.append({'dimension': dimension, 'value': value, 'value_status': status, **group,
+                       'precision': tp/(tp+fp) if tp+fp else None,
+                       'recall': tp/(tp+fn) if tp+fn else None})
+    return result, excluded
+
+
+def class_detection_counts(truths, predictions, matches, missed, false, class_count):
+    """Use the same class-aware matches as image diagnostics for class counts."""
+    if type(class_count) is not int or class_count <= 0:
+        raise ValueError('A nonempty class table is required')
+    totals = [{'ground_truth': 0, 'predictions': 0, 'tp': 0, 'fp': 0, 'fn': 0}
+              for _ in range(class_count)]
+    for items, key in ((truths, 'ground_truth'), (predictions, 'predictions')):
+        for value in items:
+            cls = value['class_id']
+            if type(cls) is not int or not 0 <= cls < class_count:
+                raise ValueError('Detection class is outside the dataset class table')
+            totals[cls][key] += 1
+    truth_indices = [gi for gi, _, _ in matches] + list(missed)
+    prediction_indices = [pi for _, pi, _ in matches] + list(false)
+    if (sorted(truth_indices) != list(range(len(truths))) or
+            sorted(prediction_indices) != list(range(len(predictions)))):
+        raise ValueError('Detection match partition is inconsistent')
+    for gi, pi, _ in matches:
+        if truths[gi]['class_id'] != predictions[pi]['class_id']:
+            raise ValueError('Matched detections have different class IDs')
+        totals[truths[gi]['class_id']]['tp'] += 1
+    for gi in missed:
+        totals[truths[gi]['class_id']]['fn'] += 1
+    for pi in false:
+        totals[predictions[pi]['class_id']]['fp'] += 1
+    if any(item['tp'] + item['fn'] != item['ground_truth'] or
+           item['tp'] + item['fp'] != item['predictions'] for item in totals):
+        raise ValueError('Detection match partition is inconsistent')
+    return totals
+
+
+def stratify_class_metrics(rows, records, image_classes, names):
+    """Report each class across reviewed image groups, including absent classes."""
+    if len(rows) != len(records) or len(rows) != len(image_classes):
+        raise ValueError('Each diagnostic image requires staged and class records')
+    if not isinstance(names, list) or not names or any(not isinstance(n, str) or not n for n in names):
+        raise ValueError('A nonempty ordered class table is required')
+    totals, seen = {}, set()
+    for row, record, counts in zip(rows, records, image_classes):
+        name = row['image']
+        if name in seen or name != Path(record['run_image']).name:
+            raise ValueError('Duplicate or mismatched diagnostic image identity')
+        seen.add(name)
+        memberships, reason = reviewed_memberships(row, record)
+        if reason:
+            continue
+        if len(counts) != len(names):
+            raise ValueError('Per-image counts differ from class table')
+        for dimension, value, status in memberships:
+            for class_id, item in enumerate(counts):
+                accumulate_class_group(totals, (dimension, value, status, class_id), item)
+    result = []
+    for (dimension, value, status, class_id), group in sorted(totals.items()):
+        result.append({'dimension': dimension, 'value': value, 'value_status': status,
+                       'class_id': class_id, 'class_name': names[class_id], **finalize_class_group(group)})
+    return result
+
+
+def accumulate_class_group(totals, key, item):
+    group = totals.setdefault(key, {'images': 0, 'images_with_class': 0, 'images_without_class': 0,
+        'images_without_class_with_false_positives': 0,
+        'ground_truth': 0, 'predictions': 0, 'tp': 0, 'fp': 0, 'fn': 0})
+    group['images'] += 1
+    group['images_with_class'] += int(item['ground_truth'] > 0)
+    group['images_without_class'] += int(item['ground_truth'] == 0)
+    group['images_without_class_with_false_positives'] += int(item['ground_truth'] == 0 and item['fp'] > 0)
+    for field in ('ground_truth', 'predictions', 'tp', 'fp', 'fn'):
+        group[field] += item[field]
+
+
+def finalize_class_group(group):
+    tp, fp, fn = group['tp'], group['fp'], group['fn']
+    return {**group, 'precision_denominator': tp+fp, 'recall_denominator': tp+fn,
+            'precision': tp/(tp+fp) if tp+fp else None, 'recall': tp/(tp+fn) if tp+fn else None}
+
+
+def joint_domain_condition_metrics(rows, records, image_classes, names):
+    """Count one- and two-condition intersections separately for each image domain."""
+    if len(rows) != len(records) or len(rows) != len(image_classes):
+        raise ValueError('Each diagnostic image requires staged and class records')
+    if not isinstance(names, list) or not names or any(not isinstance(n, str) or not n for n in names):
+        raise ValueError('A nonempty ordered class table is required')
+    totals, seen = {}, set()
+    for row, record, counts in zip(rows, records, image_classes):
+        name = row['image']
+        if name in seen or name != Path(record['run_image']).name:
+            raise ValueError('Duplicate or mismatched diagnostic image identity')
+        seen.add(name)
+        _, reason = reviewed_memberships(row, record)
+        if reason:
+            continue
+        if len(counts) != len(names):
+            raise ValueError('Per-image counts differ from class table')
+        review = record['reviewed_strata']
+        domain = review.get('image_domain')
+        if domain is not None and (not isinstance(domain, str) or not domain.strip()):
+            raise ValueError('Invalid reviewed image domain')
+        domain_value, domain_status = (domain, 'confirmed') if domain else ('unknown', 'missing')
+        conditions = review.get('conditions')
+        if conditions is None:
+            condition_groups = [((), 'missing')]
+        elif not isinstance(conditions, list) or len(conditions) > 64:
+            raise ValueError('Reviewed conditions must be a list with at most 64 entries')
+        elif not conditions:
+            condition_groups = [((), 'confirmed_empty')]
+        else:
+            ordered = sorted(conditions)
+            condition_groups = [(tuple([condition]), 'confirmed') for condition in ordered]
+            condition_groups.extend((pair, 'confirmed') for pair in combinations(ordered, 2))
+        for condition_set, condition_status in condition_groups:
+            for class_id, item in enumerate(counts):
+                accumulate_class_group(totals, (domain_value, domain_status, condition_set, condition_status, class_id), item)
+    output = []
+    for (domain, domain_status, condition_set, condition_status, class_id), group in sorted(totals.items()):
+        output.append({'image_domain': domain, 'image_domain_status': domain_status,
+                       'conditions_all_of': json.dumps(condition_set, ensure_ascii=False),
+                       'condition_status': condition_status, 'class_id': class_id, 'class_name': names[class_id],
+                       **finalize_class_group(group)})
+    return output
+
+
 def diagnostics(model, data_path, split, config, destination):
     """Save every prediction and compute diagnostics at a declared fixed threshold."""
     destination = Path(destination)
@@ -190,13 +377,21 @@ def diagnostics(model, data_path, split, config, destination):
     dataset_dir = Path(data_path).parent
     source_records = json.loads((dataset_dir / 'samples.json').read_text(encoding='utf-8'))
     lookup = {Path(record['run_image']).name: record for record in source_records if record['split'] == split}
+    v4 = str(config.get('version', '')).lower() == 'v4'
+    names = None
+    if v4:
+        names = read_yaml(data_path).get('names')
+        if isinstance(names, dict) and set(names) == set(range(len(names))):
+            names = [names[index] for index in range(len(names))]
+        if not isinstance(names, list) or not names or any(not isinstance(n, str) or not n for n in names):
+            raise ValueError('Staged data requires an ordered class table')
     threshold = config.get('diagnostic_conf', .25)
     match_iou = config.get('match_iou', .5)
     options = {'source': str(dataset_dir / 'images' / split), 'stream': True,
                'imgsz': config['imgsz'], 'conf': threshold, 'iou': config.get('nms_iou', .7),
                'max_det': config.get('max_det', 300), 'verbose': False, 'save': False,
-               'device': config.get('device', 'cpu'), 'save_txt': False, 'save_crop': False, 'show': False}
-    rows, keypoint_rows, groups = [], [], {}
+               'device': config.get('device', '0'), 'save_txt': False, 'save_crop': False, 'show': False}
+    rows, keypoint_rows, groups, diagnostic_records, image_classes = [], [], {}, [], []
     previews = failures = 0
     with (prediction_dir / 'predictions.jsonl').open('w', encoding='utf-8') as stream:
         for result in model.predict(**options):
@@ -219,6 +414,8 @@ def diagnostics(model, data_path, split, config, destination):
                     prediction['keypoints'] = result.keypoints.data[index].cpu().tolist()
                 predictions.append(prediction)
             matched, missed, false = match_detections(truths, predictions, match_iou)
+            if v4:
+                image_classes.append(class_detection_counts(truths, predictions, matched, missed, false, len(names)))
             confused = sum(any(truths[gi]['class_id'] != predictions[pi]['class_id'] and
                               box_iou(truths[gi]['xyxy'], predictions[pi]['xyxy']) >= match_iou for pi in false) for gi in missed)
             row = {'image': name, 'source_image': record['image'], 'source_group': record['source_group'],
@@ -226,6 +423,7 @@ def diagnostics(model, data_path, split, config, destination):
                    'false_positives': len(false), 'false_negatives': len(missed), 'class_confusion_candidates': confused,
                    'negative_image': not truths, 'negative_false_positive': not truths and bool(predictions)}
             rows.append(row)
+            diagnostic_records.append(record)
             group = groups.setdefault(record['source_group'], {'images': 0, 'tp': 0, 'fp': 0, 'fn': 0})
             group['images'] += 1; group['tp'] += len(matched); group['fp'] += len(false); group['fn'] += len(missed)
             for gi, pi, iou in matched:
@@ -260,6 +458,35 @@ def diagnostics(model, data_path, split, config, destination):
                            'precision': tp/(tp+fp) if tp+fp else None,
                            'recall': tp/(tp+fn) if tp+fn else None})
     write_csv(destination / 'by_source.csv', group_rows, ['source_group', 'images', 'tp', 'fp', 'fn', 'precision', 'recall'])
+    strata_summary = None
+    if v4:
+        strata, excluded = stratify_image_metrics(rows, diagnostic_records)
+        per_class = stratify_class_metrics(rows, diagnostic_records, image_classes, names)
+        joint = joint_domain_condition_metrics(rows, diagnostic_records, image_classes, names)
+        fields = ['dimension', 'value', 'value_status', 'images', 'ground_truth', 'predictions', 'tp', 'fp', 'fn',
+                  'negative_images', 'negative_images_with_false_positives', 'precision', 'recall']
+        write_csv(destination / 'by_reviewed_stratum.csv', strata, fields)
+        class_fields = ['dimension', 'value', 'value_status', 'class_id', 'class_name', 'images',
+                        'images_with_class', 'images_without_class', 'images_without_class_with_false_positives',
+                        'ground_truth', 'predictions', 'tp', 'fp', 'fn',
+                        'precision_denominator', 'recall_denominator', 'precision', 'recall']
+        write_csv(destination / 'by_reviewed_stratum_class.csv', per_class, class_fields)
+        joint_fields = ['image_domain', 'image_domain_status', 'conditions_all_of', 'condition_status',
+                        'class_id', 'class_name', 'images', 'images_with_class', 'images_without_class',
+                        'images_without_class_with_false_positives', 'ground_truth', 'predictions', 'tp', 'fp', 'fn',
+                        'precision_denominator', 'recall_denominator', 'precision', 'recall']
+        write_csv(destination / 'by_domain_conditions_class.csv', joint, joint_fields)
+        strata_summary = {'included_images': len(rows)-len(excluded), 'excluded_images': excluded,
+                          'scope': ('Fixed-threshold box counts on completely reviewed staged labels; '
+                                    'stratum attributes are recorded review claims, not independently verified truth. '
+                                    'Multi-valued groups overlap; missing attributes are unknown. '
+                                    'Each group includes all objects in its images, not only objects with that attribute. '
+                                    'Class recall uses class-aware matched objects in those images; it is not per-object '
+                                    'condition or state recall. No-GT class recall and no-prediction precision are null. '
+                                    'Domain-condition rows include each confirmed single condition and each pair; '
+                                    'groups overlap. An empty confirmed condition list records no listed tags, '
+                                    'not proof that all conditions are absent.')}
+        write_json(destination / 'reviewed_strata.json', strata_summary)
     summary = {'confidence_threshold': threshold, 'match_iou': match_iou,
                'nms_iou': config.get('nms_iou', .7), 'images': len(rows),
                'true_positives': sum(r['true_positives'] for r in rows),
@@ -271,6 +498,8 @@ def diagnostics(model, data_path, split, config, destination):
                'mean_keypoint_pixel_error': sum(r['error_pixels'] for r in keypoint_rows)/len(keypoint_rows) if keypoint_rows else None,
                'keypoint_scope': 'Visible labeled points on class/IoU-matched detections only; missed objects counted separately.',
                'preview_images': previews, 'failure_previews': failures}
+    if strata_summary is not None:
+        summary['reviewed_strata'] = strata_summary
     write_json(destination / 'diagnostics.json', summary)
     _diagnostic_plots(destination, rows, keypoint_rows)
     return summary

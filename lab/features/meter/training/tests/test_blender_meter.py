@@ -8,7 +8,7 @@ import unittest
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[5]
-SOURCE = ROOT / 'datasets/annotated/meter/blender_9011_reference/face_generated.png'
+SOURCE = ROOT / 'datasets/assets/blender/meter/blender_9011_reference/face_generated.png'
 TICKS = ROOT / 'lab/features/meter/training/config/generated_face_geometry.json'
 BUILDER = ROOT / 'lab/features/meter/training/scripts/build_blender_9011.py'
 BLENDER = os.environ.get('BLENDER_EXE', '')

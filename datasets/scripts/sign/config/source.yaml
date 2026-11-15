@@ -1,0 +1,242 @@
+task: sign
+status: configured_inputs_consumed_production_paused
+databases:
+  media_query: datasets/annotated/media_index/query_cache.sqlite3
+  blender_registry: datasets/blender_source_registry.sqlite3
+roots:
+- datasets/raw/sign/archive_assets_legacy
+- datasets/raw/car_real_capture_20261112
+- datasets/assets/blender
+records:
+- datasets/annotated/sign/v4_training_backgrounds_20261112/manifest.json
+allowed_parent_roots:
+- datasets/raw
+- Archive/Assets
+- datasets/assets/blender
+selection: 查询现有数据库和清单，按任务、集合、角色及父来源选取；跨任务背景允许复用。
+foreground_root: datasets/annotated/sign/sam2_fixture_candidates_20261110
+foreground_video: datasets/raw/sign/archive_assets_legacy/视频/禁止直行牌视频.mp4
+background_manifest: datasets/annotated/sign/v4_training_backgrounds_20261112/manifest.json
+planning_background_manifest: datasets/annotated/mixed_scene/v4_compositing_backgrounds_20261113/manifest.json
+planning_photo_manifest: datasets/annotated/site_capture_20261112/target_instances_manifest.jsonl
+production_plan: datasets/scripts/sign/config/production_plan.json
+current_selection:
+  scope: current_train_batch_only
+  backgrounds:
+  - datasets/annotated/mixed_scene/v4_compositing_backgrounds_20261113/images/junction_003_001.jpg
+  - datasets/annotated/mixed_scene/v4_compositing_backgrounds_20261113/images/junction_003_009.jpg
+  - datasets/annotated/mixed_scene/v4_compositing_backgrounds_20261113/images/junction_003_015.jpg
+  - datasets/annotated/mixed_scene/v4_compositing_backgrounds_20261113/images/junction_005_011.jpg
+  - datasets/annotated/mixed_scene/v4_compositing_backgrounds_20261113/images/junction_005_019.jpg
+  - datasets/annotated/mixed_scene/v4_compositing_backgrounds_20261113/images/parking_003_001.jpg
+  - datasets/annotated/mixed_scene/v4_compositing_backgrounds_20261113/images/parking_003_011.jpg
+  - datasets/annotated/mixed_scene/v4_compositing_backgrounds_20261113/images/parking_003_017.jpg
+  - datasets/raw/site_capture_20261112/onboard_camera_images/vehicle_0003.png
+  - datasets/raw/site_capture_20261112/onboard_camera_images/vehicle_0010.png
+  foreground_masks:
+  - train_20.png
+  - train_14.png
+  excluded_branches:
+    direct_real: No complete direct-sample sign labels selected in this batch
+  source_rule: Use the ten existing reviewed placements; prior single-background batch
+    plans are not selected.
+  designed_pole_only: Retain the lower half of the selected full-fixture masks for
+    32 of 400 states; geometry assumption, not a new photographed source.
+candidate_pool:
+  inventory: datasets/annotated/mixed_scene/v4_compositing_backgrounds_20261113
+  indexed_images: 179
+  blocking_review: per-frame review of background candidates before any count beyond the prepared 400-state plan; direct-real sign labels remain incomplete and excluded.
+pairing:
+  schema_version: 1
+  status: draft
+  composition_policy:
+    target_source: video_frame_masks
+    blender_priority: background_only
+    target_components: [fixture_video_frame_masks]
+    background_components: [real_backgrounds, blender_background]
+    note: 用户 2026-11-15 指定目标数据源为牌具视频帧裁片；Blender 只作背景，无牌具三维模型
+  policy:
+    parent_classes: [task_real, background]
+    split_unit: parent_group
+    train_parent_cap: 0.8
+    val_test_mode: reserve_only
+    derived_inherits_parent_split: true
+    cross_task_duplicates: allowed_with_separate_labels
+    same_source_splits: record_and_report
+  task_real:
+    - id: tr_sign_video
+      class: task_real
+      kind: parent_video
+      paths: [datasets/raw/sign/archive_assets_legacy/视频/禁止直行牌视频.mp4]
+      evidence:
+        - {manifest: datasets/annotated/sign/sam2_fixture_candidates_20261110/manifest.json}
+      capture_session: unknown
+      labels: {status: partial, note: 8 个掩膜视图；6 train / 1 val / 1 test}
+      roles: [direct_target, composite_target, mask_source]
+      split: {primary: train, status: proposed}
+      plan: null
+    - id: tr_sign_capture_val
+      class: task_real
+      kind: field_session
+      paths: [datasets/raw/sign/capture_20261116_val]
+      evidence:
+        - {note: 待采；采后登记原视频/照片与真值清单}
+      capture_session: planned
+      capture_id: cap_sign_val_20261116
+      labels: {status: unknown, note: 待采后标注牌具框、视面、截断、摆位}
+      roles: [direct_target, composite_target, mask_source]
+      split: {primary: val, status: proposed, action: to_capture}
+      plan: null
+    - id: tr_sign_capture_test
+      class: task_real
+      kind: field_session
+      paths: [datasets/raw/sign/capture_20261116_test]
+      evidence:
+        - {note: 待采；采后登记原视频/照片与真值清单}
+      capture_session: planned
+      capture_id: cap_sign_test_20261116
+      labels: {status: unknown, note: 待采后标注牌具框、视面、截断、摆位}
+      roles: [direct_target, composite_target, mask_source]
+      split: {primary: test, status: proposed, action: to_capture}
+      plan: null
+  backgrounds:
+    - id: bg_site_003
+      class: background
+      kind: parent_video
+      paths: [datasets/raw/site_archive_legacy/场景/三楼与场地视频/三栋楼_垃圾桶与路口_003.mp4]
+      evidence:
+        - {manifest: datasets/annotated/mixed_scene/v4_compositing_backgrounds_20261113/manifest.json}
+      review: {state: candidate_empty, method: contact_sheet, accepted_by: null, note: 未确认空场，不得作空负例}
+      labels: {status: unknown}
+      roles: [composite_background]
+      split: {primary: train, status: proposed, action: to_review}
+      plan: null
+    - id: bg_site_005
+      class: background
+      kind: parent_video
+      paths: [datasets/raw/site_archive_legacy/场景/三楼与场地视频/三栋楼_路口及垃圾桶_005.mp4]
+      evidence:
+        - {manifest: datasets/annotated/mixed_scene/v4_compositing_backgrounds_20261113/manifest.json}
+      review: {state: candidate_empty, method: contact_sheet, accepted_by: null, note: 未确认空场，不得作空负例}
+      labels: {status: unknown}
+      roles: [composite_background]
+      split: {primary: train, status: proposed, action: to_review}
+      plan: null
+    - id: bg_photo_batch
+      class: background
+      kind: parent_photo_batch
+      paths:
+        - datasets/raw/site_capture_20261112/onboard_camera_images/vehicle_0003.png
+        - datasets/raw/site_capture_20261112/onboard_camera_images/vehicle_0010.png
+      evidence:
+        - {manifest: datasets/annotated/site_capture_20261112/target_instances_manifest.jsonl}
+      review: {state: unknown, method: contact_sheet, accepted_by: null}
+      labels: {status: unknown}
+      roles: [composite_background, ordinary_pole]
+      split: {primary: val, status: proposed}
+      plan: null
+    - id: bg_ebike_003
+      class: background
+      kind: parent_video
+      paths: [datasets/raw/e_bike/archive_assets_legacy/视频/场地多辆电动车_直立与倒伏混合_较低视角_003.mp4]
+      evidence:
+        - {manifest: datasets/annotated/mixed_scene/v4_compositing_backgrounds_20261113/manifest.json}
+      review: {state: candidate_empty, method: contact_sheet, accepted_by: null}
+      labels: {status: unknown}
+      roles: [composite_background]
+      split: {primary: test, status: proposed}
+      plan: null
+    - id: bg_site_009
+      class: background
+      kind: parent_video
+      paths: [datasets/raw/site_archive_legacy/场景/三楼与场地视频/三栋楼侧向扫描_009.mp4]
+      evidence:
+        - {manifest: datasets/annotated/mixed_scene/v4_compositing_backgrounds_20261113/manifest.json}
+      review: {state: candidate_empty, method: contact_sheet, accepted_by: null}
+      labels: {status: unknown}
+      roles: [composite_background]
+      split: {primary: val, status: proposed}
+      plan: null
+    - id: bg_site_012
+      class: background
+      kind: parent_video
+      paths: [datasets/raw/e_bike/archive_assets_legacy/视频/人物立牌正背面_电动车直立_倒伏和遮挡_场地扫描_012.mp4]
+      evidence:
+        - {manifest: datasets/annotated/mixed_scene/v4_compositing_backgrounds_20261113/manifest.json}
+      review: {state: candidate_empty, method: contact_sheet, accepted_by: null}
+      labels: {status: unknown}
+      roles: [composite_background]
+      split: {primary: test, status: proposed}
+      plan: null
+    - id: bg_waste_004
+      class: background
+      kind: parent_video
+      paths: [datasets/raw/waste_bin/archive_assets_legacy/视频/四色桶较低视角_灰绿闭盖_红蓝开盖_004.mp4]
+      evidence:
+        - {manifest: datasets/annotated/mixed_scene/v4_compositing_backgrounds_20261113/manifest.json}
+      review: {state: unknown, method: contact_sheet, accepted_by: null}
+      labels: {status: unknown}
+      roles: [composite_background]
+      split: {primary: test, status: proposed}
+      plan: null
+  data_sources:
+    - id: ds_fixture_masks
+      kind: mask
+      path: datasets/annotated/sign/sam2_fixture_candidates_20261110
+      parent_group: tr_sign_video
+      roles: [target_foreground]
+      split: {primary: inherit, status: confirmed}
+    - id: ds_fixture_masks_val
+      kind: mask
+      path: datasets/annotated/sign/capture_20261116_val
+      parent_group: tr_sign_capture_val
+      capture_id: cap_sign_val_20261116
+      roles: [target_foreground]
+      split: {primary: inherit, status: proposed, action: to_capture}
+    - id: ds_fixture_masks_test
+      kind: mask
+      path: datasets/annotated/sign/capture_20261116_test
+      parent_group: tr_sign_capture_test
+      capture_id: cap_sign_test_20261116
+      roles: [target_foreground]
+      split: {primary: inherit, status: proposed, action: to_capture}
+  blender:
+    - id: bl_arena_detailed
+      kind: blender_scene
+      path: datasets/assets/blender/shared/arena_4m2_pbr_20261112/arena_indoor_detailed.blend
+      role: background_scene
+      priority: background_only
+      split: {primary: shared, status: confirmed, same_source_note: 无牌具三维模型，只提供背景}
+  captures:
+    - id: cap_sign_val_20261116
+      target_split: val
+      reason: no_independent_parent
+      status: proposed
+      object: 禁止直行牌具
+      scene: 与现有视频不同的路口或白墙摆位
+      views: [front, oblique, side, back]
+      lighting: [normal, dark, bright]
+      amount: 2–3 分钟视频或 100–200 张照片
+      truth: [fixture_box, view, truncation, placement]
+      save_to: datasets/raw/sign/capture_20261116_val/
+    - id: cap_sign_test_20261116
+      target_split: test
+      reason: no_independent_parent
+      status: proposed
+      object: 禁止直行牌具
+      scene: 第三种摆位/背景
+      views: [front, oblique, side, back]
+      lighting: [normal, dark, bright]
+      amount: 2–3 分钟视频或 100–200 张照片
+      truth: [fixture_box, view, truncation, placement]
+      save_to: datasets/raw/sign/capture_20261116_test/
+  plan_bindings:
+    train: [datasets/scripts/sign/config/production_plan.json]
+    val: []
+    test: []
+  plan_alignment:
+    status: stale
+    note: 现有 train production_plan 仍消费 pairing 标为 val/test 的背景父组；编译前需重编计划或改回同 split。
+    conflicts:
+      - {parent: bg_ebike_003, plan: datasets/scripts/sign/config/production_plan.json, pairing_split: test, plan_use: train}
+      - {parent: bg_photo_batch, plan: datasets/scripts/sign/config/production_plan.json, pairing_split: val, plan_use: train}

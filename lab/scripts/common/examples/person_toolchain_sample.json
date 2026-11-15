@@ -1,0 +1,242 @@
+{
+  "schema_version": 1,
+  "task": "person",
+  "batch": "toolchain_20261115",
+  "purpose": "有界分支工具链验证；不是训练集或模型验证。人工语义验收仅由人工 accepted_by 记录表示，程序化 Blender 标签单独标记。",
+  "required_source_kinds": [
+    "direct_camera_capture",
+    "real_image_composite",
+    "blender_render"
+  ],
+  "required_content_branches": [
+    "empty",
+    "single",
+    "multi",
+    "interference"
+  ],
+  "records": [
+    {
+      "id": "empty_candidate",
+      "image": "datasets/annotated/person/v4_multivideo_review_20261112/images/person_000201.png",
+      "source_kind": "direct_camera_capture",
+      "generation_method": "video_frame_area_downscale",
+      "content_branches": [
+        "empty"
+      ],
+      "instance_count": 0,
+      "label_state": "confirmed_negative",
+      "background_state": "candidate_empty",
+      "review": {
+        "full_frame_checked": true,
+        "accepted_by": "aoi",
+        "method": "full_frame_semantic_review",
+        "evidence": "datasets/scripts/person/config/toolchain_review_acceptance.json"
+      },
+      "parent_sources": [
+        {
+          "path": "datasets/raw/site_capture_20261112/videos/person_standees.mp4",
+          "role": "camera_source"
+        },
+        {
+          "path": "datasets/annotated/person/v4_multivideo_review_20261112/review_manifest.json",
+          "role": "review_evidence"
+        }
+      ],
+      "evidence": {
+        "review_manifest": "datasets/annotated/person/v4_multivideo_review_20261112/review_manifest.json",
+        "record_index": 0
+      }
+    },
+    {
+      "id": "real_composite_single",
+      "image": "datasets/annotated/person/teammate_real_scene_candidates_20261110/images/team_train_train_000401.jpg",
+      "source_kind": "real_image_composite",
+      "generation_method": "real_background_with_digital_person_artwork",
+      "content_branches": [
+        "single"
+      ],
+      "instance_count": 1,
+      "label_state": "complete",
+      "background_state": "contains_target",
+      "review": {
+        "full_frame_checked": true,
+        "accepted_by": "aoi",
+        "box_accepted_by": "Codex visual review",
+        "method": "full_frame_semantic_and_box_overlay_review",
+        "evidence": "datasets/scripts/person/config/toolchain_review_acceptance.json"
+      },
+      "partial_reason": "已有候选框与标签，但整图语义和人工验收未完成",
+      "parent_sources": [
+        {
+          "path": "datasets/raw/person/teammate_submission_20261110/dataset/backgrounds/bg_00206_f01193.jpg",
+          "role": "real_background"
+        },
+        {
+          "path": "datasets/raw/person/team_assets/非社区人员/F1.png",
+          "role": "target_source"
+        },
+        {
+          "path": "datasets/annotated/person/teammate_real_scene_candidates_20261110/manifest.jsonl",
+          "role": "generation_manifest"
+        }
+      ],
+      "evidence": {
+        "label": "datasets/annotated/person/teammate_real_scene_candidates_20261110/labels/team_train_train_000401.txt",
+        "record_index": 0
+      }
+    },
+    {
+      "id": "direct_multi",
+      "image": "datasets/annotated/person/v4_multivideo_review_20261112/images/person_000401.png",
+      "source_kind": "direct_camera_capture",
+      "generation_method": "video_frame_area_downscale",
+      "content_branches": [
+        "multi"
+      ],
+      "instance_count": 3,
+      "label_state": "complete",
+      "background_state": "contains_target",
+      "review": {
+        "full_frame_checked": true,
+        "accepted_by": "aoi",
+        "box_accepted_by": "Codex visual review",
+        "method": "full_frame_semantic_and_box_overlay_review",
+        "evidence": "datasets/scripts/person/config/toolchain_review_acceptance.json"
+      },
+      "partial_reason": "三近距正面候选已框；全图远处小目标和反射完整性仍待人工确认",
+      "parent_sources": [
+        {
+          "path": "datasets/raw/site_capture_20261112/videos/person_standees.mp4",
+          "role": "camera_source"
+        },
+        {
+          "path": "datasets/annotated/person/v4_multivideo_review_20261112/review_manifest.json",
+          "role": "review_evidence"
+        }
+      ],
+      "evidence": {
+        "label": "datasets/annotated/person/v4_multivideo_review_20261112/labels/person_000401.txt",
+        "record_index": 1
+      }
+    },
+    {
+      "id": "direct_interference",
+      "image": "datasets/annotated/person/v4_multivideo_review_20261112/images/person_000601.png",
+      "source_kind": "direct_camera_capture",
+      "generation_method": "video_frame_area_downscale",
+      "content_branches": [
+        "multi",
+        "interference"
+      ],
+      "instance_count": 3,
+      "label_state": "complete",
+      "background_state": "contains_target",
+      "review": {
+        "full_frame_checked": true,
+        "accepted_by": "aoi",
+        "box_accepted_by": "Codex visual review",
+        "method": "full_frame_semantic_and_box_overlay_review",
+        "evidence": "datasets/scripts/person/config/toolchain_review_acceptance.json"
+      },
+      "partial_reason": "车辆遮挡部分人物下缘；可见框已有，完整体与遮挡层待人工确认",
+      "interference_evidence": {
+        "occluder": "datasets/annotated/person/v4_vehicle_occluders_20261113/sam2_01_fallen.png",
+        "occlusion_layer": "datasets/annotated/person/v4_vehicle_occluders_20261113/sam2_01_fallen.png",
+        "note": "该掩膜来自同任务已登记的车辆遮挡源，不是该帧像素级遮挡分割结果"
+      },
+      "parent_sources": [
+        {
+          "path": "datasets/raw/site_capture_20261112/videos/person_standees.mp4",
+          "role": "camera_source"
+        },
+        {
+          "path": "datasets/annotated/person/v4_multivideo_review_20261112/review_manifest.json",
+          "role": "review_evidence"
+        }
+      ],
+      "evidence": {
+        "record_index": 2
+      }
+    },
+    {
+      "id": "blender_overlay_candidate",
+      "image": "datasets/annotated/person/v4_user_master_88_sample_overlay_20261113.jpg",
+      "source_kind": "blender_render",
+      "generation_method": "blender_render_with_review_overlay",
+      "image_role": "review_overlay_not_raw_render",
+      "content_branches": [
+        "multi"
+      ],
+      "instance_count": null,
+      "label_state": "unknown",
+      "review": {
+        "full_frame_checked": true,
+        "accepted_by": "aoi",
+        "method": "structure_audit_only"
+      },
+      "parent_sources": [
+        {
+          "path": "datasets/assets/blender/shared/arena_4m2_pbr_20261112/arena_indoor_detailed.blend",
+          "role": "blender_scene"
+        },
+        {
+          "path": "datasets/annotated/person/v4_user_master_88_structure_audit_20261113.json",
+          "role": "render_evidence"
+        }
+      ],
+      "evidence": {
+        "structure_audit": "datasets/annotated/person/v4_user_master_88_structure_audit_20261113.json",
+        "note": "这是叠图候选，不是原始渲染图或训练样本；原始预览证据单独记录在 blender_raw_preview。"
+      }
+    },
+    {
+      "id": "blender_raw_preview",
+      "image": "datasets/annotated/common/review/person/toolchain_20261115/blender_raw_preview.png",
+      "source_kind": "blender_render",
+      "generation_method": "single_preview_render_3_front_1_back",
+      "image_role": "raw_render_preview",
+      "content_branches": [
+        "multi"
+      ],
+      "instance_count": 3,
+      "label_state": "complete",
+      "review": {
+        "full_frame_checked": true,
+        "accepted_by": "programmatic_blender_generator",
+        "box_accepted_by": "programmatic_blender_generator",
+        "method": "deterministic_instance_mask_and_scene_graph",
+        "evidence": "datasets/annotated/common/review/person/toolchain_20261115/blender_raw_preview_evidence.json"
+      },
+      "parent_sources": [
+        {
+          "path": "datasets/assets/blender/person/arena_person_user_master_working_20261113.blend",
+          "role": "blender_scene"
+        },
+        {
+          "path": "datasets/annotated/person/v4_whiteborder_textures_20261113/manifest.json",
+          "role": "texture_manifest"
+        }
+      ],
+      "evidence": {
+        "preview": "datasets/annotated/common/review/person/toolchain_20261115/blender_raw_preview.png",
+        "instance_ids": "datasets/annotated/common/review/person/toolchain_20261115/blender_raw_preview_instance_ids.png",
+        "label": "datasets/annotated/common/review/person/toolchain_20261115/blender_raw_preview.txt",
+        "mask_manifest": "datasets/annotated/common/review/person/toolchain_20261115/blender_raw_preview_mask_manifest.json",
+        "mask_quality": "datasets/annotated/common/review/person/toolchain_20261115/blender_raw_preview_mask_quality.json",
+        "generator_evidence": "datasets/annotated/common/review/person/toolchain_20261115/blender_raw_preview_evidence.json",
+        "preview_status": "raw_preview_not_dataset_batch",
+        "camera": "Vehicle camera",
+        "resolution": [
+          640,
+          480
+        ],
+        "object_count": 4,
+        "target_box_count": 3,
+        "white_back_box_count": 0,
+        "occlusion_layer": "none",
+        "ground_contact_check": "pass",
+        "human_review": false
+      }
+    }
+  ]
+}

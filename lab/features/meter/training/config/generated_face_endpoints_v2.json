@@ -1,0 +1,13 @@
+{
+  "source_blend": "datasets/assets/blender/meter/blender_9011_pbr_v2_20261110/meter_9011_pbr.blend",
+  "source_face": "datasets/assets/blender/meter/blender_9011_reference/face_generated.png",
+  "image_size": [1254, 1254],
+  "coordinate_system": "pixels, top left origin; outer end of each printed limit tick relative to its corresponding needle pivot",
+  "status": "visually estimated on generated texture only; production labels, physical-meter registration and point visibility are not established",
+  "endpoints": {
+    "temperature_min": [140, 964],
+    "temperature_max": [1142, 910],
+    "humidity_min": [768, 815],
+    "humidity_max": [490, 829]
+  }
+}

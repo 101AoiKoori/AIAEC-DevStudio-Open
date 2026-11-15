@@ -1,6 +1,7 @@
 """Audit grouped OpenCV meter augmentation and write sample overlays."""
 import argparse
 import json
+import sys
 from collections import Counter
 from pathlib import Path
 import cv2
@@ -8,14 +9,12 @@ import numpy as np
 from audit_meter_source_quality import needle_contrast
 
 
-def main():
-    p=argparse.ArgumentParser(description=__doc__)
-    p.add_argument('dataset',type=Path)
-    p.add_argument('--sources',type=Path,required=True)
-    p.add_argument('--previews',type=int,default=9)
-    args=p.parse_args(); root=args.dataset
-    manifest=json.loads((root/'manifest.json').read_text(encoding='utf8'))
-    sources=json.loads((args.sources/'manifest.json').read_text(encoding='utf8'))
+ROOT=Path(__file__).resolve().parents[5]
+sys.path.insert(0,str(ROOT))
+from lab.training_common.production_guard import generation_guard
+
+def _execute(args, manifest, sources):
+    root=args.dataset
     src={s['id']:s for s in sources['samples']}
     quality_path=(args.sources/'quality_report.json').resolve()
     quality=json.loads(quality_path.read_text(encoding='utf8'))
@@ -116,6 +115,35 @@ def main():
             'note':'source image IDs are disjoint; shared batches, scenes, meter and texture limit split independence; local contrast checks are heuristic, not per-tick readability proof'}
     (root/'audit.json').write_text(json.dumps(report,ensure_ascii=False,indent=2)+'\n',encoding='utf8')
     print('AUDIT_OK',json.dumps(report,ensure_ascii=False))
+
+
+def main():
+    p=argparse.ArgumentParser(description=__doc__)
+    p.add_argument('dataset',type=Path)
+    p.add_argument('--sources',type=Path,required=True)
+    p.add_argument('--previews',type=int,default=9)
+    args=p.parse_args(); args.dataset=args.dataset.resolve(); args.sources=args.sources.resolve()
+    root=args.dataset; manifest=root/'manifest.json'; source_manifest=args.sources/'manifest.json'
+    frozen=json.loads(manifest.read_text(encoding='utf8')); frozen_sources=json.loads(source_manifest.read_text(encoding='utf8'))
+    samples=frozen['samples']; bases=frozen_sources['samples']
+    images=[root/'images'/s['split']/(s['id']+'.png') for s in samples]
+    labels=[root/'labels'/s['split']/(s['id']+'.txt') for s in samples]
+    base_ids=sorted({s['source_id'] for s in samples})
+    source_labels=[args.sources/'labels'/(sid+'.txt') for sid in base_ids]
+    outputs=[root/'audit.json']; preview_count=Counter()
+    for item in samples:
+        split=item['split']
+        if preview_count[split] < args.previews//3:
+            outputs.append(root/'review'/(item['id']+'.png')); preview_count[split]+=1
+    with generation_guard('meter.audit_python_dataset:'+root.relative_to(ROOT).as_posix(),
+                          images, outputs, {'previews':args.previews},
+                          code_paths=[Path(__file__),Path(__file__).with_name('audit_meter_source_quality.py')],
+                          procedural_inputs=[manifest,source_manifest,args.sources/'quality_report.json',*labels,*source_labels], root=ROOT) as run:
+        if run.reused:
+            print('REUSED', root/'audit.json'); return
+        if json.loads(manifest.read_text(encoding='utf8')) != frozen or json.loads(source_manifest.read_text(encoding='utf8')) != frozen_sources:
+            raise RuntimeError('manifest changed before execution')
+        _execute(args, frozen, frozen_sources)
 
 
 if __name__=='__main__':

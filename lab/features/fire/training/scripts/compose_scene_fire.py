@@ -4,9 +4,14 @@ Outputs separate fire and name-paper detection candidates.  This uses the
 existing RGB/instance passes, not a new Blender render.  A source-family group
 is retained; generated samples are train candidates, not independent tests.
 """
+
+if __name__ == "__main__":
+    raise SystemExit("Legacy dataset CLI is retired; use datasets/scripts/fire/. Production remains paused.")
+
 import argparse
 import json
 import random
+import sys
 from collections import Counter
 from pathlib import Path
 
@@ -20,13 +25,9 @@ EXPORTS = ROOT / 'datasets/exports/fire'
 DEFAULT_SOURCE = EXPORTS / 'blender_candidates_160_20261110'
 BACKGROUND = ROOT / 'datasets/annotated/fire/real_background_candidates_20261110'
 ICON = ROOT / 'datasets/raw/fire/team_assets/image1.png'
-
-
-def read_image(path, mode=cv2.IMREAD_COLOR):
-    image = cv2.imdecode(np.fromfile(str(path), dtype=np.uint8), mode)
-    if image is None:
-        raise ValueError(f'cannot decode image: {path}')
-    return image
+sys.path.insert(0, str(ROOT))
+from lab.training_common.production_guard import generation_guard
+from datasets.scripts.common.images import read_image
 
 
 def building_mask(image):
@@ -48,8 +49,9 @@ def building_mask(image):
 
 def load_sources(source):
     run = json.loads((source / 'run.json').read_text(encoding='utf-8'))
-    if run.get('status') != 'complete_candidates' or run.get('resolution') != 640:
-        raise ValueError('expected complete 640px source render candidates')
+    if (run.get('status') != 'complete_candidates' or run.get('resolution') != 640 or
+            run.get('image_size', [640, 640]) != [640, 640]):
+        raise ValueError('expected complete 640x640 source render candidates')
     groups = {0: [], 1: [], 2: [], 3: []}
     skipped = Counter()
     for line in (source / 'manifest.jsonl').read_text(encoding='utf-8').splitlines():
@@ -158,7 +160,7 @@ def add_two_papers(image, mask, instances, icon, rng):
     return result, records
 
 
-def produce(source, output, count, seed):
+def _produce(source, output, count, seed):
     if output.exists() or not output.resolve().is_relative_to(EXPORTS.resolve()):
         raise ValueError('output exists or is outside fire exports')
     if not 10 <= count <= 10000:
@@ -233,6 +235,31 @@ def produce(source, output, count, seed):
                'usage': 'training candidates only, no independent validation/test; generated text is not OCR truth'}
     (output / 'summary.json').write_text(json.dumps(summary, ensure_ascii=False, indent=2), encoding='utf-8')
     return summary
+
+
+def produce(source, output, count, seed):
+    manifest = source / 'manifest.jsonl'
+    rows = [json.loads(line) for line in manifest.read_text(encoding='utf-8').splitlines()]
+    media = [BACKGROUND / 'images' / f'{i:04}.png' for i in range(1, 7)] + [ICON]
+    for row in rows:
+        if not row.get('fire_label') or not row.get('name_label') or row.get('occluder'):
+            continue
+        if any(obj['state'] not in ('visible', 'outside_frame') for obj in row['instances']):
+            continue
+        media.extend([source / row['image'], source / row['instance_pass']])
+    metadata = [source / 'run.json', manifest]
+    inputs = list(dict.fromkeys([*metadata, *media]))
+    with generation_guard('fire.compose_scene:' + str(output.resolve().relative_to(ROOT)),
+                          inputs, [output], {'count': count, 'seed': seed},
+                          code_paths=[Path(__file__), ROOT / 'lab/features/fire/training/scripts/fire_blender_labels.py',
+                                      ROOT / 'datasets/scripts/common/images.py', ROOT / 'datasets/scripts/common/annotations.py'],
+                          procedural_inputs=metadata, root=ROOT) as run:
+        if run.reused:
+            return json.loads((output / 'summary.json').read_text(encoding='utf-8'))
+        result = _produce(source, output, count, seed)
+        result['batch_source_refs'] = run.source_refs
+        (output / 'summary.json').write_text(json.dumps(result, ensure_ascii=False, indent=2), encoding='utf-8')
+        return result
 
 
 if __name__ == '__main__':

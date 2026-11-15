@@ -1,0 +1,160 @@
+{
+  "schema_version": 1,
+  "task": "person",
+  "batch": "manual_complete_20261115",
+  "purpose": "Bounded full-frame human review for the first real-camera person labels. Existing boxes are review proposals only; no record becomes complete until a named human confirms the whole frame and every box.",
+  "class_names": [
+    "community",
+    "noncommunity"
+  ],
+  "sources": [
+    {
+      "name": "multivideo",
+      "manifest": "datasets/annotated/person/v4_multivideo_review_20261112/review_manifest.json",
+      "records_key": "samples"
+    },
+    {
+      "name": "vehicle_sequence",
+      "manifest": "datasets/annotated/person/v4_vehicle_sequence_review_20261112/review_manifest.json",
+      "records_key": "images"
+    },
+    {
+      "name": "full_scene_diverse",
+      "manifest": "datasets/annotated/person/v4_full_scene_diverse_review_20261112/review_manifest.json",
+      "records_key": "samples"
+    }
+  ],
+  "cases": [
+    {
+      "review_id": "P01",
+      "source": "multivideo",
+      "record_id": "person_000201"
+    },
+    {
+      "review_id": "P02",
+      "source": "multivideo",
+      "record_id": "person_000401"
+    },
+    {
+      "review_id": "P03",
+      "source": "multivideo",
+      "record_id": "person_000601"
+    },
+    {
+      "review_id": "P04",
+      "source": "multivideo",
+      "record_id": "person_000701"
+    },
+    {
+      "review_id": "P05",
+      "source": "multivideo",
+      "record_id": "person_000901"
+    },
+    {
+      "review_id": "P06",
+      "source": "multivideo",
+      "record_id": "person_001001"
+    },
+    {
+      "review_id": "P07",
+      "source": "multivideo",
+      "record_id": "person_001201"
+    },
+    {
+      "review_id": "P08",
+      "source": "multivideo",
+      "record_id": "person_001501"
+    },
+    {
+      "review_id": "P09",
+      "source": "vehicle_sequence",
+      "record_id": "frame_000451"
+    },
+    {
+      "review_id": "P10",
+      "source": "vehicle_sequence",
+      "record_id": "frame_000601"
+    },
+    {
+      "review_id": "P11",
+      "source": "vehicle_sequence",
+      "record_id": "frame_001201"
+    },
+    {
+      "review_id": "P12",
+      "source": "vehicle_sequence",
+      "record_id": "frame_002851"
+    },
+    {
+      "review_id": "P13",
+      "source": "vehicle_sequence",
+      "record_id": "frame_003001"
+    },
+    {
+      "review_id": "P14",
+      "source": "vehicle_sequence",
+      "record_id": "frame_007801"
+    },
+    {
+      "review_id": "P15",
+      "source": "vehicle_sequence",
+      "record_id": "frame_007951"
+    },
+    {
+      "review_id": "P16",
+      "source": "vehicle_sequence",
+      "record_id": "frame_008251"
+    },
+    {
+      "review_id": "P17",
+      "source": "vehicle_sequence",
+      "record_id": "frame_008401"
+    },
+    {
+      "review_id": "P18",
+      "source": "vehicle_sequence",
+      "record_id": "frame_008551"
+    },
+    {
+      "review_id": "P19",
+      "source": "full_scene_diverse",
+      "record_id": "frame_000751"
+    },
+    {
+      "review_id": "P20",
+      "source": "full_scene_diverse",
+      "record_id": "frame_001291"
+    },
+    {
+      "review_id": "P21",
+      "source": "full_scene_diverse",
+      "record_id": "frame_002911"
+    },
+    {
+      "review_id": "P22",
+      "source": "full_scene_diverse",
+      "record_id": "frame_008221"
+    },
+    {
+      "review_id": "P23",
+      "source": "full_scene_diverse",
+      "record_id": "frame_008521"
+    },
+    {
+      "review_id": "P24",
+      "source": "full_scene_diverse",
+      "record_id": "frame_008701"
+    }
+  ],
+  "review_scope": {
+    "label_target": "front-facing, identifiable, near-camera community or noncommunity person standee at or above the configured task scale",
+    "label_box": "visible detector box for every in-scope person target in the full frame",
+    "hard_negative": "white back, side/non-front, distant/too-small, or otherwise out-of-scope standee: no target box",
+    "completion_rule": "complete only after the whole frame has been checked and all in-scope targets have reviewed visible boxes; otherwise confirmed_negative, unknown or partial"
+  },
+  "review_status": {
+    "state": "pending_human_full_frame_review",
+    "accepted_by": null,
+    "box_accepted_by": null
+  }
+}

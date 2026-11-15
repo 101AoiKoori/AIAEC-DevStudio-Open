@@ -1,0 +1,687 @@
+# 工作空间对象分类学（OO 风格类层次）。
+# 用途：给每类对象定义所有者、权威源、版本策略、可变性、生命周期和关系，
+# 避免目录归属、版本、计划和数据/模型对象混用。
+# 修改后运行：python lab/scripts/contracts/workspace_ontology.py --write
+# 检查：python lab/scripts/contracts/workspace_ontology.py --check
+version: 1
+description: 工作空间对象类层次与路径归属；目录结构由 config/workspace_layout.yaml 管，本文管对象语义。
+classes:
+  artifact:
+    parent: null
+    abstract: true
+    description: 所有工作空间产物的基类。
+    owner_prefixes: []
+    authority: none
+    versioning: none
+    mutability: abstract
+    tracked: mixed
+    lifecycle: []
+    relations: [derived_from, documents, supersedes]
+  source_artifact:
+    parent: artifact
+    abstract: true
+    description: 原始或只读来源对象；不可由本工作空间改写。
+    owner_prefixes: []
+    authority: manifest
+    versioning: manifest
+    mutability: immutable
+    tracked: mixed
+    lifecycle: [captured, catalogued, retired]
+    relations: [documents]
+  raw_media:
+    parent: source_artifact
+    abstract: false
+    description: 原始相机图片、视频、数字素材及其工作副本。
+    owner_prefixes: [datasets/raw/]
+    authority: manifest
+    versioning: manifest
+    mutability: immutable
+    tracked: false
+    lifecycle: [captured, catalogued, retired]
+    relations: []
+  capture_batch:
+    parent: source_artifact
+    abstract: false
+    description: 采集批次记录与对应原件索引。
+    owner_prefixes: [datasets/CAR_REAL_CAPTURE_, datasets/SITE_CAPTURE_]
+    authority: manifest
+    versioning: manifest
+    mutability: immutable
+    tracked: true
+    lifecycle: [captured, catalogued, retired]
+    relations: []
+  blender_asset:
+    parent: source_artifact
+    abstract: false
+    description: Blender 源模型、母场景和可编辑批次快照。
+    owner_prefixes: [datasets/assets/blender/]
+    authority: blender_registry
+    versioning: registry
+    mutability: versioned
+    tracked: false
+    lifecycle: [captured, catalogued, retired]
+    relations: []
+  candidate_source_asset:
+    parent: source_artifact
+    abstract: false
+    description: 只读候选素材目录，例如 datasets/assets/person。
+    owner_prefixes: [datasets/assets/person/]
+    authority: manifest
+    versioning: manifest
+    mutability: immutable
+    tracked: false
+    lifecycle: [catalogued, retired]
+    relations: []
+  derived_artifact:
+    parent: artifact
+    abstract: true
+    description: 由来源派生的标注、候选或审查观测。
+    owner_prefixes: []
+    authority: manifest
+    versioning: manifest
+    mutability: rebuildable
+    tracked: false
+    lifecycle: [candidate, reviewed, accepted, superseded]
+    relations: [derived_from, annotates, reviews, documents]
+  candidate_batch:
+    parent: derived_artifact
+    abstract: false
+    description: 任务级标注与待审核候选批次。
+    owner_prefixes: [datasets/annotated/]
+    authority: manifest
+    versioning: manifest
+    mutability: rebuildable
+    tracked: false
+    lifecycle: [candidate, reviewed, accepted, isolated, superseded]
+    relations: [derived_from, annotates]
+  review_observation:
+    parent: derived_artifact
+    abstract: false
+    description: 跨任务审查度量、叠加图、批次清单与透视模板。
+    owner_prefixes: [datasets/annotated/common/review/, datasets/annotated/common/perspective/]
+    authority: manifest
+    versioning: manifest
+    mutability: rebuildable
+    tracked: false
+    lifecycle: [generated, reviewed, superseded]
+    relations: [derived_from, reviews]
+  source_ledger:
+    parent: derived_artifact
+    abstract: false
+    description: 跨任务背景与来源总账的派生报告；由 source ledger 工具从任务配对、清单、共享背景池和 Blender 登记库重算。
+    owner_prefixes: [datasets/annotated/common/sources/]
+    authority: manifest
+    versioning: manifest
+    mutability: rebuildable
+    tracked: false
+    lifecycle: [generated, superseded]
+    relations: [derived_from, documents]
+  record_artifact:
+    parent: artifact
+    abstract: true
+    description: 权威记录、回执和索引；不等同于可重建缓存。
+    owner_prefixes: []
+    authority: mixed
+    versioning: mixed
+    mutability: append_only
+    tracked: mixed
+    lifecycle: [active, superseded]
+    relations: [documents]
+  media_index_store:
+    parent: record_artifact
+    abstract: false
+    description: 媒体索引目录；包含可重建查询缓存和持久生产回执。
+    owner_prefixes: [datasets/annotated/media_index/]
+    authority: media_index
+    versioning: manifest
+    mutability: mixed
+    tracked: false
+    lifecycle: [active, superseded]
+    relations: []
+  media_index_cache:
+    parent: media_index_store
+    abstract: false
+    description: 可重建的媒体观察查询缓存 query_cache.sqlite3。
+    owner_prefixes: []
+    authority: media_index
+    versioning: manifest
+    mutability: rebuildable
+    tracked: false
+    lifecycle: [active, superseded]
+    relations: []
+  production_receipt:
+    parent: media_index_store
+    abstract: false
+    description: 持久生产回执 production_state.sqlite3；不是可清理缓存。
+    owner_prefixes: []
+    authority: production_receipt
+    versioning: receipt
+    mutability: append_only
+    tracked: false
+    lifecycle: [active, superseded]
+    relations: [produces]
+  asset_registry:
+    parent: record_artifact
+    abstract: false
+    description: Blender 源资产分类、生命周期和关系的 SQLite 权威记录。
+    owner_prefixes: []
+    authority: blender_registry
+    versioning: registry
+    mutability: append_only
+    tracked: true
+    lifecycle: [active, superseded]
+    relations: []
+  review_decision:
+    parent: record_artifact
+    abstract: false
+    description: 每任务最近一批候选审查判定 review_selection.json。
+    owner_prefixes: []
+    authority: git
+    versioning: git
+    mutability: versioned
+    tracked: true
+    lifecycle: [current, superseded]
+    relations: [reviews, documents]
+  plan_artifact:
+    parent: artifact
+    abstract: true
+    description: 需求、契约、任务配置和生成计划的基类。
+    owner_prefixes: []
+    authority: git
+    versioning: git
+    mutability: versioned
+    tracked: true
+    lifecycle: [draft, reviewed, approved, active, executed, superseded]
+    relations: [plans, produces, documents, supersedes]
+  requirement_config:
+    parent: plan_artifact
+    abstract: false
+    description: 识别任务需求的唯一编辑源 config/perception_tasks.json。
+    owner_prefixes: []
+    authority: git
+    versioning: git
+    mutability: versioned
+    tracked: true
+    lifecycle: [active, superseded]
+    relations: [documents]
+  layout_contract:
+    parent: plan_artifact
+    abstract: false
+    description: 顶层目录、数据集任务、实验分支和 ROS 包结构契约。
+    owner_prefixes: []
+    authority: git
+    versioning: git
+    mutability: versioned
+    tracked: true
+    lifecycle: [active, superseded]
+    relations: [documents]
+  ontology_contract:
+    parent: plan_artifact
+    abstract: false
+    description: 对象类层次、归属、版本策略和关系的唯一编辑源。
+    owner_prefixes: []
+    authority: git
+    versioning: git
+    mutability: versioned
+    tracked: true
+    lifecycle: [active, superseded]
+    relations: [documents]
+  design_contract:
+    parent: plan_artifact
+    abstract: false
+    description: 训练目标与组合轴的设计契约。
+    owner_prefixes: []
+    authority: git
+    versioning: git
+    mutability: versioned
+    tracked: true
+    lifecycle: [active, superseded]
+    relations: [documents]
+  task_config:
+    parent: plan_artifact
+    abstract: false
+    description: 每任务 dataset.yaml 与 source.yaml。
+    owner_prefixes: []
+    authority: git
+    versioning: git
+    mutability: versioned
+    tracked: true
+    lifecycle: [active, superseded]
+    relations: [plans]
+  plan_draft:
+    parent: plan_artifact
+    abstract: false
+    description: 全量 train 组配额设计草案 config/full_train_allocation.yaml。
+    owner_prefixes: []
+    authority: git
+    versioning: git
+    mutability: versioned
+    tracked: true
+    lifecycle: [design_draft, reviewed, approved, compiled, superseded]
+    relations: [plans, documents]
+  generation_plan:
+    parent: plan_artifact
+    abstract: false
+    description: 任务级生成计划 JSON；可被生产守卫消费的当前计划。
+    owner_prefixes: []
+    authority: git
+    versioning: git
+    mutability: versioned
+    tracked: true
+    lifecycle: [active, executed, superseded]
+    relations: [plans, produces]
+  production_plan:
+    parent: generation_plan
+    abstract: false
+    description: 当前任务的主 production_plan.json；不是设计草案。
+    owner_prefixes: []
+    authority: git
+    versioning: git
+    mutability: versioned
+    tracked: true
+    lifecycle: [active, executed, superseded]
+    relations: [plans, produces]
+  review_plan:
+    parent: generation_plan
+    abstract: false
+    description: 任务级候选审查计划 review_plan.json。
+    owner_prefixes: []
+    authority: git
+    versioning: git
+    mutability: versioned
+    tracked: true
+    lifecycle: [active, executed, superseded]
+    relations: [plans, reviews]
+  dataset_artifact:
+    parent: artifact
+    abstract: true
+    description: 当前小样、正式集合和可重建训练包。
+    owner_prefixes: []
+    authority: manifest
+    versioning: manifest
+    mutability: current_only
+    tracked: false
+    lifecycle: [work_in_progress, review_ready, usable, isolated, superseded]
+    relations: [derived_from, produces, trains, documents]
+  sample_set:
+    parent: dataset_artifact
+    abstract: false
+    description: 每任务唯一的当前小样 datasets/samples/<任务>/。
+    owner_prefixes: [datasets/samples/]
+    authority: manifest
+    versioning: manifest
+    mutability: current_only
+    tracked: false
+    lifecycle: [work_in_progress, review_ready, usable, isolated]
+    relations: [derived_from, produces]
+  dataset_export:
+    parent: dataset_artifact
+    abstract: false
+    description: 每任务唯一的当前正式集合 datasets/exports/<任务>/{train,test,val}/。
+    owner_prefixes: [datasets/exports/]
+    authority: manifest
+    versioning: manifest
+    mutability: current_only
+    tracked: false
+    lifecycle: [work_in_progress, review_ready, usable, isolated, superseded]
+    relations: [derived_from, produces, trains]
+  training_package:
+    parent: dataset_artifact
+    abstract: false
+    description: 可重建的分发副本，不是数据权威。
+    owner_prefixes: [training_packages/]
+    authority: manifest
+    versioning: manifest
+    mutability: rebuildable
+    tracked: false
+    lifecycle: [active, superseded]
+    relations: [derived_from, documents]
+  model_artifact:
+    parent: artifact
+    abstract: true
+    description: 训练运行、研究权重和部署模型。
+    owner_prefixes: []
+    authority: model_record
+    versioning: model
+    mutability: versioned
+    tracked: false
+    lifecycle: [trained, evaluated, deployed, retired]
+    relations: [derived_from, trains, deploys, documents]
+  training_run:
+    parent: model_artifact
+    abstract: false
+    description: 本机训练、评估、调参和运行记录；内层 V3 runs 受保护。
+    owner_prefixes: [runs/]
+    authority: run_record
+    versioning: run
+    mutability: immutable
+    tracked: false
+    lifecycle: [running, completed, failed, interrupted]
+    relations: [trains, documents]
+  model_weight:
+    parent: model_artifact
+    abstract: false
+    description: 研究/训练权重，含来源、训练数据版本和类别顺序记录。
+    owner_prefixes: [models/weights/]
+    authority: model_record
+    versioning: model
+    mutability: versioned
+    tracked: false
+    lifecycle: [trained, evaluated, retired]
+    relations: [derived_from, trains]
+  deployed_model:
+    parent: model_artifact
+    abstract: false
+    description: 正式 ROS 包内直接部署的模型文件。
+    owner_prefixes: [ws/src/aec_vision/models/]
+    authority: model_record
+    versioning: model
+    mutability: current_only
+    tracked: false
+    lifecycle: [deployed, retired]
+    relations: [deploys, documents]
+  code_artifact:
+    parent: artifact
+    abstract: true
+    description: 部署包、实验、数据管线、仓库工具和 Skill 脚本。
+    owner_prefixes: []
+    authority: git
+    versioning: git
+    mutability: versioned
+    tracked: true
+    lifecycle: [active, superseded]
+    relations: [documents]
+  deploy_package:
+    parent: code_artifact
+    abstract: false
+    description: ws/src 下可部署 catkin 包。
+    owner_prefixes: [ws/src/]
+    authority: git
+    versioning: git
+    mutability: versioned
+    tracked: true
+    lifecycle: [active, superseded]
+    relations: [deploys, documents]
+  experiment_code:
+    parent: code_artifact
+    abstract: false
+    description: lab 下训练、推理、导航和联调实验代码。
+    owner_prefixes: [lab/features/, lab/navigation/, lab/integration/, lab/training_common/]
+    authority: git
+    versioning: git
+    mutability: versioned
+    tracked: true
+    lifecycle: [active, superseded]
+    relations: [trains, documents]
+  data_pipeline_code:
+    parent: code_artifact
+    abstract: false
+    description: datasets/scripts 下数据生产、审查和公共能力代码。
+    owner_prefixes: [datasets/scripts/]
+    authority: git
+    versioning: git
+    mutability: versioned
+    tracked: true
+    lifecycle: [active, superseded]
+    relations: [produces, documents]
+  repo_tool:
+    parent: code_artifact
+    abstract: false
+    description: lab/scripts 下仓库级维护、检查和生成工具。
+    owner_prefixes: [lab/scripts/]
+    authority: git
+    versioning: git
+    mutability: versioned
+    tracked: true
+    lifecycle: [active, superseded]
+    relations: [documents]
+  skill_script:
+    parent: code_artifact
+    abstract: false
+    description: .agents/skills/*/scripts 下 Skill 直接使用的脚本。
+    owner_prefixes: [.agents/skills/]
+    authority: git
+    versioning: git
+    mutability: versioned
+    tracked: true
+    lifecycle: [active, superseded]
+    relations: [documents]
+  doc_artifact:
+    parent: artifact
+    abstract: true
+    description: 项目文档、生成文档和参考资料。
+    owner_prefixes: []
+    authority: git
+    versioning: git
+    mutability: versioned
+    tracked: true
+    lifecycle: [current, archived]
+    relations: [documents, supersedes]
+  project_doc:
+    parent: doc_artifact
+    abstract: false
+    description: 手工维护的项目文档、README、Skill 说明。
+    owner_prefixes: [docs/]
+    authority: git
+    versioning: git
+    mutability: versioned
+    tracked: true
+    lifecycle: [current, archived]
+    relations: [documents]
+  generated_doc:
+    parent: doc_artifact
+    abstract: false
+    description: 由配置/计划生成的文档；不手工维护生成块。
+    owner_prefixes: []
+    authority: git
+    versioning: git
+    mutability: generated
+    tracked: true
+    lifecycle: [current, superseded]
+    relations: [documents]
+  reference_doc:
+    parent: doc_artifact
+    abstract: false
+    description: refs 下外部资料与迁移笔记；非正式运行依赖。
+    owner_prefixes: [refs/]
+    authority: git
+    versioning: git
+    mutability: versioned
+    tracked: true
+    lifecycle: [current, archived]
+    relations: [documents]
+  archive_artifact:
+    parent: artifact
+    abstract: true
+    description: 技术迭代归档与外来原件。
+    owner_prefixes: []
+    authority: archive_index
+    versioning: archive
+    mutability: immutable
+    tracked: mixed
+    lifecycle: [archived]
+    relations: [documents, supersedes]
+  technical_archive:
+    parent: archive_artifact
+    abstract: false
+    description: Archive/technical 下退役模型、数据版本、脚本和差异记录。
+    owner_prefixes: [Archive/technical/]
+    authority: archive_index
+    versioning: archive
+    mutability: immutable
+    tracked: mixed
+    lifecycle: [archived]
+    relations: [supersedes]
+  external_original:
+    parent: archive_artifact
+    abstract: false
+    description: Archive/Assets 下外来原件；保留来源，不作为运行依赖。
+    owner_prefixes: [Archive/Assets/]
+    authority: archive_index
+    versioning: archive
+    mutability: immutable
+    tracked: mixed
+    lifecycle: [archived]
+    relations: []
+  publication_export:
+    parent: artifact
+    abstract: false
+    description: 独立 GitHub 发布仓库；不包含本工作空间历史和本机数据。
+    owner_prefixes: [AIAEC-DevStudio-Open/]
+    authority: external_repo
+    versioning: external
+    mutability: versioned
+    tracked: false
+    lifecycle: [active, superseded]
+    relations: [documents]
+  temp_artifact:
+    parent: artifact
+    abstract: false
+    description: tmp 下可丢弃的临时产物。
+    owner_prefixes: [tmp/]
+    authority: none
+    versioning: none
+    mutability: disposable
+    tracked: false
+    lifecycle: [disposable]
+    relations: []
+  app_runtime:
+    parent: artifact
+    abstract: false
+    description: 本机 Claude Code 会话与 worktree 运行时目录，不属于项目内容。
+    owner_prefixes: [.claude/]
+    authority: none
+    versioning: none
+    mutability: disposable
+    tracked: false
+    lifecycle: [transient]
+    relations: []
+relations:
+  derived_from:
+    from: [candidate_batch, review_observation, source_ledger, sample_set, dataset_export, training_run, model_weight, production_receipt]
+    to: [raw_media, capture_batch, blender_asset, candidate_source_asset, candidate_batch, sample_set, dataset_export, generation_plan]
+    description: 派生对象回指父来源、父批次或生成计划。
+  annotates:
+    from: [candidate_batch]
+    to: [raw_media, capture_batch, blender_asset, candidate_source_asset]
+    description: 标注/候选批次标注其来源素材。
+  reviews:
+    from: [review_observation, review_decision, review_plan]
+    to: [candidate_batch]
+    description: 审查观测、判定和计划作用于候选批次。
+  plans:
+    from: [generation_plan, production_plan, review_plan, task_config, plan_draft]
+    to: [requirement_config, design_contract, task_config]
+    description: 计划/任务配置引用需求与设计契约。
+  produces:
+    from: [generation_plan, production_plan, data_pipeline_code, production_receipt]
+    to: [sample_set, dataset_export]
+    description: 生成计划或数据管线产出当前小样/正式集合。
+  trains:
+    from: [training_run, experiment_code]
+    to: [dataset_export]
+    description: 训练运行/实验代码消费正式集合。
+  deploys:
+    from: [deployed_model, deploy_package]
+    to: [model_weight]
+    description: 部署模型来自研究/训练权重。
+  documents:
+    from: [project_doc, generated_doc, reference_doc, technical_archive]
+    to: [artifact]
+    description: 文档记录或引用任意对象。
+  supersedes:
+    from: [artifact]
+    to: [artifact]
+    description: 新版本取代旧版本；历史由 Git 或归档承载。
+versioning_policies:
+  git: 文本、代码、配置和文档由 Git 保存当前版本；不建版本命名目录，历史用提交。
+  manifest: 数据/标注用清单记录来源、派生、用途和状态；当前集合只保留一套。
+  registry: Blender 资产状态以 blender_source_registry.sqlite3 为权威。
+  receipt: production_state.sqlite3 保存持久生产回执，不当可重建缓存清理。
+  run: runs 内运行记录保持原位；内层 V3 runs 不移动、删除或覆盖。
+  model: 模型权重按来源、训练数据版本、类别顺序和运行记录管理；大文件不入 Git。
+  archive: 退役技术迭代进入 Archive/technical，保留原路径和来源关系。
+  mixed: 目录内不同文件有不同权威/版本策略，详见类说明。
+  external: 由外部独立仓库或发布流程管理，不在本仓库内版本化。
+  none: 不保留版本，可随时丢弃。
+mutability_values: [abstract, immutable, append_only, rebuildable, current_only, versioned, generated, disposable, mixed]
+artifacts:
+  - path: config/workspace_ontology.yaml
+    class: ontology_contract
+  - path: config/workspace_layout.yaml
+    class: layout_contract
+  - path: config/perception_tasks.json
+    class: requirement_config
+  - path: config/task_targets.yaml
+    class: design_contract
+  - path: config/id_policy.yaml
+    class: design_contract
+  - path: config/combination_axes.yaml
+    class: design_contract
+  - path: config/full_train_allocation.yaml
+    class: plan_draft
+  - path: docs/FULL_TRAIN_PLAN_DESIGN.md
+    class: generated_doc
+  - path: docs/ID_AND_COUNT_POLICY.md
+    class: generated_doc
+  - path: docs/WORKSPACE_ONTOLOGY.md
+    class: generated_doc
+  - path: docs/TASK_MATRIX.md
+    class: generated_doc
+  - path: lab/features/README.md
+    class: generated_doc
+  - path: datasets/blender_source_registry.sqlite3
+    class: asset_registry
+  - path: datasets/annotated/media_index/query_cache.sqlite3
+    class: media_index_cache
+  - path: datasets/annotated/media_index/production_state.sqlite3
+    class: production_receipt
+  - path: datasets/CAR_REAL_CAPTURE_20261112.md
+    class: capture_batch
+  - path: datasets/SITE_CAPTURE_20261112.md
+    class: capture_batch
+  - path: datasets/README.md
+    class: project_doc
+  - path: datasets/scripts/README.md
+    class: project_doc
+  - path: models/README.md
+    class: project_doc
+  - path: README.md
+    class: project_doc
+  - path: AGENTS.md
+    class: project_doc
+  - pattern: datasets/DATASET_COORDINATION*.md
+    class: project_doc
+  - pattern: .agents/skills/*/SKILL.md
+    class: project_doc
+  - pattern: datasets/scripts/*/config/production_plan.json
+    class: production_plan
+  - pattern: datasets/scripts/*/config/review_plan.json
+    class: review_plan
+  - pattern: datasets/scripts/*/config/review_selection.json
+    class: review_decision
+  - pattern: datasets/scripts/*/config/dataset.yaml
+    class: task_config
+  - pattern: datasets/scripts/*/config/source.yaml
+    class: task_config
+  - pattern: datasets/scripts/*/config/*.json
+    class: generation_plan
+checks:
+  plan_draft_status:
+    path: config/full_train_allocation.yaml
+    field: status
+    value: design_draft
+  required_artifacts:
+    - config/workspace_layout.yaml
+    - config/workspace_ontology.yaml
+    - config/task_targets.yaml
+    - config/combination_axes.yaml
+    - config/full_train_allocation.yaml
+    - config/id_policy.yaml
+    - docs/FULL_TRAIN_PLAN_DESIGN.md
+    - docs/ID_AND_COUNT_POLICY.md
+    - docs/WORKSPACE_ONTOLOGY.md
+  generated_docs:
+    - docs/WORKSPACE_ONTOLOGY.md
+    - docs/FULL_TRAIN_PLAN_DESIGN.md
+    - docs/ID_AND_COUNT_POLICY.md

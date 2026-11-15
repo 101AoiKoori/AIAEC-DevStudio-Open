@@ -1,0 +1,56 @@
+schema_version: 3
+task_id: waste_bin
+model_key: waste_bin_state
+version: v4
+task: detect
+data: datasets/exports/waste_bin_state/v4_handoff_20261113/data.yaml
+data_overrides:
+  train:
+  - data: datasets/exports/waste_bin_state/v4_resume_curated_20261113/data.yaml
+    split: train
+  - data: datasets/exports/waste_bin_state/v4_real_background_subset_100_20261113/data.yaml
+    split: train
+model: runs/waste_bin_state/runs/waste_bin_state/v3_20261111_151012_816475/training/weights/best.pt
+output_root: runs/waste_bin_state
+description: 候选微调：四色开闭交叉及邻桶遮挡；程序与分层审核已记录，人工验收未完成。
+imgsz: 640
+epochs: 18
+batch: 16
+workers: 0
+patience: 0
+seed: 42
+device: '0'
+optimizer: AdamW
+lr0: 0.00025
+lrf: 0.08
+momentum: 0.9
+weight_decay: 0.0005
+warmup_epochs: 1
+cos_lr: true
+close_mosaic: 0
+amp: false
+deterministic: true
+max_det: 100
+diagnostic_conf: 0.25
+match_iou: 0.5
+nms_iou: 0.7
+preview_limit: 48
+evaluate_after_training: true
+augment:
+  degrees: 3.0
+  translate: 0.05
+  scale: 0.18
+  shear: 0.0
+  perspective: 0.0
+  flipud: 0.0
+  fliplr: 0.0
+  mosaic: 0.0
+  mixup: 0.0
+  copy_paste: 0.0
+  hsv_h: 0.005
+  hsv_s: 0.1
+  hsv_v: 0.12
+source_notes:
+- 436个候选：训练273、验证95、合成压力测试68；Blender背景175张，来自两个场景视角组。
+- 真实背景来自两段视频；场景、桶模型与视频在集合间复用，测试不是独立实拍。
+- 基于来源记录、状态掩膜及有限视觉抽查；不是逐图人工验收，未进行训练和模型评价。

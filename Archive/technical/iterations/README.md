@@ -16,11 +16,11 @@
 
 ## 垃圾贴纸数据版本
 
-`synthetic_train_v1`、`synthetic_train_v2`、`stickers_synthetic_v3` 和 `synthetic_smoke_20261106` 位于 `datasets/exports/waste_bin/archive/`，`stickers_synthetic_v4` 位于 `datasets/exports/waste_bin/`；[数据集版本索引](../dataset-versions.tsv)记录归档位置。v1、v3 中途停止，缺少完整清单。v4 为当前选用版本，训练集和调试验证集使用相同来源的图标。
+`synthetic_train_v1`、`synthetic_train_v2`、`stickers_synthetic_v3` 和 `synthetic_smoke_20261106` 的原路径为 `datasets/exports/waste_bin/archive/`，`stickers_synthetic_v4` 的原路径为 `datasets/exports/waste_bin/`；这些导出现已移入 `Archive/technical/datasets/`，[数据集版本索引](../dataset-versions.tsv)记录归档位置。v1、v3 中途停止，缺少完整清单。v4 为当时的选用版本，训练集和调试验证集使用相同来源的图标；本轮 V4 数据按[数据集设计](../../../docs/DATASET_DESIGN.md)重新制作。
 
 ## 仪表合成数据
 
-仪表数据包括 PDF 单图增强试验、自绘流程试验、Blender 表盘与动画渲染候选、基于渲染底图的 OpenCV 增强数据。`datasets/annotated/meter/rendered_base_v1/` 有 89 张渲染底图，`datasets/exports/meter/opencv_rendered_meter_v1/` 有 1,000 张同源候选图，动画同一轨迹归入训练集。这两组见[数据集版本索引](../dataset-versions.tsv)；各流程试验的当前状态见[数据区](../../../datasets/README.md)。
+仪表数据包括 PDF 单图增强试验、自绘流程试验、Blender 表盘与动画渲染候选、基于渲染底图的 OpenCV 增强数据。`datasets/annotated/meter/rendered_base_v1/` 有 89 张渲染底图；`datasets/exports/meter/opencv_rendered_meter_v1/` 的 1,000 张同源候选图原路径已清空，导出现移入 `Archive/technical/datasets/`，动画同一轨迹归入训练集。这两组见[数据集版本索引](../dataset-versions.tsv)；各流程试验的当前状态见[数据区](../../../datasets/README.md)。
 
 ## 车牌实验数据
 

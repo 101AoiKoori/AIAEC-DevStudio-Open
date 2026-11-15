@@ -1,0 +1,165 @@
+{
+  "schema_version": 1,
+  "id": "person_arena_camera_candidates_20261115",
+  "task": "person",
+  "status": "design_candidate",
+  "master_scene": "datasets/assets/blender/shared/arena_4m2_pbr_20261112/arena_indoor_detailed.blend",
+  "scene_truth": {
+    "level": "fit_from_photo",
+    "note": "场地与相机为现有场景拟合；不是现场测量标定，也未在本轮打开 Blender。",
+    "evidence": "datasets/blender_source_registry.sqlite3"
+  },
+  "target": {
+    "id": "arena_standee",
+    "height_m": 0.15,
+    "anchor_m": [
+      0.0,
+      0.03
+    ],
+    "front_axis_xy": [
+      0.0,
+      -1.0
+    ],
+    "sensor_width_mm": 36.0
+  },
+  "required_views": [
+    "front",
+    "oblique",
+    "side"
+  ],
+  "required_coverage_tags": [
+    "single",
+    "multi",
+    "interference"
+  ],
+  "required_scale_bins": [
+    [
+      0.05,
+      0.3
+    ],
+    [
+      0.3,
+      0.6
+    ]
+  ],
+  "cameras": [
+    {
+      "id": "near_front",
+      "view": "front",
+      "location_m": [
+        0.0,
+        -0.4,
+        0.16
+      ],
+      "target_m": [
+        0.0,
+        0.03,
+        0.085
+      ],
+      "lens_mm": 22.0,
+      "resolution": [
+        640,
+        480
+      ],
+      "coverage_tags": [
+        "single",
+        "multi",
+        "interference"
+      ],
+      "source": "datasets/scripts/person/render_person_arena_v4.py person-near preset"
+    },
+    {
+      "id": "wide_front",
+      "view": "front",
+      "location_m": [
+        0.0,
+        -0.85,
+        0.18
+      ],
+      "target_m": [
+        0.0,
+        0.03,
+        0.085
+      ],
+      "lens_mm": 18.0,
+      "resolution": [
+        640,
+        480
+      ],
+      "coverage_tags": [
+        "multi"
+      ]
+    },
+    {
+      "id": "detail_front",
+      "view": "front",
+      "location_m": [
+        0.0,
+        -0.28,
+        0.14
+      ],
+      "target_m": [
+        0.0,
+        0.03,
+        0.085
+      ],
+      "lens_mm": 22.0,
+      "resolution": [
+        640,
+        480
+      ],
+      "coverage_tags": [
+        "single",
+        "multi",
+        "interference"
+      ],
+      "source": "design detail camera; not a field-calibrated camera"
+    },
+    {
+      "id": "oblique_042",
+      "view": "oblique",
+      "location_m": [
+        0.28,
+        -0.28,
+        0.18
+      ],
+      "target_m": [
+        0.0,
+        0.03,
+        0.085
+      ],
+      "lens_mm": 22.0,
+      "resolution": [
+        640,
+        480
+      ],
+      "coverage_tags": [
+        "single",
+        "multi"
+      ]
+    },
+    {
+      "id": "side_090",
+      "view": "side",
+      "location_m": [
+        0.4,
+        0.03,
+        0.16
+      ],
+      "target_m": [
+        0.0,
+        0.03,
+        0.085
+      ],
+      "lens_mm": 22.0,
+      "resolution": [
+        640,
+        480
+      ],
+      "coverage_tags": [
+        "single",
+        "interference"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,49 @@
+{
+  "schema_version": 1,
+  "model_key": "waste_sticker",
+  "target_split": "train",
+  "budget": 1,
+  "purpose": "Current selected fully identifiable real-frame candidate; exclude missing and partial labels",
+  "independence_basis": "one existing frame from the designated capture video",
+  "uncertainty_weight": 0,
+  "constraints": {
+    "labels": "recorded_full_frame_stickers",
+    "resize": "none"
+  },
+  "strata": [
+    {
+      "id": "direct_002016",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "failure_event": "recorded_sticker_label_missing",
+      "conditions": [],
+      "background": {
+        "image": "datasets/raw/car_real_capture_20261112/frames_20261112_152304/V_20261112_152304_002016.jpg"
+      },
+      "target": {
+        "kind": "existing_stickers"
+      },
+      "labels": {
+        "format": "yolo_detection",
+        "annotation_manifest": "datasets/annotated/waste_bin/waste_sticker_p22_stationary_annotations_20261114.json"
+      },
+      "parameters": {
+        "annotation_record_index": 1
+      },
+      "augmentation": {
+        "value_gain": 1.0,
+        "saturation_gain": 1.0
+      },
+      "sources": [
+        "datasets/raw/car_real_capture_20261112/frames_20261112_152304/V_20261112_152304_002016.jpg",
+        "datasets/raw/car_real_capture_20261112/V_20261112_152304.mp4"
+      ]
+    }
+  ]
+}

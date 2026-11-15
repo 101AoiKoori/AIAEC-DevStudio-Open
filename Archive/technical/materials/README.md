@@ -11,7 +11,7 @@
 | 垃圾贴纸 | `datasets/raw/waste_bin/source/` 和 `toolkit/`，共 64 个文件 | 队员工具包压缩包及解压工作目录，含配置、脚本、说明和缓存 |
 | 其余任务 | `datasets/raw/{e_bike,sign,thermal,traffic_light}/` | 核对时目录为空 |
 
-国赛人物素材中的 18 张人物图案与相邻人物检测工程的同名文件逐字节一致；尺寸照片存于本工作空间。外来素材的许可及采集授权待核实。模型、标注数据和训练导出见[迭代对照](../iterations/README.md)。
+国赛人物素材中的 18 张人物图案与相邻人物检测工程的同名文件逐字节一致；尺寸照片存于本工作空间。外来素材的许可及采集授权待核实。表中数量是 2026-11-09 的核对值；此后 CarRealPicture、场地补录批次和来源工作副本已加入 `datasets/raw/`，当前批次、来源和用量见[数据区说明](../../../datasets/README.md#当前素材与来源候选)。模型、标注数据和训练导出见[迭代对照](../iterations/README.md)。
 
 垃圾贴纸历史数据位于 `datasets/exports/waste_bin/archive/`；研究模型权重位于 `models/weights/`。数据与模型不提交 Git。
 

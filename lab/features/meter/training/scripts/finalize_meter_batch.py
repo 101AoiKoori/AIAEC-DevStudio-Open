@@ -7,8 +7,13 @@ Run only on a complete batch produced by render_meter_batch.py.
 import argparse
 import json
 import math
+import sys
 from pathlib import Path
 import cv2
+
+ROOT = Path(__file__).resolve().parents[5]
+sys.path.insert(0, str(ROOT))
+from lab.training_common.production_guard import generation_guard
 
 
 def distance_to_segment(point, a, b):
@@ -18,10 +23,7 @@ def distance_to_segment(point, a, b):
     return math.hypot(point[0]-(a[0]+t*dx),point[1]-(a[1]+t*dy))
 
 
-def main():
-    parser=argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('dataset',type=Path)
-    args=parser.parse_args()
+def _execute(args):
     root=args.dataset
     manifest_path=root/'manifest.json'
     manifest=json.loads(manifest_path.read_text(encoding='utf8'))
@@ -55,6 +57,28 @@ def main():
     manifest['visibility_status']='approximate: near-white pixels and projected needle-segment overlap; review required'
     manifest_path.write_text(json.dumps(manifest,ensure_ascii=False,indent=2)+'\n',encoding='utf8')
     print('ENDPOINTS_ADDED',len(manifest['samples']))
+
+
+def main():
+    parser=argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('dataset', type=Path)
+    args=parser.parse_args()
+    root=args.dataset.resolve()
+    args.dataset=root
+    manifest_path=root/'manifest.json'
+    manifest=json.loads(manifest_path.read_text(encoding='utf8'))
+    images=[root/'images'/s['split']/(s['id']+'.png') for s in manifest['samples']]
+    labels=[root/'labels'/s['split']/(s['id']+'.txt') for s in manifest['samples']]
+    inplace=[manifest_path,*labels]
+    with generation_guard('meter.finalize_batch:' + root.relative_to(ROOT).as_posix(), images, inplace, {},
+                          code_paths=[Path(__file__)], procedural_inputs=inplace,
+                          inplace_paths=inplace, root=ROOT) as run:
+        if run.reused:
+            print('REUSED', root)
+            return
+        if json.loads(manifest_path.read_text(encoding='utf8')) != manifest:
+            raise RuntimeError('manifest changed before execution')
+        _execute(args)
 
 
 if __name__=='__main__':

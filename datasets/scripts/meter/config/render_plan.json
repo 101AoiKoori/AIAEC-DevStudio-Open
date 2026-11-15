@@ -1,0 +1,531 @@
+{
+  "schema_version": 1,
+  "model_key": "meter",
+  "target_split": "train",
+  "uncertainty_weight": 0,
+  "independence_basis": "One fitted shared arena and one approximate parameterized meter station; no independent scene or capture claim.",
+  "budget": 12,
+  "purpose": "First resumed meter input preparation: twelve distinct designed needle/tone states with full-station RGBA and geometric eight-point labels.",
+  "constraints": {
+    "resolution": [
+      640,
+      480
+    ],
+    "label_policy": "candidate_pose",
+    "foreground": true
+  },
+  "strata": [
+    {
+      "id": "arena_source_00",
+      "failure_event": "dual_needle_pose_unreadable",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [],
+      "background": {
+        "kind": "arena_scene"
+      },
+      "target": {
+        "kind": "dual_needle_meter"
+      },
+      "labels": {
+        "kind": "candidate_pose"
+      },
+      "augmentation": {
+        "kind": "explicit_arena_parameters"
+      },
+      "sources": [
+        "datasets/assets/blender/shared/arena_4m2_pbr_20261112/arena_master_user_20261113.blend",
+        "datasets/assets/blender/meter/v4_parametric_station_v2_20261113/station.blend"
+      ],
+      "parameters": {
+        "temperature_fraction": 0.1,
+        "humidity_fraction": 0.25,
+        "ground_angle_deg": 65,
+        "station_x": -0.6,
+        "station_y": 0.15,
+        "camera_x": -0.6,
+        "camera_y": -0.75,
+        "camera_z": 0.42,
+        "exposure_ev": -0.4,
+        "saturation": 0.7
+      }
+    },
+    {
+      "id": "arena_source_01",
+      "failure_event": "dual_needle_pose_unreadable",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [],
+      "background": {
+        "kind": "arena_scene"
+      },
+      "target": {
+        "kind": "dual_needle_meter"
+      },
+      "labels": {
+        "kind": "candidate_pose"
+      },
+      "augmentation": {
+        "kind": "explicit_arena_parameters"
+      },
+      "sources": [
+        "datasets/assets/blender/shared/arena_4m2_pbr_20261112/arena_master_user_20261113.blend",
+        "datasets/assets/blender/meter/v4_parametric_station_v2_20261113/station.blend"
+      ],
+      "parameters": {
+        "temperature_fraction": 0.1,
+        "humidity_fraction": 0.75,
+        "ground_angle_deg": 65,
+        "station_x": -0.6,
+        "station_y": 0.15,
+        "camera_x": -0.6,
+        "camera_y": -0.75,
+        "camera_z": 0.42,
+        "exposure_ev": 0.0,
+        "saturation": 1.0
+      }
+    },
+    {
+      "id": "arena_source_02",
+      "failure_event": "dual_needle_pose_unreadable",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [],
+      "background": {
+        "kind": "arena_scene"
+      },
+      "target": {
+        "kind": "dual_needle_meter"
+      },
+      "labels": {
+        "kind": "candidate_pose"
+      },
+      "augmentation": {
+        "kind": "explicit_arena_parameters"
+      },
+      "sources": [
+        "datasets/assets/blender/shared/arena_4m2_pbr_20261112/arena_master_user_20261113.blend",
+        "datasets/assets/blender/meter/v4_parametric_station_v2_20261113/station.blend"
+      ],
+      "parameters": {
+        "temperature_fraction": 0.26,
+        "humidity_fraction": 0.25,
+        "ground_angle_deg": 65,
+        "station_x": -0.6,
+        "station_y": 0.15,
+        "camera_x": -0.6,
+        "camera_y": -0.75,
+        "camera_z": 0.42,
+        "exposure_ev": 0.0,
+        "saturation": 0.7
+      }
+    },
+    {
+      "id": "arena_source_03",
+      "failure_event": "dual_needle_pose_unreadable",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [],
+      "background": {
+        "kind": "arena_scene"
+      },
+      "target": {
+        "kind": "dual_needle_meter"
+      },
+      "labels": {
+        "kind": "candidate_pose"
+      },
+      "augmentation": {
+        "kind": "explicit_arena_parameters"
+      },
+      "sources": [
+        "datasets/assets/blender/shared/arena_4m2_pbr_20261112/arena_master_user_20261113.blend",
+        "datasets/assets/blender/meter/v4_parametric_station_v2_20261113/station.blend"
+      ],
+      "parameters": {
+        "temperature_fraction": 0.26,
+        "humidity_fraction": 0.75,
+        "ground_angle_deg": 65,
+        "station_x": -0.6,
+        "station_y": 0.15,
+        "camera_x": -0.6,
+        "camera_y": -0.75,
+        "camera_z": 0.42,
+        "exposure_ev": -0.4,
+        "saturation": 1.0
+      }
+    },
+    {
+      "id": "arena_source_04",
+      "failure_event": "dual_needle_pose_unreadable",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [],
+      "background": {
+        "kind": "arena_scene"
+      },
+      "target": {
+        "kind": "dual_needle_meter"
+      },
+      "labels": {
+        "kind": "candidate_pose"
+      },
+      "augmentation": {
+        "kind": "explicit_arena_parameters"
+      },
+      "sources": [
+        "datasets/assets/blender/shared/arena_4m2_pbr_20261112/arena_master_user_20261113.blend",
+        "datasets/assets/blender/meter/v4_parametric_station_v2_20261113/station.blend"
+      ],
+      "parameters": {
+        "temperature_fraction": 0.42,
+        "humidity_fraction": 0.25,
+        "ground_angle_deg": 65,
+        "station_x": -0.6,
+        "station_y": 0.15,
+        "camera_x": -0.6,
+        "camera_y": -0.75,
+        "camera_z": 0.42,
+        "exposure_ev": 0.0,
+        "saturation": 0.7
+      }
+    },
+    {
+      "id": "arena_source_05",
+      "failure_event": "dual_needle_pose_unreadable",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [],
+      "background": {
+        "kind": "arena_scene"
+      },
+      "target": {
+        "kind": "dual_needle_meter"
+      },
+      "labels": {
+        "kind": "candidate_pose"
+      },
+      "augmentation": {
+        "kind": "explicit_arena_parameters"
+      },
+      "sources": [
+        "datasets/assets/blender/shared/arena_4m2_pbr_20261112/arena_master_user_20261113.blend",
+        "datasets/assets/blender/meter/v4_parametric_station_v2_20261113/station.blend"
+      ],
+      "parameters": {
+        "temperature_fraction": 0.42,
+        "humidity_fraction": 0.75,
+        "ground_angle_deg": 65,
+        "station_x": -0.6,
+        "station_y": 0.15,
+        "camera_x": -0.6,
+        "camera_y": -0.75,
+        "camera_z": 0.42,
+        "exposure_ev": 0.0,
+        "saturation": 1.0
+      }
+    },
+    {
+      "id": "arena_source_06",
+      "failure_event": "dual_needle_pose_unreadable",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [],
+      "background": {
+        "kind": "arena_scene"
+      },
+      "target": {
+        "kind": "dual_needle_meter"
+      },
+      "labels": {
+        "kind": "candidate_pose"
+      },
+      "augmentation": {
+        "kind": "explicit_arena_parameters"
+      },
+      "sources": [
+        "datasets/assets/blender/shared/arena_4m2_pbr_20261112/arena_master_user_20261113.blend",
+        "datasets/assets/blender/meter/v4_parametric_station_v2_20261113/station.blend"
+      ],
+      "parameters": {
+        "temperature_fraction": 0.58,
+        "humidity_fraction": 0.25,
+        "ground_angle_deg": 65,
+        "station_x": -0.6,
+        "station_y": 0.15,
+        "camera_x": -0.6,
+        "camera_y": -0.75,
+        "camera_z": 0.42,
+        "exposure_ev": -0.4,
+        "saturation": 0.7
+      }
+    },
+    {
+      "id": "arena_source_07",
+      "failure_event": "dual_needle_pose_unreadable",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [],
+      "background": {
+        "kind": "arena_scene"
+      },
+      "target": {
+        "kind": "dual_needle_meter"
+      },
+      "labels": {
+        "kind": "candidate_pose"
+      },
+      "augmentation": {
+        "kind": "explicit_arena_parameters"
+      },
+      "sources": [
+        "datasets/assets/blender/shared/arena_4m2_pbr_20261112/arena_master_user_20261113.blend",
+        "datasets/assets/blender/meter/v4_parametric_station_v2_20261113/station.blend"
+      ],
+      "parameters": {
+        "temperature_fraction": 0.58,
+        "humidity_fraction": 0.75,
+        "ground_angle_deg": 65,
+        "station_x": -0.6,
+        "station_y": 0.15,
+        "camera_x": -0.6,
+        "camera_y": -0.75,
+        "camera_z": 0.42,
+        "exposure_ev": 0.0,
+        "saturation": 1.0
+      }
+    },
+    {
+      "id": "arena_source_08",
+      "failure_event": "dual_needle_pose_unreadable",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [],
+      "background": {
+        "kind": "arena_scene"
+      },
+      "target": {
+        "kind": "dual_needle_meter"
+      },
+      "labels": {
+        "kind": "candidate_pose"
+      },
+      "augmentation": {
+        "kind": "explicit_arena_parameters"
+      },
+      "sources": [
+        "datasets/assets/blender/shared/arena_4m2_pbr_20261112/arena_master_user_20261113.blend",
+        "datasets/assets/blender/meter/v4_parametric_station_v2_20261113/station.blend"
+      ],
+      "parameters": {
+        "temperature_fraction": 0.74,
+        "humidity_fraction": 0.25,
+        "ground_angle_deg": 65,
+        "station_x": -0.6,
+        "station_y": 0.15,
+        "camera_x": -0.6,
+        "camera_y": -0.75,
+        "camera_z": 0.42,
+        "exposure_ev": 0.0,
+        "saturation": 0.7
+      }
+    },
+    {
+      "id": "arena_source_09",
+      "failure_event": "dual_needle_pose_unreadable",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [],
+      "background": {
+        "kind": "arena_scene"
+      },
+      "target": {
+        "kind": "dual_needle_meter"
+      },
+      "labels": {
+        "kind": "candidate_pose"
+      },
+      "augmentation": {
+        "kind": "explicit_arena_parameters"
+      },
+      "sources": [
+        "datasets/assets/blender/shared/arena_4m2_pbr_20261112/arena_master_user_20261113.blend",
+        "datasets/assets/blender/meter/v4_parametric_station_v2_20261113/station.blend"
+      ],
+      "parameters": {
+        "temperature_fraction": 0.74,
+        "humidity_fraction": 0.75,
+        "ground_angle_deg": 65,
+        "station_x": -0.6,
+        "station_y": 0.15,
+        "camera_x": -0.6,
+        "camera_y": -0.75,
+        "camera_z": 0.42,
+        "exposure_ev": -0.4,
+        "saturation": 1.0
+      }
+    },
+    {
+      "id": "arena_source_10",
+      "failure_event": "dual_needle_pose_unreadable",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [],
+      "background": {
+        "kind": "arena_scene"
+      },
+      "target": {
+        "kind": "dual_needle_meter"
+      },
+      "labels": {
+        "kind": "candidate_pose"
+      },
+      "augmentation": {
+        "kind": "explicit_arena_parameters"
+      },
+      "sources": [
+        "datasets/assets/blender/shared/arena_4m2_pbr_20261112/arena_master_user_20261113.blend",
+        "datasets/assets/blender/meter/v4_parametric_station_v2_20261113/station.blend"
+      ],
+      "parameters": {
+        "temperature_fraction": 0.9,
+        "humidity_fraction": 0.25,
+        "ground_angle_deg": 65,
+        "station_x": -0.6,
+        "station_y": 0.15,
+        "camera_x": -0.6,
+        "camera_y": -0.75,
+        "camera_z": 0.42,
+        "exposure_ev": 0.0,
+        "saturation": 0.7
+      }
+    },
+    {
+      "id": "arena_source_11",
+      "failure_event": "dual_needle_pose_unreadable",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [],
+      "background": {
+        "kind": "arena_scene"
+      },
+      "target": {
+        "kind": "dual_needle_meter"
+      },
+      "labels": {
+        "kind": "candidate_pose"
+      },
+      "augmentation": {
+        "kind": "explicit_arena_parameters"
+      },
+      "sources": [
+        "datasets/assets/blender/shared/arena_4m2_pbr_20261112/arena_master_user_20261113.blend",
+        "datasets/assets/blender/meter/v4_parametric_station_v2_20261113/station.blend"
+      ],
+      "parameters": {
+        "temperature_fraction": 0.9,
+        "humidity_fraction": 0.75,
+        "ground_angle_deg": 65,
+        "station_x": -0.6,
+        "station_y": 0.15,
+        "camera_x": -0.6,
+        "camera_y": -0.75,
+        "camera_z": 0.42,
+        "exposure_ev": 0.0,
+        "saturation": 1.0
+      }
+    }
+  ],
+  "execution": {
+    "entry": "datasets/scripts/meter/render_meter_arena_v4.py",
+    "loaded_scene": "datasets/assets/blender/shared/arena_4m2_pbr_20261112/arena_master_user_20261113.blend",
+    "station": "datasets/assets/blender/meter/v4_parametric_station_v2_20261113/station.blend",
+    "endpoints": "lab/features/meter/training/config/meter_parametric_endpoints_v4.json",
+    "face": "datasets/assets/blender/meter/v4_parametric_station_v2_20261113/face.png",
+    "output": "datasets/samples/meter",
+    "device": "OPTIX",
+    "cycles_samples": 16,
+    "count": 12,
+    "pose": true,
+    "foreground": true,
+    "offset": 0,
+    "production_paused": true
+  },
+  "input_scope": {
+    "direct_photo_pose": "excluded: existing real rows have unresolved eight-point labels",
+    "actual_generated_foregrounds": 0,
+    "planned_foregrounds": 12
+  }
+}

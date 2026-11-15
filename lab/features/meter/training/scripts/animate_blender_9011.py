@@ -4,6 +4,10 @@ Run with Blender --background MODEL --python-exit-code 1 --python THIS --
 --output NEW_DIRECTORY [--frames 721] [--step 45]. Existing lights are untouched.
 Geometry and nominal values are illustrative; no training labels are asserted.
 """
+
+if __name__ == "__main__":
+    raise SystemExit("Legacy dataset CLI is retired; use datasets/scripts/meter/. Production remains paused.")
+
 import argparse
 import json
 import math
@@ -66,6 +70,10 @@ def scale_camera_animation(cam, scale):
 
 
 def main():
+    raise RuntimeError("Retired production entry; use datasets/scripts/meter/ and its source.yaml")
+
+
+def _legacy_main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--output', required=True)
     parser.add_argument('--geometry', required=True)
@@ -78,119 +86,123 @@ def main():
     parser.add_argument('--reuse-animation', action='store_true',
                         help='Render existing animation without replacing keyframes')
     args = parser.parse_args(sys.argv[sys.argv.index('--') + 1:])
-    if args.frames < 2 or args.step < 1:
-        parser.error('frames must be at least 2 and step at least 1')
-    if args.resolution is not None and not 128 <= args.resolution <= 4096:
-        parser.error('resolution must be between 128 and 4096 pixels')
-    if not .4 <= args.camera_distance_scale <= 1.5:
-        parser.error('camera distance scale must be between 0.4 and 1.5')
-    if args.camera_distance_scale != 1.0 and not args.reuse_animation:
-        parser.error('camera distance scale requires --reuse-animation')
-    out = Path(args.output).resolve()
-    if out.exists():
-        parser.error('output exists; refusing to overwrite')
-    if not bpy.data.filepath:
-        parser.error('open the user model first')
-    geom = json.loads(Path(args.geometry).read_text(encoding='utf-8-sig'))
-    scene = bpy.context.scene
-    if args.resolution is not None:
-        scene.render.resolution_x = scene.render.resolution_y = args.resolution
-        scene.render.resolution_percentage = 100
-    cam = bpy.data.objects['training_camera']
-    temp = bpy.data.objects['temperature_needle_rotate_Z']
-    humid = bpy.data.objects['humidity_needle_rotate_Z']
-    # Do not silently discard user-created animation on these objects.
-    for obj in (cam, temp, humid):
-        animated = bool(obj.animation_data and obj.animation_data.action)
-        if animated and not args.reuse_animation:
-            raise RuntimeError('Existing animation on %s; refusing to overwrite' % obj.name)
-        if args.reuse_animation and not animated:
-            raise RuntimeError('Missing animation on %s' % obj.name)
-    if scene.camera != cam:
-        raise RuntimeError('Active camera is not training_camera; inspect scene first')
-    if args.reuse_animation and (scene.frame_start != 1 or scene.frame_end != args.frames):
-        raise RuntimeError('Frame range differs from saved animation')
-    scene.frame_start, scene.frame_end, scene.render.fps = 1, args.frames, 24
-    last_euler = None
-    keyframes = list(range(1, args.frames + 1, 6))
-    if keyframes[-1] != args.frames:
-        keyframes.append(args.frames)
-    for f in ([] if args.reuse_animation else keyframes):
-        x, y, z, tf, hf = motion(f, args.frames)
-        cam.location = (x, y, z)
-        direction = (Vector((0, 0, 0)) - cam.location).normalized()
-        right = direction.cross(Vector((0, 1, 0))).normalized()
-        up = right.cross(direction).normalized()
-        rotation = Matrix((right, up, -direction)).transposed().to_euler()
-        if last_euler is not None:
-            rotation.make_compatible(last_euler)
-        cam.rotation_euler = rotation
-        last_euler = rotation.copy()
-        cam.keyframe_insert(data_path='location', frame=f, group='Slow camera orbit')
-        cam.keyframe_insert(data_path='rotation_euler', frame=f, group='Slow camera orbit')
-        temp.rotation_euler.z = math.radians(-147 - 241 * tf)
-        humid.rotation_euler.z = math.radians(44 - 264 * hf)
-        temp.keyframe_insert(data_path='rotation_euler', index=2, frame=f, group='Temperature')
-        humid.keyframe_insert(data_path='rotation_euler', index=2, frame=f, group='Humidity')
-    if not args.reuse_animation:
+    from meter_production_guard import guarded, blender_media, reload_unpacked_media
+    with guarded('animate_blender_9011', args, __file__, bpy.data.filepath, extra_inputs=[args.geometry], code_dependencies=[Path(__file__).with_name('meter_blender_action.py')], inplace=not args.reuse_animation, media_probe=lambda: blender_media(bpy), media_reload=lambda: reload_unpacked_media(bpy)) as run:
+        if run.reused:
+            return
+        if args.frames < 2 or args.step < 1:
+            parser.error('frames must be at least 2 and step at least 1')
+        if args.resolution is not None and not 128 <= args.resolution <= 4096:
+            parser.error('resolution must be between 128 and 4096 pixels')
+        if not .4 <= args.camera_distance_scale <= 1.5:
+            parser.error('camera distance scale must be between 0.4 and 1.5')
+        if args.camera_distance_scale != 1.0 and not args.reuse_animation:
+            parser.error('camera distance scale requires --reuse-animation')
+        out = Path(args.output).resolve()
+        if out.exists():
+            parser.error('output exists; refusing to overwrite')
+        if not bpy.data.filepath:
+            parser.error('open the user model first')
+        geom = json.loads(Path(args.geometry).read_text(encoding='utf-8-sig'))
+        scene = bpy.context.scene
+        if args.resolution is not None:
+            scene.render.resolution_x = scene.render.resolution_y = args.resolution
+            scene.render.resolution_percentage = 100
+        cam = bpy.data.objects['training_camera']
+        temp = bpy.data.objects['temperature_needle_rotate_Z']
+        humid = bpy.data.objects['humidity_needle_rotate_Z']
+        # Do not silently discard user-created animation on these objects.
         for obj in (cam, temp, humid):
-            for fc in object_action_curves(obj):
-                for kp in fc.keyframe_points:
-                    kp.interpolation = 'BEZIER'
-                    kp.handle_left_type = kp.handle_right_type = 'AUTO_CLAMPED'
-    if args.camera_distance_scale != 1.0:
-        scale_camera_animation(cam, args.camera_distance_scale)
-    def set_frame(frame):
-        scene.frame_set(frame)
-        bpy.context.view_layer.update()
-    # Check *all* animation frames, not just rendered samples. Project a conservative
-    # outline at the front and rear of the housing, and check upright + margin.
-    worst = 1.0
-    for f in range(1, args.frames + 1):
-        set_frame(f)
-        points = [projected(scene, cam, (1.05 * math.cos(i * math.tau / 128),
-                                       1.05 * math.sin(i * math.tau / 128), z))
-                  for z in (-.06, .15) for i in range(128)]
-        margin = min(min(x, y, 1-x, 1-y) for x, y, depth in points)
-        top = projected(scene, cam, (0, .8, .1))
-        bottom = projected(scene, cam, (0, -.8, .1))
-        if min(p[2] for p in points) <= 0 or margin < .025 or top[1] >= bottom[1]:
-            raise RuntimeError('Frame %d fails full-frame/upright check (margin %.4f)' % (f, margin))
-        worst = min(worst, margin)
-    scene.frame_set(1)
-    if not args.reuse_animation:
-        bpy.context.preferences.filepaths.save_version = 0
-        bpy.ops.wm.save_as_mainfile(filepath=bpy.data.filepath)
-    out.mkdir(parents=True, exist_ok=False)
-    (out / 'images').mkdir()
-    manifest = {'purpose':'Sparse animation sequence for inspection, not validated training data',
-                'source_blend':bpy.data.filepath, 'fps':24, 'frames':args.frames,
-                'sample_step':args.step, 'minimum_margin_all_frames':worst,
-                'render_resolution': [scene.render.resolution_x, scene.render.resolution_y],
-                'render_resolution_percentage': scene.render.resolution_percentage,
-                'camera_distance_scale': args.camera_distance_scale,
-                'geometry_status':'AI-generated face and assumed equally spaced scales, not verified',
-                'label_status':'Projected geometric candidates only; no visibility or actual scale verification',
-                'samples':[]}
-    frames = list(range(1, args.frames + 1, args.step))
-    if frames[-1] != args.frames:
-        frames.append(args.frames)
-    for f in frames:
-        set_frame(f)
-        filename = 'frame_%04d.png' % f
-        scene.render.filepath = str(out / 'images' / filename)
-        scene.render.image_settings.file_format = 'PNG'
-        bpy.ops.render.render(write_still=True)
-        points3 = [temp.matrix_world @ Vector((0,0,0)), temp.matrix_world @ Vector((.76,0,0)),
-                   humid.matrix_world @ Vector((0,0,0)), humid.matrix_world @ Vector((.31,0,0)),
-                   xy(geom['temperature'][0]['end']), xy(geom['temperature'][-1]['end']),
-                   xy(geom['humidity'][0]['end']), xy(geom['humidity'][-1]['end'])]
-        manifest['samples'].append({'frame':f, 'file':'images/'+filename,
-              'camera_location':list(cam.location), 'camera_rotation_euler':list(cam.rotation_euler),
-              'temperature_angle_rad':temp.rotation_euler.z, 'humidity_angle_rad':humid.rotation_euler.z,
-              'keypoint_candidates_xy_depth':[projected(scene,cam,p) for p in points3]})
-    (out / 'manifest.json').write_text(json.dumps(manifest, ensure_ascii=False, indent=2)+'\n', encoding='utf-8')
-    print('SEQUENCE_COMPLETE', out, 'samples', len(frames), 'minimum_margin', worst, flush=True)
+            animated = bool(obj.animation_data and obj.animation_data.action)
+            if animated and not args.reuse_animation:
+                raise RuntimeError('Existing animation on %s; refusing to overwrite' % obj.name)
+            if args.reuse_animation and not animated:
+                raise RuntimeError('Missing animation on %s' % obj.name)
+        if scene.camera != cam:
+            raise RuntimeError('Active camera is not training_camera; inspect scene first')
+        if args.reuse_animation and (scene.frame_start != 1 or scene.frame_end != args.frames):
+            raise RuntimeError('Frame range differs from saved animation')
+        scene.frame_start, scene.frame_end, scene.render.fps = 1, args.frames, 24
+        last_euler = None
+        keyframes = list(range(1, args.frames + 1, 6))
+        if keyframes[-1] != args.frames:
+            keyframes.append(args.frames)
+        for f in ([] if args.reuse_animation else keyframes):
+            x, y, z, tf, hf = motion(f, args.frames)
+            cam.location = (x, y, z)
+            direction = (Vector((0, 0, 0)) - cam.location).normalized()
+            right = direction.cross(Vector((0, 1, 0))).normalized()
+            up = right.cross(direction).normalized()
+            rotation = Matrix((right, up, -direction)).transposed().to_euler()
+            if last_euler is not None:
+                rotation.make_compatible(last_euler)
+            cam.rotation_euler = rotation
+            last_euler = rotation.copy()
+            cam.keyframe_insert(data_path='location', frame=f, group='Slow camera orbit')
+            cam.keyframe_insert(data_path='rotation_euler', frame=f, group='Slow camera orbit')
+            temp.rotation_euler.z = math.radians(-147 - 241 * tf)
+            humid.rotation_euler.z = math.radians(44 - 264 * hf)
+            temp.keyframe_insert(data_path='rotation_euler', index=2, frame=f, group='Temperature')
+            humid.keyframe_insert(data_path='rotation_euler', index=2, frame=f, group='Humidity')
+        if not args.reuse_animation:
+            for obj in (cam, temp, humid):
+                for fc in object_action_curves(obj):
+                    for kp in fc.keyframe_points:
+                        kp.interpolation = 'BEZIER'
+                        kp.handle_left_type = kp.handle_right_type = 'AUTO_CLAMPED'
+        if args.camera_distance_scale != 1.0:
+            scale_camera_animation(cam, args.camera_distance_scale)
+        def set_frame(frame):
+            scene.frame_set(frame)
+            bpy.context.view_layer.update()
+        # Check *all* animation frames, not just rendered samples. Project a conservative
+        # outline at the front and rear of the housing, and check upright + margin.
+        worst = 1.0
+        for f in range(1, args.frames + 1):
+            set_frame(f)
+            points = [projected(scene, cam, (1.05 * math.cos(i * math.tau / 128),
+                                           1.05 * math.sin(i * math.tau / 128), z))
+                      for z in (-.06, .15) for i in range(128)]
+            margin = min(min(x, y, 1-x, 1-y) for x, y, depth in points)
+            top = projected(scene, cam, (0, .8, .1))
+            bottom = projected(scene, cam, (0, -.8, .1))
+            if min(p[2] for p in points) <= 0 or margin < .025 or top[1] >= bottom[1]:
+                raise RuntimeError('Frame %d fails full-frame/upright check (margin %.4f)' % (f, margin))
+            worst = min(worst, margin)
+        scene.frame_set(1)
+        if not args.reuse_animation:
+            bpy.context.preferences.filepaths.save_version = 0
+            bpy.ops.wm.save_as_mainfile(filepath=bpy.data.filepath)
+        out.mkdir(parents=True, exist_ok=False)
+        (out / 'images').mkdir()
+        manifest = {'purpose':'Sparse animation sequence for inspection, not validated training data',
+                    'source_blend':bpy.data.filepath, 'fps':24, 'frames':args.frames,
+                    'sample_step':args.step, 'minimum_margin_all_frames':worst,
+                    'render_resolution': [scene.render.resolution_x, scene.render.resolution_y],
+                    'render_resolution_percentage': scene.render.resolution_percentage,
+                    'camera_distance_scale': args.camera_distance_scale,
+                    'geometry_status':'AI-generated face and assumed equally spaced scales, not verified',
+                    'label_status':'Projected geometric candidates only; no visibility or actual scale verification',
+                    'samples':[]}
+        frames = list(range(1, args.frames + 1, args.step))
+        if frames[-1] != args.frames:
+            frames.append(args.frames)
+        for f in frames:
+            set_frame(f)
+            filename = 'frame_%04d.png' % f
+            scene.render.filepath = str(out / 'images' / filename)
+            scene.render.image_settings.file_format = 'PNG'
+            bpy.ops.render.render(write_still=True)
+            points3 = [temp.matrix_world @ Vector((0,0,0)), temp.matrix_world @ Vector((.76,0,0)),
+                       humid.matrix_world @ Vector((0,0,0)), humid.matrix_world @ Vector((.31,0,0)),
+                       xy(geom['temperature'][0]['end']), xy(geom['temperature'][-1]['end']),
+                       xy(geom['humidity'][0]['end']), xy(geom['humidity'][-1]['end'])]
+            manifest['samples'].append({'frame':f, 'file':'images/'+filename,
+                  'camera_location':list(cam.location), 'camera_rotation_euler':list(cam.rotation_euler),
+                  'temperature_angle_rad':temp.rotation_euler.z, 'humidity_angle_rad':humid.rotation_euler.z,
+                  'keypoint_candidates_xy_depth':[projected(scene,cam,p) for p in points3]})
+        (out / 'manifest.json').write_text(json.dumps(manifest, ensure_ascii=False, indent=2)+'\n', encoding='utf-8')
+        print('SEQUENCE_COMPLETE', out, 'samples', len(frames), 'minimum_margin', worst, flush=True)
 
 
 if __name__ == '__main__':

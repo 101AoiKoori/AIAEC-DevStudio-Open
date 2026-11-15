@@ -1,0 +1,406 @@
+# 工作空间目录契约。
+# 依赖 PyYAML；pre-commit 会选择带 PyYAML 的 Python。
+# 修改后运行：python lab/scripts/contracts/sync_layout_docs.py
+# 结构检查：python lab/scripts/contracts/workspace_layout.py check
+#
+# 字段说明：
+# - root_entries[].local: true 表示本机/可忽略目录；数据树未展开时跳过缺失检查。
+# - datasets.materialized_if_any：任一目录存在时视为本地数据树已展开。
+# - datasets.shared[].create: false 表示共享输入根，scaffold 不自动创建。
+# - datasets.tasks.<id>.annotation_roots_owned: false 表示标注根属于共享/历史输入，scaffold 不创建。
+# - datasets.tasks.<id>.config.conditional：尚未生成的条件配置，check 只报提示。
+# - datasets.tasks.<id>.optional_config：存在时使用，缺失不算错误。
+# - features.extra_dirs：不属于 perception_tasks.json 的数据任务实验目录。
+# - features.feature_aliases：数据任务到识别实验目录的映射。
+# - packages.python_package_exceptions：非 Python 包可列入，跳过 Python 包入口检查。
+version: 1
+note: 修改后运行 python lab/scripts/contracts/sync_layout_docs.py 生成目录文档，再运行 python lab/scripts/contracts/workspace_layout.py check。
+generated_docs:
+  readme: README.md
+  dataset_design: docs/DATASET_DESIGN.md
+root_entries:
+- path: .agents/skills
+  kind: dir
+  purpose: 本工作空间的 Agent 技能与其直接使用的脚本
+  required: true
+- path: .claude
+  kind: dir
+  purpose: 本机 Claude Code 会话与 worktree 运行时目录；不入 Git
+  required: false
+  local: true
+- path: .codex/agents
+  kind: dir
+  purpose: 本项目可复用的 Codex 专职子代理配置
+  required: true
+- path: .githooks
+  kind: dir
+  purpose: 仓库 Git 钩子；启用方式由本机 Git 配置决定
+  required: true
+- path: config
+  kind: dir
+  purpose: 跨任务需求配置；识别任务需求以 `perception_tasks.json` 为源，目录契约以 `workspace_layout.yaml` 为源，训练目标与组合轴以 `task_targets.yaml` / `combination_axes.yaml` 为源，编号与计数口径以 `id_policy.yaml` 为源，对象分类学以 `workspace_ontology.yaml` 为源
+  required: true
+- path: ws/src
+  kind: dir
+  purpose: 正式 ROS 包开发区，最终部署代码只从这里构建
+  required: true
+- path: lab/features
+  kind: dir
+  purpose: 各识别功能的独立实验，不能被正式包直接导入
+  required: true
+- path: lab/navigation
+  kind: dir
+  purpose: 建图、路线、禁行分支、泊车实验
+  required: true
+- path: lab/integration
+  kind: dir
+  purpose: 多任务联调与计时实验
+  required: true
+- path: lab/scripts
+  kind: dir
+  purpose: 工作空间级脚本区；按 contracts、media、blender、data、audit、common 分类，规则见 `lab/scripts/README.md`
+  required: true
+- path: lab/scripts/contracts
+  kind: dir
+  purpose: 目录契约、生成文档、训练目标/组合轴覆盖、全量计划、对象分类学、编号口径和父子源配对的检查与生成工具
+  required: true
+- path: lab/scripts/media
+  kind: dir
+  purpose: 媒体索引、SQLite 查询缓存、视频抽帧、合成背景收集和站点背景特征更新工具
+  required: true
+- path: lab/scripts/blender
+  kind: dir
+  purpose: Blender MCP 桥接与源资产登记库工具；不把单帧预览当数据集批次
+  required: true
+- path: lab/scripts/data
+  kind: dir
+  purpose: 数据源门控、候选打包、现场采集评估和站点适配工具；不训练模型
+  required: true
+- path: lab/scripts/audit
+  kind: dir
+  purpose: 生产入口静态审计，检查受管写入、转发、计划入口和未分类路径
+  required: true
+- path: lab/scripts/common
+  kind: dir
+  purpose: 全工作空间共用的人工辅助标注、标签重建、完整框选、边缘/孔洞检查和 Blender 机位规划脚本；任务专用入口仍留在 `datasets/scripts/<任务>/`
+  required: true
+- path: datasets
+  kind: dir
+  purpose: 原始采集、标注候选与任务生产；`raw/` 原始素材，`annotated/` 标注与审查候选，`exports/<任务>/` 当前集合，`samples/<任务>/` 当前小样，`scripts/<任务>/` 生产入口；数据不入
+    Git
+  required: true
+- path: datasets/blender_source_registry.sqlite3
+  kind: file
+  purpose: Blender 源资产当前状态、已核实关系及带证据引用的 manifest 声明/未决 claim 的 SQLite 权威记录；按 `datasets/README.md` 和 `lab/scripts/blender/blender_source_registry.py`
+    维护
+  required: true
+- path: datasets/assets/blender
+  kind: dir
+  purpose: 当前与试验 Blender 源模型、任务工作副本及导出批次可编辑场景快照；按 shared、任务及 batch_scenes 分类，二进制不入 Git，规则见 [`datasets/README.md`](datasets/README.md#blender-源资产与派生数据)
+  required: true
+  local: true
+- path: training_packages
+  kind: dir
+  purpose: 当前仅保留 `portable_env/`；任务训练包副本已清理，目录不入 Git
+  required: true
+  local: true
+- path: lab/training_common
+  kind: dir
+  purpose: 各任务共用训练、评估、调参、可视化、生产守卫和 V1/V2 试验工具；`portable_env/` 管理 Windows 独立依赖包的构建与启动
+  required: true
+- path: runs
+  kind: dir
+  purpose: 本机历史训练、评估和调参运行记录，不入 Git；内层 `runs/` 中的 V3 模型和记录保持原位。V4 当前小样及数据集分别放在 `datasets/samples/` 和 `datasets/exports/`，不在此堆放并列版本
+  required: true
+  local: true
+- path: models
+  kind: dir
+  purpose: 模型权重与版本记录；大文件不入 Git
+  required: true
+- path: docs
+  kind: dir
+  purpose: 任务矩阵、接口调查、现场流程、技术文档
+  required: true
+- path: refs/provincial
+  kind: dir
+  purpose: 省赛迁移笔记；原仓库保持独立，不复制旧赛道
+  required: true
+- path: refs/archive
+  kind: dir
+  purpose: 已被当前方案替代的项目研究记录，仅供历史复核，不参与默认文档检索
+  required: true
+- path: refs
+  kind: dir
+  purpose: 项目参考资料与迁移笔记；非正式运行依赖
+  required: true
+- path: Archive
+  kind: dir
+  purpose: 外来原件及 `technical/` 国赛工作空间技术迭代归档；保留来源，不作为正式运行依赖，文档历史不参与技术归档
+  required: true
+- path: tmp
+  kind: dir
+  purpose: 本机可丢弃的临时产物，不提交；不可作为唯一数据或正式运行依赖
+  required: true
+  local: true
+- path: AIAEC-DevStudio-Open
+  kind: dir
+  purpose: 独立 GitHub 发布仓库；筛选当前源码与文档，不包含本工作空间 Git 历史及本机数据
+  required: true
+  local: true
+- path: 国赛规则说明.pdf
+  kind: file
+  purpose: 比赛规则原件，现有路径由文档及实验引用，保留原位
+  required: true
+# 数据集任务、共享根与标注根。
+datasets:
+  materialized_if_any:
+  - datasets/raw
+  - datasets/annotated
+  shared:
+  - path: datasets/raw
+    purpose: 原始采集与来源工作副本
+    required: true
+    create: false
+  - path: datasets/scripts/common
+    purpose: 跨任务共享脚本代码：贝叶斯分配、透视、审查等
+    required: true
+  - path: datasets/scripts/common/review
+    purpose: 跨任务审查判据库与命令行入口
+    required: true
+  - path: datasets/annotated/common/review
+    purpose: 跨任务审查观测、叠加图与批次清单
+    required: true
+  - path: datasets/annotated/common/perspective
+    purpose: 跨任务透视模板导出
+    required: true
+  - path: datasets/annotated/common/sources
+    purpose: 跨任务背景与来源总账报告 `ledger.json`；由 `datasets/scripts/common/source_ledger/` 从任务配对、清单、共享背景池和 Blender 登记库重算
+    required: true
+  - path: datasets/annotated/media_index
+    purpose: 可重建媒体查询缓存 `query_cache.sqlite3` 与持久生产回执 `production_state.sqlite3`
+    required: true
+    create: false
+    required_files:
+    - query_cache.sqlite3
+    - production_state.sqlite3
+  - path: datasets/assets/person
+    purpose: 只读人物候选来源；文件构成与重复关系见 `datasets/README.md`
+    required: true
+    create: false
+  - path: datasets/annotated/mixed_scene
+    purpose: 跨任务合成背景、场景候选与用途清单
+    required: true
+    create: false
+  - path: datasets/annotated/car_real_capture_20261112
+    purpose: 车载批次标注、序列与候选
+    required: true
+    create: false
+  - path: datasets/annotated/site_capture_20261112
+    purpose: 场地补录批次、楼名审核与来源清单
+    required: true
+    create: false
+  - path: datasets/annotated/waste_sticker_v4_handoff_20261113
+    purpose: 垃圾贴纸 V4 交接记录与场景输入
+    required: true
+    create: false
+  - path: datasets/annotated/plate
+    purpose: 车牌识别标注与候选；车牌沿用省赛模型，不生产车牌数据集
+    required: true
+    create: false
+  tasks:
+    person:
+      scripts: datasets/scripts/person
+      config:
+        required:
+        - dataset.yaml
+        - source.yaml
+        - production_plan.json
+        conditional: []
+      annotation_roots:
+      - datasets/annotated/person
+      annotation_note: ''
+      exports: datasets/exports/person
+      exports_splits:
+      - train
+      - test
+      - val
+      samples: datasets/samples/person
+      optional_config:
+      - review_plan.json
+      - review_selection.json
+    e_bike:
+      scripts: datasets/scripts/e_bike
+      config:
+        required:
+        - dataset.yaml
+        - source.yaml
+        - production_plan.json
+        conditional: []
+      annotation_roots:
+      - datasets/annotated/e_bike
+      annotation_note: ''
+      exports: datasets/exports/e_bike
+      exports_splits:
+      - train
+      - test
+      - val
+      samples: datasets/samples/e_bike
+      optional_config:
+      - direct_real_plan.json
+    fire:
+      scripts: datasets/scripts/fire
+      config:
+        required:
+        - dataset.yaml
+        - source.yaml
+        - production_plan.json
+        conditional: []
+      annotation_roots:
+      - datasets/annotated/fire
+      annotation_note: ''
+      exports: datasets/exports/fire
+      exports_splits:
+      - train
+      - test
+      - val
+      samples: datasets/samples/fire
+      optional_config: []
+    building_name_paper:
+      scripts: datasets/scripts/building_name_paper
+      config:
+        required:
+        - dataset.yaml
+        - source.yaml
+        - production_plan.json
+        conditional: []
+      annotation_roots:
+      - datasets/annotated/fire
+      - datasets/annotated/site_capture_20261112
+      annotation_note: 标注随 fire 与 site_capture_20261112 的批次记录保存；不另建 annotated/building_name_paper。
+      exports: datasets/exports/building_name_paper
+      exports_splits:
+      - train
+      - test
+      - val
+      samples: datasets/samples/building_name_paper
+      optional_config:
+      - blender_plan.json
+      - combination_plan.json
+      - direct_selection.json
+      - rooftop_sources.json
+      annotation_roots_owned: false
+    sign:
+      scripts: datasets/scripts/sign
+      config:
+        required:
+        - dataset.yaml
+        - source.yaml
+        - production_plan.json
+        conditional: []
+      annotation_roots:
+      - datasets/annotated/sign
+      annotation_note: ''
+      exports: datasets/exports/sign
+      exports_splits:
+      - train
+      - test
+      - val
+      samples: datasets/samples/sign
+      optional_config: []
+    waste_bin_state:
+      scripts: datasets/scripts/waste_bin_state
+      config:
+        required:
+        - dataset.yaml
+        - source.yaml
+        conditional:
+        - path: production_plan.json
+          reason: 渲染图与掩膜尚未生产；计划由 render_plan.json 编译后生成
+      annotation_roots:
+      - datasets/annotated/waste_bin_state
+      annotation_note: ''
+      exports: datasets/exports/waste_bin_state
+      exports_splits:
+      - train
+      - test
+      - val
+      samples: datasets/samples/waste_bin_state
+      optional_config:
+      - render_plan.json
+    waste_sticker:
+      scripts: datasets/scripts/waste_sticker
+      config:
+        required:
+        - dataset.yaml
+        - source.yaml
+        - production_plan.json
+        conditional: []
+      annotation_roots:
+      - datasets/annotated/waste_bin
+      annotation_note: 标注随 waste_bin 的批次记录保存；不另建 annotated/waste_sticker。
+      exports: datasets/exports/waste_sticker
+      exports_splits:
+      - train
+      - test
+      - val
+      samples: datasets/samples/waste_sticker
+      optional_config:
+      - blender_plan.json
+      - direct_real_plan.json
+      annotation_roots_owned: false
+    meter:
+      scripts: datasets/scripts/meter
+      config:
+        required:
+        - dataset.yaml
+        - source.yaml
+        - production_plan.json
+        conditional: []
+      annotation_roots:
+      - datasets/annotated/meter
+      annotation_note: ''
+      exports: datasets/exports/meter
+      exports_splits:
+      - train
+      - test
+      - val
+      samples: datasets/samples/meter
+      optional_config:
+      - render_plan.json
+# 识别实验分支与数据任务实验目录。
+features:
+  perception_tasks: config/perception_tasks.json
+  root: lab/features
+  required_files:
+  - README.md
+  branches:
+  - training
+  - inference
+  branch_entries:
+  - scripts
+  - config
+  - tests
+  fixed_roots:
+  - lab/navigation
+  - lab/integration
+  require_branches: true
+  branch_local_entries:
+    training:
+    - runs
+    - checkpoints
+    inference:
+    - outputs
+  extra_dirs:
+    building_name_paper: 数据任务实验目录，无 perception_tasks.json 同名任务；V3 训练位于 training/
+  feature_aliases:
+    building_name_paper: fire
+    waste_sticker: waste_bin
+# ROS 包命名与结构检查。
+packages:
+  root: ws/src
+  name_pattern: ^aec_[a-z]+(?:_[a-z]+)*$
+  required_files:
+  - package.xml
+  - CMakeLists.txt
+  python_package: src/{name}/__init__.py
+  python_package_exceptions: []

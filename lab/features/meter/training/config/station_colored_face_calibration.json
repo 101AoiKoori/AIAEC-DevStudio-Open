@@ -1,0 +1,13 @@
+{
+  "source_face": "datasets/assets/blender/meter/blender_9011_reference/face_generated.png",
+  "reference_review": "datasets/annotated/meter/v4_generated_endpoints_review_20261112/review_manifest.json",
+  "image_size": [1254, 1254],
+  "coordinate_system": "top-left texture pixels, midpoint of the outer printed stroke end",
+  "endpoints": {
+    "temperature_min": [140, 964],
+    "temperature_max": [1143, 912],
+    "humidity_min": [771, 813],
+    "humidity_max": [490, 829]
+  },
+  "status": "Outer ends fitted to ink on the colored generated 9011 texture. Synthetic appearance and geometry; physical-meter registration and intermediate scale readings are unverified."
+}

@@ -1,0 +1,1050 @@
+{
+  "schema_version": 1,
+  "purpose": "Current bin-state source-render plan: four colors, open/closed, two lighting states, multi-bin and empty scenes",
+  "model_key": "waste_bin_state",
+  "target_split": "train",
+  "budget": 19,
+  "independence_basis": "one fitted PBR bin scene; no independent scene or capture claim",
+  "uncertainty_weight": 0,
+  "constraints": {
+    "resolution": [
+      640,
+      480
+    ],
+    "label_mode": "candidate",
+    "min_visibility": 0.7,
+    "min_visible_pixels": 24
+  },
+  "strata": [
+    {
+      "id": "blue_open_normal",
+      "failure_event": "closed bin body or lid evidence unavailable",
+      "conditions": [],
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "observations": [],
+      "background": {
+        "scene": "datasets/assets/blender/waste_bin/blender_pbr_v2_20261110/waste_bin_pbr.blend",
+        "floor_gray": 0.12,
+        "backdrop_gray": 0.34
+      },
+      "target": {
+        "bins": {
+          "blue": "open"
+        },
+        "open_pose": "upright"
+      },
+      "labels": {
+        "mode": "candidate",
+        "open": 0,
+        "closed": 1
+      },
+      "augmentation": {
+        "mode": "none"
+      },
+      "sources": [
+        "datasets/assets/blender/waste_bin/blender_pbr_v2_20261110/waste_bin_pbr.blend"
+      ],
+      "parameters": {
+        "camera_location": [
+          -1.68,
+          -5.4,
+          1.35
+        ],
+        "camera_aim": [
+          -1.68,
+          0,
+          0.78
+        ],
+        "yaw_degrees": 0,
+        "lens_mm": 35,
+        "key_energy": 900,
+        "fill_energy": 500,
+        "color_factor": 1.0,
+        "roughness_delta": 0.0
+      }
+    },
+    {
+      "id": "blue_open_dark",
+      "failure_event": "closed bin body or lid evidence unavailable",
+      "conditions": [],
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "observations": [],
+      "background": {
+        "scene": "datasets/assets/blender/waste_bin/blender_pbr_v2_20261110/waste_bin_pbr.blend",
+        "floor_gray": 0.12,
+        "backdrop_gray": 0.34
+      },
+      "target": {
+        "bins": {
+          "blue": "open"
+        },
+        "open_pose": "upright"
+      },
+      "labels": {
+        "mode": "candidate",
+        "open": 0,
+        "closed": 1
+      },
+      "augmentation": {
+        "mode": "none"
+      },
+      "sources": [
+        "datasets/assets/blender/waste_bin/blender_pbr_v2_20261110/waste_bin_pbr.blend"
+      ],
+      "parameters": {
+        "camera_location": [
+          -1.68,
+          -5.4,
+          1.35
+        ],
+        "camera_aim": [
+          -1.68,
+          0,
+          0.78
+        ],
+        "yaw_degrees": 0,
+        "lens_mm": 35,
+        "key_energy": 550,
+        "fill_energy": 300,
+        "color_factor": 0.82,
+        "roughness_delta": 0.0
+      }
+    },
+    {
+      "id": "blue_closed_normal",
+      "failure_event": "closed bin body or lid evidence unavailable",
+      "conditions": [],
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "observations": [],
+      "background": {
+        "scene": "datasets/assets/blender/waste_bin/blender_pbr_v2_20261110/waste_bin_pbr.blend",
+        "floor_gray": 0.12,
+        "backdrop_gray": 0.34
+      },
+      "target": {
+        "bins": {
+          "blue": "closed"
+        },
+        "open_pose": "upright"
+      },
+      "labels": {
+        "mode": "candidate",
+        "open": 0,
+        "closed": 1
+      },
+      "augmentation": {
+        "mode": "none"
+      },
+      "sources": [
+        "datasets/assets/blender/waste_bin/blender_pbr_v2_20261110/waste_bin_pbr.blend"
+      ],
+      "parameters": {
+        "camera_location": [
+          -1.68,
+          -5.4,
+          1.35
+        ],
+        "camera_aim": [
+          -1.68,
+          0,
+          0.78
+        ],
+        "yaw_degrees": 0,
+        "lens_mm": 35,
+        "key_energy": 900,
+        "fill_energy": 500,
+        "color_factor": 1.0,
+        "roughness_delta": 0.0
+      }
+    },
+    {
+      "id": "blue_closed_dark",
+      "failure_event": "closed bin body or lid evidence unavailable",
+      "conditions": [],
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "observations": [],
+      "background": {
+        "scene": "datasets/assets/blender/waste_bin/blender_pbr_v2_20261110/waste_bin_pbr.blend",
+        "floor_gray": 0.12,
+        "backdrop_gray": 0.34
+      },
+      "target": {
+        "bins": {
+          "blue": "closed"
+        },
+        "open_pose": "upright"
+      },
+      "labels": {
+        "mode": "candidate",
+        "open": 0,
+        "closed": 1
+      },
+      "augmentation": {
+        "mode": "none"
+      },
+      "sources": [
+        "datasets/assets/blender/waste_bin/blender_pbr_v2_20261110/waste_bin_pbr.blend"
+      ],
+      "parameters": {
+        "camera_location": [
+          -1.68,
+          -5.4,
+          1.35
+        ],
+        "camera_aim": [
+          -1.68,
+          0,
+          0.78
+        ],
+        "yaw_degrees": 0,
+        "lens_mm": 35,
+        "key_energy": 550,
+        "fill_energy": 300,
+        "color_factor": 0.82,
+        "roughness_delta": 0.0
+      }
+    },
+    {
+      "id": "red_open_normal",
+      "failure_event": "closed bin body or lid evidence unavailable",
+      "conditions": [],
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "observations": [],
+      "background": {
+        "scene": "datasets/assets/blender/waste_bin/blender_pbr_v2_20261110/waste_bin_pbr.blend",
+        "floor_gray": 0.12,
+        "backdrop_gray": 0.34
+      },
+      "target": {
+        "bins": {
+          "red": "open"
+        },
+        "open_pose": "upright"
+      },
+      "labels": {
+        "mode": "candidate",
+        "open": 0,
+        "closed": 1
+      },
+      "augmentation": {
+        "mode": "none"
+      },
+      "sources": [
+        "datasets/assets/blender/waste_bin/blender_pbr_v2_20261110/waste_bin_pbr.blend"
+      ],
+      "parameters": {
+        "camera_location": [
+          -0.56,
+          -5.4,
+          1.35
+        ],
+        "camera_aim": [
+          -0.56,
+          0,
+          0.78
+        ],
+        "yaw_degrees": 0,
+        "lens_mm": 35,
+        "key_energy": 900,
+        "fill_energy": 500,
+        "color_factor": 1.0,
+        "roughness_delta": 0.0
+      }
+    },
+    {
+      "id": "red_open_dark",
+      "failure_event": "closed bin body or lid evidence unavailable",
+      "conditions": [],
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "observations": [],
+      "background": {
+        "scene": "datasets/assets/blender/waste_bin/blender_pbr_v2_20261110/waste_bin_pbr.blend",
+        "floor_gray": 0.12,
+        "backdrop_gray": 0.34
+      },
+      "target": {
+        "bins": {
+          "red": "open"
+        },
+        "open_pose": "upright"
+      },
+      "labels": {
+        "mode": "candidate",
+        "open": 0,
+        "closed": 1
+      },
+      "augmentation": {
+        "mode": "none"
+      },
+      "sources": [
+        "datasets/assets/blender/waste_bin/blender_pbr_v2_20261110/waste_bin_pbr.blend"
+      ],
+      "parameters": {
+        "camera_location": [
+          -0.56,
+          -5.4,
+          1.35
+        ],
+        "camera_aim": [
+          -0.56,
+          0,
+          0.78
+        ],
+        "yaw_degrees": 0,
+        "lens_mm": 35,
+        "key_energy": 550,
+        "fill_energy": 300,
+        "color_factor": 0.82,
+        "roughness_delta": 0.0
+      }
+    },
+    {
+      "id": "red_closed_normal",
+      "failure_event": "closed bin body or lid evidence unavailable",
+      "conditions": [],
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "observations": [],
+      "background": {
+        "scene": "datasets/assets/blender/waste_bin/blender_pbr_v2_20261110/waste_bin_pbr.blend",
+        "floor_gray": 0.12,
+        "backdrop_gray": 0.34
+      },
+      "target": {
+        "bins": {
+          "red": "closed"
+        },
+        "open_pose": "upright"
+      },
+      "labels": {
+        "mode": "candidate",
+        "open": 0,
+        "closed": 1
+      },
+      "augmentation": {
+        "mode": "none"
+      },
+      "sources": [
+        "datasets/assets/blender/waste_bin/blender_pbr_v2_20261110/waste_bin_pbr.blend"
+      ],
+      "parameters": {
+        "camera_location": [
+          -0.56,
+          -5.4,
+          1.35
+        ],
+        "camera_aim": [
+          -0.56,
+          0,
+          0.78
+        ],
+        "yaw_degrees": 0,
+        "lens_mm": 35,
+        "key_energy": 900,
+        "fill_energy": 500,
+        "color_factor": 1.0,
+        "roughness_delta": 0.0
+      }
+    },
+    {
+      "id": "red_closed_dark",
+      "failure_event": "closed bin body or lid evidence unavailable",
+      "conditions": [],
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "observations": [],
+      "background": {
+        "scene": "datasets/assets/blender/waste_bin/blender_pbr_v2_20261110/waste_bin_pbr.blend",
+        "floor_gray": 0.12,
+        "backdrop_gray": 0.34
+      },
+      "target": {
+        "bins": {
+          "red": "closed"
+        },
+        "open_pose": "upright"
+      },
+      "labels": {
+        "mode": "candidate",
+        "open": 0,
+        "closed": 1
+      },
+      "augmentation": {
+        "mode": "none"
+      },
+      "sources": [
+        "datasets/assets/blender/waste_bin/blender_pbr_v2_20261110/waste_bin_pbr.blend"
+      ],
+      "parameters": {
+        "camera_location": [
+          -0.56,
+          -5.4,
+          1.35
+        ],
+        "camera_aim": [
+          -0.56,
+          0,
+          0.78
+        ],
+        "yaw_degrees": 0,
+        "lens_mm": 35,
+        "key_energy": 550,
+        "fill_energy": 300,
+        "color_factor": 0.82,
+        "roughness_delta": 0.0
+      }
+    },
+    {
+      "id": "green_open_normal",
+      "failure_event": "closed bin body or lid evidence unavailable",
+      "conditions": [],
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "observations": [],
+      "background": {
+        "scene": "datasets/assets/blender/waste_bin/blender_pbr_v2_20261110/waste_bin_pbr.blend",
+        "floor_gray": 0.12,
+        "backdrop_gray": 0.34
+      },
+      "target": {
+        "bins": {
+          "green": "open"
+        },
+        "open_pose": "upright"
+      },
+      "labels": {
+        "mode": "candidate",
+        "open": 0,
+        "closed": 1
+      },
+      "augmentation": {
+        "mode": "none"
+      },
+      "sources": [
+        "datasets/assets/blender/waste_bin/blender_pbr_v2_20261110/waste_bin_pbr.blend"
+      ],
+      "parameters": {
+        "camera_location": [
+          0.56,
+          -5.4,
+          1.35
+        ],
+        "camera_aim": [
+          0.56,
+          0,
+          0.78
+        ],
+        "yaw_degrees": 0,
+        "lens_mm": 35,
+        "key_energy": 900,
+        "fill_energy": 500,
+        "color_factor": 1.0,
+        "roughness_delta": 0.0
+      }
+    },
+    {
+      "id": "green_open_dark",
+      "failure_event": "closed bin body or lid evidence unavailable",
+      "conditions": [],
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "observations": [],
+      "background": {
+        "scene": "datasets/assets/blender/waste_bin/blender_pbr_v2_20261110/waste_bin_pbr.blend",
+        "floor_gray": 0.12,
+        "backdrop_gray": 0.34
+      },
+      "target": {
+        "bins": {
+          "green": "open"
+        },
+        "open_pose": "upright"
+      },
+      "labels": {
+        "mode": "candidate",
+        "open": 0,
+        "closed": 1
+      },
+      "augmentation": {
+        "mode": "none"
+      },
+      "sources": [
+        "datasets/assets/blender/waste_bin/blender_pbr_v2_20261110/waste_bin_pbr.blend"
+      ],
+      "parameters": {
+        "camera_location": [
+          0.56,
+          -5.4,
+          1.35
+        ],
+        "camera_aim": [
+          0.56,
+          0,
+          0.78
+        ],
+        "yaw_degrees": 0,
+        "lens_mm": 35,
+        "key_energy": 550,
+        "fill_energy": 300,
+        "color_factor": 0.82,
+        "roughness_delta": 0.0
+      }
+    },
+    {
+      "id": "green_closed_normal",
+      "failure_event": "closed bin body or lid evidence unavailable",
+      "conditions": [],
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "observations": [],
+      "background": {
+        "scene": "datasets/assets/blender/waste_bin/blender_pbr_v2_20261110/waste_bin_pbr.blend",
+        "floor_gray": 0.12,
+        "backdrop_gray": 0.34
+      },
+      "target": {
+        "bins": {
+          "green": "closed"
+        },
+        "open_pose": "upright"
+      },
+      "labels": {
+        "mode": "candidate",
+        "open": 0,
+        "closed": 1
+      },
+      "augmentation": {
+        "mode": "none"
+      },
+      "sources": [
+        "datasets/assets/blender/waste_bin/blender_pbr_v2_20261110/waste_bin_pbr.blend"
+      ],
+      "parameters": {
+        "camera_location": [
+          0.56,
+          -5.4,
+          1.35
+        ],
+        "camera_aim": [
+          0.56,
+          0,
+          0.78
+        ],
+        "yaw_degrees": 0,
+        "lens_mm": 35,
+        "key_energy": 900,
+        "fill_energy": 500,
+        "color_factor": 1.0,
+        "roughness_delta": 0.0
+      }
+    },
+    {
+      "id": "green_closed_dark",
+      "failure_event": "closed bin body or lid evidence unavailable",
+      "conditions": [],
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "observations": [],
+      "background": {
+        "scene": "datasets/assets/blender/waste_bin/blender_pbr_v2_20261110/waste_bin_pbr.blend",
+        "floor_gray": 0.12,
+        "backdrop_gray": 0.34
+      },
+      "target": {
+        "bins": {
+          "green": "closed"
+        },
+        "open_pose": "upright"
+      },
+      "labels": {
+        "mode": "candidate",
+        "open": 0,
+        "closed": 1
+      },
+      "augmentation": {
+        "mode": "none"
+      },
+      "sources": [
+        "datasets/assets/blender/waste_bin/blender_pbr_v2_20261110/waste_bin_pbr.blend"
+      ],
+      "parameters": {
+        "camera_location": [
+          0.56,
+          -5.4,
+          1.35
+        ],
+        "camera_aim": [
+          0.56,
+          0,
+          0.78
+        ],
+        "yaw_degrees": 0,
+        "lens_mm": 35,
+        "key_energy": 550,
+        "fill_energy": 300,
+        "color_factor": 0.82,
+        "roughness_delta": 0.0
+      }
+    },
+    {
+      "id": "gray_open_normal",
+      "failure_event": "closed bin body or lid evidence unavailable",
+      "conditions": [],
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "observations": [],
+      "background": {
+        "scene": "datasets/assets/blender/waste_bin/blender_pbr_v2_20261110/waste_bin_pbr.blend",
+        "floor_gray": 0.12,
+        "backdrop_gray": 0.34
+      },
+      "target": {
+        "bins": {
+          "gray": "open"
+        },
+        "open_pose": "upright"
+      },
+      "labels": {
+        "mode": "candidate",
+        "open": 0,
+        "closed": 1
+      },
+      "augmentation": {
+        "mode": "none"
+      },
+      "sources": [
+        "datasets/assets/blender/waste_bin/blender_pbr_v2_20261110/waste_bin_pbr.blend"
+      ],
+      "parameters": {
+        "camera_location": [
+          1.68,
+          -5.4,
+          1.35
+        ],
+        "camera_aim": [
+          1.68,
+          0,
+          0.78
+        ],
+        "yaw_degrees": 0,
+        "lens_mm": 35,
+        "key_energy": 900,
+        "fill_energy": 500,
+        "color_factor": 1.0,
+        "roughness_delta": 0.0
+      }
+    },
+    {
+      "id": "gray_open_dark",
+      "failure_event": "closed bin body or lid evidence unavailable",
+      "conditions": [],
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "observations": [],
+      "background": {
+        "scene": "datasets/assets/blender/waste_bin/blender_pbr_v2_20261110/waste_bin_pbr.blend",
+        "floor_gray": 0.12,
+        "backdrop_gray": 0.34
+      },
+      "target": {
+        "bins": {
+          "gray": "open"
+        },
+        "open_pose": "upright"
+      },
+      "labels": {
+        "mode": "candidate",
+        "open": 0,
+        "closed": 1
+      },
+      "augmentation": {
+        "mode": "none"
+      },
+      "sources": [
+        "datasets/assets/blender/waste_bin/blender_pbr_v2_20261110/waste_bin_pbr.blend"
+      ],
+      "parameters": {
+        "camera_location": [
+          1.68,
+          -5.4,
+          1.35
+        ],
+        "camera_aim": [
+          1.68,
+          0,
+          0.78
+        ],
+        "yaw_degrees": 0,
+        "lens_mm": 35,
+        "key_energy": 550,
+        "fill_energy": 300,
+        "color_factor": 0.82,
+        "roughness_delta": 0.0
+      }
+    },
+    {
+      "id": "gray_closed_normal",
+      "failure_event": "closed bin body or lid evidence unavailable",
+      "conditions": [],
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "observations": [],
+      "background": {
+        "scene": "datasets/assets/blender/waste_bin/blender_pbr_v2_20261110/waste_bin_pbr.blend",
+        "floor_gray": 0.12,
+        "backdrop_gray": 0.34
+      },
+      "target": {
+        "bins": {
+          "gray": "closed"
+        },
+        "open_pose": "upright"
+      },
+      "labels": {
+        "mode": "candidate",
+        "open": 0,
+        "closed": 1
+      },
+      "augmentation": {
+        "mode": "none"
+      },
+      "sources": [
+        "datasets/assets/blender/waste_bin/blender_pbr_v2_20261110/waste_bin_pbr.blend"
+      ],
+      "parameters": {
+        "camera_location": [
+          1.68,
+          -5.4,
+          1.35
+        ],
+        "camera_aim": [
+          1.68,
+          0,
+          0.78
+        ],
+        "yaw_degrees": 0,
+        "lens_mm": 35,
+        "key_energy": 900,
+        "fill_energy": 500,
+        "color_factor": 1.0,
+        "roughness_delta": 0.0
+      }
+    },
+    {
+      "id": "gray_closed_dark",
+      "failure_event": "closed bin body or lid evidence unavailable",
+      "conditions": [],
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "observations": [],
+      "background": {
+        "scene": "datasets/assets/blender/waste_bin/blender_pbr_v2_20261110/waste_bin_pbr.blend",
+        "floor_gray": 0.12,
+        "backdrop_gray": 0.34
+      },
+      "target": {
+        "bins": {
+          "gray": "closed"
+        },
+        "open_pose": "upright"
+      },
+      "labels": {
+        "mode": "candidate",
+        "open": 0,
+        "closed": 1
+      },
+      "augmentation": {
+        "mode": "none"
+      },
+      "sources": [
+        "datasets/assets/blender/waste_bin/blender_pbr_v2_20261110/waste_bin_pbr.blend"
+      ],
+      "parameters": {
+        "camera_location": [
+          1.68,
+          -5.4,
+          1.35
+        ],
+        "camera_aim": [
+          1.68,
+          0,
+          0.78
+        ],
+        "yaw_degrees": 0,
+        "lens_mm": 35,
+        "key_energy": 550,
+        "fill_energy": 300,
+        "color_factor": 0.82,
+        "roughness_delta": 0.0
+      }
+    },
+    {
+      "id": "group_0",
+      "failure_event": "closed bin body or lid evidence unavailable",
+      "conditions": [],
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "observations": [],
+      "background": {
+        "scene": "datasets/assets/blender/waste_bin/blender_pbr_v2_20261110/waste_bin_pbr.blend",
+        "floor_gray": 0.12,
+        "backdrop_gray": 0.34
+      },
+      "target": {
+        "bins": {
+          "blue": "open",
+          "red": "closed",
+          "green": "open",
+          "gray": "closed"
+        },
+        "open_pose": "upright"
+      },
+      "labels": {
+        "mode": "candidate",
+        "open": 0,
+        "closed": 1
+      },
+      "augmentation": {
+        "mode": "none"
+      },
+      "sources": [
+        "datasets/assets/blender/waste_bin/blender_pbr_v2_20261110/waste_bin_pbr.blend"
+      ],
+      "parameters": {
+        "camera_location": [
+          0,
+          -6.3,
+          1.6
+        ],
+        "camera_aim": [
+          0,
+          0,
+          0.9
+        ],
+        "yaw_degrees": 0,
+        "lens_mm": 35,
+        "key_energy": 900,
+        "fill_energy": 500,
+        "color_factor": 1.0,
+        "roughness_delta": 0.0
+      }
+    },
+    {
+      "id": "group_1",
+      "failure_event": "closed bin body or lid evidence unavailable",
+      "conditions": [],
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "observations": [],
+      "background": {
+        "scene": "datasets/assets/blender/waste_bin/blender_pbr_v2_20261110/waste_bin_pbr.blend",
+        "floor_gray": 0.12,
+        "backdrop_gray": 0.34
+      },
+      "target": {
+        "bins": {
+          "blue": "closed",
+          "red": "open",
+          "green": "closed",
+          "gray": "open"
+        },
+        "open_pose": "upright"
+      },
+      "labels": {
+        "mode": "candidate",
+        "open": 0,
+        "closed": 1
+      },
+      "augmentation": {
+        "mode": "none"
+      },
+      "sources": [
+        "datasets/assets/blender/waste_bin/blender_pbr_v2_20261110/waste_bin_pbr.blend"
+      ],
+      "parameters": {
+        "camera_location": [
+          0,
+          -6.3,
+          1.6
+        ],
+        "camera_aim": [
+          0,
+          0,
+          0.9
+        ],
+        "yaw_degrees": 0,
+        "lens_mm": 35,
+        "key_energy": 900,
+        "fill_energy": 500,
+        "color_factor": 1.0,
+        "roughness_delta": 0.0
+      }
+    },
+    {
+      "id": "group_2",
+      "failure_event": "closed bin body or lid evidence unavailable",
+      "conditions": [],
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "observations": [],
+      "background": {
+        "scene": "datasets/assets/blender/waste_bin/blender_pbr_v2_20261110/waste_bin_pbr.blend",
+        "floor_gray": 0.12,
+        "backdrop_gray": 0.34
+      },
+      "target": {
+        "bins": {},
+        "open_pose": "upright"
+      },
+      "labels": {
+        "mode": "candidate",
+        "open": 0,
+        "closed": 1
+      },
+      "augmentation": {
+        "mode": "none"
+      },
+      "sources": [
+        "datasets/assets/blender/waste_bin/blender_pbr_v2_20261110/waste_bin_pbr.blend"
+      ],
+      "parameters": {
+        "camera_location": [
+          0,
+          -6.3,
+          1.6
+        ],
+        "camera_aim": [
+          0,
+          0,
+          0.9
+        ],
+        "yaw_degrees": 0,
+        "lens_mm": 35,
+        "key_energy": 900,
+        "fill_energy": 500,
+        "color_factor": 1.0,
+        "roughness_delta": 0.0
+      }
+    }
+  ]
+}

@@ -42,7 +42,7 @@ class OcclusionCandidatesTest(unittest.TestCase):
                                   'source_frame': str(frame)}]}
             selection.write_text(json.dumps(data), encoding='utf-8')
             out = root / 'candidates'
-            samples = module.build(selection, out)
+            samples = module._build(selection, out)
             self.assertEqual(len(samples), 2)
             manifest = json.loads((out / 'manifest.json').read_text(encoding='utf-8'))
             self.assertEqual(manifest['status'], 'complete_candidates')
@@ -50,11 +50,11 @@ class OcclusionCandidatesTest(unittest.TestCase):
             self.assertTrue(all(sample['source_group'] == 'one_source' for sample in samples))
             self.assertTrue(all((out / sample['person_visible_mask']).is_file() for sample in samples))
             with self.assertRaises(ValueError):
-                module.build(selection, out)
+                module._build(selection, out)
             data['approved_source_videos'] = []
             selection.write_text(json.dumps(data), encoding='utf-8')
             with self.assertRaises(ValueError):
-                module.build(selection, root / 'other')
+                module._build(selection, root / 'other')
             self.assertFalse((root / 'other').exists())
 
 

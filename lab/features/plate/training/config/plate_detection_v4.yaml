@@ -1,0 +1,54 @@
+schema_version: 3
+task_id: plate
+model_key: plate_detection
+version: v4
+task: detect
+data: datasets/exports/plate/v4_master_v4_20261113/data.yaml
+model: models/weights/plate/provincial/plate_detector_best.pt
+output_root: runs/plate_detection
+description: 车牌 V4 背景来源核实数据，省赛检测权重初始化；最终测试为同源合成图。
+imgsz: 640
+epochs: 18
+batch: 16
+workers: 0
+patience: 0
+seed: 42
+device: '0'
+optimizer: AdamW
+lr0: 0.0002
+lrf: 0.08
+momentum: 0.9
+weight_decay: 0.0005
+warmup_epochs: 1
+cos_lr: true
+close_mosaic: 0
+amp: false
+deterministic: true
+max_det: 120
+diagnostic_conf: 0.25
+match_iou: 0.5
+nms_iou: 0.7
+preview_limit: 48
+evaluate_after_training: true
+augment:
+  degrees: 2.0
+  translate: 0.03
+  scale: 0.12
+  shear: 0.0
+  perspective: 0.0
+  flipud: 0.0
+  fliplr: 0.0
+  mosaic: 0.0
+  mixup: 0.0
+  copy_paste: 0.0
+  hsv_h: 0.005
+  hsv_s: 0.1
+  hsv_v: 0.12
+source_notes:
+- 训练 1867 张、开发 393 张、测试 120 张；测试使用与训练成品不同的主场景合成图。
+- 真实 Blender 场景背景 1230 张，来自两处母场景及多个已记录视角；其余背景来自 CCPD 道路照片与现场视频。
+- 新主场景测试图共用实拍牌面素材和同一 Blender 母场景，不代表独立采集。
+- 车牌物理宽 36 cm、高 24 cm；原实拍牌面裁片为 46×18 像素，映射改变了比例，车体与摆放为拟合。
+- 旧单色场景 540 张及背景来源不明的旧省赛合成 960 张未纳入，源数据保留。
+- 逐图来源与背景分布见 datasets/exports/plate/v4_master_v4_20261113/manifest.json。
+- 尚未运行 V4 训练、验证或最终测试；测试集不得用于选模或调参。

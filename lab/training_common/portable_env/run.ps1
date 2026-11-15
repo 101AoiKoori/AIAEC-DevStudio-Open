@@ -19,7 +19,7 @@ if ($modeCount -ne 1) { throw 'Choose exactly one of -Check, -Script or -Module.
 $manifestPath = Join-Path $PSScriptRoot 'manifest.json'
 if (-not (Test-Path -LiteralPath $manifestPath -PathType Leaf)) { throw 'Copy a built environment bundle, including manifest.json and site-packages.' }
 $bundleOptions = [System.Collections.Generic.List[object]]::new()
-foreach ($bundleRoot in @($PSScriptRoot, (Join-Path $PSScriptRoot 'cp313'), (Join-Path $PSScriptRoot 'cp314'))) {
+foreach ($bundleRoot in @($PSScriptRoot, (Join-Path $PSScriptRoot 'cp314'))) {
     $candidateManifest = Join-Path $bundleRoot 'manifest.json'
     if (Test-Path -LiteralPath $candidateManifest -PathType Leaf) {
         $bundleOptions.Add([pscustomobject]@{ Root = $bundleRoot; Manifest = (Get-Content -LiteralPath $candidateManifest -Raw | ConvertFrom-Json) })
@@ -62,6 +62,9 @@ foreach ($candidate in @($candidates | Select-Object -Unique)) {
         $raw = & $candidate -I -S -B -c $probe 2>$null
         if ($LASTEXITCODE -ne 0) { throw 'interpreter probe failed' }
         $info = $raw | ConvertFrom-Json
+        if ($info.version[0] -ne 3 -or $info.version[1] -notin @(12, 14)) {
+            throw "Unsupported Python $($info.version -join '.'); supported versions are CPython 3.12 and 3.14."
+        }
         foreach ($bundle in $bundleOptions) {
         $manifest = $bundle.Manifest
         if ($info.implementation -ne $manifest.python_implementation -or
@@ -78,7 +81,7 @@ foreach ($candidate in @($candidates | Select-Object -Unique)) {
     } catch { $failures.Add("$candidate : $($_.Exception.Message)") }
 }
 if (-not $selected) {
-    throw ("Compatible Windows x64 CPython for an available dependency bundle was not found. Install the matching interpreter or pass -Python; no dependency installation is attempted. Candidates: " + ($failures -join '; '))
+    throw ("Compatible Windows x64 CPython 3.12 or 3.14 for an available dependency bundle was not found. Python 3.13 is unsupported. Install the matching interpreter or pass -Python; no dependency installation is attempted. Candidates: " + ($failures -join '; '))
 }
 $invokeArgs = @('-I', '-S', '-B', (Join-Path $selectedBundle 'bootstrap.py'))
 if ($Check) { $invokeArgs += '--check' }

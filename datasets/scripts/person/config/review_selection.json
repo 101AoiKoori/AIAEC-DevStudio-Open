@@ -1,0 +1,928 @@
+{
+  "schema_version": 1,
+  "task": "person",
+  "batch": "v4_review_20261115_b6",
+  "code_hash": "3253244151f290f0",
+  "generated_at": "2026-11-15T20:54:37+08:00",
+  "records": [
+    {
+      "frame": {
+        "path": "datasets/raw/person/teammate_submission_20261110/dataset/backgrounds/bg_00057_f00209.jpg",
+        "parent_video": "Archive/Assets/场景/综合视频/空场与场景物料_001.mp4",
+        "timestamp_seconds": 6.97,
+        "record_index": 209,
+        "source_group": "legacy_empty_site"
+      },
+      "role": "background",
+      "verdict": "ready",
+      "reason_codes": [
+        "ground_polygon_fit",
+        "ground_visible",
+        "horizon_estimable",
+        "horizon_forced_horizontal",
+        "no_unlabelled_target",
+        "placement_patch_fit"
+      ],
+      "ground_polygon": [
+        [
+          0,
+          808
+        ],
+        [
+          1919,
+          808
+        ],
+        [
+          1919,
+          1079
+        ],
+        [
+          0,
+          1079
+        ]
+      ],
+      "foot_xy": [
+        960,
+        862
+      ],
+      "existing_targets": [],
+      "near_duplicate_group": null,
+      "reviewed_by": "vision",
+      "accepted_by": "user_20261115",
+      "evidence": {
+        "judge": "ready",
+        "ground_area_ratio": 0.2508,
+        "ground_plane_support": 0.7312,
+        "ground_support_low": false,
+        "emptiness_covered_fraction": 0.0,
+        "below_scale_count": 0,
+        "hard_negative_count": 0,
+        "acceptance_scope": "user accepted B6 automatic verdict",
+        "parent_relation_verified_by": "user_20261115"
+      }
+    },
+    {
+      "frame": {
+        "path": "datasets/raw/person/teammate_submission_20261110/dataset/backgrounds/bg_00086_f00359.jpg",
+        "parent_video": "Archive/Assets/场景/综合视频/空场与场景物料_001.mp4",
+        "timestamp_seconds": 11.97,
+        "record_index": 359,
+        "source_group": "legacy_empty_site"
+      },
+      "role": "background",
+      "verdict": "ready",
+      "reason_codes": [
+        "ground_polygon_fit",
+        "ground_visible",
+        "horizon_estimable",
+        "horizon_forced_horizontal",
+        "no_unlabelled_target",
+        "placement_patch_fit"
+      ],
+      "ground_polygon": [
+        [
+          0,
+          878
+        ],
+        [
+          1919,
+          878
+        ],
+        [
+          1919,
+          1079
+        ],
+        [
+          0,
+          1079
+        ]
+      ],
+      "foot_xy": [
+        960,
+        906
+      ],
+      "existing_targets": [],
+      "near_duplicate_group": null,
+      "reviewed_by": "vision",
+      "accepted_by": "user_20261115",
+      "evidence": {
+        "judge": "ready",
+        "ground_area_ratio": 0.186,
+        "ground_plane_support": 0.4407,
+        "ground_support_low": false,
+        "emptiness_covered_fraction": 0.0,
+        "below_scale_count": 0,
+        "hard_negative_count": 0,
+        "acceptance_scope": "user accepted B6 automatic verdict",
+        "parent_relation_verified_by": "user_20261115"
+      }
+    },
+    {
+      "frame": {
+        "path": "datasets/raw/person/teammate_submission_20261110/dataset/backgrounds/bg_00122_f00551.jpg",
+        "parent_video": "Archive/Assets/场景/综合视频/空场与场景物料_001.mp4",
+        "timestamp_seconds": 18.37,
+        "record_index": 551,
+        "source_group": "legacy_empty_site"
+      },
+      "role": "background",
+      "verdict": "unknown",
+      "reason_codes": [
+        "geometry_rejected"
+      ],
+      "ground_polygon": null,
+      "foot_xy": null,
+      "existing_targets": [],
+      "near_duplicate_group": null,
+      "reviewed_by": "vision",
+      "accepted_by": null,
+      "evidence": {
+        "judge": "horizon_too_low",
+        "fraction": 0.9196
+      }
+    },
+    {
+      "frame": {
+        "path": "datasets/raw/person/teammate_submission_20261110/dataset/backgrounds/bg_00146_f00749.jpg",
+        "parent_video": "Archive/Assets/场景/综合视频/空场与场景物料_001.mp4",
+        "timestamp_seconds": 24.96,
+        "record_index": 749,
+        "source_group": "legacy_empty_site"
+      },
+      "role": "background",
+      "verdict": "ready",
+      "reason_codes": [
+        "below_target_scale",
+        "ground_polygon_fit",
+        "ground_visible",
+        "horizon_estimable",
+        "horizon_forced_horizontal",
+        "no_unlabelled_target",
+        "placement_patch_fit"
+      ],
+      "ground_polygon": [
+        [
+          0,
+          604
+        ],
+        [
+          1919,
+          604
+        ],
+        [
+          1919,
+          1079
+        ],
+        [
+          0,
+          1079
+        ]
+      ],
+      "foot_xy": [
+        960,
+        729
+      ],
+      "existing_targets": [],
+      "near_duplicate_group": null,
+      "reviewed_by": "vision",
+      "accepted_by": "user_20261115",
+      "evidence": {
+        "judge": "ready",
+        "ground_area_ratio": 0.4396,
+        "ground_plane_support": 0.466,
+        "ground_support_low": false,
+        "emptiness_covered_fraction": 0.0,
+        "below_scale_count": 5,
+        "hard_negative_count": 0,
+        "acceptance_scope": "user accepted B6 automatic verdict",
+        "parent_relation_verified_by": "user_20261115"
+      }
+    },
+    {
+      "frame": {
+        "path": "datasets/raw/person/teammate_submission_20261110/dataset/backgrounds/bg_00165_f00930.jpg",
+        "parent_video": "Archive/Assets/场景/综合视频/空场与场景物料_001.mp4",
+        "timestamp_seconds": 31.0,
+        "record_index": 930,
+        "source_group": "legacy_empty_site"
+      },
+      "role": "background",
+      "verdict": "unknown",
+      "reason_codes": [
+        "geometry_rejected"
+      ],
+      "ground_polygon": null,
+      "foot_xy": null,
+      "existing_targets": [],
+      "near_duplicate_group": null,
+      "reviewed_by": "vision",
+      "accepted_by": null,
+      "evidence": {
+        "judge": "ground_missing"
+      }
+    },
+    {
+      "frame": {
+        "path": "datasets/raw/person/teammate_submission_20261110/dataset/backgrounds/bg_00232_f01290.jpg",
+        "parent_video": "Archive/Assets/场景/综合视频/空场与场景物料_001.mp4",
+        "timestamp_seconds": 43.0,
+        "record_index": 1290,
+        "source_group": "legacy_empty_site"
+      },
+      "role": "background",
+      "verdict": "excluded",
+      "reason_codes": [
+        "placement_patch_cluttered"
+      ],
+      "ground_polygon": null,
+      "foot_xy": null,
+      "existing_targets": [],
+      "near_duplicate_group": null,
+      "reviewed_by": "vision",
+      "accepted_by": "user_20261115",
+      "evidence": {
+        "judge": "placement_patch_cluttered",
+        "metrics": {
+          "object_ratio": 0.179,
+          "object_max_component_ratio": 0.1672,
+          "vertical_structure_ratio": 0.0125,
+          "largest_free_rect_ratio": 0.2,
+          "valid_footpoint_ratio": 0.4,
+          "best_body_obstacle_ratio": 0.0,
+          "confidence": 0.79
+        },
+        "thresholds": {
+          "max_object_ratio": 0.122,
+          "max_object_component_ratio": 0.08,
+          "max_vertical_ratio": 0.008,
+          "min_largest_free_rect_ratio": 0.484,
+          "min_valid_footpoint_ratio": 0.677,
+          "max_body_obstacle_ratio": 0.05,
+          "clutter_exclude_ratio": 0.179,
+          "confidence_min": 0.614,
+          "borderline_margin": 0.1
+        },
+        "missing": [],
+        "confidence": 0.79,
+        "failures": [
+          {
+            "check": "object_ratio_exceeded",
+            "value": 0.179,
+            "limit": 0.122
+          },
+          {
+            "check": "object_component_exceeded",
+            "value": 0.1672,
+            "limit": 0.08
+          },
+          {
+            "check": "vertical_structure_exceeded",
+            "value": 0.0125,
+            "limit": 0.008
+          },
+          {
+            "check": "largest_free_rect_too_small",
+            "value": 0.2,
+            "limit": 0.484
+          },
+          {
+            "check": "valid_footpoint_ratio_too_small",
+            "value": 0.4,
+            "limit": 0.677
+          }
+        ],
+        "acceptance_scope": "user accepted B6 automatic verdict",
+        "parent_relation_verified_by": "user_20261115"
+      }
+    },
+    {
+      "frame": {
+        "path": "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_003001.png",
+        "parent_video": "datasets/raw/site_capture_20261112/videos/full_scene.mp4",
+        "timestamp_seconds": 100.033,
+        "record_index": null,
+        "source_group": "site_capture_full_scene"
+      },
+      "role": "background",
+      "verdict": "unknown",
+      "reason_codes": [
+        "geometry_rejected"
+      ],
+      "ground_polygon": null,
+      "foot_xy": null,
+      "existing_targets": [],
+      "near_duplicate_group": null,
+      "reviewed_by": "vision",
+      "accepted_by": null,
+      "evidence": {
+        "judge": "placement_patch_missing"
+      }
+    },
+    {
+      "frame": {
+        "path": "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_004001.png",
+        "parent_video": "datasets/raw/site_capture_20261112/videos/full_scene.mp4",
+        "timestamp_seconds": 133.367,
+        "record_index": null,
+        "source_group": "site_capture_full_scene"
+      },
+      "role": "background",
+      "verdict": "ready",
+      "reason_codes": [
+        "ground_polygon_fit",
+        "ground_visible",
+        "horizon_estimable",
+        "horizon_forced_horizontal",
+        "no_unlabelled_target",
+        "placement_patch_fit"
+      ],
+      "ground_polygon": [
+        [
+          0,
+          253
+        ],
+        [
+          639,
+          253
+        ],
+        [
+          639,
+          359
+        ],
+        [
+          0,
+          359
+        ]
+      ],
+      "foot_xy": [
+        320,
+        275
+      ],
+      "existing_targets": [],
+      "near_duplicate_group": null,
+      "reviewed_by": "vision",
+      "accepted_by": "user_20261115",
+      "evidence": {
+        "judge": "ready",
+        "ground_area_ratio": 0.294,
+        "ground_plane_support": 0.4202,
+        "ground_support_low": false,
+        "emptiness_covered_fraction": 0.0,
+        "below_scale_count": 0,
+        "hard_negative_count": 0,
+        "acceptance_scope": "user accepted B6 automatic verdict",
+        "parent_relation_verified_by": "user_20261115"
+      }
+    },
+    {
+      "frame": {
+        "path": "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_005001.png",
+        "parent_video": "datasets/raw/site_capture_20261112/videos/full_scene.mp4",
+        "timestamp_seconds": 166.7,
+        "record_index": null,
+        "source_group": "site_capture_full_scene"
+      },
+      "role": "background",
+      "verdict": "unknown",
+      "reason_codes": [
+        "geometry_rejected"
+      ],
+      "ground_polygon": null,
+      "foot_xy": null,
+      "existing_targets": [],
+      "near_duplicate_group": null,
+      "reviewed_by": "vision",
+      "accepted_by": null,
+      "evidence": {
+        "judge": "ground_missing"
+      }
+    },
+    {
+      "frame": {
+        "path": "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_006001.png",
+        "parent_video": "datasets/raw/site_capture_20261112/videos/full_scene.mp4",
+        "timestamp_seconds": 200.033,
+        "record_index": null,
+        "source_group": "site_capture_full_scene"
+      },
+      "role": "background",
+      "verdict": "excluded",
+      "reason_codes": [
+        "placement_patch_cluttered"
+      ],
+      "ground_polygon": null,
+      "foot_xy": null,
+      "existing_targets": [],
+      "near_duplicate_group": null,
+      "reviewed_by": "vision",
+      "accepted_by": "user_20261115",
+      "evidence": {
+        "judge": "placement_patch_cluttered",
+        "metrics": {
+          "object_ratio": 0.2726,
+          "object_max_component_ratio": 0.2292,
+          "vertical_structure_ratio": 0.0502,
+          "largest_free_rect_ratio": 0.4087,
+          "valid_footpoint_ratio": 0.4593,
+          "best_body_obstacle_ratio": 0.0,
+          "confidence": 0.6968
+        },
+        "thresholds": {
+          "max_object_ratio": 0.122,
+          "max_object_component_ratio": 0.08,
+          "max_vertical_ratio": 0.008,
+          "min_largest_free_rect_ratio": 0.484,
+          "min_valid_footpoint_ratio": 0.677,
+          "max_body_obstacle_ratio": 0.05,
+          "clutter_exclude_ratio": 0.179,
+          "confidence_min": 0.614,
+          "borderline_margin": 0.1
+        },
+        "missing": [],
+        "confidence": 0.6968,
+        "failures": [
+          {
+            "check": "object_ratio_exceeded",
+            "value": 0.2726,
+            "limit": 0.122
+          },
+          {
+            "check": "object_component_exceeded",
+            "value": 0.2292,
+            "limit": 0.08
+          },
+          {
+            "check": "vertical_structure_exceeded",
+            "value": 0.0502,
+            "limit": 0.008
+          },
+          {
+            "check": "largest_free_rect_too_small",
+            "value": 0.4087,
+            "limit": 0.484
+          },
+          {
+            "check": "valid_footpoint_ratio_too_small",
+            "value": 0.4593,
+            "limit": 0.677
+          }
+        ],
+        "acceptance_scope": "user accepted B6 automatic verdict",
+        "parent_relation_verified_by": "user_20261115"
+      }
+    },
+    {
+      "frame": {
+        "path": "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_007001.png",
+        "parent_video": "datasets/raw/site_capture_20261112/videos/full_scene.mp4",
+        "timestamp_seconds": 233.367,
+        "record_index": null,
+        "source_group": "site_capture_full_scene"
+      },
+      "role": "background",
+      "verdict": "excluded",
+      "reason_codes": [
+        "placement_patch_cluttered"
+      ],
+      "ground_polygon": null,
+      "foot_xy": null,
+      "existing_targets": [],
+      "near_duplicate_group": null,
+      "reviewed_by": "vision",
+      "accepted_by": "user_20261115",
+      "evidence": {
+        "judge": "placement_patch_cluttered",
+        "metrics": {
+          "object_ratio": 0.341,
+          "object_max_component_ratio": 0.2493,
+          "vertical_structure_ratio": 0.0097,
+          "largest_free_rect_ratio": 0.25,
+          "valid_footpoint_ratio": 0.4889,
+          "best_body_obstacle_ratio": 0.0,
+          "confidence": 0.877
+        },
+        "thresholds": {
+          "max_object_ratio": 0.122,
+          "max_object_component_ratio": 0.08,
+          "max_vertical_ratio": 0.008,
+          "min_largest_free_rect_ratio": 0.484,
+          "min_valid_footpoint_ratio": 0.677,
+          "max_body_obstacle_ratio": 0.05,
+          "clutter_exclude_ratio": 0.179,
+          "confidence_min": 0.614,
+          "borderline_margin": 0.1
+        },
+        "missing": [],
+        "confidence": 0.877,
+        "failures": [
+          {
+            "check": "object_ratio_exceeded",
+            "value": 0.341,
+            "limit": 0.122
+          },
+          {
+            "check": "object_component_exceeded",
+            "value": 0.2493,
+            "limit": 0.08
+          },
+          {
+            "check": "vertical_structure_exceeded",
+            "value": 0.0097,
+            "limit": 0.008
+          },
+          {
+            "check": "largest_free_rect_too_small",
+            "value": 0.25,
+            "limit": 0.484
+          },
+          {
+            "check": "valid_footpoint_ratio_too_small",
+            "value": 0.4889,
+            "limit": 0.677
+          }
+        ],
+        "acceptance_scope": "user accepted B6 automatic verdict",
+        "parent_relation_verified_by": "user_20261115"
+      }
+    },
+    {
+      "frame": {
+        "path": "datasets/raw/person/teammate_submission_20261110/dataset/backgrounds/bg_00000_f00001.jpg",
+        "parent_video": "Archive/Assets/场景/综合视频/空场与场景物料_001.mp4",
+        "timestamp_seconds": null,
+        "record_index": null,
+        "source_group": "legacy_empty_site"
+      },
+      "role": "background",
+      "verdict": "ready",
+      "reason_codes": [
+        "below_target_scale",
+        "ground_polygon_fit",
+        "ground_visible",
+        "horizon_estimable",
+        "horizon_forced_horizontal",
+        "no_unlabelled_target",
+        "placement_patch_fit"
+      ],
+      "ground_polygon": [
+        [
+          0,
+          338
+        ],
+        [
+          1919,
+          338
+        ],
+        [
+          1919,
+          1079
+        ],
+        [
+          0,
+          1079
+        ]
+      ],
+      "foot_xy": [
+        960,
+        580
+      ],
+      "existing_targets": [],
+      "near_duplicate_group": null,
+      "reviewed_by": "vision",
+      "accepted_by": "user_20261115",
+      "evidence": {
+        "judge": "ready",
+        "ground_area_ratio": 0.6858,
+        "ground_plane_support": 0.6372,
+        "ground_support_low": false,
+        "emptiness_covered_fraction": 0.0,
+        "below_scale_count": 3,
+        "hard_negative_count": 0,
+        "acceptance_scope": "user accepted B6 automatic verdict",
+        "parent_relation_verified_by": "user_20261115"
+      }
+    },
+    {
+      "frame": {
+        "path": "datasets/raw/person/teammate_submission_20261110/dataset/backgrounds/bg_00040_f00145.jpg",
+        "parent_video": "Archive/Assets/场景/综合视频/空场与场景物料_001.mp4",
+        "timestamp_seconds": null,
+        "record_index": null,
+        "source_group": "legacy_empty_site"
+      },
+      "role": "background",
+      "verdict": "ready",
+      "reason_codes": [
+        "ground_polygon_fit",
+        "ground_visible",
+        "horizon_estimable",
+        "horizon_forced_horizontal",
+        "no_unlabelled_target",
+        "placement_patch_fit",
+        "placement_patch_level_camera"
+      ],
+      "ground_polygon": [
+        [
+          0,
+          524
+        ],
+        [
+          1919,
+          524
+        ],
+        [
+          1919,
+          1079
+        ],
+        [
+          0,
+          1079
+        ]
+      ],
+      "foot_xy": [
+        960,
+        662
+      ],
+      "existing_targets": [],
+      "near_duplicate_group": null,
+      "reviewed_by": "vision",
+      "accepted_by": "user_20261115",
+      "evidence": {
+        "judge": "ready",
+        "ground_area_ratio": 0.5136,
+        "ground_plane_support": 0.5438,
+        "ground_support_low": false,
+        "emptiness_covered_fraction": 0.0,
+        "below_scale_count": 0,
+        "hard_negative_count": 0,
+        "acceptance_scope": "user accepted B6 automatic verdict",
+        "parent_relation_verified_by": "user_20261115"
+      }
+    },
+    {
+      "frame": {
+        "path": "datasets/raw/person/teammate_submission_20261110/dataset/backgrounds/bg_00080_f00314.jpg",
+        "parent_video": "Archive/Assets/场景/综合视频/空场与场景物料_001.mp4",
+        "timestamp_seconds": null,
+        "record_index": null,
+        "source_group": "legacy_empty_site"
+      },
+      "role": "background",
+      "verdict": "unknown",
+      "reason_codes": [
+        "geometry_rejected"
+      ],
+      "ground_polygon": null,
+      "foot_xy": null,
+      "existing_targets": [],
+      "near_duplicate_group": null,
+      "reviewed_by": "vision",
+      "accepted_by": null,
+      "evidence": {
+        "judge": "ground_missing"
+      }
+    },
+    {
+      "frame": {
+        "path": "datasets/raw/person/teammate_submission_20261110/dataset/backgrounds/bg_00120_f00543.jpg",
+        "parent_video": "Archive/Assets/场景/综合视频/空场与场景物料_001.mp4",
+        "timestamp_seconds": null,
+        "record_index": null,
+        "source_group": "legacy_empty_site"
+      },
+      "role": "background",
+      "verdict": "unknown",
+      "reason_codes": [
+        "geometry_rejected"
+      ],
+      "ground_polygon": null,
+      "foot_xy": null,
+      "existing_targets": [],
+      "near_duplicate_group": null,
+      "reviewed_by": "vision",
+      "accepted_by": null,
+      "evidence": {
+        "judge": "horizon_too_low",
+        "fraction": 0.9126
+      }
+    },
+    {
+      "frame": {
+        "path": "datasets/raw/person/teammate_submission_20261110/dataset/backgrounds/bg_00160_f00851.jpg",
+        "parent_video": "Archive/Assets/场景/综合视频/空场与场景物料_001.mp4",
+        "timestamp_seconds": null,
+        "record_index": null,
+        "source_group": "legacy_empty_site"
+      },
+      "role": "background",
+      "verdict": "unknown",
+      "reason_codes": [
+        "geometry_rejected"
+      ],
+      "ground_polygon": null,
+      "foot_xy": null,
+      "existing_targets": [],
+      "near_duplicate_group": null,
+      "reviewed_by": "vision",
+      "accepted_by": null,
+      "evidence": {
+        "judge": "ground_missing"
+      }
+    },
+    {
+      "frame": {
+        "path": "datasets/raw/person/teammate_submission_20261110/dataset/backgrounds/bg_00200_f01172.jpg",
+        "parent_video": "Archive/Assets/场景/综合视频/空场与场景物料_001.mp4",
+        "timestamp_seconds": null,
+        "record_index": null,
+        "source_group": "legacy_empty_site"
+      },
+      "role": "background",
+      "verdict": "unknown",
+      "reason_codes": [
+        "placement_patch_unsure"
+      ],
+      "ground_polygon": null,
+      "foot_xy": null,
+      "existing_targets": [],
+      "near_duplicate_group": null,
+      "reviewed_by": "vision",
+      "accepted_by": null,
+      "evidence": {
+        "judge": "placement_patch_unsure",
+        "metrics": {
+          "object_ratio": 0.1306,
+          "object_max_component_ratio": 0.0424,
+          "vertical_structure_ratio": 0.0112,
+          "largest_free_rect_ratio": 0.5625,
+          "valid_footpoint_ratio": 0.8,
+          "best_body_obstacle_ratio": 0.0,
+          "confidence": 0.8979
+        },
+        "thresholds": {
+          "max_object_ratio": 0.122,
+          "max_object_component_ratio": 0.08,
+          "max_vertical_ratio": 0.008,
+          "min_largest_free_rect_ratio": 0.484,
+          "min_valid_footpoint_ratio": 0.677,
+          "max_body_obstacle_ratio": 0.05,
+          "clutter_exclude_ratio": 0.179,
+          "confidence_min": 0.614,
+          "borderline_margin": 0.1
+        },
+        "missing": [],
+        "confidence": 0.8979,
+        "failures": [
+          {
+            "check": "object_ratio_exceeded",
+            "value": 0.1306,
+            "limit": 0.122
+          },
+          {
+            "check": "vertical_structure_exceeded",
+            "value": 0.0112,
+            "limit": 0.008
+          }
+        ]
+      }
+    },
+    {
+      "frame": {
+        "path": "datasets/raw/person/teammate_submission_20261110/dataset/backgrounds/bg_00240_f01318.jpg",
+        "parent_video": "Archive/Assets/场景/综合视频/空场与场景物料_001.mp4",
+        "timestamp_seconds": null,
+        "record_index": null,
+        "source_group": "legacy_empty_site"
+      },
+      "role": "background",
+      "verdict": "excluded",
+      "reason_codes": [
+        "placement_patch_cluttered"
+      ],
+      "ground_polygon": null,
+      "foot_xy": null,
+      "existing_targets": [],
+      "near_duplicate_group": null,
+      "reviewed_by": "vision",
+      "accepted_by": "user_20261115",
+      "evidence": {
+        "judge": "placement_patch_cluttered",
+        "metrics": {
+          "object_ratio": 0.248,
+          "object_max_component_ratio": 0.2052,
+          "vertical_structure_ratio": 0.0265,
+          "largest_free_rect_ratio": 0.1172,
+          "valid_footpoint_ratio": 0.3037,
+          "best_body_obstacle_ratio": 0.0,
+          "confidence": 0.8083
+        },
+        "thresholds": {
+          "max_object_ratio": 0.122,
+          "max_object_component_ratio": 0.08,
+          "max_vertical_ratio": 0.008,
+          "min_largest_free_rect_ratio": 0.484,
+          "min_valid_footpoint_ratio": 0.677,
+          "max_body_obstacle_ratio": 0.05,
+          "clutter_exclude_ratio": 0.179,
+          "confidence_min": 0.614,
+          "borderline_margin": 0.1
+        },
+        "missing": [],
+        "confidence": 0.8083,
+        "failures": [
+          {
+            "check": "object_ratio_exceeded",
+            "value": 0.248,
+            "limit": 0.122
+          },
+          {
+            "check": "object_component_exceeded",
+            "value": 0.2052,
+            "limit": 0.08
+          },
+          {
+            "check": "vertical_structure_exceeded",
+            "value": 0.0265,
+            "limit": 0.008
+          },
+          {
+            "check": "largest_free_rect_too_small",
+            "value": 0.1172,
+            "limit": 0.484
+          },
+          {
+            "check": "valid_footpoint_ratio_too_small",
+            "value": 0.3037,
+            "limit": 0.677
+          }
+        ],
+        "acceptance_scope": "user accepted B6 automatic verdict",
+        "parent_relation_verified_by": "user_20261115"
+      }
+    },
+    {
+      "frame": {
+        "path": "datasets/raw/person/teammate_submission_20261110/dataset/backgrounds/bg_00280_f01474.jpg",
+        "parent_video": "Archive/Assets/场景/综合视频/空场与场景物料_001.mp4",
+        "timestamp_seconds": null,
+        "record_index": null,
+        "source_group": "legacy_empty_site"
+      },
+      "role": "background",
+      "verdict": "excluded",
+      "reason_codes": [
+        "placement_patch_cluttered"
+      ],
+      "ground_polygon": null,
+      "foot_xy": null,
+      "existing_targets": [],
+      "near_duplicate_group": null,
+      "reviewed_by": "vision",
+      "accepted_by": "user_20261115",
+      "evidence": {
+        "judge": "placement_patch_cluttered",
+        "metrics": {
+          "object_ratio": 0.2474,
+          "object_max_component_ratio": 0.0297,
+          "vertical_structure_ratio": 0.0,
+          "largest_free_rect_ratio": 0.2754,
+          "valid_footpoint_ratio": 0.5037,
+          "best_body_obstacle_ratio": 0.0,
+          "confidence": 0.8233
+        },
+        "thresholds": {
+          "max_object_ratio": 0.122,
+          "max_object_component_ratio": 0.08,
+          "max_vertical_ratio": 0.008,
+          "min_largest_free_rect_ratio": 0.484,
+          "min_valid_footpoint_ratio": 0.677,
+          "max_body_obstacle_ratio": 0.05,
+          "clutter_exclude_ratio": 0.179,
+          "confidence_min": 0.614,
+          "borderline_margin": 0.1
+        },
+        "missing": [],
+        "confidence": 0.8233,
+        "failures": [
+          {
+            "check": "object_ratio_exceeded",
+            "value": 0.2474,
+            "limit": 0.122
+          },
+          {
+            "check": "largest_free_rect_too_small",
+            "value": 0.2754,
+            "limit": 0.484
+          },
+          {
+            "check": "valid_footpoint_ratio_too_small",
+            "value": 0.5037,
+            "limit": 0.677
+          }
+        ],
+        "acceptance_scope": "user accepted B6 automatic verdict",
+        "parent_relation_verified_by": "user_20261115"
+      }
+    }
+  ]
+}

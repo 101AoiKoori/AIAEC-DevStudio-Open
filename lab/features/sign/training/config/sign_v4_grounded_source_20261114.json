@@ -1,0 +1,752 @@
+{
+  "schema_version": 1,
+  "model_key": "sign",
+  "target_split": "train",
+  "budget": 1,
+  "purpose": "完整牌具真实背景单组输入计划；未生成图像",
+  "independence_basis": "一张共享背景帧与一个牌具视频视面；不表示独立采集或模型效果",
+  "uncertainty_weight": 0,
+  "sampling_seed": 1918,
+  "constraints": {
+    "image_size": [
+      640,
+      480
+    ],
+    "label_kind": "visible_fixture_box"
+  },
+  "background_inputs": [
+    {
+      "image": "datasets/annotated/mixed_scene/v4_compositing_backgrounds_20261113/images/junction_005_001.jpg",
+      "parent_image": "datasets/annotated/mixed_scene/v4_compositing_backgrounds_20261113/images/junction_005_001.jpg",
+      "parent_video": "Archive/Assets/场景/三楼与场地视频/三栋楼_路口及垃圾桶_005.mp4",
+      "pts_seconds": 1.0,
+      "crop_xyxy": [
+        80,
+        0,
+        560,
+        360
+      ],
+      "sign_absence": "confirmed",
+      "sign_absence_evidence": "datasets/annotated/mixed_scene/v4_compositing_backgrounds_20261113/images/junction_005_001.jpg；2026-11-14 原尺寸目视检查，当前帧及裁切范围未见可辨牌具；不推断画面外状态。",
+      "source_evidence": {
+        "manifest": "datasets/annotated/mixed_scene/v4_compositing_backgrounds_20261113/manifest.json",
+        "record_index": 20
+      },
+      "ground_evidence": "原图目视路面区域；裁切后按原图 4/3 比例转换，未实测相机几何。",
+      "content_review": "原图可见楼宇、路口、行人和远处车辆；无可辨牌具，画面中其他任务物体不作为牌具标签。",
+      "workspace_image": true
+    }
+  ],
+  "strata": [
+    {
+      "id": "sign_full_junction005_front_01",
+      "failure_event": "可辨牌具漏检或定位失败",
+      "conditions": [
+        "placed",
+        "front",
+        "normal"
+      ],
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "background": {
+        "image": "datasets/annotated/mixed_scene/v4_compositing_backgrounds_20261113/images/junction_005_001.jpg"
+      },
+      "target": {
+        "state": "placed",
+        "mask": "train_20.png"
+      },
+      "labels": {
+        "class_id": 0,
+        "kind": "visible_fixture_box"
+      },
+      "augmentation": {
+        "tone": "normal"
+      },
+      "parameters": {
+        "height": 200,
+        "left": 120,
+        "top": 160,
+        "ground_polygon": [
+          [
+            93,
+            307
+          ],
+          [
+            227,
+            307
+          ],
+          [
+            247,
+            380
+          ],
+          [
+            73,
+            380
+          ]
+        ],
+        "occlusion_polygons": [],
+        "visible_kind": "fixture",
+        "visibility_evidence": "已目视原 RGBA 掩膜：正面牌面、立杆与底座均可辨且连贯；图像边缘仅作候选输入。"
+      },
+      "sources": [
+        "datasets/annotated/mixed_scene/v4_compositing_backgrounds_20261113/images/junction_005_001.jpg",
+        "Archive/Assets/场景/三楼与场地视频/三栋楼_路口及垃圾桶_005.mp4",
+        "datasets/annotated/sign/sam2_fixture_candidates_20261110/train_20.png",
+        "datasets/annotated/sign/video_candidates_20261110/images/sign_0299.png",
+        "datasets/raw/sign/archive_assets_legacy/视频/禁止直行牌视频.mp4"
+      ]
+    }
+  ],
+  "input_evidence": {
+    "execution": "将来运行入口时显式传入 --seed 1918，与本计划的 sampling_seed 一致；当前 placed 的位置、尺寸和颜色由参数直接确定，种子用于生产守卫记录。",
+    "background": "共享背景 manifest records[20]，640×360；原帧1.0秒，原始视频作为单一父来源。",
+    "background_ground": "原图近似多边形 [[150,230],[250,230],[265,285],[135,285]]；以 crop [80,0,560,360] 后缩放4/3得到计划多边形。",
+    "proportion": "裁片缩放到高200像素；牌面、杆和底座完整，大小以已有640×480实拍牌具为参考，非测量标定。",
+    "contact": "裁后牌具中心底点约 (170.5,360)，在所列地面多边形内；底座投影横向约 x=133–208，落在地面。",
+    "foreground": "sam2_fixture_candidates_20261110/manifest.json records[3]；父帧 video_candidates_20261110/manifest.json samples[20]，约9.984秒。原清单 SAM 状态未改。",
+    "exposure": "共享背景来自已用于旧来源记录的视频，样本与历史任务存在同源可能；不声明独立场次或未知测试。",
+    "unmeasured": "相机姿态、真实尺度和实际受限路线映射未标定；影子未合成，几何为近似。"
+  },
+  "limitations": [
+    "该组只覆盖一个前景和背景，不代表完整数据集来源组成或配额。",
+    "仅杆截断、普通立杆负例和多目标背景未接入该组。",
+    "照片存在放大，新增像素不是新细节；原清单及采集来源保持不变。",
+    "生成守卫和生产过程未运行；生成物标签仍按入口标为候选。"
+  ],
+  "records": [
+    {
+      "image": "datasets/annotated/mixed_scene/v4_compositing_backgrounds_20261113/images/junction_005_001.jpg",
+      "parent_video": "Archive/Assets/场景/三楼与场地视频/三栋楼_路口及垃圾桶_005.mp4",
+      "source_time_seconds": 1.0,
+      "source_kind": "provided_video_frame",
+      "source_records": [
+        {
+          "manifest": "datasets/annotated/mixed_scene/v4_compositing_backgrounds_20261113/manifest.json",
+          "record_index": 20
+        }
+      ],
+      "task_use_status": [
+        {
+          "task": "sign",
+          "split": "train",
+          "role": "background",
+          "status": "candidate",
+          "purpose": "单牌合成背景候选",
+          "evidence": "原尺寸目视及计划 background_inputs[0]：无可辨牌具；地面为近似区域。"
+        },
+        {
+          "task": "sign",
+          "split": "train",
+          "role": "ground_contact_geometry",
+          "status": "ready",
+          "purpose": "仅用于本计划的单牌接地点几何参考",
+          "evidence": "原 640×360 路口图目视地面；裁切并按4/3转换，计划多边形和指定底边经点内检查。",
+          "scope": "仅 strata[0] 的裁切和 (170.5,360) 指定接地；几何近似，不证明背景完整训练准入或守卫通过。"
+        }
+      ],
+      "region_reference": "background_inputs[0].crop_xyxy; strata[0].parameters.ground_polygon",
+      "label_scope": "仅确认当前帧可辨禁行牌状态；其他任务物体不作为牌具标注。"
+    },
+    {
+      "image": "datasets/annotated/sign/sam2_fixture_candidates_20261110/train_20.png",
+      "parent_image": "datasets/annotated/sign/video_candidates_20261110/images/sign_0299.png",
+      "parent_video": "datasets/raw/sign/archive_assets_legacy/视频/禁止直行牌视频.mp4",
+      "source_kind": "derived_mask",
+      "source_records": [
+        {
+          "manifest": "datasets/annotated/sign/sam2_fixture_candidates_20261110/manifest.json",
+          "record_index": 3
+        },
+        {
+          "manifest": "datasets/annotated/sign/video_candidates_20261110/manifest.json",
+          "record_index": 20
+        }
+      ],
+      "task_use_status": [
+        {
+          "task": "sign",
+          "split": "train",
+          "role": "target_foreground",
+          "status": "candidate",
+          "purpose": "单牌合成前景候选",
+          "evidence": "已目视原 RGBA alpha；原 SAM 清单仍为未审核候选。"
+        },
+        {
+          "task": "sign",
+          "split": "train",
+          "role": "foreground_geometry_reference",
+          "status": "ready",
+          "purpose": "仅用于本计划正面牌具的外形、尺寸和底座接地几何参考",
+          "evidence": "已目视 RGBA alpha，牌面、杆、底座可辨；原始裁出外接尺寸324×639，按计划缩放为101×200，底边仍有20个 alpha 像素。",
+          "scope": "不改变原 SAM 未审核候选状态，不证明精细边缘标签或直接入 train；该几何参考不代表生产守卫通过。"
+        }
+      ],
+      "label_scope": "牌面、杆与底座组成单类；合成后按最终可见像素产生候选框。"
+    },
+    {
+      "image": "datasets/annotated/sign/video_candidates_20261110/images/sign_0299.png",
+      "parent_video": "datasets/raw/sign/archive_assets_legacy/视频/禁止直行牌视频.mp4",
+      "source_frame": 299,
+      "seconds_approx": 9.983769514640995,
+      "source_kind": "provided_video_frame",
+      "source_records": [
+        {
+          "manifest": "datasets/annotated/sign/video_candidates_20261110/manifest.json",
+          "record_index": 20
+        },
+        {
+          "manifest": "datasets/annotated/sign/sam2_fixture_candidates_20261110/manifest.json",
+          "record_index": 3
+        }
+      ],
+      "task_use_status": [
+        {
+          "task": "sign",
+          "split": "train",
+          "role": "foreground_parent",
+          "status": "candidate",
+          "purpose": "该牌具前景掩膜的父帧",
+          "evidence": "原候选框 pending_review；不作为已确认直接训练标签。"
+        }
+      ],
+      "label_scope": "本条为前景父帧，不宣称整图训练标签完整。"
+    },
+    {
+      "image": "datasets/annotated/sign/v4_training_backgrounds_20261112/images/background_01.png",
+      "parent_image": "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_000163.png",
+      "parent_video": "datasets/raw/site_capture_20261112/videos/full_scene.mp4",
+      "source_time_seconds": 5.4,
+      "source_kind": "provided_video_frame",
+      "source_records": [
+        {
+          "manifest": "datasets/annotated/sign/v4_training_backgrounds_20261112/manifest.json",
+          "json_pointer": "frames[0]",
+          "original_usage": "unassigned"
+        }
+      ],
+      "task_use_status": [
+        {
+          "task": "sign",
+          "split": "unassigned",
+          "role": "background",
+          "status": "reserved",
+          "purpose": "预留未来新背景用途；非训练",
+          "evidence": "原任务背景清单 frames[0] 与同父视频预留计划。"
+        }
+      ],
+      "label_scope": "原视觉观察候选；不推断为空负例，不分配 val/test。"
+    },
+    {
+      "image": "datasets/annotated/sign/v4_training_backgrounds_20261112/images/background_02.png",
+      "parent_image": "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_004359.png",
+      "parent_video": "datasets/raw/site_capture_20261112/videos/full_scene.mp4",
+      "source_time_seconds": 145.400533,
+      "source_kind": "provided_video_frame",
+      "source_records": [
+        {
+          "manifest": "datasets/annotated/sign/v4_training_backgrounds_20261112/manifest.json",
+          "json_pointer": "frames[1]",
+          "original_usage": "regression"
+        }
+      ],
+      "task_use_status": [
+        {
+          "task": "sign",
+          "split": "unassigned",
+          "role": "background",
+          "status": "reserved",
+          "purpose": "已记录的 regression，且该父视频全组预留；非训练",
+          "evidence": "原任务背景清单 frames[1] 与同父视频预留计划。"
+        }
+      ],
+      "label_scope": "原视觉观察候选；不推断为空负例，不分配 val/test。"
+    },
+    {
+      "image": "datasets/annotated/sign/v4_training_backgrounds_20261112/images/background_03.png",
+      "parent_image": "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_005751.png",
+      "parent_video": "datasets/raw/site_capture_20261112/videos/full_scene.mp4",
+      "source_time_seconds": 191.820633,
+      "source_kind": "provided_video_frame",
+      "source_records": [
+        {
+          "manifest": "datasets/annotated/sign/v4_training_backgrounds_20261112/manifest.json",
+          "json_pointer": "frames[2]",
+          "original_usage": "unassigned"
+        }
+      ],
+      "task_use_status": [
+        {
+          "task": "sign",
+          "split": "unassigned",
+          "role": "background",
+          "status": "reserved",
+          "purpose": "预留未来新背景用途；非训练",
+          "evidence": "原任务背景清单 frames[2] 与同父视频预留计划。"
+        }
+      ],
+      "label_scope": "原视觉观察候选；不推断为空负例，不分配 val/test。"
+    },
+    {
+      "image": "datasets/annotated/sign/v4_training_backgrounds_20261112/images/background_seq_000091.png",
+      "parent_image": "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_000091.png",
+      "parent_video": "datasets/raw/site_capture_20261112/videos/full_scene.mp4",
+      "source_time_seconds": 3.0,
+      "source_kind": "provided_video_frame",
+      "source_records": [
+        {
+          "manifest": "datasets/annotated/sign/v4_training_backgrounds_20261112/manifest.json",
+          "json_pointer": "frames[3]",
+          "original_usage": "unassigned"
+        }
+      ],
+      "task_use_status": [
+        {
+          "task": "sign",
+          "split": "unassigned",
+          "role": "background",
+          "status": "reserved",
+          "purpose": "预留未来新背景用途；非训练",
+          "evidence": "原任务背景清单 frames[3] 与同父视频预留计划。"
+        }
+      ],
+      "label_scope": "原视觉观察候选；不推断为空负例，不分配 val/test。"
+    },
+    {
+      "image": "datasets/annotated/sign/v4_training_backgrounds_20261112/images/background_seq_002188.png",
+      "parent_image": "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_002188.png",
+      "parent_video": "datasets/raw/site_capture_20261112/videos/full_scene.mp4",
+      "source_time_seconds": 72.993467,
+      "source_kind": "provided_video_frame",
+      "source_records": [
+        {
+          "manifest": "datasets/annotated/sign/v4_training_backgrounds_20261112/manifest.json",
+          "json_pointer": "frames[4]",
+          "original_usage": "unassigned"
+        }
+      ],
+      "task_use_status": [
+        {
+          "task": "sign",
+          "split": "unassigned",
+          "role": "background",
+          "status": "reserved",
+          "purpose": "预留未来新背景用途；非训练",
+          "evidence": "原任务背景清单 frames[4] 与同父视频预留计划。"
+        }
+      ],
+      "label_scope": "原视觉观察候选；不推断为空负例，不分配 val/test。"
+    },
+    {
+      "image": "datasets/annotated/sign/v4_training_backgrounds_20261112/images/background_seq_004887.png",
+      "parent_image": "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_004887.png",
+      "parent_video": "datasets/raw/site_capture_20261112/videos/full_scene.mp4",
+      "source_time_seconds": 163.000533,
+      "source_kind": "provided_video_frame",
+      "source_records": [
+        {
+          "manifest": "datasets/annotated/sign/v4_training_backgrounds_20261112/manifest.json",
+          "json_pointer": "frames[5]",
+          "original_usage": "regression"
+        }
+      ],
+      "task_use_status": [
+        {
+          "task": "sign",
+          "split": "unassigned",
+          "role": "background",
+          "status": "reserved",
+          "purpose": "已记录的 regression，且该父视频全组预留；非训练",
+          "evidence": "原任务背景清单 frames[5] 与同父视频预留计划。"
+        }
+      ],
+      "label_scope": "原视觉观察候选；不推断为空负例，不分配 val/test。"
+    },
+    {
+      "image": "datasets/annotated/sign/v4_training_backgrounds_20261112/images/background_seq_005277.png",
+      "parent_image": "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_005277.png",
+      "parent_video": "datasets/raw/site_capture_20261112/videos/full_scene.mp4",
+      "source_time_seconds": 176.000533,
+      "source_kind": "provided_video_frame",
+      "source_records": [
+        {
+          "manifest": "datasets/annotated/sign/v4_training_backgrounds_20261112/manifest.json",
+          "json_pointer": "frames[6]",
+          "original_usage": "unassigned"
+        }
+      ],
+      "task_use_status": [
+        {
+          "task": "sign",
+          "split": "unassigned",
+          "role": "background",
+          "status": "reserved",
+          "purpose": "预留未来新背景用途；非训练",
+          "evidence": "原任务背景清单 frames[6] 与同父视频预留计划。"
+        }
+      ],
+      "label_scope": "原视觉观察候选；不推断为空负例，不分配 val/test。"
+    },
+    {
+      "image": "datasets/annotated/sign/v4_training_backgrounds_20261112/images/background_seq_005397.png",
+      "parent_image": "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_005397.png",
+      "parent_video": "datasets/raw/site_capture_20261112/videos/full_scene.mp4",
+      "source_time_seconds": 180.000533,
+      "source_kind": "provided_video_frame",
+      "source_records": [
+        {
+          "manifest": "datasets/annotated/sign/v4_training_backgrounds_20261112/manifest.json",
+          "json_pointer": "frames[7]",
+          "original_usage": "regression"
+        }
+      ],
+      "task_use_status": [
+        {
+          "task": "sign",
+          "split": "unassigned",
+          "role": "background",
+          "status": "reserved",
+          "purpose": "已记录的 regression，且该父视频全组预留；非训练",
+          "evidence": "原任务背景清单 frames[7] 与同父视频预留计划。"
+        }
+      ],
+      "label_scope": "原视觉观察候选；不推断为空负例，不分配 val/test。"
+    },
+    {
+      "image": "datasets/annotated/sign/v4_training_backgrounds_20261112/images/background_seq_005996.png",
+      "parent_image": "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_005996.png",
+      "parent_video": "datasets/raw/site_capture_20261112/videos/full_scene.mp4",
+      "source_time_seconds": 199.9873,
+      "source_kind": "provided_video_frame",
+      "source_records": [
+        {
+          "manifest": "datasets/annotated/sign/v4_training_backgrounds_20261112/manifest.json",
+          "json_pointer": "frames[8]",
+          "original_usage": "unassigned"
+        }
+      ],
+      "task_use_status": [
+        {
+          "task": "sign",
+          "split": "unassigned",
+          "role": "background",
+          "status": "reserved",
+          "purpose": "预留未来新背景用途；非训练",
+          "evidence": "原任务背景清单 frames[8] 与同父视频预留计划。"
+        }
+      ],
+      "label_scope": "原视觉观察候选；不推断为空负例，不分配 val/test。"
+    },
+    {
+      "image": "datasets/annotated/sign/v4_training_backgrounds_20261112/images/background_seq_006236.png",
+      "parent_image": "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_006236.png",
+      "parent_video": "datasets/raw/site_capture_20261112/videos/full_scene.mp4",
+      "source_time_seconds": 207.9873,
+      "source_kind": "provided_video_frame",
+      "source_records": [
+        {
+          "manifest": "datasets/annotated/sign/v4_training_backgrounds_20261112/manifest.json",
+          "json_pointer": "frames[9]",
+          "original_usage": "unassigned"
+        }
+      ],
+      "task_use_status": [
+        {
+          "task": "sign",
+          "split": "unassigned",
+          "role": "background",
+          "status": "reserved",
+          "purpose": "预留未来新背景用途；非训练",
+          "evidence": "原任务背景清单 frames[9] 与同父视频预留计划。"
+        }
+      ],
+      "label_scope": "原视觉观察候选；不推断为空负例，不分配 val/test。"
+    },
+    {
+      "image": "datasets/annotated/sign/v4_training_backgrounds_20261112/images/background_seq_007045.png",
+      "parent_image": "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_007045.png",
+      "parent_video": "datasets/raw/site_capture_20261112/videos/full_scene.mp4",
+      "source_time_seconds": 234.992733,
+      "source_kind": "provided_video_frame",
+      "source_records": [
+        {
+          "manifest": "datasets/annotated/sign/v4_training_backgrounds_20261112/manifest.json",
+          "json_pointer": "frames[10]",
+          "original_usage": "unassigned"
+        }
+      ],
+      "task_use_status": [
+        {
+          "task": "sign",
+          "split": "unassigned",
+          "role": "background",
+          "status": "reserved",
+          "purpose": "预留未来新背景用途；非训练",
+          "evidence": "原任务背景清单 frames[10] 与同父视频预留计划。"
+        }
+      ],
+      "label_scope": "原视觉观察候选；不推断为空负例，不分配 val/test。"
+    },
+    {
+      "image": "datasets/annotated/sign/v4_training_backgrounds_20261112/images/background_seq_008185.png",
+      "parent_image": "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_008185.png",
+      "parent_video": "datasets/raw/site_capture_20261112/videos/full_scene.mp4",
+      "source_time_seconds": 273.013056,
+      "source_kind": "provided_video_frame",
+      "source_records": [
+        {
+          "manifest": "datasets/annotated/sign/v4_training_backgrounds_20261112/manifest.json",
+          "json_pointer": "frames[11]",
+          "original_usage": "unassigned"
+        }
+      ],
+      "task_use_status": [
+        {
+          "task": "sign",
+          "split": "unassigned",
+          "role": "background",
+          "status": "reserved",
+          "purpose": "预留未来新背景用途；非训练",
+          "evidence": "原任务背景清单 frames[11] 与同父视频预留计划。"
+        }
+      ],
+      "label_scope": "原视觉观察候选；不推断为空负例，不分配 val/test。"
+    },
+    {
+      "image": "datasets/annotated/sign/v4_training_backgrounds_20261112/images/background_seq_008485.png",
+      "parent_image": "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_008485.png",
+      "parent_video": "datasets/raw/site_capture_20261112/videos/full_scene.mp4",
+      "source_time_seconds": 283.013056,
+      "source_kind": "provided_video_frame",
+      "source_records": [
+        {
+          "manifest": "datasets/annotated/sign/v4_training_backgrounds_20261112/manifest.json",
+          "json_pointer": "frames[12]",
+          "original_usage": "unassigned"
+        }
+      ],
+      "task_use_status": [
+        {
+          "task": "sign",
+          "split": "unassigned",
+          "role": "background",
+          "status": "reserved",
+          "purpose": "预留未来新背景用途；非训练",
+          "evidence": "原任务背景清单 frames[12] 与同父视频预留计划。"
+        }
+      ],
+      "label_scope": "原视觉观察候选；不推断为空负例，不分配 val/test。"
+    }
+  ],
+  "bounded_composition": {
+    "branch_id": "sign_full_junction005_front_01",
+    "task": "sign",
+    "split": "train",
+    "role_pool_references": {
+      "background_record_indices": [
+        0
+      ],
+      "target_foreground_record_indices": [
+        1
+      ],
+      "foreground_parent_record_indices": [
+        2
+      ]
+    },
+    "parents_and_shares": [
+      {
+        "role": "background",
+        "parent": "Archive/Assets/场景/三楼与场地视频/三栋楼_路口及垃圾桶_005.mp4",
+        "planned_images": 1
+      },
+      {
+        "role": "target_foreground",
+        "parent": "datasets/raw/sign/archive_assets_legacy/视频/禁止直行牌视频.mp4",
+        "planned_images": 1
+      }
+    ],
+    "compatibility": "一张背景与一个可辨正面牌具掩膜、明确 4:3 裁切和地面接点；仅该指定搭配。",
+    "selection_method": "单成员池固定选择；无随机源抽样。未来入口必须 --seed 1918，种子用于守卫记录。",
+    "quota": 1,
+    "theoretical_combination_capacity": 1,
+    "candidate_input_combination_capacity": 1,
+    "ready_input_combination_count": 0,
+    "ready_count_scope": "背景和前景的几何参考角色各有1条可用关系；合成背景/目标前景仍为候选，尚未运行生产守卫，不称完整组合已准入或已生成。",
+    "label_rule": "背景当前帧未见可辨牌具；新牌具按最终可见掩膜产生 class 0 候选框，其他任务物体不标为牌具。",
+    "reservation": "records[3:16] 为同一 full_scene.mp4 父视频的13张现有帧，3张原记录为 regression；本任务 train 各角色排除该父视频及派生。",
+    "limitations": [
+      "实际产出和模型效果未知。",
+      "仅杆截断、普通杆负例及其他父来源未包含在此一组。",
+      "成像几何和尺度是近似，前景掩膜原清单未审核；生产守卫尚未执行。"
+    ],
+    "broader_plan": "lab/features/sign/training/config/sign_v4_distribution_candidate.json#v4_combination_plan",
+    "ready_geometry_pair_count": 1,
+    "production_guard_status": "not_run",
+    "current_scope": "仅 records[0] 背景、records[1] 前景和该唯一确定构图；已核候选组合1，未证明其他素材组合产能。"
+  },
+  "relation_statistics": {
+    "unit": "去重后图片—任务—集合用途—角色关系；本计划局部范围",
+    "images": 16,
+    "relations": 18,
+    "status_counts": {
+      "ready": 2,
+      "candidate": 3,
+      "reserved": 13,
+      "blocked": 0,
+      "excluded": 0
+    },
+    "reserved_regression_relations": 3,
+    "scope": "本计划16张图片；ready仅指2条限定的几何参考角色，不代表完整合成/直接训练准入或生产结果。"
+  },
+  "main_plan_alignment": {
+    "plan": "lab/features/sign/training/config/sign_v4_distribution_candidate.json",
+    "root_pointer": "v4_combination_plan",
+    "branch_links": [
+      {
+        "branch_id": "DIRECT-FULL",
+        "plan_pointer": "v4_combination_plan.branches[0]",
+        "target_images": 550,
+        "background_parent_shares_field": "background_group_shares",
+        "current_bounded_scope_images": 0,
+        "coverage_scope": "仅本次唯一记录的候选组合，不代表其他窗口或未核素材的总体容量"
+      },
+      {
+        "branch_id": "DIRECT-CLIP",
+        "plan_pointer": "v4_combination_plan.branches[1]",
+        "target_images": 150,
+        "background_parent_shares_field": "background_group_shares",
+        "current_bounded_scope_images": 0,
+        "coverage_scope": "仅本次唯一记录的候选组合，不代表其他窗口或未核素材的总体容量"
+      },
+      {
+        "branch_id": "DIRECT-EMPTY",
+        "plan_pointer": "v4_combination_plan.branches[2]",
+        "target_images": 30,
+        "background_parent_shares_field": "background_group_shares",
+        "current_bounded_scope_images": 0,
+        "coverage_scope": "仅本次唯一记录的候选组合，不代表其他窗口或未核素材的总体容量"
+      },
+      {
+        "branch_id": "DIRECT-POLE-NEG",
+        "plan_pointer": "v4_combination_plan.branches[3]",
+        "target_images": 20,
+        "background_parent_shares_field": "background_group_shares",
+        "current_bounded_scope_images": 0,
+        "coverage_scope": "仅本次唯一记录的候选组合，不代表其他窗口或未核素材的总体容量"
+      },
+      {
+        "branch_id": "PHOTO-FULL",
+        "plan_pointer": "v4_combination_plan.branches[4]",
+        "target_images": 700,
+        "background_parent_shares_field": "background_group_shares",
+        "current_bounded_scope_images": 1,
+        "coverage_scope": "仅本次唯一记录的候选组合，不代表其他窗口或未核素材的总体容量",
+        "foreground_parent_shares_field": "foreground_group_shares",
+        "cross_parent_shares_field": "background_foreground_shares"
+      },
+      {
+        "branch_id": "PHOTO-CLIP",
+        "plan_pointer": "v4_combination_plan.branches[5]",
+        "target_images": 200,
+        "background_parent_shares_field": "background_group_shares",
+        "current_bounded_scope_images": 0,
+        "coverage_scope": "仅本次唯一记录的候选组合，不代表其他窗口或未核素材的总体容量",
+        "foreground_parent_shares_field": "foreground_group_shares",
+        "cross_parent_shares_field": "background_foreground_shares"
+      },
+      {
+        "branch_id": "PHOTO-EMPTY",
+        "plan_pointer": "v4_combination_plan.branches[6]",
+        "target_images": 50,
+        "background_parent_shares_field": "background_group_shares",
+        "current_bounded_scope_images": 0,
+        "coverage_scope": "仅本次唯一记录的候选组合，不代表其他窗口或未核素材的总体容量"
+      },
+      {
+        "branch_id": "PHOTO-POLE-NEG",
+        "plan_pointer": "v4_combination_plan.branches[7]",
+        "target_images": 50,
+        "background_parent_shares_field": "background_group_shares",
+        "current_bounded_scope_images": 0,
+        "coverage_scope": "仅本次唯一记录的候选组合，不代表其他窗口或未核素材的总体容量"
+      },
+      {
+        "branch_id": "BLENDER-FULL",
+        "plan_pointer": "v4_combination_plan.branches[8]",
+        "target_images": 550,
+        "background_parent_shares_field": "background_group_shares",
+        "current_bounded_scope_images": 0,
+        "coverage_scope": "仅本次唯一记录的候选组合，不代表其他窗口或未核素材的总体容量",
+        "foreground_parent_shares_field": "foreground_group_shares",
+        "cross_parent_shares_field": "background_foreground_shares"
+      },
+      {
+        "branch_id": "BLENDER-CLIP",
+        "plan_pointer": "v4_combination_plan.branches[9]",
+        "target_images": 150,
+        "background_parent_shares_field": "background_group_shares",
+        "current_bounded_scope_images": 0,
+        "coverage_scope": "仅本次唯一记录的候选组合，不代表其他窗口或未核素材的总体容量",
+        "foreground_parent_shares_field": "foreground_group_shares",
+        "cross_parent_shares_field": "background_foreground_shares"
+      },
+      {
+        "branch_id": "BLENDER-EMPTY",
+        "plan_pointer": "v4_combination_plan.branches[10]",
+        "target_images": 20,
+        "background_parent_shares_field": "background_group_shares",
+        "current_bounded_scope_images": 0,
+        "coverage_scope": "仅本次唯一记录的候选组合，不代表其他窗口或未核素材的总体容量"
+      },
+      {
+        "branch_id": "BLENDER-POLE-NEG",
+        "plan_pointer": "v4_combination_plan.branches[11]",
+        "target_images": 30,
+        "background_parent_shares_field": "background_group_shares",
+        "current_bounded_scope_images": 0,
+        "coverage_scope": "仅本次唯一记录的候选组合，不代表其他窗口或未核素材的总体容量"
+      }
+    ],
+    "full_plan_target_images": 2500,
+    "method_budgets": {
+      "direct": 750,
+      "real_composite": 1000,
+      "blender_composite": 750
+    },
+    "reservation_reference": "v4_combination_plan.reserved_before_train",
+    "pool_references": {
+      "background": "v4_combination_plan.real_background_source_groups[1].selected_bases[0] 对应本计划 records[0]",
+      "target_foreground": "v4_combination_plan.foreground_groups[0].assets[3] 对应本计划 records[1]",
+      "parent_frame": "本计划 records[2] 为前景来源帧",
+      "other_roles": "其余分支的实拍、Blender、负例与遮挡角色见各分支父份额及 v4_combination_plan 的相应来源池"
+    },
+    "matching_branch": {
+      "branch_id": "PHOTO-FULL",
+      "branch_pointer": "v4_combination_plan.branches[4]",
+      "background_parent_group": "junction_005",
+      "foreground_parent_group": "rotation_video",
+      "cross_share_field": "background_foreground_shares.junction_005.rotation_video",
+      "planned_cross_images": 170,
+      "bounded_candidate_combinations": 1,
+      "remaining_from_cross_share_if_one_generated": 169,
+      "full_branch_target_images": 700,
+      "remaining_from_full_branch_if_one_generated": 699,
+      "scope": "差额仅以本交付的一个组合比较，未对主计划其他输入逐图统计；一组仅有一构图，不把理论上界或候选当现成图片。"
+    },
+    "full_plan_sampling_policy": {
+      "scope": "主计划12个分支的设计规则；当前计划未实现跨父组自动抽样",
+      "parent_order": "先按各 branch 的 background_group_shares 和已声明的前景/交叉份额分别定预算；不将不同视频帧计为不同父组。",
+      "within_parent": "同一父组内对符合具体用途、区域与标签约束的候选成员按种子随机顺序选择；允许有任务相关变化的同视频代表帧。",
+      "combinations": "按分支允许的背景×前景×位置与遮挡搭配；去重后每个可区分画面计一次；不可行和未知不进入已支持容量。",
+      "seed": "单组固定选择，不随机抽源；当前入口须 --seed 1918。全量跨源抽样以1918作为计划种子，实际入口尚不执行此规则，运行时按实际记录。",
+      "shortfall": "不足时保留差额并另选合格来源，不以微小调色、重复帧或候选冒充 ready。",
+      "exclusions": "本任务 full_scene.mp4 父视频及其派生预留，训练任何角色均不抽取；不自动新建 val/test 份额。"
+    },
+    "unimplemented": "主计划中跨父来源抽样、普通杆干扰、其他掩膜和区域尚未按此规则接入入口；本次只落实唯一已核组合。"
+  }
+}

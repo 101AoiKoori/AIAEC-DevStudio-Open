@@ -1,0 +1,63 @@
+schema_version: 3
+task_id: fire
+model_key: fire_sticker
+version: v4
+task: detect
+data: datasets/exports/fire/fire_sticker_v4_candidate_entry_20261113/data.yaml
+data_overrides:
+  train:
+  - images: datasets/exports/fire/fire_sticker_v4_background_mix_20261113/images/train
+    labels: datasets/exports/fire/fire_sticker_v4_background_mix_20261113/labels/train
+    source_group: datasets/exports/fire/v4_integrated_candidates_20261112/fire_sticker/source_manifest.json
+  val:
+  - images: datasets/exports/fire/fire_sticker_v4_background_mix_20261113/images/val
+    labels: datasets/exports/fire/fire_sticker_v4_background_mix_20261113/labels/val
+    source_group: datasets/exports/fire/v4_integrated_candidates_20261112/fire_sticker/source_manifest.json
+  test:
+  - images: datasets/exports/fire/fire_sticker_v4_background_mix_20261113/images/test
+    labels: datasets/exports/fire/fire_sticker_v4_background_mix_20261113/labels/test
+    source_group: datasets/exports/fire/v4_integrated_candidates_20261112/fire_sticker/source_manifest.json
+model: runs/fire_sticker/runs/fire_sticker/v3_20261111_144145_539022/training/weights/best.pt
+output_root: runs/fire_sticker
+description: V4 火焰候选数据；红桶、灯具和车辆为干扰物，仅标火焰；最终测试为合成压力候选。
+imgsz: 640
+epochs: 16
+batch: 16
+workers: 0
+patience: 0
+seed: 42
+device: '0'
+optimizer: AdamW
+lr0: 0.0003
+lrf: 0.05
+momentum: 0.9
+weight_decay: 0.0005
+warmup_epochs: 1
+cos_lr: true
+close_mosaic: 0
+amp: false
+deterministic: true
+max_det: 100
+diagnostic_conf: 0.25
+match_iou: 0.5
+nms_iou: 0.7
+preview_limit: 48
+evaluate_after_training: true
+augment:
+  degrees: 3.0
+  translate: 0.05
+  scale: 0.18
+  shear: 0.0
+  perspective: 0.0
+  flipud: 0.0
+  fliplr: 0.0
+  mosaic: 0.0
+  mixup: 0.0
+  copy_paste: 0.0
+  hsv_h: 0.005
+  hsv_s: 0.1
+  hsv_v: 0.12
+source_notes:
+- '525 candidate images: 210 fitted Blender scene and 315 real backgrounds; train/val/test
+  405/60/60; paired tone variants share a split. Scene and physical assets are shared;
+  source gate passed; no training or evaluation.'

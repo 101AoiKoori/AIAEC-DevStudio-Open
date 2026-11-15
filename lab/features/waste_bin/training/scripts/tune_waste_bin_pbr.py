@@ -4,6 +4,7 @@ Run with Blender 5.2: blender -b SOURCE.blend --python-exit-code 1 --python
 THIS_SCRIPT -- NEW_OUTPUT_DIRECTORY. Source geometry, light and camera animation
 are retained; generated previews are for visual comparison, not dataset labels.
 """
+import argparse
 import sys
 from pathlib import Path
 
@@ -36,15 +37,15 @@ def plastic_microtexture(material, shader, roughness, distance):
     links.new(bump.outputs['Normal'], shader.inputs['Normal'])
 
 
-def main():
+def _generate():
     args = sys.argv[sys.argv.index('--') + 1:] if '--' in sys.argv else []
     if len(args) != 1:
         raise ValueError('Expected one new output directory')
     output = Path(args[0]).resolve()
     source = Path(bpy.data.filepath).resolve()
     workspace = Path.cwd().resolve()
-    if not source.is_relative_to(workspace) or not output.is_relative_to(workspace):
-        raise ValueError('Source and output must be inside the workspace')
+    if not source.is_relative_to(workspace) or not output.is_relative_to(workspace / 'datasets/assets/blender/waste_bin'):
+        raise ValueError('Source must be inside the workspace and output under datasets/assets/blender/waste_bin')
     if output.exists():
         raise FileExistsError(output)
     scene = bpy.context.scene
@@ -77,6 +78,38 @@ def main():
     scene.render.filepath = str(output / 'preview.png')
     bpy.ops.render.render(write_still=True)
     print('PBR_BIN_SAVED', output)
+
+
+def main():
+    raw = sys.argv[sys.argv.index('--') + 1:] if '--' in sys.argv else []
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('output', help='new output directory')
+    parser.parse_known_args(raw)
+    if bpy.data.is_dirty:
+        raise ValueError('save or discard scene changes before producing a guarded copy')
+    if len(raw) != 1:
+        raise ValueError('Expected one new output directory')
+    workspace = Path.cwd().resolve()
+    output, source = Path(raw[0]).resolve(), Path(bpy.data.filepath).resolve()
+    media = set()
+    for image in bpy.data.images:
+        if image.source == 'FILE':
+            if not image.filepath:
+                raise ValueError('scene image source path is missing')
+            path = Path(bpy.path.abspath(image.filepath)).resolve()
+            if path.is_file():
+                media.add(path)
+            else:
+                raise ValueError('scene image source missing: ' + str(path))
+    sys.path.insert(0, str(workspace))
+    from lab.training_common.production_guard import generation_guard
+    with generation_guard('waste_bin.tune_pbr:' + str(output.relative_to(workspace)),
+                          sorted(media), [output], {'argv': raw, 'blender_version': bpy.app.version_string},
+                          code_paths=[Path(__file__).resolve()],
+                          procedural_inputs=[source], root=workspace) as run:
+        if run.reused:
+            return
+        _generate()
 
 
 if __name__ == '__main__':

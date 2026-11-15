@@ -1,0 +1,385 @@
+{
+  "schema_version": 1,
+  "task": "person",
+  "batch": "toolchain_20261115",
+  "records": [
+    {
+      "id": "empty_candidate",
+      "image": "datasets/annotated/person/v4_multivideo_review_20261112/images/person_000201.png",
+      "source_kind": "direct_camera_capture",
+      "class_names": [
+        "community",
+        "noncommunity"
+      ],
+      "label_state": "confirmed_negative",
+      "review": {
+        "full_frame_checked": true,
+        "accepted_by": "aoi",
+        "box_accepted_by": null,
+        "method": "full_frame_semantic_review",
+        "evidence": "datasets/scripts/person/config/toolchain_review_acceptance.json"
+      },
+      "parent_sources": [
+        {
+          "path": "datasets/raw/site_capture_20261112/videos/person_standees.mp4",
+          "role": "camera_source",
+          "evidence": "datasets/annotated/person/v4_multivideo_review_20261112/review_manifest.json"
+        }
+      ],
+      "instances": []
+    },
+    {
+      "id": "real_composite_single",
+      "image": "datasets/annotated/person/teammate_real_scene_candidates_20261110/images/team_train_train_000401.jpg",
+      "source_kind": "real_image_composite",
+      "class_names": [
+        "community",
+        "noncommunity"
+      ],
+      "label_state": "complete",
+      "review": {
+        "full_frame_checked": true,
+        "accepted_by": "aoi",
+        "box_accepted_by": "Codex visual review",
+        "box_acceptance": "candidate",
+        "method": "full_frame_semantic_and_box_overlay_review",
+        "evidence": "datasets/scripts/person/config/toolchain_review_acceptance.json"
+      },
+      "parent_sources": [
+        {
+          "path": "datasets/raw/person/teammate_submission_20261110/dataset/backgrounds/bg_00206_f01193.jpg",
+          "role": "real_background"
+        },
+        {
+          "path": "datasets/raw/person/team_assets/非社区人员/F1.png",
+          "role": "target_source"
+        }
+      ],
+      "instances": [
+        {
+          "id": "person_1",
+          "class_id": 1,
+          "visibility": "full",
+          "visible_bbox_xyxy": [
+            389,
+            453,
+            550,
+            943
+          ],
+          "visibility_evidence": "datasets/annotated/person/teammate_real_scene_candidates_20261110/manifest.jsonl#record_index=0"
+        }
+      ]
+    },
+    {
+      "id": "direct_multi",
+      "image": "datasets/annotated/person/v4_multivideo_review_20261112/images/person_000401.png",
+      "source_kind": "direct_camera_capture",
+      "class_names": [
+        "community",
+        "noncommunity"
+      ],
+      "label_state": "complete",
+      "review": {
+        "full_frame_checked": true,
+        "accepted_by": "aoi",
+        "box_accepted_by": "Codex visual review",
+        "box_acceptance": "candidate",
+        "method": "full_frame_semantic_and_box_overlay_review",
+        "evidence": "datasets/scripts/person/config/toolchain_review_acceptance.json"
+      },
+      "parent_sources": [
+        {
+          "path": "datasets/raw/site_capture_20261112/videos/person_standees.mp4",
+          "role": "camera_source",
+          "evidence": "datasets/annotated/person/v4_multivideo_review_20261112/review_manifest.json"
+        }
+      ],
+      "instances": [
+        {
+          "id": "person_1",
+          "class_id": 0,
+          "visibility": "full",
+          "visible_bbox_xyxy": [
+            87,
+            69,
+            138,
+            217
+          ]
+        },
+        {
+          "id": "person_2",
+          "class_id": 0,
+          "visibility": "occluded",
+          "visible_bbox_xyxy": [
+            267,
+            64,
+            320,
+            216
+          ],
+          "visibility_evidence": "datasets/scripts/person/config/toolchain_review_acceptance.json"
+        },
+        {
+          "id": "person_3",
+          "class_id": 0,
+          "visibility": "occluded",
+          "visible_bbox_xyxy": [
+            333,
+            62,
+            383,
+            213
+          ],
+          "visibility_evidence": "datasets/scripts/person/config/toolchain_review_acceptance.json"
+        }
+      ]
+    },
+    {
+      "id": "direct_interference",
+      "image": "datasets/annotated/person/v4_multivideo_review_20261112/images/person_000601.png",
+      "source_kind": "direct_camera_capture",
+      "class_names": [
+        "community",
+        "noncommunity"
+      ],
+      "label_state": "complete",
+      "review": {
+        "full_frame_checked": true,
+        "accepted_by": "aoi",
+        "box_accepted_by": "Codex visual review",
+        "box_acceptance": "candidate",
+        "method": "full_frame_semantic_and_box_overlay_review",
+        "evidence": "datasets/scripts/person/config/toolchain_review_acceptance.json"
+      },
+      "parent_sources": [
+        {
+          "path": "datasets/raw/site_capture_20261112/videos/person_standees.mp4",
+          "role": "camera_source",
+          "evidence": "datasets/annotated/person/v4_multivideo_review_20261112/review_manifest.json"
+        }
+      ],
+      "instances": [
+        {
+          "id": "person_1",
+          "class_id": 0,
+          "visibility": "partial",
+          "visible_bbox_xyxy": [
+            315,
+            72,
+            370,
+            220
+          ],
+          "visibility_evidence": "datasets/annotated/person/v4_multivideo_review_20261112/review_manifest.json#record_index=2"
+        },
+        {
+          "id": "person_2",
+          "class_id": 0,
+          "visibility": "partial",
+          "visible_bbox_xyxy": [
+            390,
+            65,
+            453,
+            225
+          ],
+          "visibility_evidence": "datasets/annotated/person/v4_multivideo_review_20261112/review_manifest.json#record_index=2"
+        },
+        {
+          "id": "person_3",
+          "class_id": 0,
+          "visibility": "occluded",
+          "visible_bbox_xyxy": [
+            473,
+            69,
+            541,
+            232
+          ],
+          "visibility_evidence": "datasets/annotated/person/v4_multivideo_review_20261112/review_manifest.json#record_index=2"
+        }
+      ]
+    },
+    {
+      "id": "blender_raw_preview",
+      "image": "datasets/annotated/common/review/person/toolchain_20261115/blender_raw_preview.png",
+      "source_kind": "blender_render",
+      "class_names": [
+        "community",
+        "noncommunity"
+      ],
+      "label_state": "complete",
+      "review": {
+        "full_frame_checked": true,
+        "accepted_by": "programmatic_blender_generator",
+        "box_accepted_by": "programmatic_blender_generator",
+        "box_acceptance": "programmatic",
+        "method": "deterministic_instance_mask_and_scene_graph",
+        "evidence": "datasets/annotated/common/review/person/toolchain_20261115/blender_raw_preview_evidence.json"
+      },
+      "parent_sources": [
+        {
+          "path": "datasets/assets/blender/person/arena_person_user_master_working_20261113.blend",
+          "role": "blender_scene"
+        },
+        {
+          "path": "datasets/annotated/person/v4_whiteborder_textures_20261113/manifest.json",
+          "role": "texture_manifest"
+        }
+      ],
+      "instances": [
+        {
+          "id": "person_01",
+          "class_id": 0,
+          "visibility": "full",
+          "visible_bbox_xyxy": [
+            74,
+            178,
+            137,
+            309
+          ],
+          "full_bbox_xyxy": [
+            74,
+            178,
+            137,
+            309
+          ],
+          "visible_mask": "datasets/annotated/common/review/person/toolchain_20261115/blender_raw_preview_masks/blender_raw_preview_visible_01.png",
+          "full_mask": "datasets/annotated/common/review/person/toolchain_20261115/blender_raw_preview_masks/blender_raw_preview_full_01.png",
+          "occlusion_masks": [],
+          "ground_polygon": [
+            [
+              -311.505,
+              338.453
+            ],
+            [
+              951.505,
+              338.453
+            ],
+            [
+              626.493,
+              252.674
+            ],
+            [
+              13.507,
+              252.674
+            ]
+          ],
+          "contact_point": [
+            111.597,
+            309.29
+          ],
+          "mask_params": {
+            "hole_max": 0.02,
+            "border_max": 0.15,
+            "components_max": 3,
+            "border_margin_px": 2,
+            "subset_tolerance": 0.005,
+            "hidden_unexplained_max": 0.02,
+            "minimum_visible_fraction": 0.01
+          },
+          "visibility_evidence": "datasets/annotated/common/review/person/toolchain_20261115/blender_raw_preview_evidence.json"
+        },
+        {
+          "id": "person_02",
+          "class_id": 1,
+          "visibility": "full",
+          "visible_bbox_xyxy": [
+            226,
+            178,
+            272,
+            309
+          ],
+          "full_bbox_xyxy": [
+            226,
+            178,
+            272,
+            309
+          ],
+          "visible_mask": "datasets/annotated/common/review/person/toolchain_20261115/blender_raw_preview_masks/blender_raw_preview_visible_02.png",
+          "full_mask": "datasets/annotated/common/review/person/toolchain_20261115/blender_raw_preview_masks/blender_raw_preview_full_02.png",
+          "occlusion_masks": [],
+          "ground_polygon": [
+            [
+              -311.505,
+              338.453
+            ],
+            [
+              951.505,
+              338.453
+            ],
+            [
+              626.493,
+              252.674
+            ],
+            [
+              13.507,
+              252.674
+            ]
+          ],
+          "contact_point": [
+            250.532,
+            309.29
+          ],
+          "mask_params": {
+            "hole_max": 0.02,
+            "border_max": 0.15,
+            "components_max": 3,
+            "border_margin_px": 2,
+            "subset_tolerance": 0.005,
+            "hidden_unexplained_max": 0.02,
+            "minimum_visible_fraction": 0.01
+          },
+          "visibility_evidence": "datasets/annotated/common/review/person/toolchain_20261115/blender_raw_preview_evidence.json"
+        },
+        {
+          "id": "person_03",
+          "class_id": 0,
+          "visibility": "full",
+          "visible_bbox_xyxy": [
+            364,
+            178,
+            418,
+            309
+          ],
+          "full_bbox_xyxy": [
+            364,
+            178,
+            418,
+            309
+          ],
+          "visible_mask": "datasets/annotated/common/review/person/toolchain_20261115/blender_raw_preview_masks/blender_raw_preview_visible_03.png",
+          "full_mask": "datasets/annotated/common/review/person/toolchain_20261115/blender_raw_preview_masks/blender_raw_preview_full_03.png",
+          "occlusion_masks": [],
+          "ground_polygon": [
+            [
+              -311.505,
+              338.453
+            ],
+            [
+              951.505,
+              338.453
+            ],
+            [
+              626.493,
+              252.674
+            ],
+            [
+              13.507,
+              252.674
+            ]
+          ],
+          "contact_point": [
+            389.468,
+            309.29
+          ],
+          "mask_params": {
+            "hole_max": 0.02,
+            "border_max": 0.15,
+            "components_max": 3,
+            "border_margin_px": 2,
+            "subset_tolerance": 0.005,
+            "hidden_unexplained_max": 0.02,
+            "minimum_visible_fraction": 0.01
+          },
+          "visibility_evidence": "datasets/annotated/common/review/person/toolchain_20261115/blender_raw_preview_evidence.json"
+        }
+      ]
+    }
+  ]
+}

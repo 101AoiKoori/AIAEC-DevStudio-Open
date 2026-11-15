@@ -6,10 +6,16 @@ import argparse
 import json
 import math
 import shutil
+import sys
 from pathlib import Path
 import cv2
 import numpy as np
 from scipy.spatial.transform import Rotation
+
+ROOT = Path(__file__).resolve().parents[5]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+from lab.training_common.production_guard import generation_guard
 
 
 def projected_outline(sample):
@@ -38,11 +44,33 @@ def main():
     parser.add_argument('--partial',required=True,type=Path)
     parser.add_argument('--output',required=True,type=Path)
     args=parser.parse_args()
-    if args.output.exists():
-        parser.error('output exists; refusing to overwrite')
-    anim=json.loads((args.animation/'manifest.json').read_text(encoding='utf8'))
+    args.animation, args.partial, args.output = args.animation.resolve(), args.partial.resolve(), args.output.resolve()
+    animation_manifest = args.animation/'manifest.json'
+    animation_bytes = animation_manifest.read_bytes()
+    anim=json.loads(animation_bytes.decode('utf8'))
     if len(anim['samples']) != 17 or anim['render_resolution'] != [1024,1024]:
         raise ValueError('expected 17-frame 1024-square source animation')
+    chosen = list(range(0,9)) + [10,11,13,14]
+    images = [args.animation / anim['samples'][i]['file'] for i in chosen]
+    labels = [label for split in ('train','val','test')
+              for label in sorted((args.partial/'labels'/split).glob('*.txt'))]
+    images += [args.partial/'images'/label.parent.name/(label.stem+'.png') for label in labels]
+    procedural = [animation_manifest, *labels]
+    partial_manifest = args.partial/'manifest.json'
+    if partial_manifest.is_file():
+        procedural.append(partial_manifest)
+    with generation_guard('meter.prepare_rendered_sources:' + str(args.output.resolve()),
+                          images, [args.output], {'animation_indices': chosen},
+                          procedural_inputs=procedural, code_paths=[Path(__file__)]) as run:
+        if animation_manifest.read_bytes() != animation_bytes:
+            raise ValueError('animation manifest changed during input enumeration')
+        if run.reused:
+            print('REUSED', args.output)
+            return
+        _produce(args, anim, run.source_refs, labels)
+
+
+def _produce(args, anim, source_refs, labels):
     args.output.mkdir(parents=True)
     (args.output/'images').mkdir();(args.output/'labels').mkdir()
     records=[]
@@ -68,7 +96,7 @@ def main():
         records.append({'id':name,'split':split,'origin':'animation_frame','frame':sample['frame'],
                         'source':str(source.resolve()),'endpoint_status':'estimated projected endpoints'})
     for split in ('train','val','test'):
-        for label in sorted((args.partial/'labels'/split).glob('*.txt')):
+        for label in (item for item in labels if item.parent.name == split):
             image=args.partial/'images'/split/(label.stem+'.png')
             tokens=label.read_text(encoding='utf8').split()
             if not image.is_file() or len(tokens)!=29 or any(float(tokens[7+3*k])!=0 for k in range(4,8)):
@@ -81,6 +109,7 @@ def main():
     if len(records)<30 or len({r['id'] for r in records})!=len(records):
         raise ValueError('not enough unique rendered sources')
     manifest={'purpose':'Rendered meter bases for OpenCV augmentation; no new Blender rendering',
+              'input_source_refs':source_refs,
               'keypoint_order':['temperature_pivot','temperature_tip','humidity_pivot','humidity_tip',
                                 'temperature_min','temperature_max','humidity_min','humidity_max'],
               'split_policy':'prior random-render split; all frames from the single animation are train only',

@@ -1,0 +1,713 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-11-15T20:28:53+08:00",
+  "kind": "manual_review_acceptance",
+  "task": "person",
+  "batch": "toolchain_20261115",
+  "status": "accepted",
+  "source_review": "datasets/annotated/common/review/person/toolchain_20261115/manual_review.json",
+  "source_sha256": "10482abe8481f0b1b27c840a91dd5c57447d32267d6c61e551ee599341672a91",
+  "source_digest_scope": "SHA-256 of the accepted source-review bytes at this acceptance time.",
+  "source_normalization": null,
+  "recovered_from": {
+    "acceptance": "datasets/scripts/person/config/toolchain_review_acceptance.json",
+    "acceptance_source_sha256": "49b80f5d432e8c29f71a1b45a9e0ed5d76d85cd0f2fb3c18ab11a4fe737c9084",
+    "method": "acceptance panels plus current item metadata; no box coordinates inferred"
+  },
+  "object_matrix_columns": {
+    "row_id": "本图内稳定行标识，例如 obj_001",
+    "left_to_right_order": "从左到右顺序；不确定时为 null",
+    "category": "community_person / noncommunity_person / person_standee_back / person_standee_nonfront / vehicle / other / unknown",
+    "view": "front / back / side / oblique / unknown",
+    "visibility": "full / partial / cropped / occluded / unknown",
+    "occluder": "none / person / vehicle / object / unknown",
+    "is_task_target": "true / false / null",
+    "annotation_action": "label_visible_box / hard_negative_no_box / do_not_label / unknown",
+    "visible_bbox_xyxy": "只覆盖可见区域的像素框 [x1,y1,x2,y2]；不输出框时为 null",
+    "full_bbox_xyxy": "有完整实体依据时的像素框 [x1,y1,x2,y2]；没有依据时为 null",
+    "box_accepted_by": "实际确认这些框的人员；程序化生成值只能进入自动验证层",
+    "notes": "遮挡、截断、类别疑点或证据说明"
+  },
+  "items": [
+    {
+      "id": "empty_candidate",
+      "image": "datasets/annotated/person/v4_multivideo_review_20261112/images/person_000201.png",
+      "source_kind": "direct_camera_capture",
+      "content_branches": [
+        "empty"
+      ],
+      "questions": [
+        "全图是否还有未列出的任务目标？",
+        "每个目标的类别和状态是否正确？",
+        "可见框是否只包含可见区域，遮挡关系是否记录？",
+        "来源父图/视频、生成方式与现有证据是否一致？"
+      ],
+      "status_matrix": {
+        "presence": "none",
+        "task_target_count": 0,
+        "background_state": "confirmed_empty",
+        "objects": [],
+        "other_objects": [],
+        "reviewer": "aoi",
+        "full_frame_checked": true,
+        "notes": "已逐处确认没有社区或非社区正面人物目标",
+        "accepted_by": "aoi",
+        "review_state": "confirmed"
+      },
+      "class_names": null,
+      "parent_sources": [
+        {
+          "path": "datasets/raw/site_capture_20261112/videos/person_standees.mp4",
+          "role": "camera_source"
+        },
+        {
+          "path": "datasets/annotated/person/v4_multivideo_review_20261112/review_manifest.json",
+          "role": "review_evidence"
+        }
+      ],
+      "evidence": {
+        "review_manifest": "datasets/annotated/person/v4_multivideo_review_20261112/review_manifest.json",
+        "record_index": 0
+      }
+    },
+    {
+      "id": "real_composite_single",
+      "image": "datasets/annotated/person/teammate_real_scene_candidates_20261110/images/team_train_train_000401.jpg",
+      "source_kind": "real_image_composite",
+      "content_branches": [
+        "single"
+      ],
+      "questions": [
+        "全图是否还有未列出的任务目标？",
+        "每个目标的类别和状态是否正确？",
+        "可见框是否只包含可见区域，遮挡关系是否记录？",
+        "来源父图/视频、生成方式与现有证据是否一致？"
+      ],
+      "status_matrix": {
+        "image_role": "single_frame",
+        "presence": "single",
+        "task_target_count": 1,
+        "background_state": "contains_target",
+        "objects": [
+          {
+            "row_id": "obj_001",
+            "left_to_right_order": 1,
+            "category": "noncommunity_person",
+            "view": "front",
+            "visibility": "full",
+            "occluder": "none",
+            "is_task_target": true,
+            "annotation_action": "label_visible_box",
+            "notes": "已逐处确认是非社区正面人物目标",
+            "visible_bbox_xyxy": null,
+            "full_bbox_xyxy": null,
+            "box_accepted_by": null
+          }
+        ],
+        "other_objects": [],
+        "reviewer": "aoi",
+        "full_frame_checked": true,
+        "notes": null,
+        "accepted_by": "aoi",
+        "review_state": "confirmed"
+      },
+      "class_names": null,
+      "parent_sources": [
+        {
+          "path": "datasets/raw/person/teammate_submission_20261110/dataset/backgrounds/bg_00206_f01193.jpg",
+          "role": "real_background"
+        },
+        {
+          "path": "datasets/raw/person/team_assets/非社区人员/F1.png",
+          "role": "target_source"
+        },
+        {
+          "path": "datasets/annotated/person/teammate_real_scene_candidates_20261110/manifest.jsonl",
+          "role": "generation_manifest"
+        }
+      ],
+      "evidence": {
+        "label": "datasets/annotated/person/teammate_real_scene_candidates_20261110/labels/team_train_train_000401.txt",
+        "record_index": 0
+      }
+    },
+    {
+      "id": "direct_multi",
+      "image": "datasets/annotated/person/v4_multivideo_review_20261112/images/person_000401.png",
+      "source_kind": "direct_camera_capture",
+      "content_branches": [
+        "multi"
+      ],
+      "questions": [
+        "全图是否还有未列出的任务目标？",
+        "每个目标的类别和状态是否正确？",
+        "可见框是否只包含可见区域，遮挡关系是否记录？",
+        "来源父图/视频、生成方式与现有证据是否一致？"
+      ],
+      "status_matrix": {
+        "image_role": "single_frame",
+        "presence": "multi",
+        "task_target_count": 3,
+        "background_state": "contains_target",
+        "objects": [
+          {
+            "row_id": "obj_001",
+            "left_to_right_order": 1,
+            "category": "community_person",
+            "view": "front",
+            "visibility": "full",
+            "occluder": "none",
+            "is_task_target": true,
+            "annotation_action": "label_visible_box",
+            "notes": "已逐处确认是社区正面人物目标",
+            "visible_bbox_xyxy": null,
+            "full_bbox_xyxy": null,
+            "box_accepted_by": null
+          },
+          {
+            "row_id": "obj_002",
+            "left_to_right_order": 2,
+            "category": "person_standee_back",
+            "view": "back",
+            "visibility": "full",
+            "occluder": "none",
+            "is_task_target": false,
+            "annotation_action": "hard_negative_no_box",
+            "notes": "已逐处确认是人物白色背面",
+            "visible_bbox_xyxy": null,
+            "full_bbox_xyxy": null,
+            "box_accepted_by": null
+          },
+          {
+            "row_id": "obj_003",
+            "left_to_right_order": 3,
+            "category": "community_person",
+            "view": "front",
+            "visibility": "occluded",
+            "occluder": "vehicle",
+            "is_task_target": true,
+            "annotation_action": "label_visible_box",
+            "notes": "已逐处确认是社区正面人物目标，腿部被直立电动车遮挡一部分，但人又刚好从电动车的中间部分透出来了",
+            "visible_bbox_xyxy": null,
+            "full_bbox_xyxy": null,
+            "box_accepted_by": null
+          },
+          {
+            "row_id": "obj_004",
+            "left_to_right_order": 4,
+            "category": "community_person",
+            "view": "front",
+            "visibility": "occluded",
+            "occluder": "vehicle",
+            "is_task_target": true,
+            "annotation_action": "label_visible_box",
+            "notes": "已逐处确认是社区正面人物目标，下半身被直立电动车遮挡",
+            "visible_bbox_xyxy": null,
+            "full_bbox_xyxy": null,
+            "box_accepted_by": null
+          },
+          {
+            "row_id": "obj_005",
+            "left_to_right_order": 5,
+            "category": "person_standee_back",
+            "view": "back",
+            "visibility": "full",
+            "occluder": "none",
+            "is_task_target": false,
+            "annotation_action": "hard_negative_no_box",
+            "notes": "已逐处确认是人物白色背面",
+            "visible_bbox_xyxy": null,
+            "full_bbox_xyxy": null,
+            "box_accepted_by": null
+          },
+          {
+            "row_id": "obj_006",
+            "left_to_right_order": 6,
+            "category": "person_standee_nonfront",
+            "view": "side",
+            "visibility": "full",
+            "occluder": "none",
+            "is_task_target": false,
+            "annotation_action": "hard_negative_no_box",
+            "notes": "薄侧边视角人物立牌",
+            "visible_bbox_xyxy": null,
+            "full_bbox_xyxy": null,
+            "box_accepted_by": null
+          },
+          {
+            "row_id": "obj_007",
+            "left_to_right_order": 7,
+            "category": "person_standee_nonfront",
+            "view": "side",
+            "visibility": "full",
+            "occluder": "none",
+            "is_task_target": false,
+            "annotation_action": "hard_negative_no_box",
+            "notes": "薄侧边视角人物立牌",
+            "visible_bbox_xyxy": null,
+            "full_bbox_xyxy": null,
+            "box_accepted_by": null
+          },
+          {
+            "row_id": "obj_008",
+            "left_to_right_order": 8,
+            "category": "person_standee_nonfront",
+            "view": "side",
+            "visibility": "full",
+            "occluder": "none",
+            "is_task_target": false,
+            "annotation_action": "hard_negative_no_box",
+            "notes": "薄侧边视角人物立牌",
+            "visible_bbox_xyxy": null,
+            "full_bbox_xyxy": null,
+            "box_accepted_by": null
+          }
+        ],
+        "other_objects": [
+          {
+            "row_id": "other_001",
+            "left_to_right_order": null,
+            "category": "vehicle",
+            "view": "side",
+            "visibility": "full",
+            "occluder": "none",
+            "is_task_target": false,
+            "annotation_action": "do_not_label",
+            "notes": "直立电动车，遮挡第3和第4个正面人物的部分腿部",
+            "visible_bbox_xyxy": null,
+            "full_bbox_xyxy": null,
+            "box_accepted_by": null
+          }
+        ],
+        "reviewer": "aoi",
+        "full_frame_checked": true,
+        "notes": null,
+        "accepted_by": "aoi",
+        "review_state": "confirmed"
+      },
+      "class_names": null,
+      "parent_sources": [
+        {
+          "path": "datasets/raw/site_capture_20261112/videos/person_standees.mp4",
+          "role": "camera_source"
+        },
+        {
+          "path": "datasets/annotated/person/v4_multivideo_review_20261112/review_manifest.json",
+          "role": "review_evidence"
+        }
+      ],
+      "evidence": {
+        "label": "datasets/annotated/person/v4_multivideo_review_20261112/labels/person_000401.txt",
+        "record_index": 1
+      }
+    },
+    {
+      "id": "direct_interference",
+      "image": "datasets/annotated/person/v4_multivideo_review_20261112/images/person_000601.png",
+      "source_kind": "direct_camera_capture",
+      "content_branches": [
+        "multi",
+        "interference"
+      ],
+      "questions": [
+        "全图是否还有未列出的任务目标？",
+        "每个目标的类别和状态是否正确？",
+        "可见框是否只包含可见区域，遮挡关系是否记录？",
+        "来源父图/视频、生成方式与现有证据是否一致？"
+      ],
+      "status_matrix": {
+        "image_role": "single_frame",
+        "presence": "multi",
+        "task_target_count": 3,
+        "background_state": "contains_target",
+        "objects": [
+          {
+            "row_id": "obj_001",
+            "left_to_right_order": 1,
+            "category": "community_person",
+            "view": "front",
+            "visibility": "partial",
+            "occluder": "vehicle",
+            "is_task_target": true,
+            "annotation_action": "label_visible_box",
+            "notes": "已逐处确认是社区正面人物目标，腿部被倒伏电动车遮挡",
+            "visible_bbox_xyxy": null,
+            "full_bbox_xyxy": null,
+            "box_accepted_by": null
+          },
+          {
+            "row_id": "obj_002",
+            "left_to_right_order": 2,
+            "category": "community_person",
+            "view": "front",
+            "visibility": "partial",
+            "occluder": "vehicle",
+            "is_task_target": true,
+            "annotation_action": "label_visible_box",
+            "notes": "已逐处确认是社区正面人物目标，腿部被倒伏电动车遮挡",
+            "visible_bbox_xyxy": null,
+            "full_bbox_xyxy": null,
+            "box_accepted_by": null
+          },
+          {
+            "row_id": "obj_003",
+            "left_to_right_order": 3,
+            "category": "community_person",
+            "view": "front",
+            "visibility": "occluded",
+            "occluder": "vehicle",
+            "is_task_target": true,
+            "annotation_action": "label_visible_box",
+            "notes": "已逐处确认是社区正面人物目标，腿部被倒伏电动车遮挡",
+            "visible_bbox_xyxy": null,
+            "full_bbox_xyxy": null,
+            "box_accepted_by": null
+          },
+          {
+            "row_id": "obj_004",
+            "left_to_right_order": null,
+            "category": "person_standee_back",
+            "view": "back",
+            "visibility": "full",
+            "occluder": "none",
+            "is_task_target": false,
+            "annotation_action": "hard_negative_no_box",
+            "notes": "人物后面的白色背面立牌，不输出人物框",
+            "visible_bbox_xyxy": null,
+            "full_bbox_xyxy": null,
+            "box_accepted_by": null
+          }
+        ],
+        "other_objects": [
+          {
+            "row_id": "other_001",
+            "left_to_right_order": null,
+            "category": "vehicle",
+            "view": "side",
+            "visibility": "full",
+            "occluder": "none",
+            "is_task_target": false,
+            "annotation_action": "do_not_label",
+            "notes": "倒伏电动车，遮挡三个正面人物的腿部",
+            "visible_bbox_xyxy": null,
+            "full_bbox_xyxy": null,
+            "box_accepted_by": null
+          }
+        ],
+        "reviewer": "aoi",
+        "full_frame_checked": true,
+        "notes": null,
+        "accepted_by": "aoi",
+        "review_state": "confirmed"
+      },
+      "class_names": null,
+      "parent_sources": [
+        {
+          "path": "datasets/raw/site_capture_20261112/videos/person_standees.mp4",
+          "role": "camera_source"
+        },
+        {
+          "path": "datasets/annotated/person/v4_multivideo_review_20261112/review_manifest.json",
+          "role": "review_evidence"
+        }
+      ],
+      "evidence": {
+        "record_index": 2
+      }
+    },
+    {
+      "id": "blender_overlay_candidate",
+      "image": "datasets/annotated/person/v4_user_master_88_sample_overlay_20261113.jpg",
+      "source_kind": "blender_render",
+      "content_branches": [
+        "multi"
+      ],
+      "questions": [
+        "全图是否还有未列出的任务目标？",
+        "每个目标的类别和状态是否正确？",
+        "可见框是否只包含可见区域，遮挡关系是否记录？",
+        "来源父图/视频、生成方式与现有证据是否一致？"
+      ],
+      "status_matrix": {
+        "image_role": "contact_sheet",
+        "panels": [
+          {
+            "panel_id": "row1_col1",
+            "source_name": "images/a_person_arena_00001.png original",
+            "presence": "multi",
+            "task_target_count": 3,
+            "background_state": "contains_target",
+            "objects": [
+              {
+                "row_id": "obj_001",
+                "left_to_right_order": 1,
+                "category": "community_person",
+                "view": "front",
+                "visibility": "full",
+                "occluder": "none",
+                "is_task_target": true,
+                "annotation_action": "label_visible_box",
+                "notes": "已逐处确认是社区正面人物目标",
+                "visible_bbox_xyxy": null,
+                "full_bbox_xyxy": null,
+                "box_accepted_by": null
+              },
+              {
+                "row_id": "obj_002",
+                "left_to_right_order": 2,
+                "category": "noncommunity_person",
+                "view": "front",
+                "visibility": "full",
+                "occluder": "none",
+                "is_task_target": true,
+                "annotation_action": "label_visible_box",
+                "notes": "已逐处确认是非社区正面人物目标",
+                "visible_bbox_xyxy": null,
+                "full_bbox_xyxy": null,
+                "box_accepted_by": null
+              },
+              {
+                "row_id": "obj_003",
+                "left_to_right_order": 3,
+                "category": "person_standee_back",
+                "view": "back",
+                "visibility": "full",
+                "occluder": "none",
+                "is_task_target": false,
+                "annotation_action": "hard_negative_no_box",
+                "notes": "已逐处确认是人物白色背面",
+                "visible_bbox_xyxy": null,
+                "full_bbox_xyxy": null,
+                "box_accepted_by": null
+              },
+              {
+                "row_id": "obj_004",
+                "left_to_right_order": 4,
+                "category": "community_person",
+                "view": "front",
+                "visibility": "full",
+                "occluder": "none",
+                "is_task_target": true,
+                "annotation_action": "label_visible_box",
+                "notes": "已逐处确认是社区正面人物目标",
+                "visible_bbox_xyxy": null,
+                "full_bbox_xyxy": null,
+                "box_accepted_by": null
+              }
+            ],
+            "other_objects": [],
+            "reviewer": "aoi",
+            "full_frame_checked": true,
+            "notes": null,
+            "accepted_by": "aoi",
+            "review_state": "confirmed"
+          },
+          {
+            "panel_id": "row1_col2",
+            "source_name": "images/b_person_arena_00013.png moderate",
+            "presence": "multi",
+            "task_target_count": 3,
+            "background_state": "contains_target",
+            "objects": [
+              {
+                "row_id": "obj_001",
+                "left_to_right_order": 1,
+                "category": "noncommunity_person",
+                "view": "front",
+                "visibility": "full",
+                "occluder": "none",
+                "is_task_target": true,
+                "annotation_action": "label_visible_box",
+                "notes": "已逐处确认是非社区正面人物目标",
+                "visible_bbox_xyxy": null,
+                "full_bbox_xyxy": null,
+                "box_accepted_by": null
+              },
+              {
+                "row_id": "obj_002",
+                "left_to_right_order": 2,
+                "category": "community_person",
+                "view": "front",
+                "visibility": "full",
+                "occluder": "none",
+                "is_task_target": true,
+                "annotation_action": "label_visible_box",
+                "notes": "已逐处确认是社区正面人物目标",
+                "visible_bbox_xyxy": null,
+                "full_bbox_xyxy": null,
+                "box_accepted_by": null
+              },
+              {
+                "row_id": "obj_003",
+                "left_to_right_order": 3,
+                "category": "noncommunity_person",
+                "view": "front",
+                "visibility": "full",
+                "occluder": "none",
+                "is_task_target": true,
+                "annotation_action": "label_visible_box",
+                "notes": "已逐处确认是非社区正面人物目标",
+                "visible_bbox_xyxy": null,
+                "full_bbox_xyxy": null,
+                "box_accepted_by": null
+              },
+              {
+                "row_id": "obj_004",
+                "left_to_right_order": 4,
+                "category": "person_standee_back",
+                "view": "back",
+                "visibility": "full",
+                "occluder": "none",
+                "is_task_target": false,
+                "annotation_action": "hard_negative_no_box",
+                "notes": "已逐处确认是人物白色背面",
+                "visible_bbox_xyxy": null,
+                "full_bbox_xyxy": null,
+                "box_accepted_by": null
+              }
+            ],
+            "other_objects": [],
+            "reviewer": "aoi",
+            "full_frame_checked": true,
+            "notes": null,
+            "accepted_by": "aoi",
+            "review_state": "confirmed"
+          },
+          {
+            "panel_id": "row2_col1",
+            "source_name": "images/c_person_arena_00025.png mild",
+            "presence": "multi",
+            "task_target_count": 3,
+            "background_state": "contains_target",
+            "objects": [
+              {
+                "row_id": "obj_001",
+                "left_to_right_order": 1,
+                "category": "noncommunity_person",
+                "view": "front",
+                "visibility": "full",
+                "occluder": "none",
+                "is_task_target": true,
+                "annotation_action": "label_visible_box",
+                "notes": "已逐处确认是非社区正面人物目标",
+                "visible_bbox_xyxy": null,
+                "full_bbox_xyxy": null,
+                "box_accepted_by": null
+              },
+              {
+                "row_id": "obj_002",
+                "left_to_right_order": 2,
+                "category": "community_person",
+                "view": "front",
+                "visibility": "full",
+                "occluder": "none",
+                "is_task_target": true,
+                "annotation_action": "label_visible_box",
+                "notes": "已逐处确认是社区正面人物目标",
+                "visible_bbox_xyxy": null,
+                "full_bbox_xyxy": null,
+                "box_accepted_by": null
+              },
+              {
+                "row_id": "obj_003",
+                "left_to_right_order": 3,
+                "category": "community_person",
+                "view": "front",
+                "visibility": "full",
+                "occluder": "none",
+                "is_task_target": true,
+                "annotation_action": "label_visible_box",
+                "notes": "已逐处确认是社区正面人物目标",
+                "visible_bbox_xyxy": null,
+                "full_bbox_xyxy": null,
+                "box_accepted_by": null
+              },
+              {
+                "row_id": "obj_004",
+                "left_to_right_order": 4,
+                "category": "person_standee_back",
+                "view": "back",
+                "visibility": "full",
+                "occluder": "none",
+                "is_task_target": false,
+                "annotation_action": "hard_negative_no_box",
+                "notes": "已逐处确认是人物白色背面",
+                "visible_bbox_xyxy": null,
+                "full_bbox_xyxy": null,
+                "box_accepted_by": null
+              }
+            ],
+            "other_objects": [],
+            "reviewer": "aoi",
+            "full_frame_checked": true,
+            "notes": null,
+            "accepted_by": "aoi",
+            "review_state": "confirmed"
+          }
+        ],
+        "reviewer": "aoi",
+        "notes": null,
+        "accepted_by": "aoi"
+      },
+      "class_names": null,
+      "parent_sources": [
+        {
+          "path": "datasets/assets/blender/shared/arena_4m2_pbr_20261112/arena_indoor_detailed.blend",
+          "role": "blender_scene"
+        },
+        {
+          "path": "datasets/annotated/person/v4_user_master_88_structure_audit_20261113.json",
+          "role": "render_evidence"
+        }
+      ],
+      "evidence": {
+        "structure_audit": "datasets/annotated/person/v4_user_master_88_structure_audit_20261113.json",
+        "note": "这是叠图候选，不是原始渲染图或训练样本；原始预览证据单独记录在 blender_raw_preview。"
+      }
+    }
+  ],
+  "status_layers": {
+    "source/available": {
+      "frames": 7,
+      "definition": "review units declared by the current manual package"
+    },
+    "annotated": {
+      "frames": 7
+    },
+    "candidate": {
+      "frames": 6,
+      "instances": 27,
+      "label_action_boxes": 16
+    },
+    "auto_validated": {
+      "frames": 0,
+      "box_instances": 0,
+      "automatic_acceptors": [
+        "Codex visual review",
+        "programmatic_blender_generator"
+      ]
+    },
+    "human_confirmed": {
+      "frames": 7,
+      "positive_frames": 6,
+      "negative_frames": 1,
+      "box_instances": 0,
+      "semantic_and_box_rule": "accepted_by confirms semantics; box_accepted_by must name a human for a confirmed box"
+    },
+    "training_admitted": {
+      "frames": 0,
+      "box_instances": 0,
+      "status": "not_recorded",
+      "reason": "manual review does not grant training admission"
+    },
+    "pending": {
+      "frames": 0,
+      "label_action_boxes": 16
+    },
+    "rejected_or_excluded": {
+      "frames": 0,
+      "rule": "count only explicit review_state with failure evidence"
+    }
+  },
+  "boundary": "This records human semantic review only. Detector box coordinates, masks, raw Blender render status and training eligibility remain separate fields. accepted_by records semantic confirmation; box_accepted_by records box confirmation; programmatic values do not populate the human layer."
+}

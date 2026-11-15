@@ -4,6 +4,7 @@ This is a heuristic screen for the selected synthetic dial, not a guarantee
 that each printed tick is readable. Original images and labels are never changed.
 """
 import argparse
+import sys
 import json
 from collections import Counter
 from pathlib import Path
@@ -15,6 +16,10 @@ TICK_MIN=35.0
 NEEDLE_MIN=35.0
 HUMIDITY_TICK_MIN=25.0
 
+
+ROOT = Path(__file__).resolve().parents[5]
+sys.path.insert(0, str(ROOT))
+from lab.training_common.production_guard import generation_guard
 
 def needle_contrast(gray, row, index):
     height,width=gray.shape
@@ -42,13 +47,8 @@ def radial_points(angles, center=(623,646), radius=520):
                             center[1]-radius*np.sin(np.deg2rad(angles))))
 
 
-def main():
-    ap=argparse.ArgumentParser(description=__doc__)
-    ap.add_argument('--sources',required=True,type=Path)
-    ap.add_argument('--face',required=True,type=Path)
-    args=ap.parse_args()
+def _execute(args, manifest):
     source_path=(args.sources/'manifest.json').resolve()
-    manifest=json.loads(source_path.read_text(encoding='utf8'))
     face=cv2.imread(str(args.face),cv2.IMREAD_GRAYSCALE)
     if face is None or face.shape!=(1254,1254):
         raise ValueError('expected selected 1254px synthetic face')
@@ -122,6 +122,26 @@ def main():
             'samples':records}
     (args.sources/'quality_report.json').write_text(json.dumps(report,ensure_ascii=False,indent=2)+'\n',encoding='utf8')
     print('SOURCE_QUALITY_READY',len(records),'eligible',dict(eligible),'rejected',sum(not r['eligible'] for r in records))
+
+
+def main():
+    ap=argparse.ArgumentParser(description=__doc__)
+    ap.add_argument('--sources',required=True,type=Path)
+    ap.add_argument('--face',required=True,type=Path)
+    args=ap.parse_args(); args.sources=args.sources.resolve(); args.face=args.face.resolve()
+    manifest=args.sources/'manifest.json'
+    frozen=json.loads(manifest.read_text(encoding='utf8')); records=frozen['samples']
+    images=[args.sources/'images'/(r['id']+'.png') for r in records]
+    labels=[args.sources/'labels'/(r['id']+'.txt') for r in records]
+    output=args.sources/'quality_report.json'
+    with generation_guard('meter.audit_source_quality:'+args.sources.relative_to(ROOT).as_posix(),
+                          [args.face,*images], [output], {}, code_paths=[Path(__file__)],
+                          procedural_inputs=[manifest,*labels], root=ROOT) as run:
+        if run.reused:
+            print('REUSED', output); return
+        if json.loads(manifest.read_text(encoding='utf8')) != frozen:
+            raise RuntimeError('source manifest changed before execution')
+        _execute(args, frozen)
 
 
 if __name__=='__main__':

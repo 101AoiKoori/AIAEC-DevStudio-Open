@@ -1,0 +1,6532 @@
+{
+  "schema_version": 1,
+  "model_key": "person",
+  "target_split": "train",
+  "purpose": "Current bounded person batch with B6 reviewed background dispatch; foreground and label scope remain as declared per state.",
+  "budget": 36,
+  "uncertainty_weight": 0,
+  "independence_basis": "Three time-separated frames share full_scene.mp4. Foregrounds retain two artwork parents and two distinct vehicle videos; no independent capture claim.",
+  "constraints": {
+    "foreground": "planned_actors",
+    "identity": "front_visible",
+    "background": "complete_existing_or_empty"
+  },
+  "strata": [
+    {
+      "id": "frame_001201_community_none_tone0",
+      "failure_event": "person_unoccluded",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 3
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [],
+      "background": {
+        "role": "reviewed_background",
+        "manifest": "datasets/scripts/person/config/background_dispatch.json",
+        "record_index": 0,
+        "image": "datasets/raw/person/teammate_submission_20261110/dataset/backgrounds/bg_00057_f00209.jpg"
+      },
+      "target": {
+        "actors": [
+          {
+            "id": "person_added",
+            "kind": "person",
+            "source": "datasets/annotated/person/v4_whiteborder_textures_20261113/community_1.png",
+            "source_role": "foreground_texture",
+            "source_record": {
+              "manifest": "datasets/annotated/person/v4_whiteborder_textures_20261113/manifest.json",
+              "record_index": 0
+            },
+            "view": "front",
+            "category": "community",
+            "identity": "1",
+            "identity_evidence": "datasets/annotated/person/v4_whiteborder_textures_20261113/manifest.json:record_index=0; AI visual design region head and upper clothing",
+            "identity_region_xyxy": [
+              18,
+              12,
+              118,
+              170
+            ],
+            "min_identity_visible": 0.9,
+            "foot_xy": [
+              320,
+              287
+            ],
+            "contact_width": 20,
+            "size_wh": [
+              69,
+              150
+            ],
+            "angles_degrees": {
+              "yaw": -4,
+              "pitch": 0,
+              "roll": 0
+            }
+          }
+        ]
+      },
+      "labels": {
+        "person": "existing_and_new_visible_yolo",
+        "white_back": "not_labeled"
+      },
+      "augmentation": {
+        "value_gain": 1.0,
+        "saturation_gain": 1.0
+      },
+      "parameters": {
+        "resolution": [
+          640,
+          360
+        ],
+        "ground_polygon": [
+          [
+            0,
+            269
+          ],
+          [
+            639,
+            269
+          ],
+          [
+            639,
+            359
+          ],
+          [
+            0,
+            359
+          ]
+        ],
+        "obstacle_polygons": [],
+        "required_overlaps": []
+      },
+      "sources": [
+        "Archive/Assets/场景/综合视频/空场与场景物料_001.mp4",
+        "datasets/annotated/person/v4_whiteborder_textures_20261113/community_1.png",
+        "datasets/raw/person/team_assets/社区人员/1.png",
+        "datasets/raw/person/teammate_submission_20261110/dataset/backgrounds/bg_00057_f00209.jpg"
+      ]
+    },
+    {
+      "id": "frame_001201_community_none_tone1",
+      "failure_event": "person_unoccluded",
+      "min_count": 0,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 3
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [],
+      "background": {
+        "role": "reviewed_background",
+        "manifest": "datasets/scripts/person/config/background_dispatch.json",
+        "record_index": 1,
+        "image": "datasets/raw/person/teammate_submission_20261110/dataset/backgrounds/bg_00086_f00359.jpg"
+      },
+      "target": {
+        "actors": [
+          {
+            "id": "person_added",
+            "kind": "person",
+            "source": "datasets/annotated/person/v4_whiteborder_textures_20261113/community_1.png",
+            "source_role": "foreground_texture",
+            "source_record": {
+              "manifest": "datasets/annotated/person/v4_whiteborder_textures_20261113/manifest.json",
+              "record_index": 0
+            },
+            "view": "front",
+            "category": "community",
+            "identity": "1",
+            "identity_evidence": "datasets/annotated/person/v4_whiteborder_textures_20261113/manifest.json:record_index=0; AI visual design region head and upper clothing",
+            "identity_region_xyxy": [
+              18,
+              12,
+              118,
+              170
+            ],
+            "min_identity_visible": 0.9,
+            "foot_xy": [
+              320,
+              302
+            ],
+            "contact_width": 20,
+            "size_wh": [
+              69,
+              150
+            ],
+            "angles_degrees": {
+              "yaw": 0,
+              "pitch": 0,
+              "roll": 0
+            }
+          }
+        ]
+      },
+      "labels": {
+        "person": "existing_and_new_visible_yolo",
+        "white_back": "not_labeled"
+      },
+      "augmentation": {
+        "value_gain": 0.88,
+        "saturation_gain": 0.82
+      },
+      "parameters": {
+        "resolution": [
+          640,
+          360
+        ],
+        "ground_polygon": [
+          [
+            0,
+            293
+          ],
+          [
+            639,
+            293
+          ],
+          [
+            639,
+            359
+          ],
+          [
+            0,
+            359
+          ]
+        ],
+        "obstacle_polygons": [],
+        "required_overlaps": []
+      },
+      "sources": [
+        "Archive/Assets/场景/综合视频/空场与场景物料_001.mp4",
+        "datasets/annotated/person/v4_whiteborder_textures_20261113/community_1.png",
+        "datasets/raw/person/team_assets/社区人员/1.png",
+        "datasets/raw/person/teammate_submission_20261110/dataset/backgrounds/bg_00086_f00359.jpg"
+      ]
+    },
+    {
+      "id": "frame_001201_community_none_tone2",
+      "failure_event": "person_unoccluded",
+      "min_count": 0,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 3
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [],
+      "background": {
+        "role": "reviewed_background",
+        "manifest": "datasets/scripts/person/config/background_dispatch.json",
+        "record_index": 2,
+        "image": "datasets/raw/person/teammate_submission_20261110/dataset/backgrounds/bg_00146_f00749.jpg"
+      },
+      "target": {
+        "actors": [
+          {
+            "id": "person_added",
+            "kind": "person",
+            "source": "datasets/annotated/person/v4_whiteborder_textures_20261113/community_1.png",
+            "source_role": "foreground_texture",
+            "source_record": {
+              "manifest": "datasets/annotated/person/v4_whiteborder_textures_20261113/manifest.json",
+              "record_index": 0
+            },
+            "view": "front",
+            "category": "community",
+            "identity": "1",
+            "identity_evidence": "datasets/annotated/person/v4_whiteborder_textures_20261113/manifest.json:record_index=0; AI visual design region head and upper clothing",
+            "identity_region_xyxy": [
+              18,
+              12,
+              118,
+              170
+            ],
+            "min_identity_visible": 0.9,
+            "foot_xy": [
+              320,
+              243
+            ],
+            "contact_width": 20,
+            "size_wh": [
+              69,
+              150
+            ],
+            "angles_degrees": {
+              "yaw": 4,
+              "pitch": 0,
+              "roll": 0
+            }
+          }
+        ]
+      },
+      "labels": {
+        "person": "existing_and_new_visible_yolo",
+        "white_back": "not_labeled"
+      },
+      "augmentation": {
+        "value_gain": 1.1,
+        "saturation_gain": 0.72
+      },
+      "parameters": {
+        "resolution": [
+          640,
+          360
+        ],
+        "ground_polygon": [
+          [
+            0,
+            201
+          ],
+          [
+            639,
+            201
+          ],
+          [
+            639,
+            359
+          ],
+          [
+            0,
+            359
+          ]
+        ],
+        "obstacle_polygons": [],
+        "required_overlaps": []
+      },
+      "sources": [
+        "Archive/Assets/场景/综合视频/空场与场景物料_001.mp4",
+        "datasets/annotated/person/v4_whiteborder_textures_20261113/community_1.png",
+        "datasets/raw/person/team_assets/社区人员/1.png",
+        "datasets/raw/person/teammate_submission_20261110/dataset/backgrounds/bg_00146_f00749.jpg"
+      ]
+    },
+    {
+      "id": "frame_001201_community_upright_tone0",
+      "failure_event": "person_upright_occlusion",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 3,
+        "beta": 3
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [],
+      "background": {
+        "role": "reviewed_background",
+        "manifest": "datasets/scripts/person/config/background_dispatch.json",
+        "record_index": 3,
+        "image": "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_004001.png"
+      },
+      "target": {
+        "actors": [
+          {
+            "id": "person_added",
+            "kind": "person",
+            "source": "datasets/annotated/person/v4_whiteborder_textures_20261113/community_1.png",
+            "source_role": "foreground_texture",
+            "source_record": {
+              "manifest": "datasets/annotated/person/v4_whiteborder_textures_20261113/manifest.json",
+              "record_index": 0
+            },
+            "view": "front",
+            "category": "community",
+            "identity": "1",
+            "identity_evidence": "datasets/annotated/person/v4_whiteborder_textures_20261113/manifest.json:record_index=0; AI visual design region head and upper clothing",
+            "identity_region_xyxy": [
+              18,
+              12,
+              118,
+              170
+            ],
+            "min_identity_visible": 0.9,
+            "foot_xy": [
+              320,
+              275
+            ],
+            "contact_width": 20,
+            "size_wh": [
+              69,
+              150
+            ],
+            "angles_degrees": {
+              "yaw": -4,
+              "pitch": 0,
+              "roll": 0
+            }
+          },
+          {
+            "id": "vehicle_front",
+            "kind": "vehicle",
+            "source": "datasets/annotated/person/v4_vehicle_occluders_20261113/sam2_04_upright.png",
+            "source_role": "vehicle_occluder",
+            "source_record": {
+              "manifest": "datasets/annotated/person/v4_vehicle_occluders_20261113/manifest.json",
+              "record_index": 2
+            },
+            "category": "upright",
+            "foot_xy": [
+              328,
+              280
+            ],
+            "contact_width": 25,
+            "size_wh": [
+              53,
+              76
+            ],
+            "angles_degrees": {
+              "yaw": 0,
+              "pitch": 0,
+              "roll": 0
+            }
+          }
+        ]
+      },
+      "labels": {
+        "person": "existing_and_new_visible_yolo",
+        "white_back": "not_labeled"
+      },
+      "augmentation": {
+        "value_gain": 1.0,
+        "saturation_gain": 1.0
+      },
+      "parameters": {
+        "resolution": [
+          640,
+          360
+        ],
+        "ground_polygon": [
+          [
+            0,
+            253
+          ],
+          [
+            639,
+            253
+          ],
+          [
+            639,
+            359
+          ],
+          [
+            0,
+            359
+          ]
+        ],
+        "obstacle_polygons": [],
+        "required_overlaps": [
+          [
+            "person_added",
+            "vehicle_front"
+          ]
+        ]
+      },
+      "sources": [
+        "datasets/annotated/e_bike/multiview_masks_refined_20261110_v2/sam2_04_upright.png",
+        "datasets/annotated/e_bike/video_review_20261110/images/source_002/frame_000003.jpg",
+        "datasets/annotated/person/v4_vehicle_occluders_20261113/sam2_04_upright.png",
+        "datasets/annotated/person/v4_whiteborder_textures_20261113/community_1.png",
+        "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_004001.png",
+        "datasets/raw/e_bike/archive_assets_legacy/视频/浅色背景单辆直立车_平视旋转_009.mp4",
+        "datasets/raw/person/team_assets/社区人员/1.png",
+        "datasets/raw/site_capture_20261112/videos/full_scene.mp4"
+      ]
+    },
+    {
+      "id": "frame_001201_community_upright_tone1",
+      "failure_event": "person_upright_occlusion",
+      "min_count": 0,
+      "max_count": 1,
+      "prior": {
+        "alpha": 3,
+        "beta": 3
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [],
+      "background": {
+        "role": "reviewed_background",
+        "manifest": "datasets/scripts/person/config/background_dispatch.json",
+        "record_index": 4,
+        "image": "datasets/raw/person/teammate_submission_20261110/dataset/backgrounds/bg_00000_f00001.jpg"
+      },
+      "target": {
+        "actors": [
+          {
+            "id": "person_added",
+            "kind": "person",
+            "source": "datasets/annotated/person/v4_whiteborder_textures_20261113/community_1.png",
+            "source_role": "foreground_texture",
+            "source_record": {
+              "manifest": "datasets/annotated/person/v4_whiteborder_textures_20261113/manifest.json",
+              "record_index": 0
+            },
+            "view": "front",
+            "category": "community",
+            "identity": "1",
+            "identity_evidence": "datasets/annotated/person/v4_whiteborder_textures_20261113/manifest.json:record_index=0; AI visual design region head and upper clothing",
+            "identity_region_xyxy": [
+              18,
+              12,
+              118,
+              170
+            ],
+            "min_identity_visible": 0.9,
+            "foot_xy": [
+              320,
+              193
+            ],
+            "contact_width": 20,
+            "size_wh": [
+              69,
+              150
+            ],
+            "angles_degrees": {
+              "yaw": 0,
+              "pitch": 0,
+              "roll": 0
+            }
+          },
+          {
+            "id": "vehicle_front",
+            "kind": "vehicle",
+            "source": "datasets/annotated/person/v4_vehicle_occluders_20261113/sam2_04_upright.png",
+            "source_role": "vehicle_occluder",
+            "source_record": {
+              "manifest": "datasets/annotated/person/v4_vehicle_occluders_20261113/manifest.json",
+              "record_index": 2
+            },
+            "category": "upright",
+            "foot_xy": [
+              328,
+              198
+            ],
+            "contact_width": 25,
+            "size_wh": [
+              53,
+              76
+            ],
+            "angles_degrees": {
+              "yaw": 0,
+              "pitch": 0,
+              "roll": 0
+            }
+          }
+        ]
+      },
+      "labels": {
+        "person": "existing_and_new_visible_yolo",
+        "white_back": "not_labeled"
+      },
+      "augmentation": {
+        "value_gain": 0.88,
+        "saturation_gain": 0.82
+      },
+      "parameters": {
+        "resolution": [
+          640,
+          360
+        ],
+        "ground_polygon": [
+          [
+            0,
+            113
+          ],
+          [
+            639,
+            113
+          ],
+          [
+            639,
+            359
+          ],
+          [
+            0,
+            359
+          ]
+        ],
+        "obstacle_polygons": [],
+        "required_overlaps": [
+          [
+            "person_added",
+            "vehicle_front"
+          ]
+        ]
+      },
+      "sources": [
+        "Archive/Assets/场景/综合视频/空场与场景物料_001.mp4",
+        "datasets/annotated/e_bike/multiview_masks_refined_20261110_v2/sam2_04_upright.png",
+        "datasets/annotated/e_bike/video_review_20261110/images/source_002/frame_000003.jpg",
+        "datasets/annotated/person/v4_vehicle_occluders_20261113/sam2_04_upright.png",
+        "datasets/annotated/person/v4_whiteborder_textures_20261113/community_1.png",
+        "datasets/raw/e_bike/archive_assets_legacy/视频/浅色背景单辆直立车_平视旋转_009.mp4",
+        "datasets/raw/person/team_assets/社区人员/1.png",
+        "datasets/raw/person/teammate_submission_20261110/dataset/backgrounds/bg_00000_f00001.jpg"
+      ]
+    },
+    {
+      "id": "frame_001201_community_upright_tone2",
+      "failure_event": "person_upright_occlusion",
+      "min_count": 0,
+      "max_count": 1,
+      "prior": {
+        "alpha": 3,
+        "beta": 3
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [],
+      "background": {
+        "role": "reviewed_background",
+        "manifest": "datasets/scripts/person/config/background_dispatch.json",
+        "record_index": 5,
+        "image": "datasets/raw/person/teammate_submission_20261110/dataset/backgrounds/bg_00040_f00145.jpg"
+      },
+      "target": {
+        "actors": [
+          {
+            "id": "person_added",
+            "kind": "person",
+            "source": "datasets/annotated/person/v4_whiteborder_textures_20261113/community_1.png",
+            "source_role": "foreground_texture",
+            "source_record": {
+              "manifest": "datasets/annotated/person/v4_whiteborder_textures_20261113/manifest.json",
+              "record_index": 0
+            },
+            "view": "front",
+            "category": "community",
+            "identity": "1",
+            "identity_evidence": "datasets/annotated/person/v4_whiteborder_textures_20261113/manifest.json:record_index=0; AI visual design region head and upper clothing",
+            "identity_region_xyxy": [
+              18,
+              12,
+              118,
+              170
+            ],
+            "min_identity_visible": 0.9,
+            "foot_xy": [
+              320,
+              221
+            ],
+            "contact_width": 20,
+            "size_wh": [
+              69,
+              150
+            ],
+            "angles_degrees": {
+              "yaw": 4,
+              "pitch": 0,
+              "roll": 0
+            }
+          },
+          {
+            "id": "vehicle_front",
+            "kind": "vehicle",
+            "source": "datasets/annotated/person/v4_vehicle_occluders_20261113/sam2_04_upright.png",
+            "source_role": "vehicle_occluder",
+            "source_record": {
+              "manifest": "datasets/annotated/person/v4_vehicle_occluders_20261113/manifest.json",
+              "record_index": 2
+            },
+            "category": "upright",
+            "foot_xy": [
+              328,
+              226
+            ],
+            "contact_width": 25,
+            "size_wh": [
+              53,
+              76
+            ],
+            "angles_degrees": {
+              "yaw": 0,
+              "pitch": 0,
+              "roll": 0
+            }
+          }
+        ]
+      },
+      "labels": {
+        "person": "existing_and_new_visible_yolo",
+        "white_back": "not_labeled"
+      },
+      "augmentation": {
+        "value_gain": 1.1,
+        "saturation_gain": 0.72
+      },
+      "parameters": {
+        "resolution": [
+          640,
+          360
+        ],
+        "ground_polygon": [
+          [
+            0,
+            175
+          ],
+          [
+            639,
+            175
+          ],
+          [
+            639,
+            359
+          ],
+          [
+            0,
+            359
+          ]
+        ],
+        "obstacle_polygons": [],
+        "required_overlaps": [
+          [
+            "person_added",
+            "vehicle_front"
+          ]
+        ]
+      },
+      "sources": [
+        "Archive/Assets/场景/综合视频/空场与场景物料_001.mp4",
+        "datasets/annotated/e_bike/multiview_masks_refined_20261110_v2/sam2_04_upright.png",
+        "datasets/annotated/e_bike/video_review_20261110/images/source_002/frame_000003.jpg",
+        "datasets/annotated/person/v4_vehicle_occluders_20261113/sam2_04_upright.png",
+        "datasets/annotated/person/v4_whiteborder_textures_20261113/community_1.png",
+        "datasets/raw/e_bike/archive_assets_legacy/视频/浅色背景单辆直立车_平视旋转_009.mp4",
+        "datasets/raw/person/team_assets/社区人员/1.png",
+        "datasets/raw/person/teammate_submission_20261110/dataset/backgrounds/bg_00040_f00145.jpg"
+      ]
+    },
+    {
+      "id": "frame_001201_community_fallen_tone0",
+      "failure_event": "person_fallen_occlusion",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 3,
+        "beta": 3
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [],
+      "background": {
+        "role": "reviewed_background",
+        "manifest": "datasets/scripts/person/config/background_dispatch.json",
+        "record_index": 3,
+        "image": "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_004001.png"
+      },
+      "target": {
+        "actors": [
+          {
+            "id": "person_added",
+            "kind": "person",
+            "source": "datasets/annotated/person/v4_whiteborder_textures_20261113/community_1.png",
+            "source_role": "foreground_texture",
+            "source_record": {
+              "manifest": "datasets/annotated/person/v4_whiteborder_textures_20261113/manifest.json",
+              "record_index": 0
+            },
+            "view": "front",
+            "category": "community",
+            "identity": "1",
+            "identity_evidence": "datasets/annotated/person/v4_whiteborder_textures_20261113/manifest.json:record_index=0; AI visual design region head and upper clothing",
+            "identity_region_xyxy": [
+              18,
+              12,
+              118,
+              170
+            ],
+            "min_identity_visible": 0.9,
+            "foot_xy": [
+              320,
+              275
+            ],
+            "contact_width": 20,
+            "size_wh": [
+              69,
+              150
+            ],
+            "angles_degrees": {
+              "yaw": -4,
+              "pitch": 0,
+              "roll": 0
+            }
+          },
+          {
+            "id": "vehicle_front",
+            "kind": "vehicle",
+            "source": "datasets/annotated/person/v4_vehicle_occluders_20261113/sam2_01_fallen.png",
+            "source_role": "vehicle_occluder",
+            "source_record": {
+              "manifest": "datasets/annotated/person/v4_vehicle_occluders_20261113/manifest.json",
+              "record_index": 0
+            },
+            "category": "fallen",
+            "foot_xy": [
+              328,
+              280
+            ],
+            "contact_width": 25,
+            "size_wh": [
+              88,
+              49
+            ],
+            "angles_degrees": {
+              "yaw": 0,
+              "pitch": 0,
+              "roll": 0
+            }
+          }
+        ]
+      },
+      "labels": {
+        "person": "existing_and_new_visible_yolo",
+        "white_back": "not_labeled"
+      },
+      "augmentation": {
+        "value_gain": 1.0,
+        "saturation_gain": 1.0
+      },
+      "parameters": {
+        "resolution": [
+          640,
+          360
+        ],
+        "ground_polygon": [
+          [
+            0,
+            253
+          ],
+          [
+            639,
+            253
+          ],
+          [
+            639,
+            359
+          ],
+          [
+            0,
+            359
+          ]
+        ],
+        "obstacle_polygons": [],
+        "required_overlaps": [
+          [
+            "person_added",
+            "vehicle_front"
+          ]
+        ]
+      },
+      "sources": [
+        "datasets/annotated/e_bike/multiview_masks_refined_20261110_v2/sam2_01_fallen.png",
+        "datasets/annotated/e_bike/video_review_20261110/images/source_001/frame_000001.jpg",
+        "datasets/annotated/person/v4_vehicle_occluders_20261113/sam2_01_fallen.png",
+        "datasets/annotated/person/v4_whiteborder_textures_20261113/community_1.png",
+        "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_004001.png",
+        "datasets/raw/e_bike/archive_assets_legacy/视频/浅色背景单辆倒伏车_平视旋转_008.mp4",
+        "datasets/raw/person/team_assets/社区人员/1.png",
+        "datasets/raw/site_capture_20261112/videos/full_scene.mp4"
+      ]
+    },
+    {
+      "id": "frame_001201_community_fallen_tone1",
+      "failure_event": "person_fallen_occlusion",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 3,
+        "beta": 3
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [],
+      "background": {
+        "role": "reviewed_background",
+        "manifest": "datasets/scripts/person/config/background_dispatch.json",
+        "record_index": 1,
+        "image": "datasets/raw/person/teammate_submission_20261110/dataset/backgrounds/bg_00086_f00359.jpg"
+      },
+      "target": {
+        "actors": [
+          {
+            "id": "person_added",
+            "kind": "person",
+            "source": "datasets/annotated/person/v4_whiteborder_textures_20261113/community_1.png",
+            "source_role": "foreground_texture",
+            "source_record": {
+              "manifest": "datasets/annotated/person/v4_whiteborder_textures_20261113/manifest.json",
+              "record_index": 0
+            },
+            "view": "front",
+            "category": "community",
+            "identity": "1",
+            "identity_evidence": "datasets/annotated/person/v4_whiteborder_textures_20261113/manifest.json:record_index=0; AI visual design region head and upper clothing",
+            "identity_region_xyxy": [
+              18,
+              12,
+              118,
+              170
+            ],
+            "min_identity_visible": 0.9,
+            "foot_xy": [
+              320,
+              302
+            ],
+            "contact_width": 20,
+            "size_wh": [
+              69,
+              150
+            ],
+            "angles_degrees": {
+              "yaw": 0,
+              "pitch": 0,
+              "roll": 0
+            }
+          },
+          {
+            "id": "vehicle_front",
+            "kind": "vehicle",
+            "source": "datasets/annotated/person/v4_vehicle_occluders_20261113/sam2_01_fallen.png",
+            "source_role": "vehicle_occluder",
+            "source_record": {
+              "manifest": "datasets/annotated/person/v4_vehicle_occluders_20261113/manifest.json",
+              "record_index": 0
+            },
+            "category": "fallen",
+            "foot_xy": [
+              328,
+              307
+            ],
+            "contact_width": 25,
+            "size_wh": [
+              88,
+              49
+            ],
+            "angles_degrees": {
+              "yaw": 0,
+              "pitch": 0,
+              "roll": 0
+            }
+          }
+        ]
+      },
+      "labels": {
+        "person": "existing_and_new_visible_yolo",
+        "white_back": "not_labeled"
+      },
+      "augmentation": {
+        "value_gain": 0.88,
+        "saturation_gain": 0.82
+      },
+      "parameters": {
+        "resolution": [
+          640,
+          360
+        ],
+        "ground_polygon": [
+          [
+            0,
+            293
+          ],
+          [
+            639,
+            293
+          ],
+          [
+            639,
+            359
+          ],
+          [
+            0,
+            359
+          ]
+        ],
+        "obstacle_polygons": [],
+        "required_overlaps": [
+          [
+            "person_added",
+            "vehicle_front"
+          ]
+        ]
+      },
+      "sources": [
+        "Archive/Assets/场景/综合视频/空场与场景物料_001.mp4",
+        "datasets/annotated/e_bike/multiview_masks_refined_20261110_v2/sam2_01_fallen.png",
+        "datasets/annotated/e_bike/video_review_20261110/images/source_001/frame_000001.jpg",
+        "datasets/annotated/person/v4_vehicle_occluders_20261113/sam2_01_fallen.png",
+        "datasets/annotated/person/v4_whiteborder_textures_20261113/community_1.png",
+        "datasets/raw/e_bike/archive_assets_legacy/视频/浅色背景单辆倒伏车_平视旋转_008.mp4",
+        "datasets/raw/person/team_assets/社区人员/1.png",
+        "datasets/raw/person/teammate_submission_20261110/dataset/backgrounds/bg_00086_f00359.jpg"
+      ]
+    },
+    {
+      "id": "frame_001201_community_fallen_tone2",
+      "failure_event": "person_fallen_occlusion",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 3,
+        "beta": 3
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [],
+      "background": {
+        "role": "reviewed_background",
+        "manifest": "datasets/scripts/person/config/background_dispatch.json",
+        "record_index": 2,
+        "image": "datasets/raw/person/teammate_submission_20261110/dataset/backgrounds/bg_00146_f00749.jpg"
+      },
+      "target": {
+        "actors": [
+          {
+            "id": "person_added",
+            "kind": "person",
+            "source": "datasets/annotated/person/v4_whiteborder_textures_20261113/community_1.png",
+            "source_role": "foreground_texture",
+            "source_record": {
+              "manifest": "datasets/annotated/person/v4_whiteborder_textures_20261113/manifest.json",
+              "record_index": 0
+            },
+            "view": "front",
+            "category": "community",
+            "identity": "1",
+            "identity_evidence": "datasets/annotated/person/v4_whiteborder_textures_20261113/manifest.json:record_index=0; AI visual design region head and upper clothing",
+            "identity_region_xyxy": [
+              18,
+              12,
+              118,
+              170
+            ],
+            "min_identity_visible": 0.9,
+            "foot_xy": [
+              320,
+              243
+            ],
+            "contact_width": 20,
+            "size_wh": [
+              69,
+              150
+            ],
+            "angles_degrees": {
+              "yaw": 4,
+              "pitch": 0,
+              "roll": 0
+            }
+          },
+          {
+            "id": "vehicle_front",
+            "kind": "vehicle",
+            "source": "datasets/annotated/person/v4_vehicle_occluders_20261113/sam2_01_fallen.png",
+            "source_role": "vehicle_occluder",
+            "source_record": {
+              "manifest": "datasets/annotated/person/v4_vehicle_occluders_20261113/manifest.json",
+              "record_index": 0
+            },
+            "category": "fallen",
+            "foot_xy": [
+              328,
+              248
+            ],
+            "contact_width": 25,
+            "size_wh": [
+              88,
+              49
+            ],
+            "angles_degrees": {
+              "yaw": 0,
+              "pitch": 0,
+              "roll": 0
+            }
+          }
+        ]
+      },
+      "labels": {
+        "person": "existing_and_new_visible_yolo",
+        "white_back": "not_labeled"
+      },
+      "augmentation": {
+        "value_gain": 1.1,
+        "saturation_gain": 0.72
+      },
+      "parameters": {
+        "resolution": [
+          640,
+          360
+        ],
+        "ground_polygon": [
+          [
+            0,
+            201
+          ],
+          [
+            639,
+            201
+          ],
+          [
+            639,
+            359
+          ],
+          [
+            0,
+            359
+          ]
+        ],
+        "obstacle_polygons": [],
+        "required_overlaps": [
+          [
+            "person_added",
+            "vehicle_front"
+          ]
+        ]
+      },
+      "sources": [
+        "Archive/Assets/场景/综合视频/空场与场景物料_001.mp4",
+        "datasets/annotated/e_bike/multiview_masks_refined_20261110_v2/sam2_01_fallen.png",
+        "datasets/annotated/e_bike/video_review_20261110/images/source_001/frame_000001.jpg",
+        "datasets/annotated/person/v4_vehicle_occluders_20261113/sam2_01_fallen.png",
+        "datasets/annotated/person/v4_whiteborder_textures_20261113/community_1.png",
+        "datasets/raw/e_bike/archive_assets_legacy/视频/浅色背景单辆倒伏车_平视旋转_008.mp4",
+        "datasets/raw/person/team_assets/社区人员/1.png",
+        "datasets/raw/person/teammate_submission_20261110/dataset/backgrounds/bg_00146_f00749.jpg"
+      ]
+    },
+    {
+      "id": "frame_001201_noncommunity_none_tone0",
+      "failure_event": "person_unoccluded",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 3
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [],
+      "background": {
+        "role": "reviewed_background",
+        "manifest": "datasets/scripts/person/config/background_dispatch.json",
+        "record_index": 3,
+        "image": "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_004001.png"
+      },
+      "target": {
+        "actors": [
+          {
+            "id": "person_added",
+            "kind": "person",
+            "source": "datasets/annotated/person/v4_whiteborder_textures_20261113/noncommunity_F2.png",
+            "source_role": "foreground_texture",
+            "source_record": {
+              "manifest": "datasets/annotated/person/v4_whiteborder_textures_20261113/manifest.json",
+              "record_index": 17
+            },
+            "view": "front",
+            "category": "noncommunity",
+            "identity": "F2",
+            "identity_evidence": "datasets/annotated/person/v4_whiteborder_textures_20261113/manifest.json:record_index=17; AI visual design region head and upper clothing",
+            "identity_region_xyxy": [
+              26,
+              8,
+              148,
+              168
+            ],
+            "min_identity_visible": 0.9,
+            "foot_xy": [
+              320,
+              275
+            ],
+            "contact_width": 20,
+            "size_wh": [
+              67,
+              150
+            ],
+            "angles_degrees": {
+              "yaw": -4,
+              "pitch": 0,
+              "roll": 0
+            }
+          }
+        ]
+      },
+      "labels": {
+        "person": "existing_and_new_visible_yolo",
+        "white_back": "not_labeled"
+      },
+      "augmentation": {
+        "value_gain": 1.0,
+        "saturation_gain": 1.0
+      },
+      "parameters": {
+        "resolution": [
+          640,
+          360
+        ],
+        "ground_polygon": [
+          [
+            0,
+            253
+          ],
+          [
+            639,
+            253
+          ],
+          [
+            639,
+            359
+          ],
+          [
+            0,
+            359
+          ]
+        ],
+        "obstacle_polygons": [],
+        "required_overlaps": []
+      },
+      "sources": [
+        "datasets/annotated/person/v4_whiteborder_textures_20261113/noncommunity_F2.png",
+        "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_004001.png",
+        "datasets/raw/person/team_assets/非社区人员/F2.png",
+        "datasets/raw/site_capture_20261112/videos/full_scene.mp4"
+      ]
+    },
+    {
+      "id": "frame_001201_noncommunity_none_tone1",
+      "failure_event": "person_unoccluded",
+      "min_count": 0,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 3
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [],
+      "background": {
+        "role": "reviewed_background",
+        "manifest": "datasets/scripts/person/config/background_dispatch.json",
+        "record_index": 4,
+        "image": "datasets/raw/person/teammate_submission_20261110/dataset/backgrounds/bg_00000_f00001.jpg"
+      },
+      "target": {
+        "actors": [
+          {
+            "id": "person_added",
+            "kind": "person",
+            "source": "datasets/annotated/person/v4_whiteborder_textures_20261113/noncommunity_F2.png",
+            "source_role": "foreground_texture",
+            "source_record": {
+              "manifest": "datasets/annotated/person/v4_whiteborder_textures_20261113/manifest.json",
+              "record_index": 17
+            },
+            "view": "front",
+            "category": "noncommunity",
+            "identity": "F2",
+            "identity_evidence": "datasets/annotated/person/v4_whiteborder_textures_20261113/manifest.json:record_index=17; AI visual design region head and upper clothing",
+            "identity_region_xyxy": [
+              26,
+              8,
+              148,
+              168
+            ],
+            "min_identity_visible": 0.9,
+            "foot_xy": [
+              320,
+              193
+            ],
+            "contact_width": 20,
+            "size_wh": [
+              67,
+              150
+            ],
+            "angles_degrees": {
+              "yaw": 0,
+              "pitch": 0,
+              "roll": 0
+            }
+          }
+        ]
+      },
+      "labels": {
+        "person": "existing_and_new_visible_yolo",
+        "white_back": "not_labeled"
+      },
+      "augmentation": {
+        "value_gain": 0.88,
+        "saturation_gain": 0.82
+      },
+      "parameters": {
+        "resolution": [
+          640,
+          360
+        ],
+        "ground_polygon": [
+          [
+            0,
+            113
+          ],
+          [
+            639,
+            113
+          ],
+          [
+            639,
+            359
+          ],
+          [
+            0,
+            359
+          ]
+        ],
+        "obstacle_polygons": [],
+        "required_overlaps": []
+      },
+      "sources": [
+        "Archive/Assets/场景/综合视频/空场与场景物料_001.mp4",
+        "datasets/annotated/person/v4_whiteborder_textures_20261113/noncommunity_F2.png",
+        "datasets/raw/person/team_assets/非社区人员/F2.png",
+        "datasets/raw/person/teammate_submission_20261110/dataset/backgrounds/bg_00000_f00001.jpg"
+      ]
+    },
+    {
+      "id": "frame_001201_noncommunity_none_tone2",
+      "failure_event": "person_unoccluded",
+      "min_count": 0,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 3
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [],
+      "background": {
+        "role": "reviewed_background",
+        "manifest": "datasets/scripts/person/config/background_dispatch.json",
+        "record_index": 5,
+        "image": "datasets/raw/person/teammate_submission_20261110/dataset/backgrounds/bg_00040_f00145.jpg"
+      },
+      "target": {
+        "actors": [
+          {
+            "id": "person_added",
+            "kind": "person",
+            "source": "datasets/annotated/person/v4_whiteborder_textures_20261113/noncommunity_F2.png",
+            "source_role": "foreground_texture",
+            "source_record": {
+              "manifest": "datasets/annotated/person/v4_whiteborder_textures_20261113/manifest.json",
+              "record_index": 17
+            },
+            "view": "front",
+            "category": "noncommunity",
+            "identity": "F2",
+            "identity_evidence": "datasets/annotated/person/v4_whiteborder_textures_20261113/manifest.json:record_index=17; AI visual design region head and upper clothing",
+            "identity_region_xyxy": [
+              26,
+              8,
+              148,
+              168
+            ],
+            "min_identity_visible": 0.9,
+            "foot_xy": [
+              320,
+              221
+            ],
+            "contact_width": 20,
+            "size_wh": [
+              67,
+              150
+            ],
+            "angles_degrees": {
+              "yaw": 4,
+              "pitch": 0,
+              "roll": 0
+            }
+          }
+        ]
+      },
+      "labels": {
+        "person": "existing_and_new_visible_yolo",
+        "white_back": "not_labeled"
+      },
+      "augmentation": {
+        "value_gain": 1.1,
+        "saturation_gain": 0.72
+      },
+      "parameters": {
+        "resolution": [
+          640,
+          360
+        ],
+        "ground_polygon": [
+          [
+            0,
+            175
+          ],
+          [
+            639,
+            175
+          ],
+          [
+            639,
+            359
+          ],
+          [
+            0,
+            359
+          ]
+        ],
+        "obstacle_polygons": [],
+        "required_overlaps": []
+      },
+      "sources": [
+        "Archive/Assets/场景/综合视频/空场与场景物料_001.mp4",
+        "datasets/annotated/person/v4_whiteborder_textures_20261113/noncommunity_F2.png",
+        "datasets/raw/person/team_assets/非社区人员/F2.png",
+        "datasets/raw/person/teammate_submission_20261110/dataset/backgrounds/bg_00040_f00145.jpg"
+      ]
+    },
+    {
+      "id": "frame_001201_noncommunity_upright_tone0",
+      "failure_event": "person_upright_occlusion",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 3,
+        "beta": 3
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [],
+      "background": {
+        "role": "reviewed_background",
+        "manifest": "datasets/scripts/person/config/background_dispatch.json",
+        "record_index": 0,
+        "image": "datasets/raw/person/teammate_submission_20261110/dataset/backgrounds/bg_00057_f00209.jpg"
+      },
+      "target": {
+        "actors": [
+          {
+            "id": "person_added",
+            "kind": "person",
+            "source": "datasets/annotated/person/v4_whiteborder_textures_20261113/noncommunity_F2.png",
+            "source_role": "foreground_texture",
+            "source_record": {
+              "manifest": "datasets/annotated/person/v4_whiteborder_textures_20261113/manifest.json",
+              "record_index": 17
+            },
+            "view": "front",
+            "category": "noncommunity",
+            "identity": "F2",
+            "identity_evidence": "datasets/annotated/person/v4_whiteborder_textures_20261113/manifest.json:record_index=17; AI visual design region head and upper clothing",
+            "identity_region_xyxy": [
+              26,
+              8,
+              148,
+              168
+            ],
+            "min_identity_visible": 0.9,
+            "foot_xy": [
+              320,
+              287
+            ],
+            "contact_width": 20,
+            "size_wh": [
+              67,
+              150
+            ],
+            "angles_degrees": {
+              "yaw": -4,
+              "pitch": 0,
+              "roll": 0
+            }
+          },
+          {
+            "id": "vehicle_front",
+            "kind": "vehicle",
+            "source": "datasets/annotated/person/v4_vehicle_occluders_20261113/sam2_04_upright.png",
+            "source_role": "vehicle_occluder",
+            "source_record": {
+              "manifest": "datasets/annotated/person/v4_vehicle_occluders_20261113/manifest.json",
+              "record_index": 2
+            },
+            "category": "upright",
+            "foot_xy": [
+              328,
+              292
+            ],
+            "contact_width": 25,
+            "size_wh": [
+              53,
+              76
+            ],
+            "angles_degrees": {
+              "yaw": 0,
+              "pitch": 0,
+              "roll": 0
+            }
+          }
+        ]
+      },
+      "labels": {
+        "person": "existing_and_new_visible_yolo",
+        "white_back": "not_labeled"
+      },
+      "augmentation": {
+        "value_gain": 1.0,
+        "saturation_gain": 1.0
+      },
+      "parameters": {
+        "resolution": [
+          640,
+          360
+        ],
+        "ground_polygon": [
+          [
+            0,
+            269
+          ],
+          [
+            639,
+            269
+          ],
+          [
+            639,
+            359
+          ],
+          [
+            0,
+            359
+          ]
+        ],
+        "obstacle_polygons": [],
+        "required_overlaps": [
+          [
+            "person_added",
+            "vehicle_front"
+          ]
+        ]
+      },
+      "sources": [
+        "Archive/Assets/场景/综合视频/空场与场景物料_001.mp4",
+        "datasets/annotated/e_bike/multiview_masks_refined_20261110_v2/sam2_04_upright.png",
+        "datasets/annotated/e_bike/video_review_20261110/images/source_002/frame_000003.jpg",
+        "datasets/annotated/person/v4_vehicle_occluders_20261113/sam2_04_upright.png",
+        "datasets/annotated/person/v4_whiteborder_textures_20261113/noncommunity_F2.png",
+        "datasets/raw/e_bike/archive_assets_legacy/视频/浅色背景单辆直立车_平视旋转_009.mp4",
+        "datasets/raw/person/team_assets/非社区人员/F2.png",
+        "datasets/raw/person/teammate_submission_20261110/dataset/backgrounds/bg_00057_f00209.jpg"
+      ]
+    },
+    {
+      "id": "frame_001201_noncommunity_upright_tone1",
+      "failure_event": "person_upright_occlusion",
+      "min_count": 0,
+      "max_count": 1,
+      "prior": {
+        "alpha": 3,
+        "beta": 3
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [],
+      "background": {
+        "role": "reviewed_background",
+        "manifest": "datasets/scripts/person/config/background_dispatch.json",
+        "record_index": 1,
+        "image": "datasets/raw/person/teammate_submission_20261110/dataset/backgrounds/bg_00086_f00359.jpg"
+      },
+      "target": {
+        "actors": [
+          {
+            "id": "person_added",
+            "kind": "person",
+            "source": "datasets/annotated/person/v4_whiteborder_textures_20261113/noncommunity_F2.png",
+            "source_role": "foreground_texture",
+            "source_record": {
+              "manifest": "datasets/annotated/person/v4_whiteborder_textures_20261113/manifest.json",
+              "record_index": 17
+            },
+            "view": "front",
+            "category": "noncommunity",
+            "identity": "F2",
+            "identity_evidence": "datasets/annotated/person/v4_whiteborder_textures_20261113/manifest.json:record_index=17; AI visual design region head and upper clothing",
+            "identity_region_xyxy": [
+              26,
+              8,
+              148,
+              168
+            ],
+            "min_identity_visible": 0.9,
+            "foot_xy": [
+              320,
+              302
+            ],
+            "contact_width": 20,
+            "size_wh": [
+              67,
+              150
+            ],
+            "angles_degrees": {
+              "yaw": 0,
+              "pitch": 0,
+              "roll": 0
+            }
+          },
+          {
+            "id": "vehicle_front",
+            "kind": "vehicle",
+            "source": "datasets/annotated/person/v4_vehicle_occluders_20261113/sam2_04_upright.png",
+            "source_role": "vehicle_occluder",
+            "source_record": {
+              "manifest": "datasets/annotated/person/v4_vehicle_occluders_20261113/manifest.json",
+              "record_index": 2
+            },
+            "category": "upright",
+            "foot_xy": [
+              328,
+              307
+            ],
+            "contact_width": 25,
+            "size_wh": [
+              53,
+              76
+            ],
+            "angles_degrees": {
+              "yaw": 0,
+              "pitch": 0,
+              "roll": 0
+            }
+          }
+        ]
+      },
+      "labels": {
+        "person": "existing_and_new_visible_yolo",
+        "white_back": "not_labeled"
+      },
+      "augmentation": {
+        "value_gain": 0.88,
+        "saturation_gain": 0.82
+      },
+      "parameters": {
+        "resolution": [
+          640,
+          360
+        ],
+        "ground_polygon": [
+          [
+            0,
+            293
+          ],
+          [
+            639,
+            293
+          ],
+          [
+            639,
+            359
+          ],
+          [
+            0,
+            359
+          ]
+        ],
+        "obstacle_polygons": [],
+        "required_overlaps": [
+          [
+            "person_added",
+            "vehicle_front"
+          ]
+        ]
+      },
+      "sources": [
+        "Archive/Assets/场景/综合视频/空场与场景物料_001.mp4",
+        "datasets/annotated/e_bike/multiview_masks_refined_20261110_v2/sam2_04_upright.png",
+        "datasets/annotated/e_bike/video_review_20261110/images/source_002/frame_000003.jpg",
+        "datasets/annotated/person/v4_vehicle_occluders_20261113/sam2_04_upright.png",
+        "datasets/annotated/person/v4_whiteborder_textures_20261113/noncommunity_F2.png",
+        "datasets/raw/e_bike/archive_assets_legacy/视频/浅色背景单辆直立车_平视旋转_009.mp4",
+        "datasets/raw/person/team_assets/非社区人员/F2.png",
+        "datasets/raw/person/teammate_submission_20261110/dataset/backgrounds/bg_00086_f00359.jpg"
+      ]
+    },
+    {
+      "id": "frame_001201_noncommunity_upright_tone2",
+      "failure_event": "person_upright_occlusion",
+      "min_count": 0,
+      "max_count": 1,
+      "prior": {
+        "alpha": 3,
+        "beta": 3
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [],
+      "background": {
+        "role": "reviewed_background",
+        "manifest": "datasets/scripts/person/config/background_dispatch.json",
+        "record_index": 2,
+        "image": "datasets/raw/person/teammate_submission_20261110/dataset/backgrounds/bg_00146_f00749.jpg"
+      },
+      "target": {
+        "actors": [
+          {
+            "id": "person_added",
+            "kind": "person",
+            "source": "datasets/annotated/person/v4_whiteborder_textures_20261113/noncommunity_F2.png",
+            "source_role": "foreground_texture",
+            "source_record": {
+              "manifest": "datasets/annotated/person/v4_whiteborder_textures_20261113/manifest.json",
+              "record_index": 17
+            },
+            "view": "front",
+            "category": "noncommunity",
+            "identity": "F2",
+            "identity_evidence": "datasets/annotated/person/v4_whiteborder_textures_20261113/manifest.json:record_index=17; AI visual design region head and upper clothing",
+            "identity_region_xyxy": [
+              26,
+              8,
+              148,
+              168
+            ],
+            "min_identity_visible": 0.9,
+            "foot_xy": [
+              320,
+              243
+            ],
+            "contact_width": 20,
+            "size_wh": [
+              67,
+              150
+            ],
+            "angles_degrees": {
+              "yaw": 4,
+              "pitch": 0,
+              "roll": 0
+            }
+          },
+          {
+            "id": "vehicle_front",
+            "kind": "vehicle",
+            "source": "datasets/annotated/person/v4_vehicle_occluders_20261113/sam2_04_upright.png",
+            "source_role": "vehicle_occluder",
+            "source_record": {
+              "manifest": "datasets/annotated/person/v4_vehicle_occluders_20261113/manifest.json",
+              "record_index": 2
+            },
+            "category": "upright",
+            "foot_xy": [
+              328,
+              248
+            ],
+            "contact_width": 25,
+            "size_wh": [
+              53,
+              76
+            ],
+            "angles_degrees": {
+              "yaw": 0,
+              "pitch": 0,
+              "roll": 0
+            }
+          }
+        ]
+      },
+      "labels": {
+        "person": "existing_and_new_visible_yolo",
+        "white_back": "not_labeled"
+      },
+      "augmentation": {
+        "value_gain": 1.1,
+        "saturation_gain": 0.72
+      },
+      "parameters": {
+        "resolution": [
+          640,
+          360
+        ],
+        "ground_polygon": [
+          [
+            0,
+            201
+          ],
+          [
+            639,
+            201
+          ],
+          [
+            639,
+            359
+          ],
+          [
+            0,
+            359
+          ]
+        ],
+        "obstacle_polygons": [],
+        "required_overlaps": [
+          [
+            "person_added",
+            "vehicle_front"
+          ]
+        ]
+      },
+      "sources": [
+        "Archive/Assets/场景/综合视频/空场与场景物料_001.mp4",
+        "datasets/annotated/e_bike/multiview_masks_refined_20261110_v2/sam2_04_upright.png",
+        "datasets/annotated/e_bike/video_review_20261110/images/source_002/frame_000003.jpg",
+        "datasets/annotated/person/v4_vehicle_occluders_20261113/sam2_04_upright.png",
+        "datasets/annotated/person/v4_whiteborder_textures_20261113/noncommunity_F2.png",
+        "datasets/raw/e_bike/archive_assets_legacy/视频/浅色背景单辆直立车_平视旋转_009.mp4",
+        "datasets/raw/person/team_assets/非社区人员/F2.png",
+        "datasets/raw/person/teammate_submission_20261110/dataset/backgrounds/bg_00146_f00749.jpg"
+      ]
+    },
+    {
+      "id": "frame_001201_noncommunity_fallen_tone0",
+      "failure_event": "person_fallen_occlusion",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 3,
+        "beta": 3
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [],
+      "background": {
+        "role": "reviewed_background",
+        "manifest": "datasets/scripts/person/config/background_dispatch.json",
+        "record_index": 3,
+        "image": "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_004001.png"
+      },
+      "target": {
+        "actors": [
+          {
+            "id": "person_added",
+            "kind": "person",
+            "source": "datasets/annotated/person/v4_whiteborder_textures_20261113/noncommunity_F2.png",
+            "source_role": "foreground_texture",
+            "source_record": {
+              "manifest": "datasets/annotated/person/v4_whiteborder_textures_20261113/manifest.json",
+              "record_index": 17
+            },
+            "view": "front",
+            "category": "noncommunity",
+            "identity": "F2",
+            "identity_evidence": "datasets/annotated/person/v4_whiteborder_textures_20261113/manifest.json:record_index=17; AI visual design region head and upper clothing",
+            "identity_region_xyxy": [
+              26,
+              8,
+              148,
+              168
+            ],
+            "min_identity_visible": 0.9,
+            "foot_xy": [
+              320,
+              275
+            ],
+            "contact_width": 20,
+            "size_wh": [
+              67,
+              150
+            ],
+            "angles_degrees": {
+              "yaw": -4,
+              "pitch": 0,
+              "roll": 0
+            }
+          },
+          {
+            "id": "vehicle_front",
+            "kind": "vehicle",
+            "source": "datasets/annotated/person/v4_vehicle_occluders_20261113/sam2_01_fallen.png",
+            "source_role": "vehicle_occluder",
+            "source_record": {
+              "manifest": "datasets/annotated/person/v4_vehicle_occluders_20261113/manifest.json",
+              "record_index": 0
+            },
+            "category": "fallen",
+            "foot_xy": [
+              328,
+              280
+            ],
+            "contact_width": 25,
+            "size_wh": [
+              88,
+              49
+            ],
+            "angles_degrees": {
+              "yaw": 0,
+              "pitch": 0,
+              "roll": 0
+            }
+          }
+        ]
+      },
+      "labels": {
+        "person": "existing_and_new_visible_yolo",
+        "white_back": "not_labeled"
+      },
+      "augmentation": {
+        "value_gain": 1.0,
+        "saturation_gain": 1.0
+      },
+      "parameters": {
+        "resolution": [
+          640,
+          360
+        ],
+        "ground_polygon": [
+          [
+            0,
+            253
+          ],
+          [
+            639,
+            253
+          ],
+          [
+            639,
+            359
+          ],
+          [
+            0,
+            359
+          ]
+        ],
+        "obstacle_polygons": [],
+        "required_overlaps": [
+          [
+            "person_added",
+            "vehicle_front"
+          ]
+        ]
+      },
+      "sources": [
+        "datasets/annotated/e_bike/multiview_masks_refined_20261110_v2/sam2_01_fallen.png",
+        "datasets/annotated/e_bike/video_review_20261110/images/source_001/frame_000001.jpg",
+        "datasets/annotated/person/v4_vehicle_occluders_20261113/sam2_01_fallen.png",
+        "datasets/annotated/person/v4_whiteborder_textures_20261113/noncommunity_F2.png",
+        "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_004001.png",
+        "datasets/raw/e_bike/archive_assets_legacy/视频/浅色背景单辆倒伏车_平视旋转_008.mp4",
+        "datasets/raw/person/team_assets/非社区人员/F2.png",
+        "datasets/raw/site_capture_20261112/videos/full_scene.mp4"
+      ]
+    },
+    {
+      "id": "frame_001201_noncommunity_fallen_tone1",
+      "failure_event": "person_fallen_occlusion",
+      "min_count": 0,
+      "max_count": 1,
+      "prior": {
+        "alpha": 3,
+        "beta": 3
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [],
+      "background": {
+        "role": "reviewed_background",
+        "manifest": "datasets/scripts/person/config/background_dispatch.json",
+        "record_index": 4,
+        "image": "datasets/raw/person/teammate_submission_20261110/dataset/backgrounds/bg_00000_f00001.jpg"
+      },
+      "target": {
+        "actors": [
+          {
+            "id": "person_added",
+            "kind": "person",
+            "source": "datasets/annotated/person/v4_whiteborder_textures_20261113/noncommunity_F2.png",
+            "source_role": "foreground_texture",
+            "source_record": {
+              "manifest": "datasets/annotated/person/v4_whiteborder_textures_20261113/manifest.json",
+              "record_index": 17
+            },
+            "view": "front",
+            "category": "noncommunity",
+            "identity": "F2",
+            "identity_evidence": "datasets/annotated/person/v4_whiteborder_textures_20261113/manifest.json:record_index=17; AI visual design region head and upper clothing",
+            "identity_region_xyxy": [
+              26,
+              8,
+              148,
+              168
+            ],
+            "min_identity_visible": 0.9,
+            "foot_xy": [
+              320,
+              193
+            ],
+            "contact_width": 20,
+            "size_wh": [
+              67,
+              150
+            ],
+            "angles_degrees": {
+              "yaw": 0,
+              "pitch": 0,
+              "roll": 0
+            }
+          },
+          {
+            "id": "vehicle_front",
+            "kind": "vehicle",
+            "source": "datasets/annotated/person/v4_vehicle_occluders_20261113/sam2_01_fallen.png",
+            "source_role": "vehicle_occluder",
+            "source_record": {
+              "manifest": "datasets/annotated/person/v4_vehicle_occluders_20261113/manifest.json",
+              "record_index": 0
+            },
+            "category": "fallen",
+            "foot_xy": [
+              328,
+              198
+            ],
+            "contact_width": 25,
+            "size_wh": [
+              88,
+              49
+            ],
+            "angles_degrees": {
+              "yaw": 0,
+              "pitch": 0,
+              "roll": 0
+            }
+          }
+        ]
+      },
+      "labels": {
+        "person": "existing_and_new_visible_yolo",
+        "white_back": "not_labeled"
+      },
+      "augmentation": {
+        "value_gain": 0.88,
+        "saturation_gain": 0.82
+      },
+      "parameters": {
+        "resolution": [
+          640,
+          360
+        ],
+        "ground_polygon": [
+          [
+            0,
+            113
+          ],
+          [
+            639,
+            113
+          ],
+          [
+            639,
+            359
+          ],
+          [
+            0,
+            359
+          ]
+        ],
+        "obstacle_polygons": [],
+        "required_overlaps": [
+          [
+            "person_added",
+            "vehicle_front"
+          ]
+        ]
+      },
+      "sources": [
+        "Archive/Assets/场景/综合视频/空场与场景物料_001.mp4",
+        "datasets/annotated/e_bike/multiview_masks_refined_20261110_v2/sam2_01_fallen.png",
+        "datasets/annotated/e_bike/video_review_20261110/images/source_001/frame_000001.jpg",
+        "datasets/annotated/person/v4_vehicle_occluders_20261113/sam2_01_fallen.png",
+        "datasets/annotated/person/v4_whiteborder_textures_20261113/noncommunity_F2.png",
+        "datasets/raw/e_bike/archive_assets_legacy/视频/浅色背景单辆倒伏车_平视旋转_008.mp4",
+        "datasets/raw/person/team_assets/非社区人员/F2.png",
+        "datasets/raw/person/teammate_submission_20261110/dataset/backgrounds/bg_00000_f00001.jpg"
+      ]
+    },
+    {
+      "id": "frame_001201_noncommunity_fallen_tone2",
+      "failure_event": "person_fallen_occlusion",
+      "min_count": 0,
+      "max_count": 1,
+      "prior": {
+        "alpha": 3,
+        "beta": 3
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [],
+      "background": {
+        "role": "reviewed_background",
+        "manifest": "datasets/scripts/person/config/background_dispatch.json",
+        "record_index": 5,
+        "image": "datasets/raw/person/teammate_submission_20261110/dataset/backgrounds/bg_00040_f00145.jpg"
+      },
+      "target": {
+        "actors": [
+          {
+            "id": "person_added",
+            "kind": "person",
+            "source": "datasets/annotated/person/v4_whiteborder_textures_20261113/noncommunity_F2.png",
+            "source_role": "foreground_texture",
+            "source_record": {
+              "manifest": "datasets/annotated/person/v4_whiteborder_textures_20261113/manifest.json",
+              "record_index": 17
+            },
+            "view": "front",
+            "category": "noncommunity",
+            "identity": "F2",
+            "identity_evidence": "datasets/annotated/person/v4_whiteborder_textures_20261113/manifest.json:record_index=17; AI visual design region head and upper clothing",
+            "identity_region_xyxy": [
+              26,
+              8,
+              148,
+              168
+            ],
+            "min_identity_visible": 0.9,
+            "foot_xy": [
+              320,
+              221
+            ],
+            "contact_width": 20,
+            "size_wh": [
+              67,
+              150
+            ],
+            "angles_degrees": {
+              "yaw": 4,
+              "pitch": 0,
+              "roll": 0
+            }
+          },
+          {
+            "id": "vehicle_front",
+            "kind": "vehicle",
+            "source": "datasets/annotated/person/v4_vehicle_occluders_20261113/sam2_01_fallen.png",
+            "source_role": "vehicle_occluder",
+            "source_record": {
+              "manifest": "datasets/annotated/person/v4_vehicle_occluders_20261113/manifest.json",
+              "record_index": 0
+            },
+            "category": "fallen",
+            "foot_xy": [
+              328,
+              226
+            ],
+            "contact_width": 25,
+            "size_wh": [
+              88,
+              49
+            ],
+            "angles_degrees": {
+              "yaw": 0,
+              "pitch": 0,
+              "roll": 0
+            }
+          }
+        ]
+      },
+      "labels": {
+        "person": "existing_and_new_visible_yolo",
+        "white_back": "not_labeled"
+      },
+      "augmentation": {
+        "value_gain": 1.1,
+        "saturation_gain": 0.72
+      },
+      "parameters": {
+        "resolution": [
+          640,
+          360
+        ],
+        "ground_polygon": [
+          [
+            0,
+            175
+          ],
+          [
+            639,
+            175
+          ],
+          [
+            639,
+            359
+          ],
+          [
+            0,
+            359
+          ]
+        ],
+        "obstacle_polygons": [],
+        "required_overlaps": [
+          [
+            "person_added",
+            "vehicle_front"
+          ]
+        ]
+      },
+      "sources": [
+        "Archive/Assets/场景/综合视频/空场与场景物料_001.mp4",
+        "datasets/annotated/e_bike/multiview_masks_refined_20261110_v2/sam2_01_fallen.png",
+        "datasets/annotated/e_bike/video_review_20261110/images/source_001/frame_000001.jpg",
+        "datasets/annotated/person/v4_vehicle_occluders_20261113/sam2_01_fallen.png",
+        "datasets/annotated/person/v4_whiteborder_textures_20261113/noncommunity_F2.png",
+        "datasets/raw/e_bike/archive_assets_legacy/视频/浅色背景单辆倒伏车_平视旋转_008.mp4",
+        "datasets/raw/person/team_assets/非社区人员/F2.png",
+        "datasets/raw/person/teammate_submission_20261110/dataset/backgrounds/bg_00040_f00145.jpg"
+      ]
+    },
+    {
+      "id": "frame_007951_community_none_tone0",
+      "failure_event": "person_unoccluded",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 3
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [],
+      "background": {
+        "role": "reviewed_background",
+        "manifest": "datasets/scripts/person/config/background_dispatch.json",
+        "record_index": 1,
+        "image": "datasets/raw/person/teammate_submission_20261110/dataset/backgrounds/bg_00086_f00359.jpg"
+      },
+      "target": {
+        "actors": [
+          {
+            "id": "person_added",
+            "kind": "person",
+            "source": "datasets/annotated/person/v4_whiteborder_textures_20261113/community_1.png",
+            "source_role": "foreground_texture",
+            "source_record": {
+              "manifest": "datasets/annotated/person/v4_whiteborder_textures_20261113/manifest.json",
+              "record_index": 0
+            },
+            "view": "front",
+            "category": "community",
+            "identity": "1",
+            "identity_evidence": "datasets/annotated/person/v4_whiteborder_textures_20261113/manifest.json:record_index=0; AI visual design region head and upper clothing",
+            "identity_region_xyxy": [
+              18,
+              12,
+              118,
+              170
+            ],
+            "min_identity_visible": 0.9,
+            "foot_xy": [
+              320,
+              302
+            ],
+            "contact_width": 20,
+            "size_wh": [
+              69,
+              150
+            ],
+            "angles_degrees": {
+              "yaw": -4,
+              "pitch": 0,
+              "roll": 0
+            }
+          }
+        ]
+      },
+      "labels": {
+        "person": "existing_and_new_visible_yolo",
+        "white_back": "not_labeled"
+      },
+      "augmentation": {
+        "value_gain": 1.0,
+        "saturation_gain": 1.0
+      },
+      "parameters": {
+        "resolution": [
+          640,
+          360
+        ],
+        "ground_polygon": [
+          [
+            0,
+            293
+          ],
+          [
+            639,
+            293
+          ],
+          [
+            639,
+            359
+          ],
+          [
+            0,
+            359
+          ]
+        ],
+        "obstacle_polygons": [],
+        "required_overlaps": []
+      },
+      "sources": [
+        "Archive/Assets/场景/综合视频/空场与场景物料_001.mp4",
+        "datasets/annotated/person/v4_whiteborder_textures_20261113/community_1.png",
+        "datasets/raw/person/team_assets/社区人员/1.png",
+        "datasets/raw/person/teammate_submission_20261110/dataset/backgrounds/bg_00086_f00359.jpg"
+      ]
+    },
+    {
+      "id": "frame_007951_community_none_tone1",
+      "failure_event": "person_unoccluded",
+      "min_count": 0,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 3
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [],
+      "background": {
+        "role": "reviewed_background",
+        "manifest": "datasets/scripts/person/config/background_dispatch.json",
+        "record_index": 2,
+        "image": "datasets/raw/person/teammate_submission_20261110/dataset/backgrounds/bg_00146_f00749.jpg"
+      },
+      "target": {
+        "actors": [
+          {
+            "id": "person_added",
+            "kind": "person",
+            "source": "datasets/annotated/person/v4_whiteborder_textures_20261113/community_1.png",
+            "source_role": "foreground_texture",
+            "source_record": {
+              "manifest": "datasets/annotated/person/v4_whiteborder_textures_20261113/manifest.json",
+              "record_index": 0
+            },
+            "view": "front",
+            "category": "community",
+            "identity": "1",
+            "identity_evidence": "datasets/annotated/person/v4_whiteborder_textures_20261113/manifest.json:record_index=0; AI visual design region head and upper clothing",
+            "identity_region_xyxy": [
+              18,
+              12,
+              118,
+              170
+            ],
+            "min_identity_visible": 0.9,
+            "foot_xy": [
+              320,
+              243
+            ],
+            "contact_width": 20,
+            "size_wh": [
+              69,
+              150
+            ],
+            "angles_degrees": {
+              "yaw": 0,
+              "pitch": 0,
+              "roll": 0
+            }
+          }
+        ]
+      },
+      "labels": {
+        "person": "existing_and_new_visible_yolo",
+        "white_back": "not_labeled"
+      },
+      "augmentation": {
+        "value_gain": 0.88,
+        "saturation_gain": 0.82
+      },
+      "parameters": {
+        "resolution": [
+          640,
+          360
+        ],
+        "ground_polygon": [
+          [
+            0,
+            201
+          ],
+          [
+            639,
+            201
+          ],
+          [
+            639,
+            359
+          ],
+          [
+            0,
+            359
+          ]
+        ],
+        "obstacle_polygons": [],
+        "required_overlaps": []
+      },
+      "sources": [
+        "Archive/Assets/场景/综合视频/空场与场景物料_001.mp4",
+        "datasets/annotated/person/v4_whiteborder_textures_20261113/community_1.png",
+        "datasets/raw/person/team_assets/社区人员/1.png",
+        "datasets/raw/person/teammate_submission_20261110/dataset/backgrounds/bg_00146_f00749.jpg"
+      ]
+    },
+    {
+      "id": "frame_007951_community_none_tone2",
+      "failure_event": "person_unoccluded",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 3
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [],
+      "background": {
+        "role": "reviewed_background",
+        "manifest": "datasets/scripts/person/config/background_dispatch.json",
+        "record_index": 3,
+        "image": "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_004001.png"
+      },
+      "target": {
+        "actors": [
+          {
+            "id": "person_added",
+            "kind": "person",
+            "source": "datasets/annotated/person/v4_whiteborder_textures_20261113/community_1.png",
+            "source_role": "foreground_texture",
+            "source_record": {
+              "manifest": "datasets/annotated/person/v4_whiteborder_textures_20261113/manifest.json",
+              "record_index": 0
+            },
+            "view": "front",
+            "category": "community",
+            "identity": "1",
+            "identity_evidence": "datasets/annotated/person/v4_whiteborder_textures_20261113/manifest.json:record_index=0; AI visual design region head and upper clothing",
+            "identity_region_xyxy": [
+              18,
+              12,
+              118,
+              170
+            ],
+            "min_identity_visible": 0.9,
+            "foot_xy": [
+              320,
+              275
+            ],
+            "contact_width": 20,
+            "size_wh": [
+              69,
+              150
+            ],
+            "angles_degrees": {
+              "yaw": 4,
+              "pitch": 0,
+              "roll": 0
+            }
+          }
+        ]
+      },
+      "labels": {
+        "person": "existing_and_new_visible_yolo",
+        "white_back": "not_labeled"
+      },
+      "augmentation": {
+        "value_gain": 1.1,
+        "saturation_gain": 0.72
+      },
+      "parameters": {
+        "resolution": [
+          640,
+          360
+        ],
+        "ground_polygon": [
+          [
+            0,
+            253
+          ],
+          [
+            639,
+            253
+          ],
+          [
+            639,
+            359
+          ],
+          [
+            0,
+            359
+          ]
+        ],
+        "obstacle_polygons": [],
+        "required_overlaps": []
+      },
+      "sources": [
+        "datasets/annotated/person/v4_whiteborder_textures_20261113/community_1.png",
+        "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_004001.png",
+        "datasets/raw/person/team_assets/社区人员/1.png",
+        "datasets/raw/site_capture_20261112/videos/full_scene.mp4"
+      ]
+    },
+    {
+      "id": "frame_007951_community_upright_tone0",
+      "failure_event": "person_upright_occlusion",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 3,
+        "beta": 3
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [],
+      "background": {
+        "role": "reviewed_background",
+        "manifest": "datasets/scripts/person/config/background_dispatch.json",
+        "record_index": 4,
+        "image": "datasets/raw/person/teammate_submission_20261110/dataset/backgrounds/bg_00000_f00001.jpg"
+      },
+      "target": {
+        "actors": [
+          {
+            "id": "person_added",
+            "kind": "person",
+            "source": "datasets/annotated/person/v4_whiteborder_textures_20261113/community_1.png",
+            "source_role": "foreground_texture",
+            "source_record": {
+              "manifest": "datasets/annotated/person/v4_whiteborder_textures_20261113/manifest.json",
+              "record_index": 0
+            },
+            "view": "front",
+            "category": "community",
+            "identity": "1",
+            "identity_evidence": "datasets/annotated/person/v4_whiteborder_textures_20261113/manifest.json:record_index=0; AI visual design region head and upper clothing",
+            "identity_region_xyxy": [
+              18,
+              12,
+              118,
+              170
+            ],
+            "min_identity_visible": 0.9,
+            "foot_xy": [
+              320,
+              193
+            ],
+            "contact_width": 20,
+            "size_wh": [
+              69,
+              150
+            ],
+            "angles_degrees": {
+              "yaw": -4,
+              "pitch": 0,
+              "roll": 0
+            }
+          },
+          {
+            "id": "vehicle_front",
+            "kind": "vehicle",
+            "source": "datasets/annotated/person/v4_vehicle_occluders_20261113/sam2_04_upright.png",
+            "source_role": "vehicle_occluder",
+            "source_record": {
+              "manifest": "datasets/annotated/person/v4_vehicle_occluders_20261113/manifest.json",
+              "record_index": 2
+            },
+            "category": "upright",
+            "foot_xy": [
+              328,
+              198
+            ],
+            "contact_width": 25,
+            "size_wh": [
+              53,
+              76
+            ],
+            "angles_degrees": {
+              "yaw": 0,
+              "pitch": 0,
+              "roll": 0
+            }
+          }
+        ]
+      },
+      "labels": {
+        "person": "existing_and_new_visible_yolo",
+        "white_back": "not_labeled"
+      },
+      "augmentation": {
+        "value_gain": 1.0,
+        "saturation_gain": 1.0
+      },
+      "parameters": {
+        "resolution": [
+          640,
+          360
+        ],
+        "ground_polygon": [
+          [
+            0,
+            113
+          ],
+          [
+            639,
+            113
+          ],
+          [
+            639,
+            359
+          ],
+          [
+            0,
+            359
+          ]
+        ],
+        "obstacle_polygons": [],
+        "required_overlaps": [
+          [
+            "person_added",
+            "vehicle_front"
+          ]
+        ]
+      },
+      "sources": [
+        "Archive/Assets/场景/综合视频/空场与场景物料_001.mp4",
+        "datasets/annotated/e_bike/multiview_masks_refined_20261110_v2/sam2_04_upright.png",
+        "datasets/annotated/e_bike/video_review_20261110/images/source_002/frame_000003.jpg",
+        "datasets/annotated/person/v4_vehicle_occluders_20261113/sam2_04_upright.png",
+        "datasets/annotated/person/v4_whiteborder_textures_20261113/community_1.png",
+        "datasets/raw/e_bike/archive_assets_legacy/视频/浅色背景单辆直立车_平视旋转_009.mp4",
+        "datasets/raw/person/team_assets/社区人员/1.png",
+        "datasets/raw/person/teammate_submission_20261110/dataset/backgrounds/bg_00000_f00001.jpg"
+      ]
+    },
+    {
+      "id": "frame_007951_community_upright_tone1",
+      "failure_event": "person_upright_occlusion",
+      "min_count": 0,
+      "max_count": 1,
+      "prior": {
+        "alpha": 3,
+        "beta": 3
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [],
+      "background": {
+        "role": "reviewed_background",
+        "manifest": "datasets/scripts/person/config/background_dispatch.json",
+        "record_index": 5,
+        "image": "datasets/raw/person/teammate_submission_20261110/dataset/backgrounds/bg_00040_f00145.jpg"
+      },
+      "target": {
+        "actors": [
+          {
+            "id": "person_added",
+            "kind": "person",
+            "source": "datasets/annotated/person/v4_whiteborder_textures_20261113/community_1.png",
+            "source_role": "foreground_texture",
+            "source_record": {
+              "manifest": "datasets/annotated/person/v4_whiteborder_textures_20261113/manifest.json",
+              "record_index": 0
+            },
+            "view": "front",
+            "category": "community",
+            "identity": "1",
+            "identity_evidence": "datasets/annotated/person/v4_whiteborder_textures_20261113/manifest.json:record_index=0; AI visual design region head and upper clothing",
+            "identity_region_xyxy": [
+              18,
+              12,
+              118,
+              170
+            ],
+            "min_identity_visible": 0.9,
+            "foot_xy": [
+              320,
+              221
+            ],
+            "contact_width": 20,
+            "size_wh": [
+              69,
+              150
+            ],
+            "angles_degrees": {
+              "yaw": 0,
+              "pitch": 0,
+              "roll": 0
+            }
+          },
+          {
+            "id": "vehicle_front",
+            "kind": "vehicle",
+            "source": "datasets/annotated/person/v4_vehicle_occluders_20261113/sam2_04_upright.png",
+            "source_role": "vehicle_occluder",
+            "source_record": {
+              "manifest": "datasets/annotated/person/v4_vehicle_occluders_20261113/manifest.json",
+              "record_index": 2
+            },
+            "category": "upright",
+            "foot_xy": [
+              328,
+              226
+            ],
+            "contact_width": 25,
+            "size_wh": [
+              53,
+              76
+            ],
+            "angles_degrees": {
+              "yaw": 0,
+              "pitch": 0,
+              "roll": 0
+            }
+          }
+        ]
+      },
+      "labels": {
+        "person": "existing_and_new_visible_yolo",
+        "white_back": "not_labeled"
+      },
+      "augmentation": {
+        "value_gain": 0.88,
+        "saturation_gain": 0.82
+      },
+      "parameters": {
+        "resolution": [
+          640,
+          360
+        ],
+        "ground_polygon": [
+          [
+            0,
+            175
+          ],
+          [
+            639,
+            175
+          ],
+          [
+            639,
+            359
+          ],
+          [
+            0,
+            359
+          ]
+        ],
+        "obstacle_polygons": [],
+        "required_overlaps": [
+          [
+            "person_added",
+            "vehicle_front"
+          ]
+        ]
+      },
+      "sources": [
+        "Archive/Assets/场景/综合视频/空场与场景物料_001.mp4",
+        "datasets/annotated/e_bike/multiview_masks_refined_20261110_v2/sam2_04_upright.png",
+        "datasets/annotated/e_bike/video_review_20261110/images/source_002/frame_000003.jpg",
+        "datasets/annotated/person/v4_vehicle_occluders_20261113/sam2_04_upright.png",
+        "datasets/annotated/person/v4_whiteborder_textures_20261113/community_1.png",
+        "datasets/raw/e_bike/archive_assets_legacy/视频/浅色背景单辆直立车_平视旋转_009.mp4",
+        "datasets/raw/person/team_assets/社区人员/1.png",
+        "datasets/raw/person/teammate_submission_20261110/dataset/backgrounds/bg_00040_f00145.jpg"
+      ]
+    },
+    {
+      "id": "frame_007951_community_upright_tone2",
+      "failure_event": "person_upright_occlusion",
+      "min_count": 0,
+      "max_count": 1,
+      "prior": {
+        "alpha": 3,
+        "beta": 3
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [],
+      "background": {
+        "role": "reviewed_background",
+        "manifest": "datasets/scripts/person/config/background_dispatch.json",
+        "record_index": 0,
+        "image": "datasets/raw/person/teammate_submission_20261110/dataset/backgrounds/bg_00057_f00209.jpg"
+      },
+      "target": {
+        "actors": [
+          {
+            "id": "person_added",
+            "kind": "person",
+            "source": "datasets/annotated/person/v4_whiteborder_textures_20261113/community_1.png",
+            "source_role": "foreground_texture",
+            "source_record": {
+              "manifest": "datasets/annotated/person/v4_whiteborder_textures_20261113/manifest.json",
+              "record_index": 0
+            },
+            "view": "front",
+            "category": "community",
+            "identity": "1",
+            "identity_evidence": "datasets/annotated/person/v4_whiteborder_textures_20261113/manifest.json:record_index=0; AI visual design region head and upper clothing",
+            "identity_region_xyxy": [
+              18,
+              12,
+              118,
+              170
+            ],
+            "min_identity_visible": 0.9,
+            "foot_xy": [
+              320,
+              287
+            ],
+            "contact_width": 20,
+            "size_wh": [
+              69,
+              150
+            ],
+            "angles_degrees": {
+              "yaw": 4,
+              "pitch": 0,
+              "roll": 0
+            }
+          },
+          {
+            "id": "vehicle_front",
+            "kind": "vehicle",
+            "source": "datasets/annotated/person/v4_vehicle_occluders_20261113/sam2_04_upright.png",
+            "source_role": "vehicle_occluder",
+            "source_record": {
+              "manifest": "datasets/annotated/person/v4_vehicle_occluders_20261113/manifest.json",
+              "record_index": 2
+            },
+            "category": "upright",
+            "foot_xy": [
+              328,
+              292
+            ],
+            "contact_width": 25,
+            "size_wh": [
+              53,
+              76
+            ],
+            "angles_degrees": {
+              "yaw": 0,
+              "pitch": 0,
+              "roll": 0
+            }
+          }
+        ]
+      },
+      "labels": {
+        "person": "existing_and_new_visible_yolo",
+        "white_back": "not_labeled"
+      },
+      "augmentation": {
+        "value_gain": 1.1,
+        "saturation_gain": 0.72
+      },
+      "parameters": {
+        "resolution": [
+          640,
+          360
+        ],
+        "ground_polygon": [
+          [
+            0,
+            269
+          ],
+          [
+            639,
+            269
+          ],
+          [
+            639,
+            359
+          ],
+          [
+            0,
+            359
+          ]
+        ],
+        "obstacle_polygons": [],
+        "required_overlaps": [
+          [
+            "person_added",
+            "vehicle_front"
+          ]
+        ]
+      },
+      "sources": [
+        "Archive/Assets/场景/综合视频/空场与场景物料_001.mp4",
+        "datasets/annotated/e_bike/multiview_masks_refined_20261110_v2/sam2_04_upright.png",
+        "datasets/annotated/e_bike/video_review_20261110/images/source_002/frame_000003.jpg",
+        "datasets/annotated/person/v4_vehicle_occluders_20261113/sam2_04_upright.png",
+        "datasets/annotated/person/v4_whiteborder_textures_20261113/community_1.png",
+        "datasets/raw/e_bike/archive_assets_legacy/视频/浅色背景单辆直立车_平视旋转_009.mp4",
+        "datasets/raw/person/team_assets/社区人员/1.png",
+        "datasets/raw/person/teammate_submission_20261110/dataset/backgrounds/bg_00057_f00209.jpg"
+      ]
+    },
+    {
+      "id": "frame_007951_community_fallen_tone0",
+      "failure_event": "person_fallen_occlusion",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 3,
+        "beta": 3
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [],
+      "background": {
+        "role": "reviewed_background",
+        "manifest": "datasets/scripts/person/config/background_dispatch.json",
+        "record_index": 1,
+        "image": "datasets/raw/person/teammate_submission_20261110/dataset/backgrounds/bg_00086_f00359.jpg"
+      },
+      "target": {
+        "actors": [
+          {
+            "id": "person_added",
+            "kind": "person",
+            "source": "datasets/annotated/person/v4_whiteborder_textures_20261113/community_1.png",
+            "source_role": "foreground_texture",
+            "source_record": {
+              "manifest": "datasets/annotated/person/v4_whiteborder_textures_20261113/manifest.json",
+              "record_index": 0
+            },
+            "view": "front",
+            "category": "community",
+            "identity": "1",
+            "identity_evidence": "datasets/annotated/person/v4_whiteborder_textures_20261113/manifest.json:record_index=0; AI visual design region head and upper clothing",
+            "identity_region_xyxy": [
+              18,
+              12,
+              118,
+              170
+            ],
+            "min_identity_visible": 0.9,
+            "foot_xy": [
+              320,
+              302
+            ],
+            "contact_width": 20,
+            "size_wh": [
+              69,
+              150
+            ],
+            "angles_degrees": {
+              "yaw": -4,
+              "pitch": 0,
+              "roll": 0
+            }
+          },
+          {
+            "id": "vehicle_front",
+            "kind": "vehicle",
+            "source": "datasets/annotated/person/v4_vehicle_occluders_20261113/sam2_01_fallen.png",
+            "source_role": "vehicle_occluder",
+            "source_record": {
+              "manifest": "datasets/annotated/person/v4_vehicle_occluders_20261113/manifest.json",
+              "record_index": 0
+            },
+            "category": "fallen",
+            "foot_xy": [
+              328,
+              307
+            ],
+            "contact_width": 25,
+            "size_wh": [
+              88,
+              49
+            ],
+            "angles_degrees": {
+              "yaw": 0,
+              "pitch": 0,
+              "roll": 0
+            }
+          }
+        ]
+      },
+      "labels": {
+        "person": "existing_and_new_visible_yolo",
+        "white_back": "not_labeled"
+      },
+      "augmentation": {
+        "value_gain": 1.0,
+        "saturation_gain": 1.0
+      },
+      "parameters": {
+        "resolution": [
+          640,
+          360
+        ],
+        "ground_polygon": [
+          [
+            0,
+            293
+          ],
+          [
+            639,
+            293
+          ],
+          [
+            639,
+            359
+          ],
+          [
+            0,
+            359
+          ]
+        ],
+        "obstacle_polygons": [],
+        "required_overlaps": [
+          [
+            "person_added",
+            "vehicle_front"
+          ]
+        ]
+      },
+      "sources": [
+        "Archive/Assets/场景/综合视频/空场与场景物料_001.mp4",
+        "datasets/annotated/e_bike/multiview_masks_refined_20261110_v2/sam2_01_fallen.png",
+        "datasets/annotated/e_bike/video_review_20261110/images/source_001/frame_000001.jpg",
+        "datasets/annotated/person/v4_vehicle_occluders_20261113/sam2_01_fallen.png",
+        "datasets/annotated/person/v4_whiteborder_textures_20261113/community_1.png",
+        "datasets/raw/e_bike/archive_assets_legacy/视频/浅色背景单辆倒伏车_平视旋转_008.mp4",
+        "datasets/raw/person/team_assets/社区人员/1.png",
+        "datasets/raw/person/teammate_submission_20261110/dataset/backgrounds/bg_00086_f00359.jpg"
+      ]
+    },
+    {
+      "id": "frame_007951_community_fallen_tone1",
+      "failure_event": "person_fallen_occlusion",
+      "min_count": 0,
+      "max_count": 1,
+      "prior": {
+        "alpha": 3,
+        "beta": 3
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [],
+      "background": {
+        "role": "reviewed_background",
+        "manifest": "datasets/scripts/person/config/background_dispatch.json",
+        "record_index": 2,
+        "image": "datasets/raw/person/teammate_submission_20261110/dataset/backgrounds/bg_00146_f00749.jpg"
+      },
+      "target": {
+        "actors": [
+          {
+            "id": "person_added",
+            "kind": "person",
+            "source": "datasets/annotated/person/v4_whiteborder_textures_20261113/community_1.png",
+            "source_role": "foreground_texture",
+            "source_record": {
+              "manifest": "datasets/annotated/person/v4_whiteborder_textures_20261113/manifest.json",
+              "record_index": 0
+            },
+            "view": "front",
+            "category": "community",
+            "identity": "1",
+            "identity_evidence": "datasets/annotated/person/v4_whiteborder_textures_20261113/manifest.json:record_index=0; AI visual design region head and upper clothing",
+            "identity_region_xyxy": [
+              18,
+              12,
+              118,
+              170
+            ],
+            "min_identity_visible": 0.9,
+            "foot_xy": [
+              320,
+              243
+            ],
+            "contact_width": 20,
+            "size_wh": [
+              69,
+              150
+            ],
+            "angles_degrees": {
+              "yaw": 0,
+              "pitch": 0,
+              "roll": 0
+            }
+          },
+          {
+            "id": "vehicle_front",
+            "kind": "vehicle",
+            "source": "datasets/annotated/person/v4_vehicle_occluders_20261113/sam2_01_fallen.png",
+            "source_role": "vehicle_occluder",
+            "source_record": {
+              "manifest": "datasets/annotated/person/v4_vehicle_occluders_20261113/manifest.json",
+              "record_index": 0
+            },
+            "category": "fallen",
+            "foot_xy": [
+              328,
+              248
+            ],
+            "contact_width": 25,
+            "size_wh": [
+              88,
+              49
+            ],
+            "angles_degrees": {
+              "yaw": 0,
+              "pitch": 0,
+              "roll": 0
+            }
+          }
+        ]
+      },
+      "labels": {
+        "person": "existing_and_new_visible_yolo",
+        "white_back": "not_labeled"
+      },
+      "augmentation": {
+        "value_gain": 0.88,
+        "saturation_gain": 0.82
+      },
+      "parameters": {
+        "resolution": [
+          640,
+          360
+        ],
+        "ground_polygon": [
+          [
+            0,
+            201
+          ],
+          [
+            639,
+            201
+          ],
+          [
+            639,
+            359
+          ],
+          [
+            0,
+            359
+          ]
+        ],
+        "obstacle_polygons": [],
+        "required_overlaps": [
+          [
+            "person_added",
+            "vehicle_front"
+          ]
+        ]
+      },
+      "sources": [
+        "Archive/Assets/场景/综合视频/空场与场景物料_001.mp4",
+        "datasets/annotated/e_bike/multiview_masks_refined_20261110_v2/sam2_01_fallen.png",
+        "datasets/annotated/e_bike/video_review_20261110/images/source_001/frame_000001.jpg",
+        "datasets/annotated/person/v4_vehicle_occluders_20261113/sam2_01_fallen.png",
+        "datasets/annotated/person/v4_whiteborder_textures_20261113/community_1.png",
+        "datasets/raw/e_bike/archive_assets_legacy/视频/浅色背景单辆倒伏车_平视旋转_008.mp4",
+        "datasets/raw/person/team_assets/社区人员/1.png",
+        "datasets/raw/person/teammate_submission_20261110/dataset/backgrounds/bg_00146_f00749.jpg"
+      ]
+    },
+    {
+      "id": "frame_007951_community_fallen_tone2",
+      "failure_event": "person_fallen_occlusion",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 3,
+        "beta": 3
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [],
+      "background": {
+        "role": "reviewed_background",
+        "manifest": "datasets/scripts/person/config/background_dispatch.json",
+        "record_index": 3,
+        "image": "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_004001.png"
+      },
+      "target": {
+        "actors": [
+          {
+            "id": "person_added",
+            "kind": "person",
+            "source": "datasets/annotated/person/v4_whiteborder_textures_20261113/community_1.png",
+            "source_role": "foreground_texture",
+            "source_record": {
+              "manifest": "datasets/annotated/person/v4_whiteborder_textures_20261113/manifest.json",
+              "record_index": 0
+            },
+            "view": "front",
+            "category": "community",
+            "identity": "1",
+            "identity_evidence": "datasets/annotated/person/v4_whiteborder_textures_20261113/manifest.json:record_index=0; AI visual design region head and upper clothing",
+            "identity_region_xyxy": [
+              18,
+              12,
+              118,
+              170
+            ],
+            "min_identity_visible": 0.9,
+            "foot_xy": [
+              320,
+              275
+            ],
+            "contact_width": 20,
+            "size_wh": [
+              69,
+              150
+            ],
+            "angles_degrees": {
+              "yaw": 4,
+              "pitch": 0,
+              "roll": 0
+            }
+          },
+          {
+            "id": "vehicle_front",
+            "kind": "vehicle",
+            "source": "datasets/annotated/person/v4_vehicle_occluders_20261113/sam2_01_fallen.png",
+            "source_role": "vehicle_occluder",
+            "source_record": {
+              "manifest": "datasets/annotated/person/v4_vehicle_occluders_20261113/manifest.json",
+              "record_index": 0
+            },
+            "category": "fallen",
+            "foot_xy": [
+              328,
+              280
+            ],
+            "contact_width": 25,
+            "size_wh": [
+              88,
+              49
+            ],
+            "angles_degrees": {
+              "yaw": 0,
+              "pitch": 0,
+              "roll": 0
+            }
+          }
+        ]
+      },
+      "labels": {
+        "person": "existing_and_new_visible_yolo",
+        "white_back": "not_labeled"
+      },
+      "augmentation": {
+        "value_gain": 1.1,
+        "saturation_gain": 0.72
+      },
+      "parameters": {
+        "resolution": [
+          640,
+          360
+        ],
+        "ground_polygon": [
+          [
+            0,
+            253
+          ],
+          [
+            639,
+            253
+          ],
+          [
+            639,
+            359
+          ],
+          [
+            0,
+            359
+          ]
+        ],
+        "obstacle_polygons": [],
+        "required_overlaps": [
+          [
+            "person_added",
+            "vehicle_front"
+          ]
+        ]
+      },
+      "sources": [
+        "datasets/annotated/e_bike/multiview_masks_refined_20261110_v2/sam2_01_fallen.png",
+        "datasets/annotated/e_bike/video_review_20261110/images/source_001/frame_000001.jpg",
+        "datasets/annotated/person/v4_vehicle_occluders_20261113/sam2_01_fallen.png",
+        "datasets/annotated/person/v4_whiteborder_textures_20261113/community_1.png",
+        "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_004001.png",
+        "datasets/raw/e_bike/archive_assets_legacy/视频/浅色背景单辆倒伏车_平视旋转_008.mp4",
+        "datasets/raw/person/team_assets/社区人员/1.png",
+        "datasets/raw/site_capture_20261112/videos/full_scene.mp4"
+      ]
+    },
+    {
+      "id": "frame_007951_noncommunity_none_tone0",
+      "failure_event": "person_unoccluded",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 3
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [],
+      "background": {
+        "role": "reviewed_background",
+        "manifest": "datasets/scripts/person/config/background_dispatch.json",
+        "record_index": 4,
+        "image": "datasets/raw/person/teammate_submission_20261110/dataset/backgrounds/bg_00000_f00001.jpg"
+      },
+      "target": {
+        "actors": [
+          {
+            "id": "person_added",
+            "kind": "person",
+            "source": "datasets/annotated/person/v4_whiteborder_textures_20261113/noncommunity_F2.png",
+            "source_role": "foreground_texture",
+            "source_record": {
+              "manifest": "datasets/annotated/person/v4_whiteborder_textures_20261113/manifest.json",
+              "record_index": 17
+            },
+            "view": "front",
+            "category": "noncommunity",
+            "identity": "F2",
+            "identity_evidence": "datasets/annotated/person/v4_whiteborder_textures_20261113/manifest.json:record_index=17; AI visual design region head and upper clothing",
+            "identity_region_xyxy": [
+              26,
+              8,
+              148,
+              168
+            ],
+            "min_identity_visible": 0.9,
+            "foot_xy": [
+              320,
+              193
+            ],
+            "contact_width": 20,
+            "size_wh": [
+              67,
+              150
+            ],
+            "angles_degrees": {
+              "yaw": -4,
+              "pitch": 0,
+              "roll": 0
+            }
+          }
+        ]
+      },
+      "labels": {
+        "person": "existing_and_new_visible_yolo",
+        "white_back": "not_labeled"
+      },
+      "augmentation": {
+        "value_gain": 1.0,
+        "saturation_gain": 1.0
+      },
+      "parameters": {
+        "resolution": [
+          640,
+          360
+        ],
+        "ground_polygon": [
+          [
+            0,
+            113
+          ],
+          [
+            639,
+            113
+          ],
+          [
+            639,
+            359
+          ],
+          [
+            0,
+            359
+          ]
+        ],
+        "obstacle_polygons": [],
+        "required_overlaps": []
+      },
+      "sources": [
+        "Archive/Assets/场景/综合视频/空场与场景物料_001.mp4",
+        "datasets/annotated/person/v4_whiteborder_textures_20261113/noncommunity_F2.png",
+        "datasets/raw/person/team_assets/非社区人员/F2.png",
+        "datasets/raw/person/teammate_submission_20261110/dataset/backgrounds/bg_00000_f00001.jpg"
+      ]
+    },
+    {
+      "id": "frame_007951_noncommunity_none_tone1",
+      "failure_event": "person_unoccluded",
+      "min_count": 0,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 3
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [],
+      "background": {
+        "role": "reviewed_background",
+        "manifest": "datasets/scripts/person/config/background_dispatch.json",
+        "record_index": 5,
+        "image": "datasets/raw/person/teammate_submission_20261110/dataset/backgrounds/bg_00040_f00145.jpg"
+      },
+      "target": {
+        "actors": [
+          {
+            "id": "person_added",
+            "kind": "person",
+            "source": "datasets/annotated/person/v4_whiteborder_textures_20261113/noncommunity_F2.png",
+            "source_role": "foreground_texture",
+            "source_record": {
+              "manifest": "datasets/annotated/person/v4_whiteborder_textures_20261113/manifest.json",
+              "record_index": 17
+            },
+            "view": "front",
+            "category": "noncommunity",
+            "identity": "F2",
+            "identity_evidence": "datasets/annotated/person/v4_whiteborder_textures_20261113/manifest.json:record_index=17; AI visual design region head and upper clothing",
+            "identity_region_xyxy": [
+              26,
+              8,
+              148,
+              168
+            ],
+            "min_identity_visible": 0.9,
+            "foot_xy": [
+              320,
+              221
+            ],
+            "contact_width": 20,
+            "size_wh": [
+              67,
+              150
+            ],
+            "angles_degrees": {
+              "yaw": 0,
+              "pitch": 0,
+              "roll": 0
+            }
+          }
+        ]
+      },
+      "labels": {
+        "person": "existing_and_new_visible_yolo",
+        "white_back": "not_labeled"
+      },
+      "augmentation": {
+        "value_gain": 0.88,
+        "saturation_gain": 0.82
+      },
+      "parameters": {
+        "resolution": [
+          640,
+          360
+        ],
+        "ground_polygon": [
+          [
+            0,
+            175
+          ],
+          [
+            639,
+            175
+          ],
+          [
+            639,
+            359
+          ],
+          [
+            0,
+            359
+          ]
+        ],
+        "obstacle_polygons": [],
+        "required_overlaps": []
+      },
+      "sources": [
+        "Archive/Assets/场景/综合视频/空场与场景物料_001.mp4",
+        "datasets/annotated/person/v4_whiteborder_textures_20261113/noncommunity_F2.png",
+        "datasets/raw/person/team_assets/非社区人员/F2.png",
+        "datasets/raw/person/teammate_submission_20261110/dataset/backgrounds/bg_00040_f00145.jpg"
+      ]
+    },
+    {
+      "id": "frame_007951_noncommunity_none_tone2",
+      "failure_event": "person_unoccluded",
+      "min_count": 0,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 3
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [],
+      "background": {
+        "role": "reviewed_background",
+        "manifest": "datasets/scripts/person/config/background_dispatch.json",
+        "record_index": 0,
+        "image": "datasets/raw/person/teammate_submission_20261110/dataset/backgrounds/bg_00057_f00209.jpg"
+      },
+      "target": {
+        "actors": [
+          {
+            "id": "person_added",
+            "kind": "person",
+            "source": "datasets/annotated/person/v4_whiteborder_textures_20261113/noncommunity_F2.png",
+            "source_role": "foreground_texture",
+            "source_record": {
+              "manifest": "datasets/annotated/person/v4_whiteborder_textures_20261113/manifest.json",
+              "record_index": 17
+            },
+            "view": "front",
+            "category": "noncommunity",
+            "identity": "F2",
+            "identity_evidence": "datasets/annotated/person/v4_whiteborder_textures_20261113/manifest.json:record_index=17; AI visual design region head and upper clothing",
+            "identity_region_xyxy": [
+              26,
+              8,
+              148,
+              168
+            ],
+            "min_identity_visible": 0.9,
+            "foot_xy": [
+              320,
+              287
+            ],
+            "contact_width": 20,
+            "size_wh": [
+              67,
+              150
+            ],
+            "angles_degrees": {
+              "yaw": 4,
+              "pitch": 0,
+              "roll": 0
+            }
+          }
+        ]
+      },
+      "labels": {
+        "person": "existing_and_new_visible_yolo",
+        "white_back": "not_labeled"
+      },
+      "augmentation": {
+        "value_gain": 1.1,
+        "saturation_gain": 0.72
+      },
+      "parameters": {
+        "resolution": [
+          640,
+          360
+        ],
+        "ground_polygon": [
+          [
+            0,
+            269
+          ],
+          [
+            639,
+            269
+          ],
+          [
+            639,
+            359
+          ],
+          [
+            0,
+            359
+          ]
+        ],
+        "obstacle_polygons": [],
+        "required_overlaps": []
+      },
+      "sources": [
+        "Archive/Assets/场景/综合视频/空场与场景物料_001.mp4",
+        "datasets/annotated/person/v4_whiteborder_textures_20261113/noncommunity_F2.png",
+        "datasets/raw/person/team_assets/非社区人员/F2.png",
+        "datasets/raw/person/teammate_submission_20261110/dataset/backgrounds/bg_00057_f00209.jpg"
+      ]
+    },
+    {
+      "id": "frame_007951_noncommunity_upright_tone0",
+      "failure_event": "person_upright_occlusion",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 3,
+        "beta": 3
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [],
+      "background": {
+        "role": "reviewed_background",
+        "manifest": "datasets/scripts/person/config/background_dispatch.json",
+        "record_index": 1,
+        "image": "datasets/raw/person/teammate_submission_20261110/dataset/backgrounds/bg_00086_f00359.jpg"
+      },
+      "target": {
+        "actors": [
+          {
+            "id": "person_added",
+            "kind": "person",
+            "source": "datasets/annotated/person/v4_whiteborder_textures_20261113/noncommunity_F2.png",
+            "source_role": "foreground_texture",
+            "source_record": {
+              "manifest": "datasets/annotated/person/v4_whiteborder_textures_20261113/manifest.json",
+              "record_index": 17
+            },
+            "view": "front",
+            "category": "noncommunity",
+            "identity": "F2",
+            "identity_evidence": "datasets/annotated/person/v4_whiteborder_textures_20261113/manifest.json:record_index=17; AI visual design region head and upper clothing",
+            "identity_region_xyxy": [
+              26,
+              8,
+              148,
+              168
+            ],
+            "min_identity_visible": 0.9,
+            "foot_xy": [
+              320,
+              302
+            ],
+            "contact_width": 20,
+            "size_wh": [
+              67,
+              150
+            ],
+            "angles_degrees": {
+              "yaw": -4,
+              "pitch": 0,
+              "roll": 0
+            }
+          },
+          {
+            "id": "vehicle_front",
+            "kind": "vehicle",
+            "source": "datasets/annotated/person/v4_vehicle_occluders_20261113/sam2_04_upright.png",
+            "source_role": "vehicle_occluder",
+            "source_record": {
+              "manifest": "datasets/annotated/person/v4_vehicle_occluders_20261113/manifest.json",
+              "record_index": 2
+            },
+            "category": "upright",
+            "foot_xy": [
+              328,
+              307
+            ],
+            "contact_width": 25,
+            "size_wh": [
+              53,
+              76
+            ],
+            "angles_degrees": {
+              "yaw": 0,
+              "pitch": 0,
+              "roll": 0
+            }
+          }
+        ]
+      },
+      "labels": {
+        "person": "existing_and_new_visible_yolo",
+        "white_back": "not_labeled"
+      },
+      "augmentation": {
+        "value_gain": 1.0,
+        "saturation_gain": 1.0
+      },
+      "parameters": {
+        "resolution": [
+          640,
+          360
+        ],
+        "ground_polygon": [
+          [
+            0,
+            293
+          ],
+          [
+            639,
+            293
+          ],
+          [
+            639,
+            359
+          ],
+          [
+            0,
+            359
+          ]
+        ],
+        "obstacle_polygons": [],
+        "required_overlaps": [
+          [
+            "person_added",
+            "vehicle_front"
+          ]
+        ]
+      },
+      "sources": [
+        "Archive/Assets/场景/综合视频/空场与场景物料_001.mp4",
+        "datasets/annotated/e_bike/multiview_masks_refined_20261110_v2/sam2_04_upright.png",
+        "datasets/annotated/e_bike/video_review_20261110/images/source_002/frame_000003.jpg",
+        "datasets/annotated/person/v4_vehicle_occluders_20261113/sam2_04_upright.png",
+        "datasets/annotated/person/v4_whiteborder_textures_20261113/noncommunity_F2.png",
+        "datasets/raw/e_bike/archive_assets_legacy/视频/浅色背景单辆直立车_平视旋转_009.mp4",
+        "datasets/raw/person/team_assets/非社区人员/F2.png",
+        "datasets/raw/person/teammate_submission_20261110/dataset/backgrounds/bg_00086_f00359.jpg"
+      ]
+    },
+    {
+      "id": "frame_007951_noncommunity_upright_tone1",
+      "failure_event": "person_upright_occlusion",
+      "min_count": 0,
+      "max_count": 1,
+      "prior": {
+        "alpha": 3,
+        "beta": 3
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [],
+      "background": {
+        "role": "reviewed_background",
+        "manifest": "datasets/scripts/person/config/background_dispatch.json",
+        "record_index": 2,
+        "image": "datasets/raw/person/teammate_submission_20261110/dataset/backgrounds/bg_00146_f00749.jpg"
+      },
+      "target": {
+        "actors": [
+          {
+            "id": "person_added",
+            "kind": "person",
+            "source": "datasets/annotated/person/v4_whiteborder_textures_20261113/noncommunity_F2.png",
+            "source_role": "foreground_texture",
+            "source_record": {
+              "manifest": "datasets/annotated/person/v4_whiteborder_textures_20261113/manifest.json",
+              "record_index": 17
+            },
+            "view": "front",
+            "category": "noncommunity",
+            "identity": "F2",
+            "identity_evidence": "datasets/annotated/person/v4_whiteborder_textures_20261113/manifest.json:record_index=17; AI visual design region head and upper clothing",
+            "identity_region_xyxy": [
+              26,
+              8,
+              148,
+              168
+            ],
+            "min_identity_visible": 0.9,
+            "foot_xy": [
+              320,
+              243
+            ],
+            "contact_width": 20,
+            "size_wh": [
+              67,
+              150
+            ],
+            "angles_degrees": {
+              "yaw": 0,
+              "pitch": 0,
+              "roll": 0
+            }
+          },
+          {
+            "id": "vehicle_front",
+            "kind": "vehicle",
+            "source": "datasets/annotated/person/v4_vehicle_occluders_20261113/sam2_04_upright.png",
+            "source_role": "vehicle_occluder",
+            "source_record": {
+              "manifest": "datasets/annotated/person/v4_vehicle_occluders_20261113/manifest.json",
+              "record_index": 2
+            },
+            "category": "upright",
+            "foot_xy": [
+              328,
+              248
+            ],
+            "contact_width": 25,
+            "size_wh": [
+              53,
+              76
+            ],
+            "angles_degrees": {
+              "yaw": 0,
+              "pitch": 0,
+              "roll": 0
+            }
+          }
+        ]
+      },
+      "labels": {
+        "person": "existing_and_new_visible_yolo",
+        "white_back": "not_labeled"
+      },
+      "augmentation": {
+        "value_gain": 0.88,
+        "saturation_gain": 0.82
+      },
+      "parameters": {
+        "resolution": [
+          640,
+          360
+        ],
+        "ground_polygon": [
+          [
+            0,
+            201
+          ],
+          [
+            639,
+            201
+          ],
+          [
+            639,
+            359
+          ],
+          [
+            0,
+            359
+          ]
+        ],
+        "obstacle_polygons": [],
+        "required_overlaps": [
+          [
+            "person_added",
+            "vehicle_front"
+          ]
+        ]
+      },
+      "sources": [
+        "Archive/Assets/场景/综合视频/空场与场景物料_001.mp4",
+        "datasets/annotated/e_bike/multiview_masks_refined_20261110_v2/sam2_04_upright.png",
+        "datasets/annotated/e_bike/video_review_20261110/images/source_002/frame_000003.jpg",
+        "datasets/annotated/person/v4_vehicle_occluders_20261113/sam2_04_upright.png",
+        "datasets/annotated/person/v4_whiteborder_textures_20261113/noncommunity_F2.png",
+        "datasets/raw/e_bike/archive_assets_legacy/视频/浅色背景单辆直立车_平视旋转_009.mp4",
+        "datasets/raw/person/team_assets/非社区人员/F2.png",
+        "datasets/raw/person/teammate_submission_20261110/dataset/backgrounds/bg_00146_f00749.jpg"
+      ]
+    },
+    {
+      "id": "frame_007951_noncommunity_upright_tone2",
+      "failure_event": "person_upright_occlusion",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 3,
+        "beta": 3
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [],
+      "background": {
+        "role": "reviewed_background",
+        "manifest": "datasets/scripts/person/config/background_dispatch.json",
+        "record_index": 3,
+        "image": "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_004001.png"
+      },
+      "target": {
+        "actors": [
+          {
+            "id": "person_added",
+            "kind": "person",
+            "source": "datasets/annotated/person/v4_whiteborder_textures_20261113/noncommunity_F2.png",
+            "source_role": "foreground_texture",
+            "source_record": {
+              "manifest": "datasets/annotated/person/v4_whiteborder_textures_20261113/manifest.json",
+              "record_index": 17
+            },
+            "view": "front",
+            "category": "noncommunity",
+            "identity": "F2",
+            "identity_evidence": "datasets/annotated/person/v4_whiteborder_textures_20261113/manifest.json:record_index=17; AI visual design region head and upper clothing",
+            "identity_region_xyxy": [
+              26,
+              8,
+              148,
+              168
+            ],
+            "min_identity_visible": 0.9,
+            "foot_xy": [
+              320,
+              275
+            ],
+            "contact_width": 20,
+            "size_wh": [
+              67,
+              150
+            ],
+            "angles_degrees": {
+              "yaw": 4,
+              "pitch": 0,
+              "roll": 0
+            }
+          },
+          {
+            "id": "vehicle_front",
+            "kind": "vehicle",
+            "source": "datasets/annotated/person/v4_vehicle_occluders_20261113/sam2_04_upright.png",
+            "source_role": "vehicle_occluder",
+            "source_record": {
+              "manifest": "datasets/annotated/person/v4_vehicle_occluders_20261113/manifest.json",
+              "record_index": 2
+            },
+            "category": "upright",
+            "foot_xy": [
+              328,
+              280
+            ],
+            "contact_width": 25,
+            "size_wh": [
+              53,
+              76
+            ],
+            "angles_degrees": {
+              "yaw": 0,
+              "pitch": 0,
+              "roll": 0
+            }
+          }
+        ]
+      },
+      "labels": {
+        "person": "existing_and_new_visible_yolo",
+        "white_back": "not_labeled"
+      },
+      "augmentation": {
+        "value_gain": 1.1,
+        "saturation_gain": 0.72
+      },
+      "parameters": {
+        "resolution": [
+          640,
+          360
+        ],
+        "ground_polygon": [
+          [
+            0,
+            253
+          ],
+          [
+            639,
+            253
+          ],
+          [
+            639,
+            359
+          ],
+          [
+            0,
+            359
+          ]
+        ],
+        "obstacle_polygons": [],
+        "required_overlaps": [
+          [
+            "person_added",
+            "vehicle_front"
+          ]
+        ]
+      },
+      "sources": [
+        "datasets/annotated/e_bike/multiview_masks_refined_20261110_v2/sam2_04_upright.png",
+        "datasets/annotated/e_bike/video_review_20261110/images/source_002/frame_000003.jpg",
+        "datasets/annotated/person/v4_vehicle_occluders_20261113/sam2_04_upright.png",
+        "datasets/annotated/person/v4_whiteborder_textures_20261113/noncommunity_F2.png",
+        "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_004001.png",
+        "datasets/raw/e_bike/archive_assets_legacy/视频/浅色背景单辆直立车_平视旋转_009.mp4",
+        "datasets/raw/person/team_assets/非社区人员/F2.png",
+        "datasets/raw/site_capture_20261112/videos/full_scene.mp4"
+      ]
+    },
+    {
+      "id": "frame_007951_noncommunity_fallen_tone0",
+      "failure_event": "person_fallen_occlusion",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 3,
+        "beta": 3
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [],
+      "background": {
+        "role": "reviewed_background",
+        "manifest": "datasets/scripts/person/config/background_dispatch.json",
+        "record_index": 4,
+        "image": "datasets/raw/person/teammate_submission_20261110/dataset/backgrounds/bg_00000_f00001.jpg"
+      },
+      "target": {
+        "actors": [
+          {
+            "id": "person_added",
+            "kind": "person",
+            "source": "datasets/annotated/person/v4_whiteborder_textures_20261113/noncommunity_F2.png",
+            "source_role": "foreground_texture",
+            "source_record": {
+              "manifest": "datasets/annotated/person/v4_whiteborder_textures_20261113/manifest.json",
+              "record_index": 17
+            },
+            "view": "front",
+            "category": "noncommunity",
+            "identity": "F2",
+            "identity_evidence": "datasets/annotated/person/v4_whiteborder_textures_20261113/manifest.json:record_index=17; AI visual design region head and upper clothing",
+            "identity_region_xyxy": [
+              26,
+              8,
+              148,
+              168
+            ],
+            "min_identity_visible": 0.9,
+            "foot_xy": [
+              320,
+              193
+            ],
+            "contact_width": 20,
+            "size_wh": [
+              67,
+              150
+            ],
+            "angles_degrees": {
+              "yaw": -4,
+              "pitch": 0,
+              "roll": 0
+            }
+          },
+          {
+            "id": "vehicle_front",
+            "kind": "vehicle",
+            "source": "datasets/annotated/person/v4_vehicle_occluders_20261113/sam2_01_fallen.png",
+            "source_role": "vehicle_occluder",
+            "source_record": {
+              "manifest": "datasets/annotated/person/v4_vehicle_occluders_20261113/manifest.json",
+              "record_index": 0
+            },
+            "category": "fallen",
+            "foot_xy": [
+              328,
+              198
+            ],
+            "contact_width": 25,
+            "size_wh": [
+              88,
+              49
+            ],
+            "angles_degrees": {
+              "yaw": 0,
+              "pitch": 0,
+              "roll": 0
+            }
+          }
+        ]
+      },
+      "labels": {
+        "person": "existing_and_new_visible_yolo",
+        "white_back": "not_labeled"
+      },
+      "augmentation": {
+        "value_gain": 1.0,
+        "saturation_gain": 1.0
+      },
+      "parameters": {
+        "resolution": [
+          640,
+          360
+        ],
+        "ground_polygon": [
+          [
+            0,
+            113
+          ],
+          [
+            639,
+            113
+          ],
+          [
+            639,
+            359
+          ],
+          [
+            0,
+            359
+          ]
+        ],
+        "obstacle_polygons": [],
+        "required_overlaps": [
+          [
+            "person_added",
+            "vehicle_front"
+          ]
+        ]
+      },
+      "sources": [
+        "Archive/Assets/场景/综合视频/空场与场景物料_001.mp4",
+        "datasets/annotated/e_bike/multiview_masks_refined_20261110_v2/sam2_01_fallen.png",
+        "datasets/annotated/e_bike/video_review_20261110/images/source_001/frame_000001.jpg",
+        "datasets/annotated/person/v4_vehicle_occluders_20261113/sam2_01_fallen.png",
+        "datasets/annotated/person/v4_whiteborder_textures_20261113/noncommunity_F2.png",
+        "datasets/raw/e_bike/archive_assets_legacy/视频/浅色背景单辆倒伏车_平视旋转_008.mp4",
+        "datasets/raw/person/team_assets/非社区人员/F2.png",
+        "datasets/raw/person/teammate_submission_20261110/dataset/backgrounds/bg_00000_f00001.jpg"
+      ]
+    },
+    {
+      "id": "frame_007951_noncommunity_fallen_tone1",
+      "failure_event": "person_fallen_occlusion",
+      "min_count": 0,
+      "max_count": 1,
+      "prior": {
+        "alpha": 3,
+        "beta": 3
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [],
+      "background": {
+        "role": "reviewed_background",
+        "manifest": "datasets/scripts/person/config/background_dispatch.json",
+        "record_index": 5,
+        "image": "datasets/raw/person/teammate_submission_20261110/dataset/backgrounds/bg_00040_f00145.jpg"
+      },
+      "target": {
+        "actors": [
+          {
+            "id": "person_added",
+            "kind": "person",
+            "source": "datasets/annotated/person/v4_whiteborder_textures_20261113/noncommunity_F2.png",
+            "source_role": "foreground_texture",
+            "source_record": {
+              "manifest": "datasets/annotated/person/v4_whiteborder_textures_20261113/manifest.json",
+              "record_index": 17
+            },
+            "view": "front",
+            "category": "noncommunity",
+            "identity": "F2",
+            "identity_evidence": "datasets/annotated/person/v4_whiteborder_textures_20261113/manifest.json:record_index=17; AI visual design region head and upper clothing",
+            "identity_region_xyxy": [
+              26,
+              8,
+              148,
+              168
+            ],
+            "min_identity_visible": 0.9,
+            "foot_xy": [
+              320,
+              221
+            ],
+            "contact_width": 20,
+            "size_wh": [
+              67,
+              150
+            ],
+            "angles_degrees": {
+              "yaw": 0,
+              "pitch": 0,
+              "roll": 0
+            }
+          },
+          {
+            "id": "vehicle_front",
+            "kind": "vehicle",
+            "source": "datasets/annotated/person/v4_vehicle_occluders_20261113/sam2_01_fallen.png",
+            "source_role": "vehicle_occluder",
+            "source_record": {
+              "manifest": "datasets/annotated/person/v4_vehicle_occluders_20261113/manifest.json",
+              "record_index": 0
+            },
+            "category": "fallen",
+            "foot_xy": [
+              328,
+              226
+            ],
+            "contact_width": 25,
+            "size_wh": [
+              88,
+              49
+            ],
+            "angles_degrees": {
+              "yaw": 0,
+              "pitch": 0,
+              "roll": 0
+            }
+          }
+        ]
+      },
+      "labels": {
+        "person": "existing_and_new_visible_yolo",
+        "white_back": "not_labeled"
+      },
+      "augmentation": {
+        "value_gain": 0.88,
+        "saturation_gain": 0.82
+      },
+      "parameters": {
+        "resolution": [
+          640,
+          360
+        ],
+        "ground_polygon": [
+          [
+            0,
+            175
+          ],
+          [
+            639,
+            175
+          ],
+          [
+            639,
+            359
+          ],
+          [
+            0,
+            359
+          ]
+        ],
+        "obstacle_polygons": [],
+        "required_overlaps": [
+          [
+            "person_added",
+            "vehicle_front"
+          ]
+        ]
+      },
+      "sources": [
+        "Archive/Assets/场景/综合视频/空场与场景物料_001.mp4",
+        "datasets/annotated/e_bike/multiview_masks_refined_20261110_v2/sam2_01_fallen.png",
+        "datasets/annotated/e_bike/video_review_20261110/images/source_001/frame_000001.jpg",
+        "datasets/annotated/person/v4_vehicle_occluders_20261113/sam2_01_fallen.png",
+        "datasets/annotated/person/v4_whiteborder_textures_20261113/noncommunity_F2.png",
+        "datasets/raw/e_bike/archive_assets_legacy/视频/浅色背景单辆倒伏车_平视旋转_008.mp4",
+        "datasets/raw/person/team_assets/非社区人员/F2.png",
+        "datasets/raw/person/teammate_submission_20261110/dataset/backgrounds/bg_00040_f00145.jpg"
+      ]
+    },
+    {
+      "id": "frame_007951_noncommunity_fallen_tone2",
+      "failure_event": "person_fallen_occlusion",
+      "min_count": 0,
+      "max_count": 1,
+      "prior": {
+        "alpha": 3,
+        "beta": 3
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [],
+      "background": {
+        "role": "reviewed_background",
+        "manifest": "datasets/scripts/person/config/background_dispatch.json",
+        "record_index": 0,
+        "image": "datasets/raw/person/teammate_submission_20261110/dataset/backgrounds/bg_00057_f00209.jpg"
+      },
+      "target": {
+        "actors": [
+          {
+            "id": "person_added",
+            "kind": "person",
+            "source": "datasets/annotated/person/v4_whiteborder_textures_20261113/noncommunity_F2.png",
+            "source_role": "foreground_texture",
+            "source_record": {
+              "manifest": "datasets/annotated/person/v4_whiteborder_textures_20261113/manifest.json",
+              "record_index": 17
+            },
+            "view": "front",
+            "category": "noncommunity",
+            "identity": "F2",
+            "identity_evidence": "datasets/annotated/person/v4_whiteborder_textures_20261113/manifest.json:record_index=17; AI visual design region head and upper clothing",
+            "identity_region_xyxy": [
+              26,
+              8,
+              148,
+              168
+            ],
+            "min_identity_visible": 0.9,
+            "foot_xy": [
+              320,
+              287
+            ],
+            "contact_width": 20,
+            "size_wh": [
+              67,
+              150
+            ],
+            "angles_degrees": {
+              "yaw": 4,
+              "pitch": 0,
+              "roll": 0
+            }
+          },
+          {
+            "id": "vehicle_front",
+            "kind": "vehicle",
+            "source": "datasets/annotated/person/v4_vehicle_occluders_20261113/sam2_01_fallen.png",
+            "source_role": "vehicle_occluder",
+            "source_record": {
+              "manifest": "datasets/annotated/person/v4_vehicle_occluders_20261113/manifest.json",
+              "record_index": 0
+            },
+            "category": "fallen",
+            "foot_xy": [
+              328,
+              292
+            ],
+            "contact_width": 25,
+            "size_wh": [
+              88,
+              49
+            ],
+            "angles_degrees": {
+              "yaw": 0,
+              "pitch": 0,
+              "roll": 0
+            }
+          }
+        ]
+      },
+      "labels": {
+        "person": "existing_and_new_visible_yolo",
+        "white_back": "not_labeled"
+      },
+      "augmentation": {
+        "value_gain": 1.1,
+        "saturation_gain": 0.72
+      },
+      "parameters": {
+        "resolution": [
+          640,
+          360
+        ],
+        "ground_polygon": [
+          [
+            0,
+            269
+          ],
+          [
+            639,
+            269
+          ],
+          [
+            639,
+            359
+          ],
+          [
+            0,
+            359
+          ]
+        ],
+        "obstacle_polygons": [],
+        "required_overlaps": [
+          [
+            "person_added",
+            "vehicle_front"
+          ]
+        ]
+      },
+      "sources": [
+        "Archive/Assets/场景/综合视频/空场与场景物料_001.mp4",
+        "datasets/annotated/e_bike/multiview_masks_refined_20261110_v2/sam2_01_fallen.png",
+        "datasets/annotated/e_bike/video_review_20261110/images/source_001/frame_000001.jpg",
+        "datasets/annotated/person/v4_vehicle_occluders_20261113/sam2_01_fallen.png",
+        "datasets/annotated/person/v4_whiteborder_textures_20261113/noncommunity_F2.png",
+        "datasets/raw/e_bike/archive_assets_legacy/视频/浅色背景单辆倒伏车_平视旋转_008.mp4",
+        "datasets/raw/person/team_assets/非社区人员/F2.png",
+        "datasets/raw/person/teammate_submission_20261110/dataset/backgrounds/bg_00057_f00209.jpg"
+      ]
+    },
+    {
+      "id": "frame_008551_community_none_tone0",
+      "failure_event": "person_unoccluded",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 3
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [],
+      "background": {
+        "role": "reviewed_background",
+        "manifest": "datasets/scripts/person/config/background_dispatch.json",
+        "record_index": 2,
+        "image": "datasets/raw/person/teammate_submission_20261110/dataset/backgrounds/bg_00146_f00749.jpg"
+      },
+      "target": {
+        "actors": [
+          {
+            "id": "person_added",
+            "kind": "person",
+            "source": "datasets/annotated/person/v4_whiteborder_textures_20261113/community_1.png",
+            "source_role": "foreground_texture",
+            "source_record": {
+              "manifest": "datasets/annotated/person/v4_whiteborder_textures_20261113/manifest.json",
+              "record_index": 0
+            },
+            "view": "front",
+            "category": "community",
+            "identity": "1",
+            "identity_evidence": "datasets/annotated/person/v4_whiteborder_textures_20261113/manifest.json:record_index=0; AI visual design region head and upper clothing",
+            "identity_region_xyxy": [
+              18,
+              12,
+              118,
+              170
+            ],
+            "min_identity_visible": 0.9,
+            "foot_xy": [
+              320,
+              243
+            ],
+            "contact_width": 20,
+            "size_wh": [
+              69,
+              150
+            ],
+            "angles_degrees": {
+              "yaw": -4,
+              "pitch": 0,
+              "roll": 0
+            }
+          }
+        ]
+      },
+      "labels": {
+        "person": "existing_and_new_visible_yolo",
+        "white_back": "not_labeled"
+      },
+      "augmentation": {
+        "value_gain": 1.0,
+        "saturation_gain": 1.0
+      },
+      "parameters": {
+        "resolution": [
+          640,
+          360
+        ],
+        "ground_polygon": [
+          [
+            0,
+            201
+          ],
+          [
+            639,
+            201
+          ],
+          [
+            639,
+            359
+          ],
+          [
+            0,
+            359
+          ]
+        ],
+        "obstacle_polygons": [],
+        "required_overlaps": []
+      },
+      "sources": [
+        "Archive/Assets/场景/综合视频/空场与场景物料_001.mp4",
+        "datasets/annotated/person/v4_whiteborder_textures_20261113/community_1.png",
+        "datasets/raw/person/team_assets/社区人员/1.png",
+        "datasets/raw/person/teammate_submission_20261110/dataset/backgrounds/bg_00146_f00749.jpg"
+      ]
+    },
+    {
+      "id": "frame_008551_community_none_tone1",
+      "failure_event": "person_unoccluded",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 3
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [],
+      "background": {
+        "role": "reviewed_background",
+        "manifest": "datasets/scripts/person/config/background_dispatch.json",
+        "record_index": 3,
+        "image": "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_004001.png"
+      },
+      "target": {
+        "actors": [
+          {
+            "id": "person_added",
+            "kind": "person",
+            "source": "datasets/annotated/person/v4_whiteborder_textures_20261113/community_1.png",
+            "source_role": "foreground_texture",
+            "source_record": {
+              "manifest": "datasets/annotated/person/v4_whiteborder_textures_20261113/manifest.json",
+              "record_index": 0
+            },
+            "view": "front",
+            "category": "community",
+            "identity": "1",
+            "identity_evidence": "datasets/annotated/person/v4_whiteborder_textures_20261113/manifest.json:record_index=0; AI visual design region head and upper clothing",
+            "identity_region_xyxy": [
+              18,
+              12,
+              118,
+              170
+            ],
+            "min_identity_visible": 0.9,
+            "foot_xy": [
+              320,
+              275
+            ],
+            "contact_width": 20,
+            "size_wh": [
+              69,
+              150
+            ],
+            "angles_degrees": {
+              "yaw": 0,
+              "pitch": 0,
+              "roll": 0
+            }
+          }
+        ]
+      },
+      "labels": {
+        "person": "existing_and_new_visible_yolo",
+        "white_back": "not_labeled"
+      },
+      "augmentation": {
+        "value_gain": 0.88,
+        "saturation_gain": 0.82
+      },
+      "parameters": {
+        "resolution": [
+          640,
+          360
+        ],
+        "ground_polygon": [
+          [
+            0,
+            253
+          ],
+          [
+            639,
+            253
+          ],
+          [
+            639,
+            359
+          ],
+          [
+            0,
+            359
+          ]
+        ],
+        "obstacle_polygons": [],
+        "required_overlaps": []
+      },
+      "sources": [
+        "datasets/annotated/person/v4_whiteborder_textures_20261113/community_1.png",
+        "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_004001.png",
+        "datasets/raw/person/team_assets/社区人员/1.png",
+        "datasets/raw/site_capture_20261112/videos/full_scene.mp4"
+      ]
+    },
+    {
+      "id": "frame_008551_community_none_tone2",
+      "failure_event": "person_unoccluded",
+      "min_count": 0,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 3
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [],
+      "background": {
+        "role": "reviewed_background",
+        "manifest": "datasets/scripts/person/config/background_dispatch.json",
+        "record_index": 4,
+        "image": "datasets/raw/person/teammate_submission_20261110/dataset/backgrounds/bg_00000_f00001.jpg"
+      },
+      "target": {
+        "actors": [
+          {
+            "id": "person_added",
+            "kind": "person",
+            "source": "datasets/annotated/person/v4_whiteborder_textures_20261113/community_1.png",
+            "source_role": "foreground_texture",
+            "source_record": {
+              "manifest": "datasets/annotated/person/v4_whiteborder_textures_20261113/manifest.json",
+              "record_index": 0
+            },
+            "view": "front",
+            "category": "community",
+            "identity": "1",
+            "identity_evidence": "datasets/annotated/person/v4_whiteborder_textures_20261113/manifest.json:record_index=0; AI visual design region head and upper clothing",
+            "identity_region_xyxy": [
+              18,
+              12,
+              118,
+              170
+            ],
+            "min_identity_visible": 0.9,
+            "foot_xy": [
+              320,
+              193
+            ],
+            "contact_width": 20,
+            "size_wh": [
+              69,
+              150
+            ],
+            "angles_degrees": {
+              "yaw": 4,
+              "pitch": 0,
+              "roll": 0
+            }
+          }
+        ]
+      },
+      "labels": {
+        "person": "existing_and_new_visible_yolo",
+        "white_back": "not_labeled"
+      },
+      "augmentation": {
+        "value_gain": 1.1,
+        "saturation_gain": 0.72
+      },
+      "parameters": {
+        "resolution": [
+          640,
+          360
+        ],
+        "ground_polygon": [
+          [
+            0,
+            113
+          ],
+          [
+            639,
+            113
+          ],
+          [
+            639,
+            359
+          ],
+          [
+            0,
+            359
+          ]
+        ],
+        "obstacle_polygons": [],
+        "required_overlaps": []
+      },
+      "sources": [
+        "Archive/Assets/场景/综合视频/空场与场景物料_001.mp4",
+        "datasets/annotated/person/v4_whiteborder_textures_20261113/community_1.png",
+        "datasets/raw/person/team_assets/社区人员/1.png",
+        "datasets/raw/person/teammate_submission_20261110/dataset/backgrounds/bg_00000_f00001.jpg"
+      ]
+    },
+    {
+      "id": "frame_008551_community_upright_tone0",
+      "failure_event": "person_upright_occlusion",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 3,
+        "beta": 3
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [],
+      "background": {
+        "role": "reviewed_background",
+        "manifest": "datasets/scripts/person/config/background_dispatch.json",
+        "record_index": 5,
+        "image": "datasets/raw/person/teammate_submission_20261110/dataset/backgrounds/bg_00040_f00145.jpg"
+      },
+      "target": {
+        "actors": [
+          {
+            "id": "person_added",
+            "kind": "person",
+            "source": "datasets/annotated/person/v4_whiteborder_textures_20261113/community_1.png",
+            "source_role": "foreground_texture",
+            "source_record": {
+              "manifest": "datasets/annotated/person/v4_whiteborder_textures_20261113/manifest.json",
+              "record_index": 0
+            },
+            "view": "front",
+            "category": "community",
+            "identity": "1",
+            "identity_evidence": "datasets/annotated/person/v4_whiteborder_textures_20261113/manifest.json:record_index=0; AI visual design region head and upper clothing",
+            "identity_region_xyxy": [
+              18,
+              12,
+              118,
+              170
+            ],
+            "min_identity_visible": 0.9,
+            "foot_xy": [
+              320,
+              221
+            ],
+            "contact_width": 20,
+            "size_wh": [
+              69,
+              150
+            ],
+            "angles_degrees": {
+              "yaw": -4,
+              "pitch": 0,
+              "roll": 0
+            }
+          },
+          {
+            "id": "vehicle_front",
+            "kind": "vehicle",
+            "source": "datasets/annotated/person/v4_vehicle_occluders_20261113/sam2_04_upright.png",
+            "source_role": "vehicle_occluder",
+            "source_record": {
+              "manifest": "datasets/annotated/person/v4_vehicle_occluders_20261113/manifest.json",
+              "record_index": 2
+            },
+            "category": "upright",
+            "foot_xy": [
+              328,
+              226
+            ],
+            "contact_width": 25,
+            "size_wh": [
+              53,
+              76
+            ],
+            "angles_degrees": {
+              "yaw": 0,
+              "pitch": 0,
+              "roll": 0
+            }
+          }
+        ]
+      },
+      "labels": {
+        "person": "existing_and_new_visible_yolo",
+        "white_back": "not_labeled"
+      },
+      "augmentation": {
+        "value_gain": 1.0,
+        "saturation_gain": 1.0
+      },
+      "parameters": {
+        "resolution": [
+          640,
+          360
+        ],
+        "ground_polygon": [
+          [
+            0,
+            175
+          ],
+          [
+            639,
+            175
+          ],
+          [
+            639,
+            359
+          ],
+          [
+            0,
+            359
+          ]
+        ],
+        "obstacle_polygons": [],
+        "required_overlaps": [
+          [
+            "person_added",
+            "vehicle_front"
+          ]
+        ]
+      },
+      "sources": [
+        "Archive/Assets/场景/综合视频/空场与场景物料_001.mp4",
+        "datasets/annotated/e_bike/multiview_masks_refined_20261110_v2/sam2_04_upright.png",
+        "datasets/annotated/e_bike/video_review_20261110/images/source_002/frame_000003.jpg",
+        "datasets/annotated/person/v4_vehicle_occluders_20261113/sam2_04_upright.png",
+        "datasets/annotated/person/v4_whiteborder_textures_20261113/community_1.png",
+        "datasets/raw/e_bike/archive_assets_legacy/视频/浅色背景单辆直立车_平视旋转_009.mp4",
+        "datasets/raw/person/team_assets/社区人员/1.png",
+        "datasets/raw/person/teammate_submission_20261110/dataset/backgrounds/bg_00040_f00145.jpg"
+      ]
+    },
+    {
+      "id": "frame_008551_community_upright_tone1",
+      "failure_event": "person_upright_occlusion",
+      "min_count": 0,
+      "max_count": 1,
+      "prior": {
+        "alpha": 3,
+        "beta": 3
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [],
+      "background": {
+        "role": "reviewed_background",
+        "manifest": "datasets/scripts/person/config/background_dispatch.json",
+        "record_index": 0,
+        "image": "datasets/raw/person/teammate_submission_20261110/dataset/backgrounds/bg_00057_f00209.jpg"
+      },
+      "target": {
+        "actors": [
+          {
+            "id": "person_added",
+            "kind": "person",
+            "source": "datasets/annotated/person/v4_whiteborder_textures_20261113/community_1.png",
+            "source_role": "foreground_texture",
+            "source_record": {
+              "manifest": "datasets/annotated/person/v4_whiteborder_textures_20261113/manifest.json",
+              "record_index": 0
+            },
+            "view": "front",
+            "category": "community",
+            "identity": "1",
+            "identity_evidence": "datasets/annotated/person/v4_whiteborder_textures_20261113/manifest.json:record_index=0; AI visual design region head and upper clothing",
+            "identity_region_xyxy": [
+              18,
+              12,
+              118,
+              170
+            ],
+            "min_identity_visible": 0.9,
+            "foot_xy": [
+              320,
+              287
+            ],
+            "contact_width": 20,
+            "size_wh": [
+              69,
+              150
+            ],
+            "angles_degrees": {
+              "yaw": 0,
+              "pitch": 0,
+              "roll": 0
+            }
+          },
+          {
+            "id": "vehicle_front",
+            "kind": "vehicle",
+            "source": "datasets/annotated/person/v4_vehicle_occluders_20261113/sam2_04_upright.png",
+            "source_role": "vehicle_occluder",
+            "source_record": {
+              "manifest": "datasets/annotated/person/v4_vehicle_occluders_20261113/manifest.json",
+              "record_index": 2
+            },
+            "category": "upright",
+            "foot_xy": [
+              328,
+              292
+            ],
+            "contact_width": 25,
+            "size_wh": [
+              53,
+              76
+            ],
+            "angles_degrees": {
+              "yaw": 0,
+              "pitch": 0,
+              "roll": 0
+            }
+          }
+        ]
+      },
+      "labels": {
+        "person": "existing_and_new_visible_yolo",
+        "white_back": "not_labeled"
+      },
+      "augmentation": {
+        "value_gain": 0.88,
+        "saturation_gain": 0.82
+      },
+      "parameters": {
+        "resolution": [
+          640,
+          360
+        ],
+        "ground_polygon": [
+          [
+            0,
+            269
+          ],
+          [
+            639,
+            269
+          ],
+          [
+            639,
+            359
+          ],
+          [
+            0,
+            359
+          ]
+        ],
+        "obstacle_polygons": [],
+        "required_overlaps": [
+          [
+            "person_added",
+            "vehicle_front"
+          ]
+        ]
+      },
+      "sources": [
+        "Archive/Assets/场景/综合视频/空场与场景物料_001.mp4",
+        "datasets/annotated/e_bike/multiview_masks_refined_20261110_v2/sam2_04_upright.png",
+        "datasets/annotated/e_bike/video_review_20261110/images/source_002/frame_000003.jpg",
+        "datasets/annotated/person/v4_vehicle_occluders_20261113/sam2_04_upright.png",
+        "datasets/annotated/person/v4_whiteborder_textures_20261113/community_1.png",
+        "datasets/raw/e_bike/archive_assets_legacy/视频/浅色背景单辆直立车_平视旋转_009.mp4",
+        "datasets/raw/person/team_assets/社区人员/1.png",
+        "datasets/raw/person/teammate_submission_20261110/dataset/backgrounds/bg_00057_f00209.jpg"
+      ]
+    },
+    {
+      "id": "frame_008551_community_upright_tone2",
+      "failure_event": "person_upright_occlusion",
+      "min_count": 0,
+      "max_count": 1,
+      "prior": {
+        "alpha": 3,
+        "beta": 3
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [],
+      "background": {
+        "role": "reviewed_background",
+        "manifest": "datasets/scripts/person/config/background_dispatch.json",
+        "record_index": 1,
+        "image": "datasets/raw/person/teammate_submission_20261110/dataset/backgrounds/bg_00086_f00359.jpg"
+      },
+      "target": {
+        "actors": [
+          {
+            "id": "person_added",
+            "kind": "person",
+            "source": "datasets/annotated/person/v4_whiteborder_textures_20261113/community_1.png",
+            "source_role": "foreground_texture",
+            "source_record": {
+              "manifest": "datasets/annotated/person/v4_whiteborder_textures_20261113/manifest.json",
+              "record_index": 0
+            },
+            "view": "front",
+            "category": "community",
+            "identity": "1",
+            "identity_evidence": "datasets/annotated/person/v4_whiteborder_textures_20261113/manifest.json:record_index=0; AI visual design region head and upper clothing",
+            "identity_region_xyxy": [
+              18,
+              12,
+              118,
+              170
+            ],
+            "min_identity_visible": 0.9,
+            "foot_xy": [
+              320,
+              302
+            ],
+            "contact_width": 20,
+            "size_wh": [
+              69,
+              150
+            ],
+            "angles_degrees": {
+              "yaw": 4,
+              "pitch": 0,
+              "roll": 0
+            }
+          },
+          {
+            "id": "vehicle_front",
+            "kind": "vehicle",
+            "source": "datasets/annotated/person/v4_vehicle_occluders_20261113/sam2_04_upright.png",
+            "source_role": "vehicle_occluder",
+            "source_record": {
+              "manifest": "datasets/annotated/person/v4_vehicle_occluders_20261113/manifest.json",
+              "record_index": 2
+            },
+            "category": "upright",
+            "foot_xy": [
+              328,
+              307
+            ],
+            "contact_width": 25,
+            "size_wh": [
+              53,
+              76
+            ],
+            "angles_degrees": {
+              "yaw": 0,
+              "pitch": 0,
+              "roll": 0
+            }
+          }
+        ]
+      },
+      "labels": {
+        "person": "existing_and_new_visible_yolo",
+        "white_back": "not_labeled"
+      },
+      "augmentation": {
+        "value_gain": 1.1,
+        "saturation_gain": 0.72
+      },
+      "parameters": {
+        "resolution": [
+          640,
+          360
+        ],
+        "ground_polygon": [
+          [
+            0,
+            293
+          ],
+          [
+            639,
+            293
+          ],
+          [
+            639,
+            359
+          ],
+          [
+            0,
+            359
+          ]
+        ],
+        "obstacle_polygons": [],
+        "required_overlaps": [
+          [
+            "person_added",
+            "vehicle_front"
+          ]
+        ]
+      },
+      "sources": [
+        "Archive/Assets/场景/综合视频/空场与场景物料_001.mp4",
+        "datasets/annotated/e_bike/multiview_masks_refined_20261110_v2/sam2_04_upright.png",
+        "datasets/annotated/e_bike/video_review_20261110/images/source_002/frame_000003.jpg",
+        "datasets/annotated/person/v4_vehicle_occluders_20261113/sam2_04_upright.png",
+        "datasets/annotated/person/v4_whiteborder_textures_20261113/community_1.png",
+        "datasets/raw/e_bike/archive_assets_legacy/视频/浅色背景单辆直立车_平视旋转_009.mp4",
+        "datasets/raw/person/team_assets/社区人员/1.png",
+        "datasets/raw/person/teammate_submission_20261110/dataset/backgrounds/bg_00086_f00359.jpg"
+      ]
+    },
+    {
+      "id": "frame_008551_community_fallen_tone0",
+      "failure_event": "person_fallen_occlusion",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 3,
+        "beta": 3
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [],
+      "background": {
+        "role": "reviewed_background",
+        "manifest": "datasets/scripts/person/config/background_dispatch.json",
+        "record_index": 2,
+        "image": "datasets/raw/person/teammate_submission_20261110/dataset/backgrounds/bg_00146_f00749.jpg"
+      },
+      "target": {
+        "actors": [
+          {
+            "id": "person_added",
+            "kind": "person",
+            "source": "datasets/annotated/person/v4_whiteborder_textures_20261113/community_1.png",
+            "source_role": "foreground_texture",
+            "source_record": {
+              "manifest": "datasets/annotated/person/v4_whiteborder_textures_20261113/manifest.json",
+              "record_index": 0
+            },
+            "view": "front",
+            "category": "community",
+            "identity": "1",
+            "identity_evidence": "datasets/annotated/person/v4_whiteborder_textures_20261113/manifest.json:record_index=0; AI visual design region head and upper clothing",
+            "identity_region_xyxy": [
+              18,
+              12,
+              118,
+              170
+            ],
+            "min_identity_visible": 0.9,
+            "foot_xy": [
+              320,
+              243
+            ],
+            "contact_width": 20,
+            "size_wh": [
+              69,
+              150
+            ],
+            "angles_degrees": {
+              "yaw": -4,
+              "pitch": 0,
+              "roll": 0
+            }
+          },
+          {
+            "id": "vehicle_front",
+            "kind": "vehicle",
+            "source": "datasets/annotated/person/v4_vehicle_occluders_20261113/sam2_01_fallen.png",
+            "source_role": "vehicle_occluder",
+            "source_record": {
+              "manifest": "datasets/annotated/person/v4_vehicle_occluders_20261113/manifest.json",
+              "record_index": 0
+            },
+            "category": "fallen",
+            "foot_xy": [
+              328,
+              248
+            ],
+            "contact_width": 25,
+            "size_wh": [
+              88,
+              49
+            ],
+            "angles_degrees": {
+              "yaw": 0,
+              "pitch": 0,
+              "roll": 0
+            }
+          }
+        ]
+      },
+      "labels": {
+        "person": "existing_and_new_visible_yolo",
+        "white_back": "not_labeled"
+      },
+      "augmentation": {
+        "value_gain": 1.0,
+        "saturation_gain": 1.0
+      },
+      "parameters": {
+        "resolution": [
+          640,
+          360
+        ],
+        "ground_polygon": [
+          [
+            0,
+            201
+          ],
+          [
+            639,
+            201
+          ],
+          [
+            639,
+            359
+          ],
+          [
+            0,
+            359
+          ]
+        ],
+        "obstacle_polygons": [],
+        "required_overlaps": [
+          [
+            "person_added",
+            "vehicle_front"
+          ]
+        ]
+      },
+      "sources": [
+        "Archive/Assets/场景/综合视频/空场与场景物料_001.mp4",
+        "datasets/annotated/e_bike/multiview_masks_refined_20261110_v2/sam2_01_fallen.png",
+        "datasets/annotated/e_bike/video_review_20261110/images/source_001/frame_000001.jpg",
+        "datasets/annotated/person/v4_vehicle_occluders_20261113/sam2_01_fallen.png",
+        "datasets/annotated/person/v4_whiteborder_textures_20261113/community_1.png",
+        "datasets/raw/e_bike/archive_assets_legacy/视频/浅色背景单辆倒伏车_平视旋转_008.mp4",
+        "datasets/raw/person/team_assets/社区人员/1.png",
+        "datasets/raw/person/teammate_submission_20261110/dataset/backgrounds/bg_00146_f00749.jpg"
+      ]
+    },
+    {
+      "id": "frame_008551_community_fallen_tone1",
+      "failure_event": "person_fallen_occlusion",
+      "min_count": 0,
+      "max_count": 1,
+      "prior": {
+        "alpha": 3,
+        "beta": 3
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [],
+      "background": {
+        "role": "reviewed_background",
+        "manifest": "datasets/scripts/person/config/background_dispatch.json",
+        "record_index": 3,
+        "image": "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_004001.png"
+      },
+      "target": {
+        "actors": [
+          {
+            "id": "person_added",
+            "kind": "person",
+            "source": "datasets/annotated/person/v4_whiteborder_textures_20261113/community_1.png",
+            "source_role": "foreground_texture",
+            "source_record": {
+              "manifest": "datasets/annotated/person/v4_whiteborder_textures_20261113/manifest.json",
+              "record_index": 0
+            },
+            "view": "front",
+            "category": "community",
+            "identity": "1",
+            "identity_evidence": "datasets/annotated/person/v4_whiteborder_textures_20261113/manifest.json:record_index=0; AI visual design region head and upper clothing",
+            "identity_region_xyxy": [
+              18,
+              12,
+              118,
+              170
+            ],
+            "min_identity_visible": 0.9,
+            "foot_xy": [
+              320,
+              275
+            ],
+            "contact_width": 20,
+            "size_wh": [
+              69,
+              150
+            ],
+            "angles_degrees": {
+              "yaw": 0,
+              "pitch": 0,
+              "roll": 0
+            }
+          },
+          {
+            "id": "vehicle_front",
+            "kind": "vehicle",
+            "source": "datasets/annotated/person/v4_vehicle_occluders_20261113/sam2_01_fallen.png",
+            "source_role": "vehicle_occluder",
+            "source_record": {
+              "manifest": "datasets/annotated/person/v4_vehicle_occluders_20261113/manifest.json",
+              "record_index": 0
+            },
+            "category": "fallen",
+            "foot_xy": [
+              328,
+              280
+            ],
+            "contact_width": 25,
+            "size_wh": [
+              88,
+              49
+            ],
+            "angles_degrees": {
+              "yaw": 0,
+              "pitch": 0,
+              "roll": 0
+            }
+          }
+        ]
+      },
+      "labels": {
+        "person": "existing_and_new_visible_yolo",
+        "white_back": "not_labeled"
+      },
+      "augmentation": {
+        "value_gain": 0.88,
+        "saturation_gain": 0.82
+      },
+      "parameters": {
+        "resolution": [
+          640,
+          360
+        ],
+        "ground_polygon": [
+          [
+            0,
+            253
+          ],
+          [
+            639,
+            253
+          ],
+          [
+            639,
+            359
+          ],
+          [
+            0,
+            359
+          ]
+        ],
+        "obstacle_polygons": [],
+        "required_overlaps": [
+          [
+            "person_added",
+            "vehicle_front"
+          ]
+        ]
+      },
+      "sources": [
+        "datasets/annotated/e_bike/multiview_masks_refined_20261110_v2/sam2_01_fallen.png",
+        "datasets/annotated/e_bike/video_review_20261110/images/source_001/frame_000001.jpg",
+        "datasets/annotated/person/v4_vehicle_occluders_20261113/sam2_01_fallen.png",
+        "datasets/annotated/person/v4_whiteborder_textures_20261113/community_1.png",
+        "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_004001.png",
+        "datasets/raw/e_bike/archive_assets_legacy/视频/浅色背景单辆倒伏车_平视旋转_008.mp4",
+        "datasets/raw/person/team_assets/社区人员/1.png",
+        "datasets/raw/site_capture_20261112/videos/full_scene.mp4"
+      ]
+    },
+    {
+      "id": "frame_008551_community_fallen_tone2",
+      "failure_event": "person_fallen_occlusion",
+      "min_count": 0,
+      "max_count": 1,
+      "prior": {
+        "alpha": 3,
+        "beta": 3
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [],
+      "background": {
+        "role": "reviewed_background",
+        "manifest": "datasets/scripts/person/config/background_dispatch.json",
+        "record_index": 4,
+        "image": "datasets/raw/person/teammate_submission_20261110/dataset/backgrounds/bg_00000_f00001.jpg"
+      },
+      "target": {
+        "actors": [
+          {
+            "id": "person_added",
+            "kind": "person",
+            "source": "datasets/annotated/person/v4_whiteborder_textures_20261113/community_1.png",
+            "source_role": "foreground_texture",
+            "source_record": {
+              "manifest": "datasets/annotated/person/v4_whiteborder_textures_20261113/manifest.json",
+              "record_index": 0
+            },
+            "view": "front",
+            "category": "community",
+            "identity": "1",
+            "identity_evidence": "datasets/annotated/person/v4_whiteborder_textures_20261113/manifest.json:record_index=0; AI visual design region head and upper clothing",
+            "identity_region_xyxy": [
+              18,
+              12,
+              118,
+              170
+            ],
+            "min_identity_visible": 0.9,
+            "foot_xy": [
+              320,
+              193
+            ],
+            "contact_width": 20,
+            "size_wh": [
+              69,
+              150
+            ],
+            "angles_degrees": {
+              "yaw": 4,
+              "pitch": 0,
+              "roll": 0
+            }
+          },
+          {
+            "id": "vehicle_front",
+            "kind": "vehicle",
+            "source": "datasets/annotated/person/v4_vehicle_occluders_20261113/sam2_01_fallen.png",
+            "source_role": "vehicle_occluder",
+            "source_record": {
+              "manifest": "datasets/annotated/person/v4_vehicle_occluders_20261113/manifest.json",
+              "record_index": 0
+            },
+            "category": "fallen",
+            "foot_xy": [
+              328,
+              198
+            ],
+            "contact_width": 25,
+            "size_wh": [
+              88,
+              49
+            ],
+            "angles_degrees": {
+              "yaw": 0,
+              "pitch": 0,
+              "roll": 0
+            }
+          }
+        ]
+      },
+      "labels": {
+        "person": "existing_and_new_visible_yolo",
+        "white_back": "not_labeled"
+      },
+      "augmentation": {
+        "value_gain": 1.1,
+        "saturation_gain": 0.72
+      },
+      "parameters": {
+        "resolution": [
+          640,
+          360
+        ],
+        "ground_polygon": [
+          [
+            0,
+            113
+          ],
+          [
+            639,
+            113
+          ],
+          [
+            639,
+            359
+          ],
+          [
+            0,
+            359
+          ]
+        ],
+        "obstacle_polygons": [],
+        "required_overlaps": [
+          [
+            "person_added",
+            "vehicle_front"
+          ]
+        ]
+      },
+      "sources": [
+        "Archive/Assets/场景/综合视频/空场与场景物料_001.mp4",
+        "datasets/annotated/e_bike/multiview_masks_refined_20261110_v2/sam2_01_fallen.png",
+        "datasets/annotated/e_bike/video_review_20261110/images/source_001/frame_000001.jpg",
+        "datasets/annotated/person/v4_vehicle_occluders_20261113/sam2_01_fallen.png",
+        "datasets/annotated/person/v4_whiteborder_textures_20261113/community_1.png",
+        "datasets/raw/e_bike/archive_assets_legacy/视频/浅色背景单辆倒伏车_平视旋转_008.mp4",
+        "datasets/raw/person/team_assets/社区人员/1.png",
+        "datasets/raw/person/teammate_submission_20261110/dataset/backgrounds/bg_00000_f00001.jpg"
+      ]
+    },
+    {
+      "id": "frame_008551_noncommunity_none_tone0",
+      "failure_event": "person_unoccluded",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 3
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [],
+      "background": {
+        "role": "reviewed_background",
+        "manifest": "datasets/scripts/person/config/background_dispatch.json",
+        "record_index": 5,
+        "image": "datasets/raw/person/teammate_submission_20261110/dataset/backgrounds/bg_00040_f00145.jpg"
+      },
+      "target": {
+        "actors": [
+          {
+            "id": "person_added",
+            "kind": "person",
+            "source": "datasets/annotated/person/v4_whiteborder_textures_20261113/noncommunity_F2.png",
+            "source_role": "foreground_texture",
+            "source_record": {
+              "manifest": "datasets/annotated/person/v4_whiteborder_textures_20261113/manifest.json",
+              "record_index": 17
+            },
+            "view": "front",
+            "category": "noncommunity",
+            "identity": "F2",
+            "identity_evidence": "datasets/annotated/person/v4_whiteborder_textures_20261113/manifest.json:record_index=17; AI visual design region head and upper clothing",
+            "identity_region_xyxy": [
+              26,
+              8,
+              148,
+              168
+            ],
+            "min_identity_visible": 0.9,
+            "foot_xy": [
+              320,
+              221
+            ],
+            "contact_width": 20,
+            "size_wh": [
+              67,
+              150
+            ],
+            "angles_degrees": {
+              "yaw": -4,
+              "pitch": 0,
+              "roll": 0
+            }
+          }
+        ]
+      },
+      "labels": {
+        "person": "existing_and_new_visible_yolo",
+        "white_back": "not_labeled"
+      },
+      "augmentation": {
+        "value_gain": 1.0,
+        "saturation_gain": 1.0
+      },
+      "parameters": {
+        "resolution": [
+          640,
+          360
+        ],
+        "ground_polygon": [
+          [
+            0,
+            175
+          ],
+          [
+            639,
+            175
+          ],
+          [
+            639,
+            359
+          ],
+          [
+            0,
+            359
+          ]
+        ],
+        "obstacle_polygons": [],
+        "required_overlaps": []
+      },
+      "sources": [
+        "Archive/Assets/场景/综合视频/空场与场景物料_001.mp4",
+        "datasets/annotated/person/v4_whiteborder_textures_20261113/noncommunity_F2.png",
+        "datasets/raw/person/team_assets/非社区人员/F2.png",
+        "datasets/raw/person/teammate_submission_20261110/dataset/backgrounds/bg_00040_f00145.jpg"
+      ]
+    },
+    {
+      "id": "frame_008551_noncommunity_none_tone1",
+      "failure_event": "person_unoccluded",
+      "min_count": 0,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 3
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [],
+      "background": {
+        "role": "reviewed_background",
+        "manifest": "datasets/scripts/person/config/background_dispatch.json",
+        "record_index": 0,
+        "image": "datasets/raw/person/teammate_submission_20261110/dataset/backgrounds/bg_00057_f00209.jpg"
+      },
+      "target": {
+        "actors": [
+          {
+            "id": "person_added",
+            "kind": "person",
+            "source": "datasets/annotated/person/v4_whiteborder_textures_20261113/noncommunity_F2.png",
+            "source_role": "foreground_texture",
+            "source_record": {
+              "manifest": "datasets/annotated/person/v4_whiteborder_textures_20261113/manifest.json",
+              "record_index": 17
+            },
+            "view": "front",
+            "category": "noncommunity",
+            "identity": "F2",
+            "identity_evidence": "datasets/annotated/person/v4_whiteborder_textures_20261113/manifest.json:record_index=17; AI visual design region head and upper clothing",
+            "identity_region_xyxy": [
+              26,
+              8,
+              148,
+              168
+            ],
+            "min_identity_visible": 0.9,
+            "foot_xy": [
+              320,
+              287
+            ],
+            "contact_width": 20,
+            "size_wh": [
+              67,
+              150
+            ],
+            "angles_degrees": {
+              "yaw": 0,
+              "pitch": 0,
+              "roll": 0
+            }
+          }
+        ]
+      },
+      "labels": {
+        "person": "existing_and_new_visible_yolo",
+        "white_back": "not_labeled"
+      },
+      "augmentation": {
+        "value_gain": 0.88,
+        "saturation_gain": 0.82
+      },
+      "parameters": {
+        "resolution": [
+          640,
+          360
+        ],
+        "ground_polygon": [
+          [
+            0,
+            269
+          ],
+          [
+            639,
+            269
+          ],
+          [
+            639,
+            359
+          ],
+          [
+            0,
+            359
+          ]
+        ],
+        "obstacle_polygons": [],
+        "required_overlaps": []
+      },
+      "sources": [
+        "Archive/Assets/场景/综合视频/空场与场景物料_001.mp4",
+        "datasets/annotated/person/v4_whiteborder_textures_20261113/noncommunity_F2.png",
+        "datasets/raw/person/team_assets/非社区人员/F2.png",
+        "datasets/raw/person/teammate_submission_20261110/dataset/backgrounds/bg_00057_f00209.jpg"
+      ]
+    },
+    {
+      "id": "frame_008551_noncommunity_none_tone2",
+      "failure_event": "person_unoccluded",
+      "min_count": 0,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 3
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [],
+      "background": {
+        "role": "reviewed_background",
+        "manifest": "datasets/scripts/person/config/background_dispatch.json",
+        "record_index": 1,
+        "image": "datasets/raw/person/teammate_submission_20261110/dataset/backgrounds/bg_00086_f00359.jpg"
+      },
+      "target": {
+        "actors": [
+          {
+            "id": "person_added",
+            "kind": "person",
+            "source": "datasets/annotated/person/v4_whiteborder_textures_20261113/noncommunity_F2.png",
+            "source_role": "foreground_texture",
+            "source_record": {
+              "manifest": "datasets/annotated/person/v4_whiteborder_textures_20261113/manifest.json",
+              "record_index": 17
+            },
+            "view": "front",
+            "category": "noncommunity",
+            "identity": "F2",
+            "identity_evidence": "datasets/annotated/person/v4_whiteborder_textures_20261113/manifest.json:record_index=17; AI visual design region head and upper clothing",
+            "identity_region_xyxy": [
+              26,
+              8,
+              148,
+              168
+            ],
+            "min_identity_visible": 0.9,
+            "foot_xy": [
+              320,
+              302
+            ],
+            "contact_width": 20,
+            "size_wh": [
+              67,
+              150
+            ],
+            "angles_degrees": {
+              "yaw": 4,
+              "pitch": 0,
+              "roll": 0
+            }
+          }
+        ]
+      },
+      "labels": {
+        "person": "existing_and_new_visible_yolo",
+        "white_back": "not_labeled"
+      },
+      "augmentation": {
+        "value_gain": 1.1,
+        "saturation_gain": 0.72
+      },
+      "parameters": {
+        "resolution": [
+          640,
+          360
+        ],
+        "ground_polygon": [
+          [
+            0,
+            293
+          ],
+          [
+            639,
+            293
+          ],
+          [
+            639,
+            359
+          ],
+          [
+            0,
+            359
+          ]
+        ],
+        "obstacle_polygons": [],
+        "required_overlaps": []
+      },
+      "sources": [
+        "Archive/Assets/场景/综合视频/空场与场景物料_001.mp4",
+        "datasets/annotated/person/v4_whiteborder_textures_20261113/noncommunity_F2.png",
+        "datasets/raw/person/team_assets/非社区人员/F2.png",
+        "datasets/raw/person/teammate_submission_20261110/dataset/backgrounds/bg_00086_f00359.jpg"
+      ]
+    },
+    {
+      "id": "frame_008551_noncommunity_upright_tone0",
+      "failure_event": "person_upright_occlusion",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 3,
+        "beta": 3
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [],
+      "background": {
+        "role": "reviewed_background",
+        "manifest": "datasets/scripts/person/config/background_dispatch.json",
+        "record_index": 2,
+        "image": "datasets/raw/person/teammate_submission_20261110/dataset/backgrounds/bg_00146_f00749.jpg"
+      },
+      "target": {
+        "actors": [
+          {
+            "id": "person_added",
+            "kind": "person",
+            "source": "datasets/annotated/person/v4_whiteborder_textures_20261113/noncommunity_F2.png",
+            "source_role": "foreground_texture",
+            "source_record": {
+              "manifest": "datasets/annotated/person/v4_whiteborder_textures_20261113/manifest.json",
+              "record_index": 17
+            },
+            "view": "front",
+            "category": "noncommunity",
+            "identity": "F2",
+            "identity_evidence": "datasets/annotated/person/v4_whiteborder_textures_20261113/manifest.json:record_index=17; AI visual design region head and upper clothing",
+            "identity_region_xyxy": [
+              26,
+              8,
+              148,
+              168
+            ],
+            "min_identity_visible": 0.9,
+            "foot_xy": [
+              320,
+              243
+            ],
+            "contact_width": 20,
+            "size_wh": [
+              67,
+              150
+            ],
+            "angles_degrees": {
+              "yaw": -4,
+              "pitch": 0,
+              "roll": 0
+            }
+          },
+          {
+            "id": "vehicle_front",
+            "kind": "vehicle",
+            "source": "datasets/annotated/person/v4_vehicle_occluders_20261113/sam2_04_upright.png",
+            "source_role": "vehicle_occluder",
+            "source_record": {
+              "manifest": "datasets/annotated/person/v4_vehicle_occluders_20261113/manifest.json",
+              "record_index": 2
+            },
+            "category": "upright",
+            "foot_xy": [
+              328,
+              248
+            ],
+            "contact_width": 25,
+            "size_wh": [
+              53,
+              76
+            ],
+            "angles_degrees": {
+              "yaw": 0,
+              "pitch": 0,
+              "roll": 0
+            }
+          }
+        ]
+      },
+      "labels": {
+        "person": "existing_and_new_visible_yolo",
+        "white_back": "not_labeled"
+      },
+      "augmentation": {
+        "value_gain": 1.0,
+        "saturation_gain": 1.0
+      },
+      "parameters": {
+        "resolution": [
+          640,
+          360
+        ],
+        "ground_polygon": [
+          [
+            0,
+            201
+          ],
+          [
+            639,
+            201
+          ],
+          [
+            639,
+            359
+          ],
+          [
+            0,
+            359
+          ]
+        ],
+        "obstacle_polygons": [],
+        "required_overlaps": [
+          [
+            "person_added",
+            "vehicle_front"
+          ]
+        ]
+      },
+      "sources": [
+        "Archive/Assets/场景/综合视频/空场与场景物料_001.mp4",
+        "datasets/annotated/e_bike/multiview_masks_refined_20261110_v2/sam2_04_upright.png",
+        "datasets/annotated/e_bike/video_review_20261110/images/source_002/frame_000003.jpg",
+        "datasets/annotated/person/v4_vehicle_occluders_20261113/sam2_04_upright.png",
+        "datasets/annotated/person/v4_whiteborder_textures_20261113/noncommunity_F2.png",
+        "datasets/raw/e_bike/archive_assets_legacy/视频/浅色背景单辆直立车_平视旋转_009.mp4",
+        "datasets/raw/person/team_assets/非社区人员/F2.png",
+        "datasets/raw/person/teammate_submission_20261110/dataset/backgrounds/bg_00146_f00749.jpg"
+      ]
+    },
+    {
+      "id": "frame_008551_noncommunity_upright_tone1",
+      "failure_event": "person_upright_occlusion",
+      "min_count": 0,
+      "max_count": 1,
+      "prior": {
+        "alpha": 3,
+        "beta": 3
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [],
+      "background": {
+        "role": "reviewed_background",
+        "manifest": "datasets/scripts/person/config/background_dispatch.json",
+        "record_index": 3,
+        "image": "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_004001.png"
+      },
+      "target": {
+        "actors": [
+          {
+            "id": "person_added",
+            "kind": "person",
+            "source": "datasets/annotated/person/v4_whiteborder_textures_20261113/noncommunity_F2.png",
+            "source_role": "foreground_texture",
+            "source_record": {
+              "manifest": "datasets/annotated/person/v4_whiteborder_textures_20261113/manifest.json",
+              "record_index": 17
+            },
+            "view": "front",
+            "category": "noncommunity",
+            "identity": "F2",
+            "identity_evidence": "datasets/annotated/person/v4_whiteborder_textures_20261113/manifest.json:record_index=17; AI visual design region head and upper clothing",
+            "identity_region_xyxy": [
+              26,
+              8,
+              148,
+              168
+            ],
+            "min_identity_visible": 0.9,
+            "foot_xy": [
+              320,
+              275
+            ],
+            "contact_width": 20,
+            "size_wh": [
+              67,
+              150
+            ],
+            "angles_degrees": {
+              "yaw": 0,
+              "pitch": 0,
+              "roll": 0
+            }
+          },
+          {
+            "id": "vehicle_front",
+            "kind": "vehicle",
+            "source": "datasets/annotated/person/v4_vehicle_occluders_20261113/sam2_04_upright.png",
+            "source_role": "vehicle_occluder",
+            "source_record": {
+              "manifest": "datasets/annotated/person/v4_vehicle_occluders_20261113/manifest.json",
+              "record_index": 2
+            },
+            "category": "upright",
+            "foot_xy": [
+              328,
+              280
+            ],
+            "contact_width": 25,
+            "size_wh": [
+              53,
+              76
+            ],
+            "angles_degrees": {
+              "yaw": 0,
+              "pitch": 0,
+              "roll": 0
+            }
+          }
+        ]
+      },
+      "labels": {
+        "person": "existing_and_new_visible_yolo",
+        "white_back": "not_labeled"
+      },
+      "augmentation": {
+        "value_gain": 0.88,
+        "saturation_gain": 0.82
+      },
+      "parameters": {
+        "resolution": [
+          640,
+          360
+        ],
+        "ground_polygon": [
+          [
+            0,
+            253
+          ],
+          [
+            639,
+            253
+          ],
+          [
+            639,
+            359
+          ],
+          [
+            0,
+            359
+          ]
+        ],
+        "obstacle_polygons": [],
+        "required_overlaps": [
+          [
+            "person_added",
+            "vehicle_front"
+          ]
+        ]
+      },
+      "sources": [
+        "datasets/annotated/e_bike/multiview_masks_refined_20261110_v2/sam2_04_upright.png",
+        "datasets/annotated/e_bike/video_review_20261110/images/source_002/frame_000003.jpg",
+        "datasets/annotated/person/v4_vehicle_occluders_20261113/sam2_04_upright.png",
+        "datasets/annotated/person/v4_whiteborder_textures_20261113/noncommunity_F2.png",
+        "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_004001.png",
+        "datasets/raw/e_bike/archive_assets_legacy/视频/浅色背景单辆直立车_平视旋转_009.mp4",
+        "datasets/raw/person/team_assets/非社区人员/F2.png",
+        "datasets/raw/site_capture_20261112/videos/full_scene.mp4"
+      ]
+    },
+    {
+      "id": "frame_008551_noncommunity_upright_tone2",
+      "failure_event": "person_upright_occlusion",
+      "min_count": 0,
+      "max_count": 1,
+      "prior": {
+        "alpha": 3,
+        "beta": 3
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [],
+      "background": {
+        "role": "reviewed_background",
+        "manifest": "datasets/scripts/person/config/background_dispatch.json",
+        "record_index": 4,
+        "image": "datasets/raw/person/teammate_submission_20261110/dataset/backgrounds/bg_00000_f00001.jpg"
+      },
+      "target": {
+        "actors": [
+          {
+            "id": "person_added",
+            "kind": "person",
+            "source": "datasets/annotated/person/v4_whiteborder_textures_20261113/noncommunity_F2.png",
+            "source_role": "foreground_texture",
+            "source_record": {
+              "manifest": "datasets/annotated/person/v4_whiteborder_textures_20261113/manifest.json",
+              "record_index": 17
+            },
+            "view": "front",
+            "category": "noncommunity",
+            "identity": "F2",
+            "identity_evidence": "datasets/annotated/person/v4_whiteborder_textures_20261113/manifest.json:record_index=17; AI visual design region head and upper clothing",
+            "identity_region_xyxy": [
+              26,
+              8,
+              148,
+              168
+            ],
+            "min_identity_visible": 0.9,
+            "foot_xy": [
+              320,
+              193
+            ],
+            "contact_width": 20,
+            "size_wh": [
+              67,
+              150
+            ],
+            "angles_degrees": {
+              "yaw": 4,
+              "pitch": 0,
+              "roll": 0
+            }
+          },
+          {
+            "id": "vehicle_front",
+            "kind": "vehicle",
+            "source": "datasets/annotated/person/v4_vehicle_occluders_20261113/sam2_04_upright.png",
+            "source_role": "vehicle_occluder",
+            "source_record": {
+              "manifest": "datasets/annotated/person/v4_vehicle_occluders_20261113/manifest.json",
+              "record_index": 2
+            },
+            "category": "upright",
+            "foot_xy": [
+              328,
+              198
+            ],
+            "contact_width": 25,
+            "size_wh": [
+              53,
+              76
+            ],
+            "angles_degrees": {
+              "yaw": 0,
+              "pitch": 0,
+              "roll": 0
+            }
+          }
+        ]
+      },
+      "labels": {
+        "person": "existing_and_new_visible_yolo",
+        "white_back": "not_labeled"
+      },
+      "augmentation": {
+        "value_gain": 1.1,
+        "saturation_gain": 0.72
+      },
+      "parameters": {
+        "resolution": [
+          640,
+          360
+        ],
+        "ground_polygon": [
+          [
+            0,
+            113
+          ],
+          [
+            639,
+            113
+          ],
+          [
+            639,
+            359
+          ],
+          [
+            0,
+            359
+          ]
+        ],
+        "obstacle_polygons": [],
+        "required_overlaps": [
+          [
+            "person_added",
+            "vehicle_front"
+          ]
+        ]
+      },
+      "sources": [
+        "Archive/Assets/场景/综合视频/空场与场景物料_001.mp4",
+        "datasets/annotated/e_bike/multiview_masks_refined_20261110_v2/sam2_04_upright.png",
+        "datasets/annotated/e_bike/video_review_20261110/images/source_002/frame_000003.jpg",
+        "datasets/annotated/person/v4_vehicle_occluders_20261113/sam2_04_upright.png",
+        "datasets/annotated/person/v4_whiteborder_textures_20261113/noncommunity_F2.png",
+        "datasets/raw/e_bike/archive_assets_legacy/视频/浅色背景单辆直立车_平视旋转_009.mp4",
+        "datasets/raw/person/team_assets/非社区人员/F2.png",
+        "datasets/raw/person/teammate_submission_20261110/dataset/backgrounds/bg_00000_f00001.jpg"
+      ]
+    },
+    {
+      "id": "frame_008551_noncommunity_fallen_tone0",
+      "failure_event": "person_fallen_occlusion",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 3,
+        "beta": 3
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [],
+      "background": {
+        "role": "reviewed_background",
+        "manifest": "datasets/scripts/person/config/background_dispatch.json",
+        "record_index": 5,
+        "image": "datasets/raw/person/teammate_submission_20261110/dataset/backgrounds/bg_00040_f00145.jpg"
+      },
+      "target": {
+        "actors": [
+          {
+            "id": "person_added",
+            "kind": "person",
+            "source": "datasets/annotated/person/v4_whiteborder_textures_20261113/noncommunity_F2.png",
+            "source_role": "foreground_texture",
+            "source_record": {
+              "manifest": "datasets/annotated/person/v4_whiteborder_textures_20261113/manifest.json",
+              "record_index": 17
+            },
+            "view": "front",
+            "category": "noncommunity",
+            "identity": "F2",
+            "identity_evidence": "datasets/annotated/person/v4_whiteborder_textures_20261113/manifest.json:record_index=17; AI visual design region head and upper clothing",
+            "identity_region_xyxy": [
+              26,
+              8,
+              148,
+              168
+            ],
+            "min_identity_visible": 0.9,
+            "foot_xy": [
+              320,
+              221
+            ],
+            "contact_width": 20,
+            "size_wh": [
+              67,
+              150
+            ],
+            "angles_degrees": {
+              "yaw": -4,
+              "pitch": 0,
+              "roll": 0
+            }
+          },
+          {
+            "id": "vehicle_front",
+            "kind": "vehicle",
+            "source": "datasets/annotated/person/v4_vehicle_occluders_20261113/sam2_01_fallen.png",
+            "source_role": "vehicle_occluder",
+            "source_record": {
+              "manifest": "datasets/annotated/person/v4_vehicle_occluders_20261113/manifest.json",
+              "record_index": 0
+            },
+            "category": "fallen",
+            "foot_xy": [
+              328,
+              226
+            ],
+            "contact_width": 25,
+            "size_wh": [
+              88,
+              49
+            ],
+            "angles_degrees": {
+              "yaw": 0,
+              "pitch": 0,
+              "roll": 0
+            }
+          }
+        ]
+      },
+      "labels": {
+        "person": "existing_and_new_visible_yolo",
+        "white_back": "not_labeled"
+      },
+      "augmentation": {
+        "value_gain": 1.0,
+        "saturation_gain": 1.0
+      },
+      "parameters": {
+        "resolution": [
+          640,
+          360
+        ],
+        "ground_polygon": [
+          [
+            0,
+            175
+          ],
+          [
+            639,
+            175
+          ],
+          [
+            639,
+            359
+          ],
+          [
+            0,
+            359
+          ]
+        ],
+        "obstacle_polygons": [],
+        "required_overlaps": [
+          [
+            "person_added",
+            "vehicle_front"
+          ]
+        ]
+      },
+      "sources": [
+        "Archive/Assets/场景/综合视频/空场与场景物料_001.mp4",
+        "datasets/annotated/e_bike/multiview_masks_refined_20261110_v2/sam2_01_fallen.png",
+        "datasets/annotated/e_bike/video_review_20261110/images/source_001/frame_000001.jpg",
+        "datasets/annotated/person/v4_vehicle_occluders_20261113/sam2_01_fallen.png",
+        "datasets/annotated/person/v4_whiteborder_textures_20261113/noncommunity_F2.png",
+        "datasets/raw/e_bike/archive_assets_legacy/视频/浅色背景单辆倒伏车_平视旋转_008.mp4",
+        "datasets/raw/person/team_assets/非社区人员/F2.png",
+        "datasets/raw/person/teammate_submission_20261110/dataset/backgrounds/bg_00040_f00145.jpg"
+      ]
+    },
+    {
+      "id": "frame_008551_noncommunity_fallen_tone1",
+      "failure_event": "person_fallen_occlusion",
+      "min_count": 0,
+      "max_count": 1,
+      "prior": {
+        "alpha": 3,
+        "beta": 3
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [],
+      "background": {
+        "role": "reviewed_background",
+        "manifest": "datasets/scripts/person/config/background_dispatch.json",
+        "record_index": 0,
+        "image": "datasets/raw/person/teammate_submission_20261110/dataset/backgrounds/bg_00057_f00209.jpg"
+      },
+      "target": {
+        "actors": [
+          {
+            "id": "person_added",
+            "kind": "person",
+            "source": "datasets/annotated/person/v4_whiteborder_textures_20261113/noncommunity_F2.png",
+            "source_role": "foreground_texture",
+            "source_record": {
+              "manifest": "datasets/annotated/person/v4_whiteborder_textures_20261113/manifest.json",
+              "record_index": 17
+            },
+            "view": "front",
+            "category": "noncommunity",
+            "identity": "F2",
+            "identity_evidence": "datasets/annotated/person/v4_whiteborder_textures_20261113/manifest.json:record_index=17; AI visual design region head and upper clothing",
+            "identity_region_xyxy": [
+              26,
+              8,
+              148,
+              168
+            ],
+            "min_identity_visible": 0.9,
+            "foot_xy": [
+              320,
+              287
+            ],
+            "contact_width": 20,
+            "size_wh": [
+              67,
+              150
+            ],
+            "angles_degrees": {
+              "yaw": 0,
+              "pitch": 0,
+              "roll": 0
+            }
+          },
+          {
+            "id": "vehicle_front",
+            "kind": "vehicle",
+            "source": "datasets/annotated/person/v4_vehicle_occluders_20261113/sam2_01_fallen.png",
+            "source_role": "vehicle_occluder",
+            "source_record": {
+              "manifest": "datasets/annotated/person/v4_vehicle_occluders_20261113/manifest.json",
+              "record_index": 0
+            },
+            "category": "fallen",
+            "foot_xy": [
+              328,
+              292
+            ],
+            "contact_width": 25,
+            "size_wh": [
+              88,
+              49
+            ],
+            "angles_degrees": {
+              "yaw": 0,
+              "pitch": 0,
+              "roll": 0
+            }
+          }
+        ]
+      },
+      "labels": {
+        "person": "existing_and_new_visible_yolo",
+        "white_back": "not_labeled"
+      },
+      "augmentation": {
+        "value_gain": 0.88,
+        "saturation_gain": 0.82
+      },
+      "parameters": {
+        "resolution": [
+          640,
+          360
+        ],
+        "ground_polygon": [
+          [
+            0,
+            269
+          ],
+          [
+            639,
+            269
+          ],
+          [
+            639,
+            359
+          ],
+          [
+            0,
+            359
+          ]
+        ],
+        "obstacle_polygons": [],
+        "required_overlaps": [
+          [
+            "person_added",
+            "vehicle_front"
+          ]
+        ]
+      },
+      "sources": [
+        "Archive/Assets/场景/综合视频/空场与场景物料_001.mp4",
+        "datasets/annotated/e_bike/multiview_masks_refined_20261110_v2/sam2_01_fallen.png",
+        "datasets/annotated/e_bike/video_review_20261110/images/source_001/frame_000001.jpg",
+        "datasets/annotated/person/v4_vehicle_occluders_20261113/sam2_01_fallen.png",
+        "datasets/annotated/person/v4_whiteborder_textures_20261113/noncommunity_F2.png",
+        "datasets/raw/e_bike/archive_assets_legacy/视频/浅色背景单辆倒伏车_平视旋转_008.mp4",
+        "datasets/raw/person/team_assets/非社区人员/F2.png",
+        "datasets/raw/person/teammate_submission_20261110/dataset/backgrounds/bg_00057_f00209.jpg"
+      ]
+    },
+    {
+      "id": "frame_008551_noncommunity_fallen_tone2",
+      "failure_event": "person_fallen_occlusion",
+      "min_count": 0,
+      "max_count": 1,
+      "prior": {
+        "alpha": 3,
+        "beta": 3
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [],
+      "background": {
+        "role": "reviewed_background",
+        "manifest": "datasets/scripts/person/config/background_dispatch.json",
+        "record_index": 1,
+        "image": "datasets/raw/person/teammate_submission_20261110/dataset/backgrounds/bg_00086_f00359.jpg"
+      },
+      "target": {
+        "actors": [
+          {
+            "id": "person_added",
+            "kind": "person",
+            "source": "datasets/annotated/person/v4_whiteborder_textures_20261113/noncommunity_F2.png",
+            "source_role": "foreground_texture",
+            "source_record": {
+              "manifest": "datasets/annotated/person/v4_whiteborder_textures_20261113/manifest.json",
+              "record_index": 17
+            },
+            "view": "front",
+            "category": "noncommunity",
+            "identity": "F2",
+            "identity_evidence": "datasets/annotated/person/v4_whiteborder_textures_20261113/manifest.json:record_index=17; AI visual design region head and upper clothing",
+            "identity_region_xyxy": [
+              26,
+              8,
+              148,
+              168
+            ],
+            "min_identity_visible": 0.9,
+            "foot_xy": [
+              320,
+              302
+            ],
+            "contact_width": 20,
+            "size_wh": [
+              67,
+              150
+            ],
+            "angles_degrees": {
+              "yaw": 4,
+              "pitch": 0,
+              "roll": 0
+            }
+          },
+          {
+            "id": "vehicle_front",
+            "kind": "vehicle",
+            "source": "datasets/annotated/person/v4_vehicle_occluders_20261113/sam2_01_fallen.png",
+            "source_role": "vehicle_occluder",
+            "source_record": {
+              "manifest": "datasets/annotated/person/v4_vehicle_occluders_20261113/manifest.json",
+              "record_index": 0
+            },
+            "category": "fallen",
+            "foot_xy": [
+              328,
+              307
+            ],
+            "contact_width": 25,
+            "size_wh": [
+              88,
+              49
+            ],
+            "angles_degrees": {
+              "yaw": 0,
+              "pitch": 0,
+              "roll": 0
+            }
+          }
+        ]
+      },
+      "labels": {
+        "person": "existing_and_new_visible_yolo",
+        "white_back": "not_labeled"
+      },
+      "augmentation": {
+        "value_gain": 1.1,
+        "saturation_gain": 0.72
+      },
+      "parameters": {
+        "resolution": [
+          640,
+          360
+        ],
+        "ground_polygon": [
+          [
+            0,
+            293
+          ],
+          [
+            639,
+            293
+          ],
+          [
+            639,
+            359
+          ],
+          [
+            0,
+            359
+          ]
+        ],
+        "obstacle_polygons": [],
+        "required_overlaps": [
+          [
+            "person_added",
+            "vehicle_front"
+          ]
+        ]
+      },
+      "sources": [
+        "Archive/Assets/场景/综合视频/空场与场景物料_001.mp4",
+        "datasets/annotated/e_bike/multiview_masks_refined_20261110_v2/sam2_01_fallen.png",
+        "datasets/annotated/e_bike/video_review_20261110/images/source_001/frame_000001.jpg",
+        "datasets/annotated/person/v4_vehicle_occluders_20261113/sam2_01_fallen.png",
+        "datasets/annotated/person/v4_whiteborder_textures_20261113/noncommunity_F2.png",
+        "datasets/raw/e_bike/archive_assets_legacy/视频/浅色背景单辆倒伏车_平视旋转_008.mp4",
+        "datasets/raw/person/team_assets/非社区人员/F2.png",
+        "datasets/raw/person/teammate_submission_20261110/dataset/backgrounds/bg_00086_f00359.jpg"
+      ]
+    }
+  ]
+}

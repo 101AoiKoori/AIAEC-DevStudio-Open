@@ -1,11 +1,14 @@
 """Apply two narrowly scoped visual corrections to four selected SAM2 masks."""
 import argparse
 import json
+import sys
 
 import cv2
 import numpy as np
 
 import preview_person_occlusions as core
+sys.path.insert(0, str(core.ROOT))
+from lab.training_common.production_guard import generation_guard
 
 
 def local_background_cleanup(rgba, index):
@@ -29,6 +32,17 @@ def local_background_cleanup(rgba, index):
 
 
 def refine(selection, output):
+    plan = json.loads(selection.read_text(encoding='utf-8'))
+    sources = list(dict.fromkeys(core.workspace_path(item['path']) for item in plan['vehicles']))
+    with generation_guard('e_bike.refine_masks:' + str(output.resolve()),
+                          [selection, *sources], [output], {},
+                          code_paths=[__file__, core.__file__], procedural_inputs=[selection]) as run:
+        if run.reused:
+            return json.loads((output / 'refinement_manifest.json').read_text(encoding='utf-8'))['changes']
+        return _refine(selection, output)
+
+
+def _refine(selection, output):
     if output.exists():
         raise ValueError('输出目录已存在')
     plan = json.loads(selection.read_text(encoding='utf-8'))

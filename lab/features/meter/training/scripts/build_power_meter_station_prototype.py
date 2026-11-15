@@ -1,9 +1,13 @@
 """Make an editable 9011 station prototype and three single-frame previews.
 
 Blender 5.2: blender -b SOURCE --python-exit-code 1 --python THIS --
---output NEW_DIRECTORY [--ground-angle-deg 77.5] [--device OPTIX].
+--output NEW_DIRECTORY [--ground-angle-deg 65] [--device OPTIX].
 Display characters are synthetic.
 """
+
+if __name__ == "__main__":
+    raise SystemExit("Legacy dataset CLI is retired; use datasets/scripts/meter/. Production remains paused.")
+
 import argparse
 import json
 import math
@@ -19,8 +23,8 @@ from render_meter_batch import KEYPOINTS, project, texture_xy
 
 
 ROOT = Path(__file__).resolve().parents[5]
-SOURCE = ROOT / 'datasets/annotated/meter/blender_9011_pbr_v2_20261110/meter_9011_pbr.blend'
-ENDPOINTS = ROOT / 'lab/features/meter/training/config/generated_face_endpoints_v1.json'
+SOURCE = ROOT / 'datasets/assets/blender/meter/blender_9011_pbr_v2_20261110/meter_9011_pbr.blend'
+ENDPOINTS = ROOT / 'lab/features/meter/training/config/generated_face_endpoints_v2.json'
 DIAL_NAMES = ('metal_shell', 'PDF_face_inpainted', 'metal_bezel_bezier',
               'temperature_needle_rotate_Z', 'temperature_pivot_cap',
               'humidity_needle_rotate_Z', 'humidity_pivot_cap', 'glass_reflection_surface')
@@ -219,7 +223,7 @@ def draft_scene(equipment, device):
     stage = bpy.data.collections.new('Preview room, lamps and cameras')
     scene.collection.children.link(stage)
     room_context = add_room_environment(scene, stage, box, material, add_area)
-    front = camera(stage, 'Preview vehicle front', (-.78, -1.54, 14.5), (-.78, -1.18, 0), 34)
+    front = camera(stage, 'Preview vehicle front', (-.78, -1.54, 14.5), (-.78, -1.18, 0), 35)
     angled = camera(stage, 'Preview close three quarter', (3.6, -.56, 10.25), (0, -2.35, 0), 35)
     side = camera(stage, 'Preview right side orthographic', (13, -2.43, -.38), (0, -2.43, -.38), 35)
     side.data.type = 'ORTHO'
@@ -245,7 +249,7 @@ def draft_scene(equipment, device):
     return scene, front, angled, side, room_context
 
 
-def render(scene, camera_obj, path, size, roi, dial_points, assembly_matrix, top, base):
+def _render(scene, camera_obj, path, size, roi, dial_points, assembly_matrix, top, base):
     scene.camera = camera_obj
     scene.render.resolution_x, scene.render.resolution_y = size
     scene.render.filepath = str(path)
@@ -269,71 +273,79 @@ def render(scene, camera_obj, path, size, roi, dial_points, assembly_matrix, top
 
 
 def main():
+    raise RuntimeError("Retired production entry; use datasets/scripts/meter/ and its source.yaml")
+
+
+def _legacy_main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--output', required=True, type=Path)
-    parser.add_argument('--device', choices=('CPU', 'OPTIX'), default='CPU')
-    parser.add_argument('--ground-angle-deg', type=float, default=77.5,
-                        help='Angle of the display plane relative to ground, 70–85 degrees')
+    parser.add_argument('--device', choices=('CPU', 'OPTIX'), default='OPTIX')
+    parser.add_argument('--ground-angle-deg', type=float, default=65.0,
+                        help='Angle of the display plane relative to ground, 60–70 degrees')
     args = parser.parse_args(sys.argv[sys.argv.index('--')+1:] if '--' in sys.argv else [])
-    if not 70 <= args.ground_angle_deg <= 85:
-        parser.error('Ground angle must be between 70 and 85 degrees')
-    output = args.output.resolve()
-    base = (ROOT / 'datasets/annotated/meter').resolve()
-    if output.exists() or not output.is_relative_to(base) or output == base:
-        parser.error('Output must be a new directory under datasets/annotated/meter')
-    if not bpy.data.filepath or Path(bpy.data.filepath).resolve() != SOURCE.resolve():
-        parser.error('Open the calibrated 9011 PBR source blend')
-    original = bpy.context.scene
-    dial = [original.objects[name] for name in DIAL_NAMES]
-    equipment = bpy.data.collections.new('Power meter station prototype')
-    roi = station(equipment)
-    preview, front, angle, side, room_context = draft_scene(equipment, args.device)
-    pivot, points = tilted_dial(preview, dial, args.ground_angle_deg)
-    preview.frame_start, preview.frame_end = original.frame_start, original.frame_end
-    bpy.context.window.scene = preview
-    preview.frame_set(original.frame_current)
-    bpy.context.view_layer.update()
-    assembly_matrix = pivot.matrix_world @ Matrix.Translation(-DIAL_PIVOT)
-    pivot_world = assembly_matrix @ DIAL_PIVOT
-    top_world = assembly_matrix @ (DIAL_PIVOT + Vector((0, 2.08, 0)))
-    up = top_world - pivot_world
-    ground_angle = math.degrees(math.atan2(up.y, abs(up.z)))
-    if abs(ground_angle - args.ground_angle_deg) > 1e-4 or up.z >= 0 or (pivot_world-DIAL_PIVOT).length > 1e-6:
-        raise RuntimeError('Station dial tilt direction, angle or support contact does not match')
-    world_points = [point.matrix_world.translation for point in points]
-    output.mkdir(parents=True)
-    images = [render(preview, view, output / name, size, roi, world_points, assembly_matrix, top_world, pivot_world)
-              for view, name, size in ((front, 'prototype_vehicle_front.png', (640, 480)),
-                                       (angle, 'prototype_three_quarter.png', (960, 720)))]
-    # Keep the actual side elevation visible when the context wall sits between camera and station.
-    room_context.hide_render = True
-    try:
-        side_image = render(preview, side, output / 'prototype_right_side.png', (960, 720), roi, world_points,
-                            assembly_matrix, top_world, pivot_world)
-        side_image['room_context_visible'] = False
-        images.append(side_image)
-    finally:
-        room_context.hide_render = False
-    preview.camera = front
-    preview.render.resolution_x, preview.render.resolution_y = (640, 480)
-    preview.render.filepath = '//prototype_vehicle_front.png'
-    bpy.ops.wm.save_as_mainfile(filepath=str(output / 'meter_9011_power_meter_station.blend'))
-    report = {'status': 'editable visual prototype', 'source_blend': SOURCE.relative_to(ROOT).as_posix(),
-              'endpoint_config': ENDPOINTS.relative_to(ROOT).as_posix(),
-              'source_photos': [f'datasets/raw/site_capture_20261112/vehicle_images/vehicle_{id}.png'
-                                for id in ('0024', '0100', '0103', '0104')],
-              'unit_scale_basis': 'approximate proportions observed in car photos, not measured dimensions',
-              'dial_tilt': {'ground_angle_requested_deg': args.ground_angle_deg,
-                            'ground_angle_measured_deg': ground_angle,
-                            'pivot_world': list(pivot_world), 'top_world': list(top_world),
-                            'front_direction': '+Z', 'up_direction': '+Y',
-                            'source_scene': original.name, 'assembly_object': pivot.name},
-              'synthetic_display_example': {'text': READING, 'unit': 'kWh'},
-              'environment': 'procedural indoor track with sky contribution at window and interior fixtures',
-              'screen_roi_order': ['TL', 'TR', 'BR', 'BL'], 'previews': images}
-    (output / 'prototype_manifest.json').write_text(json.dumps(report, ensure_ascii=False, indent=2) + '\n',
-                                                   encoding='utf-8')
-    print('POWER_METER_PROTOTYPE', output, flush=True)
+    from meter_production_guard import guarded, blender_media, reload_unpacked_media
+    with guarded('build_power_meter_station_prototype', args, __file__, bpy.data.filepath, extra_inputs=[ENDPOINTS] + [ROOT / f'datasets/raw/site_capture_20261112/onboard_camera_images/vehicle_{i}.png' for i in ('0024','0100','0103','0104')], code_dependencies=[Path(__file__).with_name('render_meter_batch.py'), Path(__file__).with_name('power_meter_room.py')], media_probe=lambda: blender_media(bpy), media_reload=lambda: reload_unpacked_media(bpy)) as run:
+        if run.reused:
+            return
+        if not 60 <= args.ground_angle_deg <= 70:
+            parser.error('Ground angle must be between 60 and 70 degrees')
+        output = args.output.resolve()
+        base = (ROOT / 'datasets/assets/blender/meter').resolve()
+        if output.exists() or not output.is_relative_to(base) or output == base:
+            parser.error('Output must be a new directory under datasets/assets/blender/meter')
+        if not bpy.data.filepath or Path(bpy.data.filepath).resolve() != SOURCE.resolve():
+            parser.error('Open the calibrated 9011 PBR source blend')
+        original = bpy.context.scene
+        dial = [original.objects[name] for name in DIAL_NAMES]
+        equipment = bpy.data.collections.new('Power meter station prototype')
+        roi = station(equipment)
+        preview, front, angle, side, room_context = draft_scene(equipment, args.device)
+        pivot, points = tilted_dial(preview, dial, args.ground_angle_deg)
+        preview.frame_start, preview.frame_end = original.frame_start, original.frame_end
+        bpy.context.window.scene = preview
+        preview.frame_set(original.frame_current)
+        bpy.context.view_layer.update()
+        assembly_matrix = pivot.matrix_world @ Matrix.Translation(-DIAL_PIVOT)
+        pivot_world = assembly_matrix @ DIAL_PIVOT
+        top_world = assembly_matrix @ (DIAL_PIVOT + Vector((0, 2.08, 0)))
+        up = top_world - pivot_world
+        ground_angle = math.degrees(math.atan2(up.y, abs(up.z)))
+        if abs(ground_angle - args.ground_angle_deg) > 1e-4 or up.z >= 0 or (pivot_world-DIAL_PIVOT).length > 1e-6:
+            raise RuntimeError('Station dial tilt direction, angle or support contact does not match')
+        world_points = [point.matrix_world.translation for point in points]
+        output.mkdir(parents=True)
+        images = [_render(preview, view, output / name, size, roi, world_points, assembly_matrix, top_world, pivot_world)
+                  for view, name, size in ((front, 'prototype_vehicle_front.png', (640, 480)),
+                                           (angle, 'prototype_three_quarter.png', (640, 480)))]
+        # Keep the actual side elevation visible when the context wall sits between camera and station.
+        room_context.hide_render = True
+        try:
+            side_image = _render(preview, side, output / 'prototype_right_side.png', (640, 480), roi, world_points,
+                                assembly_matrix, top_world, pivot_world)
+            side_image['room_context_visible'] = False
+            images.append(side_image)
+        finally:
+            room_context.hide_render = False
+        preview.camera = front
+        preview.render.resolution_x, preview.render.resolution_y = (640, 480)
+        preview.render.filepath = '//prototype_vehicle_front.png'
+        bpy.ops.wm.save_as_mainfile(filepath=str(output / 'meter_9011_power_meter_station.blend'))
+        report = {'status': 'editable visual prototype', 'source_blend': SOURCE.relative_to(ROOT).as_posix(),
+                  'endpoint_config': ENDPOINTS.relative_to(ROOT).as_posix(),
+                  'source_photos': [f'datasets/raw/site_capture_20261112/onboard_camera_images/vehicle_{id}.png'
+                                    for id in ('0024', '0100', '0103', '0104')],
+                  'unit_scale_basis': 'approximate proportions observed in car photos, not measured dimensions',
+                  'dial_tilt': {'ground_angle_requested_deg': args.ground_angle_deg,
+                                'ground_angle_measured_deg': ground_angle,
+                                'pivot_world': list(pivot_world), 'top_world': list(top_world),
+                                'front_direction': '+Z', 'up_direction': '+Y',
+                                'source_scene': original.name, 'assembly_object': pivot.name},
+                  'synthetic_display_example': {'text': READING, 'unit': 'kWh'},
+                  'environment': 'procedural indoor track with sky contribution at window and interior fixtures',
+                  'screen_roi_order': ['TL', 'TR', 'BR', 'BL'], 'previews': images}
+        (output / 'prototype_manifest.json').write_text(json.dumps(report, ensure_ascii=False, indent=2) + '\n',
+                                                       encoding='utf-8')
+        print('POWER_METER_PROTOTYPE', output, flush=True)
 
 
 if __name__ == '__main__':

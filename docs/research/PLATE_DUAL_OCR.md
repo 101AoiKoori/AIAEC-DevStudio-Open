@@ -26,13 +26,13 @@
 
 | 本工作区本机路径 | 来源（相邻工程） | 内容与使用边界 |
 | --- | --- | --- |
-| `datasets/exports/plate/provincial_ccpd/` | 省赛车牌识别数据 | 原样保留检测、OCR、字符表及既有 split；包含下述独立测试裁剪 |
-| `datasets/exports/plate/provincial_synthetic/synthetic_train/` | 省赛第一轮合成数据 | 第一轮合成数据，不能作为独立实拍验收 |
-| `datasets/exports/plate/provincial_synthetic/round2_multi_car/` | 省赛第二轮合成数据 | 第二轮固定多车场景，与第一轮保持相对目录关系 |
+| `datasets/exports/plate/provincial_ccpd/` | 省赛车牌识别数据 | 历史副本含检测、OCR、字符表及既有 split；原导出路径已清空 |
+| `datasets/exports/plate/provincial_synthetic/synthetic_train/` | 省赛第一轮合成数据 | 历史副本为第一轮合成数据，原导出路径已清空；不属于独立实拍验收 |
+| `datasets/exports/plate/provincial_synthetic/round2_multi_car/` | 省赛第二轮合成数据 | 历史副本为第二轮固定多车场景，原导出路径已清空 |
 | `datasets/raw/plate/provincial_source_pic/` | 省赛合成素材 | 五张合成底图/素材，保留文件名；不是五张独立现场评估样本 |
 | `models/weights/plate/provincial/` | 省赛模型材料 | 检测、完整 CNN 检查点、Paddle v4 推理目录，共五个文件；供统一训练窗口和模型研究使用 |
 
-以上数据及模型全部保持 Git 忽略。来源工程没有提供足以确认这些具体数据副本及训练权重再分发许可的证据，许可与采集授权待核实；此次只做用户授权的本机复制，不宣称可公开分发。原始目录不移动、不删除。
+以上数据及模型属于 Git 忽略范围。`datasets/exports/` 下的副本已清空，其余素材和模型的状态以实际路径为准。来源工程没有提供足以确认这些具体数据副本及训练权重再分发许可的证据，许可与采集授权待核实；此前的本机复制不代表可公开分发。
 
 数据组成：
 
@@ -84,7 +84,7 @@ python lab/features/plate/training/scripts/train_cnn_ocr.py --config lab/feature
 
 ## 测试数据来源
 
-既有卡通贴纸回归使用复制自省赛微调工程的 `datasets/exports/plate/provincial_synthetic/synthetic_train/detector/` 验证划分，属于合成域回归，不作为独立实拍测试或实车验收。CCPD 2,700 张 OCR test 及同源检测裁剪 500 张保留为真实照片补充评估，不能替代卡通贴纸场景评估；检测全量 split 含 2,800 张（2,700 正、100 负）。已有 Assets 实拍及其裁剪可在核实标注后用于国赛评测，结果注明来源及其与训练素材的复用范围；既有回归结果未使用这些素材。数据来源、分布偏差和复现实验详见[资产调查](#本机省赛资产调查与导入2026-11-06)及[卡通验证回归](#卡通合成验证集回归2026-11-07)。
+既有卡通贴纸回归使用复制自省赛微调工程的 `datasets/exports/plate/provincial_synthetic/synthetic_train/detector/` 验证划分，属于合成域回归，不作为独立实拍测试或实车验收。CCPD 2,700 张 OCR test 及同源检测裁剪 500 张曾用于真实照片补充评估，不能替代卡通贴纸场景评估；检测全量 split 含 2,800 张（2,700 正、100 负）。这些 `exports` 下的历史数据副本已清空。已有 Assets 实拍及其裁剪可在核实标注后用于国赛评测，结果注明来源及其与训练素材的复用范围；既有回归结果未使用这些素材。数据来源、分布偏差和复现实验详见[资产调查](#本机省赛资产调查与导入2026-11-06)及[卡通验证回归](#卡通合成验证集回归2026-11-07)。
 
 <a id="本次比赛双-ocr-决策"></a>
 ## 本次比赛双 OCR 决策（2026-11-07）

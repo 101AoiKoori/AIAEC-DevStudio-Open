@@ -51,13 +51,13 @@ class RefineSelectedTest(unittest.TestCase):
             plan['vehicles'][0]['path'] = str(root / 'wrong.png')
             selection.write_text(json.dumps(plan), encoding='utf-8')
             with self.assertRaises(ValueError):
-                module.refine(selection, root / 'wrong_views')
+                module._refine(selection, root / 'wrong_views')
             self.assertFalse((root / 'wrong_views').exists())
             plan['vehicles'][0]['path'] = str(root / names[0])
             selection.write_text(json.dumps(plan), encoding='utf-8')
             out = root / 'wrong_dimensions'
             with self.assertRaises(ValueError):
-                module.refine(selection, out)
+                module._refine(selection, out)
             manifest = json.loads((out / 'refinement_manifest.json').read_text(encoding='utf-8'))
             self.assertEqual(manifest['status'], 'failed')
             self.assertIn('2160×3840', manifest['error'])

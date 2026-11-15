@@ -1,7 +1,5 @@
 # 技术版本入口
 
-> 本仓库包含索引所列技术脚本、配置快照及 V1/V2 来源与环境元数据；数据、模型、图片与运行产物未包含。来源提交属于原开发仓库，不能在本仓库直接通过 Git 查询。
-
 这里收录有明确迭代边界的数据集、脚本、模型及技术配置。每个版本记录原路径、来源和状态；代码历史以 Git 为依据。
 
 ## YOLO 训练 V1/V2（2026-11-11）
@@ -24,7 +22,7 @@
 
 原位置为 `runs/smoke_versions/training_iterations_20261111/<模型>_<版本>/`。源码在准备时冻结自 `lab/training_common/`；当时 Git HEAD 为 `f3bdd0aa2e135be2a09e12bd4ea1f49bde736351`，工作树含未提交训练工程，因此该提交号本身不代表快照全部内容。每版 `runs/provenance.json` 记录实际源路径与快照对应、准备时工作树状态，`runs/preparation_environment.json` 记录软件环境。当前 V3 的后续工程补丁不追写这些冻结脚本。
 
-归档移动后核对 18 项完成状态、同任务训练样本一致性、类别覆盖、完整评估数量及运行产物；对应证据为原 suite 目录的 `suite.json`、`artifact_audit.json` 和 `git_snapshot_files.txt`。V3 开发源仍在各任务 `training/`，分发镜像位于额外的 `training_packages/`。
+归档移动后核对 18 项完成状态、同任务训练样本一致性、类别覆盖、完整评估数量及运行产物；对应证据为原 suite 目录的 `suite.json`、`artifact_audit.json` 和 `git_snapshot_files.txt`。V3 开发源仍在各任务 `training/`；分发包镜像曾位于 `training_packages/`，已于 2026-11-15 删除，该目录现只保留 `portable_env/`。
 
 ## 三栋楼 Blender 模型
 
@@ -32,19 +30,19 @@
 
 | 版本 | 本机归档位置 | Blender 模型数 | 预览图数 |
 | --- | --- | ---: | ---: |
-| v1 | blender_buildings_v1 | 1 | 6 |
-| v2 | blender_buildings_v2 | 1 | 6 |
-| v3 | blender_buildings_v3 | 1 | 13 |
-| v4 | blender_buildings_v4 | 1 | 14 |
-| v5 | blender_buildings_v5 | 1 | 14 |
-| v7 | blender_buildings_v7 | 1 | 15 |
-| v8 | blender_buildings_v8 | 1 | 16 |
-| v9 | blender_buildings_v9 | 1 | 16 |
-| v10 | blender_buildings_v10 | 4 | 16 |
-| v11 | blender_buildings_v11 | 4 | 16 |
-| v12 | blender_buildings_v12 | 4 | 16 |
+| v1 | [blender_buildings_v1](fire/blender_buildings_v1/) | 1 | 6 |
+| v2 | [blender_buildings_v2](fire/blender_buildings_v2/) | 1 | 6 |
+| v3 | [blender_buildings_v3](fire/blender_buildings_v3/) | 1 | 13 |
+| v4 | [blender_buildings_v4](fire/blender_buildings_v4/) | 1 | 14 |
+| v5 | [blender_buildings_v5](fire/blender_buildings_v5/) | 1 | 14 |
+| v7 | [blender_buildings_v7](fire/blender_buildings_v7/) | 1 | 15 |
+| v8 | [blender_buildings_v8](fire/blender_buildings_v8/) | 1 | 16 |
+| v9 | [blender_buildings_v9](fire/blender_buildings_v9/) | 1 | 16 |
+| v10 | [blender_buildings_v10](fire/blender_buildings_v10/) | 4 | 16 |
+| v11 | [blender_buildings_v11](fire/blender_buildings_v11/) | 4 | 16 |
+| v12 | [blender_buildings_v12](fire/blender_buildings_v12/) | 4 | 16 |
 
-v6 原目录仅发现字体和许可，模型及预览缺失，生成状态未知；当前 v13 保留在数据区。各原版本目录中的 `NotoSansSC.ttf` 和 `OFL.txt` 保留原位；模型内打包 Noto Sans SC 字体与用户提供的火焰图案，其来源与许可边界见[数据区说明](../../../datasets/README.md)。这些模型和预览是渲染派生物；实拍提供的楼体外观线索沿原始照片/视频来源记录，渲染产物不计为新的相机拍摄，也不提交 Git。
+v6 模型及预览缺失，生成状态未知；当前 v13 保留在数据区。v2–v12 原目录的字体和许可与 v13 同名文件逐字节一致，重复副本已删除；v1 的不同字体及许可保留原位，v13 字体及许可保留。模型内打包 Noto Sans SC 字体与用户提供的火焰图案，其来源与许可边界见[数据区说明](../../../datasets/README.md)。这些模型和预览是渲染派生物；实拍提供的楼体外观线索沿原始照片/视频来源记录，渲染产物不计为新的相机拍摄，也不提交 Git。
 
 ## 垃圾桶 Blender 模型
 
@@ -52,25 +50,44 @@ v6 原目录仅发现字体和许可，模型及预览缺失，生成状态未�
 
 | 本机归档位置 | Blender 模型数 | 预览图数 |
 | --- | ---: | ---: |
-| blender_reference_20261109 | 1 | 1 |
-| blender_reference_v2_20261109 | 1 | 1 |
-| blender_reference_v3_20261109 | 1 | 1 |
-| blender_reference_v4_20261109 | 1 | 1 |
-| blender_reference_v5_20261109 | 1 | 2 |
-| blender_reference_v6_20261109 | 1 | 2 |
-| blender_reference_v7_20261109 | 1 | 2 |
-| blender_reference_v8_20261109 | 1 | 2 |
-| blender_reference_v10_20261109 | 1 | 2 |
-| blender_reference_v11_20261109 | 1 | 2 |
-| blender_reference_v12_20261109 | 1 | 2 |
-| blender_pbr_v1_20261110 | 1 | 1 |
+| [blender_reference_20261109](waste_bin/blender_reference_20261109/) | 1 | 1 |
+| [blender_reference_v2_20261109](waste_bin/blender_reference_v2_20261109/) | 1 | 1 |
+| [blender_reference_v3_20261109](waste_bin/blender_reference_v3_20261109/) | 1 | 1 |
+| [blender_reference_v4_20261109](waste_bin/blender_reference_v4_20261109/) | 1 | 1 |
+| [blender_reference_v5_20261109](waste_bin/blender_reference_v5_20261109/) | 1 | 2 |
+| [blender_reference_v6_20261109](waste_bin/blender_reference_v6_20261109/) | 1 | 2 |
+| [blender_reference_v7_20261109](waste_bin/blender_reference_v7_20261109/) | 1 | 2 |
+| [blender_reference_v8_20261109](waste_bin/blender_reference_v8_20261109/) | 1 | 2 |
+| [blender_reference_v10_20261109](waste_bin/blender_reference_v10_20261109/) | 1 | 2 |
+| [blender_reference_v11_20261109](waste_bin/blender_reference_v11_20261109/) | 1 | 2 |
+| [blender_reference_v12_20261109](waste_bin/blender_reference_v12_20261109/) | 1 | 2 |
+| [blender_pbr_v1_20261110](waste_bin/blender_pbr_v1_20261110/) | 1 | 1 |
 
-`blender_reference_v9_20261109` 原目录为空，模型和预览缺失；当前参考 v13 与 PBR v2 保留在数据区，PBR v3 也保留原位，其使用状态待核。部分模型打包了 Wikimedia 派生标识，作者及 CC BY-SA 4.0 许可见标识署名文件。归档文件是本机模型和预览，不提交 Git。
+`blender_reference_v9_20261109` 原目录为空，模型和预览缺失。当前 PBR v2 保留在数据区；PBR v3 仍待核。v13 旧构建基线及预览已归档见[历史基线记录](waste_bin/waste_bin_reference_v13_20261109/)。其场景由 2026-11-09 的三个现存批次 manifest 和一个归档批次 manifest 声明为 `scene_file`；这些是生成时来源声明，不确立其与 PBR v2 的精确父子关系。场景包含内嵌 Wikimedia 标识，署名及 CC BY-SA 4.0 许可见[标识署名文件](../../../datasets/annotated/waste_bin/wikimedia_decals_20261109/attribution.json)。归档模型和预览是本机文件，不提交 Git。
+
+### 垃圾桶 v13 历史构建基线
+
+[归档文件夹](waste_bin/waste_bin_reference_v13_20261109/)保留 `waste_bin_reference.blend`、`preview.png` 和 `preview_detail.png`。依据实拍和用户测量近似建模；场景深度及车载观察距离未测。Blender 5.2.3 成功打开模型：87 个对象，4 张 768×768 标识图均已打包，无外部库或缺失图像。当前文本检索未发现活动生成入口消费；四份历史 manifest 记录其来源。旧清单中的 `scene_file` 路径保留为生成时原始声明。场景和预览不由 Git 恢复；标识来源及署名见[标识署名文件](../../../datasets/annotated/waste_bin/wikimedia_decals_20261109/attribution.json)。
 
 ## 仪表 Blender 模型
 
-blender_9011_pbr_v1_20261110 包含一个 PBR 模型及一张预览，原位置为 `datasets/annotated/meter/blender_9011_pbr_v1_20261110/`。模型打包了生成式表盘贴图，贴图许可及与实物的一致性待核；模型对应的具体脚本 Git 提交未确定。当前 PBR v2、可编辑参考模型、贴图和 `.blend1` 备份保留在数据区；归档模型与预览不提交 Git。
+[blender_9011_pbr_v1_20261110](meter/blender_9011_pbr_v1_20261110/) 包含一个 PBR 模型及一张预览，原位置为 `datasets/annotated/meter/blender_9011_pbr_v1_20261110/`。模型打包了生成式表盘贴图，贴图许可及与实物的一致性待核；模型对应的具体脚本 Git 提交未确定。当前 PBR v2、可编辑参考模型和贴图保留在数据区；旧 `.blend1` 静态备份已归档为恢复候选，直接版本关系待核。归档模型与预览不提交 Git。
 
+| 分支状态 | 原路径 | 归档位置 | 文件与依据 |
+| --- | --- | --- | --- |
+| 参数化站房初始父偏移分支，已退役 | `datasets/annotated/meter/v4_parametric_station_20261113/` | [parametric_station_parent_offset_retired_20261113](meter/parametric_station_parent_offset_retired_20261113/) | 1 个 `station.blend`、`face.png`、`endpoints.json`。归档文件来自当前磁盘快照；未找到可恢复这些二进制的 Git 提交。`endpoints.json` 的 `index_lifecycle.status` 为 `retired`，依据是初始 face 与 markers 使用错误偏移。关联 pilot 原路径 `datasets/exports/meter/v4_parametric_station_pilot_20261113/` 的归档映射见[数据集版本索引](../dataset-versions.tsv)；其 manifest 记录 `corrected v2 supersedes this pilot`，生成时的 `source_blend` 仍保留原路径。退役原因不证明仪表实物刻度对应、端点可见性或 Pose 真值已验证。 |
+| 自动备份静态恢复候选，直接谱系待核 | `datasets/assets/blender/meter/blender_9011_reference/meter_9011_approx.blend1` | [meter_9011_approx_static_backup_candidate_20261106](meter/meter_9011_approx_static_backup_candidate_20261106/) | 保留原 `.blend1` 文件格式。Blender 5.2.3 打开归档文件成功：13 个对象，512×512，帧终点 250，无对象动画；相机 Z 为 4.2，两根指针为零旋转。当前同名 `.blend` 为 1024×1024、帧终点 721，相机 Z 为 3.944，指针和相机各有 121 个关键帧；两文件对象名、网格计数、材质和 1254×1254 打包表盘贴图一致，均无外部库。源文件修改时间早于当前 `.blend`，且代码/文档未发现对 `.blend1` 的活动引用。该备份保留了相较当前文件不同的静态状态，故归档作本机恢复候选；它是否为当前动画模型的直接前一版、动画是否为两者唯一变化，均未证实。该归档二进制不在 Git 中。 |
+
+
+## 共享场景候选备份
+
+| 备份及原路径 | 归档位置 | 对照记录 |
+| --- | --- | --- |
+| `datasets/assets/blender/shared/arena_4m2_pbr_20261112/arena_4_2m.blend1` | [arena_4_2m_backup_candidate_20261112](arena/arena_4_2m_backup_candidate_20261112/) | Blender 5.2.3 可打开。当前 `.blend` 与备份均有 11 个对象、7 个集合、5 个材质、640×480 输出；逐项结构检查中的对象名、类型、变换、尺寸、网格计数、材质名、相机和依赖结构一致。两者均无文件图像依赖或外部库。未做渲染比较；修改时间相差约 24 秒，不证明完整等价或直接保存谱系。归档作本机恢复候选。 |
+| `datasets/assets/blender/shared/arena_4m2_pbr_20261112/arena_indoor_calibrated.blend1` | [arena_indoor_calibrated_backup_candidate_20261112](arena/arena_indoor_calibrated_backup_candidate_20261112/) | Blender 5.2.3 可打开。备份 18 个对象，当前 `.blend` 20 个；备份墙高 3m，缺少 `Reference crossing line` 和 `Reference side line`，`Vehicle camera` 位置为 `(-0.6,-1.45,0.38)`，当前为 `(-0.6,-0.75,0.42)`。材质名称和 640×480 输出相同；无外部库，图像依赖均可解析。未发现 `.blend1` 活动消费者。作为几何/机位恢复候选保存；它是否为当前校准场景的直接前一版未知。 |
+| `datasets/assets/blender/shared/arena_4m2_pbr_20261112/arena_indoor_detailed.blend1` | [arena_indoor_detailed_material_backup_candidate_20261112](arena/arena_indoor_detailed_material_backup_candidate_20261112/) | Blender 5.2.3 可打开。对象、位置、尺寸、网格结构、材质名称和 640×480 输出相同；材质 `PBR asphalt charcoal` 的 Base Color 当前为 `(0.002,0.002,0.002,1)`、备份为 `(0.003,0.003,0.003,1)`，Specular IOR Level 当前为 `0.12`、备份为 `0.23`，其他抽查的节点输入和连接相同。无外部库，图像依赖均可解析；未发现 `.blend1` 活动消费者。未进行渲染对比，直接保存谱系未知，归档作材质参数恢复候选。当前 `arena_indoor_detailed.blend` 仍被人物、禁行牌和车牌生成入口引用；其记录的父场景仍是当前 `arena_indoor_calibrated.blend`，不指向此备份。
+
+三份 arena 文件均保留 `.blend1` 格式，归档二进制在本机存在且不由 Git 恢复。SQLite 保留原路径别名，并以 `backup_candidate_for` 记录与当前 `.blend` 的候选关系；这不确立直接版本谱系。
 ## 垃圾贴纸生成脚本
 
 已复原的垃圾贴纸生成脚本：

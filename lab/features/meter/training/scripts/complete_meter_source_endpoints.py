@@ -7,9 +7,15 @@ resulting endpoints inherit the approximate source geometry. Validates against
 import argparse
 import json
 import math
+import sys
 from pathlib import Path
 import cv2
 import numpy as np
+
+ROOT = Path(__file__).resolve().parents[5]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+from lab.training_common.production_guard import generation_guard
 
 
 def distance(p,a,b):
@@ -25,8 +31,26 @@ def main():
     parser.add_argument('--face',required=True,type=Path)
     parser.add_argument('--geometry',required=True,type=Path)
     args=parser.parse_args()
+    args.sources, args.face, args.geometry = args.sources.resolve(), args.face.resolve(), args.geometry.resolve()
     manifest_path=args.sources/'manifest.json'
-    data=json.loads(manifest_path.read_text(encoding='utf8'))
+    manifest_bytes=manifest_path.read_bytes()
+    data=json.loads(manifest_bytes.decode('utf8'))
+    images=[args.sources/'images'/(s['id']+'.png') for s in data['samples']]
+    labels=[args.sources/'labels'/(s['id']+'.txt') for s in data['samples']]
+    outputs=[manifest_path, *labels]
+    with generation_guard('meter.complete_source_endpoints:' + str(args.sources.resolve()),
+                          [args.face, *images], outputs, {},
+                          procedural_inputs=[args.geometry, manifest_path, *labels],
+                          inplace_paths=outputs, code_paths=[Path(__file__)]) as run:
+        if manifest_path.read_bytes() != manifest_bytes:
+            raise ValueError('source manifest changed during input enumeration')
+        if run.reused:
+            print('REUSED', args.sources)
+            return
+        _produce(args, manifest_path, data)
+
+
+def _produce(args, manifest_path, data):
     if data.get('endpoints_completed'):
         raise RuntimeError('endpoints already completed')
     config=json.loads(args.geometry.read_text(encoding='utf-8-sig'))

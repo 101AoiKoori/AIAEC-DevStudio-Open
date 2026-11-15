@@ -13,6 +13,9 @@ datasets/annotated/*
 !/datasets/annotated/.gitkeep
 datasets/exports/*
 !/datasets/exports/.gitkeep
+/datasets/samples/
+/datasets/assets/blender/
+/datasets/assets/person/
 /datasets/person/
 models/weights/*
 !/models/weights/.gitkeep

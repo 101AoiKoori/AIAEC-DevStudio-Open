@@ -1,0 +1,370 @@
+task: fire
+status: configured_inputs_consumed_by_canonical_entry
+databases: {media_query: datasets/annotated/media_index/query_cache.sqlite3, blender_registry: datasets/blender_source_registry.sqlite3}
+target_artwork_root: datasets/raw/fire/team_assets
+roots: [datasets/raw/fire/archive_assets_legacy, datasets/raw/car_real_capture_20261112, datasets/assets/blender]
+records: [datasets/annotated/fire/real_review_candidates_20261110/manifest.json]
+selection: 火焰图案仅使用指定目录；背景可跨任务复用，记录父来源。
+scene: datasets/assets/blender/fire/blender_buildings_v13/three_buildings.blend
+target_artwork: datasets/raw/fire/team_assets/image1.png
+production_plan: datasets/scripts/fire/config/production_plan.json
+current_supervision_scope: configured_crops_only
+excluded_supervision: full_original_photos_without_complete_target_labels
+real_facades:
+  relations: datasets/annotated/fire/fire_sticker_v4_arena_handoff_20261113/fire_image_use_manifest_20261114.json
+  task: fire_sticker
+  split: train
+  role: background
+  status: candidate
+  crop_xyxy: [1354, 1452, 2430, 2259]
+  source_image_size: [3472, 4640]
+  region_reference_size: [600, 450]
+  review_state: no_recognizable_target_in_crop_candidate
+  patches:
+    facade_A_04: [[180, 80], [220, 82], [220, 138], [180, 136]]
+    facade_B_51: [[318, 150], [334, 150], [334, 174], [318, 174]]
+    facade_C_33: [[230, 125], [248, 125], [248, 150], [230, 150]]
+  supported_counts: [0, 1]
+  augmentation:
+    contrast: [0.9, 1.1]
+    brightness: [-8.0, 8.0]
+    saturation: [0.8, 1.2]
+    patch_scale: [0.78, 0.88]
+candidate_pool:
+  inventory: datasets/annotated/fire/fire_sticker_v4_arena_handoff_20261113
+  gates:
+    - {file: facade_v4_gate_20261113.json, selections: 560}
+    - {file: render_batch_v4_gate_20261113.json, selections: 677}
+    - {file: distractor_v4_gate_20261113.json, selections: 216}
+    - {file: instance_gate_20261113.json, selections: 210}
+    - {file: real_legacy_v4_gate_20261113.json, selections: 197}
+  blocking_review: per-record AI observations exist; full-image target completeness and the multi-sticker branches stay unreviewed, so these gates are not training exports.
+pairing:
+  schema_version: 1
+  status: draft
+  composition_policy:
+    target_source: blender_primary
+    blender_priority: increased
+    blender_share_target: 0.40
+    target_components: [fixed_flame_artwork]
+    background_components: [building_scene]
+    note: 用户 2026-11-15 确认采用 20/40/40；固定火焰图案为目标，楼宇模型与三楼合景提供背景
+  policy:
+    parent_classes: [task_real, background]
+    split_unit: parent_group
+    train_parent_cap: 0.8
+    val_test_mode: reserve_only
+    derived_inherits_parent_split: true
+    cross_task_duplicates: allowed_with_separate_labels
+    same_source_splits: record_and_report
+  task_real:
+    - id: tr_facade_A_photos_train
+      class: task_real
+      kind: parent_photo_batch
+      paths:
+        - datasets/raw/fire/archive_assets_legacy/楼宇/开心大厦/照片/另一侧斜视_整体_013.jpg
+        - datasets/raw/fire/archive_assets_legacy/楼宇/开心大厦/照片/正侧倾斜视图_整体_012.jpg
+      evidence:
+        - {manifest: datasets/annotated/fire/fire_sticker_v4_arena_handoff_20261113/fire_image_use_manifest_20261114.json}
+      capture_session: unknown
+      labels: {status: partial, note: 当前裁剪只支持 0/1 贴}
+      roles: [direct_target, composite_target, composite_background]
+      split: {primary: train, status: proposed}
+      plan: null
+    - id: tr_facade_A_photos_val
+      class: task_real
+      kind: parent_photo_batch
+      paths:
+        - datasets/raw/fire/archive_assets_legacy/楼宇/开心大厦/照片/正面_横向窗洞及底部开口_006.jpg
+        - datasets/raw/fire/archive_assets_legacy/楼宇/开心大厦/照片/远距离正面_整体_017.jpg
+      evidence:
+        - {manifest: datasets/annotated/fire/fire_sticker_v4_arena_handoff_20261113/fire_image_use_manifest_20261114.json}
+      capture_session: unknown
+      labels: {status: partial, note: 待完整标注与批次核对}
+      roles: [direct_target, composite_target, composite_background]
+      split: {primary: val, status: proposed}
+      plan: null
+    - id: tr_facade_A_photos_test
+      class: task_real
+      kind: parent_photo_batch
+      paths:
+        - datasets/raw/fire/archive_assets_legacy/楼宇/开心大厦/照片/正侧斜视_楼体整体_023.jpg
+        - datasets/raw/fire/archive_assets_legacy/楼宇/开心大厦/照片/正侧斜视_横向窗洞_007.jpg
+      evidence:
+        - {manifest: datasets/annotated/fire/fire_sticker_v4_arena_handoff_20261113/fire_image_use_manifest_20261114.json}
+      capture_session: unknown
+      labels: {status: partial, note: 待完整标注与批次核对}
+      roles: [direct_target, composite_target, composite_background]
+      split: {primary: test, status: proposed}
+      plan: null
+    - id: tr_facade_B_photos_train
+      class: task_real
+      kind: parent_photo_batch
+      paths:
+        - datasets/raw/fire/archive_assets_legacy/楼宇/锦绣大厦/照片/中距离斜视_楼体和格栅_004.jpg
+        - datasets/raw/fire/archive_assets_legacy/楼宇/锦绣大厦/照片/中距离斜视_楼体和格栅_006.jpg
+      evidence:
+        - {manifest: datasets/annotated/fire/fire_sticker_v4_arena_handoff_20261113/fire_image_use_manifest_20261114.json}
+      capture_session: unknown
+      labels: {status: partial, note: 当前裁剪只支持 0/1 贴}
+      roles: [direct_target, composite_target, composite_background]
+      split: {primary: train, status: proposed}
+      plan: null
+    - id: tr_facade_B_photos_val
+      class: task_real
+      kind: parent_photo_batch
+      paths:
+        - datasets/raw/fire/archive_assets_legacy/楼宇/锦绣大厦/照片/正面中景_中央竖格栅_007.jpg
+        - datasets/raw/fire/archive_assets_legacy/楼宇/锦绣大厦/照片/正面中远景_竖格栅与窗格_015.jpg
+      evidence:
+        - {manifest: datasets/annotated/fire/fire_sticker_v4_arena_handoff_20261113/fire_image_use_manifest_20261114.json}
+      capture_session: unknown
+      labels: {status: partial, note: 待完整标注与批次核对}
+      roles: [direct_target, composite_target, composite_background]
+      split: {primary: val, status: proposed}
+      plan: null
+    - id: tr_facade_B_photos_test
+      class: task_real
+      kind: parent_photo_batch
+      paths:
+        - datasets/raw/fire/archive_assets_legacy/楼宇/锦绣大厦/照片/较远正面_格栅和窗格_009.jpg
+        - datasets/raw/fire/archive_assets_legacy/楼宇/锦绣大厦/照片/正面_楼名与3张火焰纸贴_017.jpg
+      evidence:
+        - {manifest: datasets/annotated/fire/fire_sticker_v4_arena_handoff_20261113/fire_image_use_manifest_20261114.json}
+      capture_session: unknown
+      labels: {status: partial, note: 017 含 3 贴，多贴分支待标注}
+      roles: [direct_target, composite_target, composite_background]
+      split: {primary: test, status: proposed}
+      plan: null
+    - id: tr_facade_C_photos_train
+      class: task_real
+      kind: parent_photo_batch
+      paths:
+        - datasets/raw/fire/archive_assets_legacy/楼宇/晨光大厦/照片/正侧斜视_L形窗格立面_006.jpg
+        - datasets/raw/fire/archive_assets_legacy/楼宇/晨光大厦/照片/较近正侧斜视_窗格与入口_005.jpg
+      evidence:
+        - {manifest: datasets/annotated/fire/fire_sticker_v4_arena_handoff_20261113/fire_image_use_manifest_20261114.json}
+      capture_session: unknown
+      labels: {status: partial, note: 当前裁剪只支持 0/1 贴}
+      roles: [direct_target, composite_target, composite_background]
+      split: {primary: train, status: proposed}
+      plan: null
+    - id: tr_facade_C_photos_val
+      class: task_real
+      kind: parent_photo_batch
+      paths:
+        - datasets/raw/fire/archive_assets_legacy/楼宇/晨光大厦/照片/左侧_外墙小窗洞_022.jpg
+        - datasets/raw/fire/archive_assets_legacy/楼宇/晨光大厦/照片/斜视_L形墙面与窗口_019.jpg
+      evidence:
+        - {manifest: datasets/annotated/fire/fire_sticker_v4_arena_handoff_20261113/fire_image_use_manifest_20261114.json}
+      capture_session: unknown
+      labels: {status: partial, note: 待完整标注与批次核对}
+      roles: [direct_target, composite_target, composite_background]
+      split: {primary: val, status: proposed}
+      plan: null
+    - id: tr_facade_C_photos_test
+      class: task_real
+      kind: parent_photo_batch
+      paths:
+        - datasets/raw/fire/archive_assets_legacy/楼宇/晨光大厦/照片/较远平视_楼体前侧_015.jpg
+        - datasets/raw/fire/archive_assets_legacy/楼宇/晨光大厦/照片/远景_楼体前侧与前景_017.jpg
+      evidence:
+        - {manifest: datasets/annotated/fire/fire_sticker_v4_arena_handoff_20261113/fire_image_use_manifest_20261114.json}
+      capture_session: unknown
+      labels: {status: partial, note: 待完整标注与批次核对}
+      roles: [direct_target, composite_target, composite_background]
+      split: {primary: test, status: proposed}
+      plan: null
+    - id: tr_facade_video_A_001
+      class: task_real
+      kind: parent_video
+      paths: [datasets/raw/fire/archive_assets_legacy/楼宇/开心大厦/视频/开心楼正侧背面绕拍_001.mp4]
+      evidence:
+        - {manifest: datasets/annotated/fire/real_review_candidates_20261110/manifest.json}
+      capture_session: unknown
+      labels: {status: partial, note: 每视频 3 审核帧}
+      roles: [direct_target, geometry_reference]
+      split: {primary: train, status: proposed}
+      plan: null
+    - id: tr_facade_video_A_002
+      class: task_real
+      kind: parent_video
+      paths: [datasets/raw/fire/archive_assets_legacy/楼宇/开心大厦/视频/开心楼正侧背面绕拍_002.mp4]
+      evidence:
+        - {manifest: datasets/annotated/fire/real_review_candidates_20261110/manifest.json}
+      capture_session: unknown
+      labels: {status: partial, note: 每视频 3 审核帧}
+      roles: [direct_target, geometry_reference]
+      split: {primary: val, status: proposed}
+      plan: null
+    - id: tr_facade_video_B_001_002
+      class: task_real
+      kind: parent_video
+      paths:
+        - datasets/raw/fire/archive_assets_legacy/楼宇/锦绣大厦/视频/锦绣楼在室内地砖上的多面绕拍_001.mp4
+        - datasets/raw/fire/archive_assets_legacy/楼宇/锦绣大厦/视频/锦绣楼在室内地砖上的多面绕拍_002.mp4
+      evidence:
+        - {manifest: datasets/annotated/fire/real_review_candidates_20261110/manifest.json}
+      capture_session: unknown
+      labels: {status: partial, note: 每视频 3 审核帧}
+      roles: [direct_target, geometry_reference]
+      split: {primary: train, status: proposed}
+      plan: null
+    - id: tr_facade_video_B_003
+      class: task_real
+      kind: parent_video
+      paths: [datasets/raw/fire/archive_assets_legacy/楼宇/锦绣大厦/视频/锦绣楼在赛道上的多面绕拍_003.mp4]
+      evidence:
+        - {manifest: datasets/annotated/fire/real_review_candidates_20261110/manifest.json}
+      capture_session: unknown
+      labels: {status: partial, note: 每视频 3 审核帧}
+      roles: [direct_target, geometry_reference]
+      split: {primary: val, status: proposed}
+      plan: null
+    - id: tr_facade_video_B_004
+      class: task_real
+      kind: parent_video
+      paths: [datasets/raw/fire/archive_assets_legacy/楼宇/锦绣大厦/视频/锦绣楼在赛道上的多面绕拍_004.mp4]
+      evidence:
+        - {manifest: datasets/annotated/fire/real_review_candidates_20261110/manifest.json}
+      capture_session: unknown
+      labels: {status: partial, note: 每视频 3 审核帧}
+      roles: [direct_target, geometry_reference]
+      split: {primary: test, status: proposed}
+      plan: null
+    - id: tr_facade_video_C_001
+      class: task_real
+      kind: parent_video
+      paths: [datasets/raw/fire/archive_assets_legacy/楼宇/晨光大厦/视频/晨光楼环绕_正面和背面_001.mp4]
+      evidence:
+        - {manifest: datasets/annotated/fire/real_review_candidates_20261110/manifest.json}
+      capture_session: unknown
+      labels: {status: partial, note: 每视频 3 审核帧}
+      roles: [direct_target, geometry_reference]
+      split: {primary: train, status: proposed}
+      plan: null
+    - id: tr_facade_video_C_002
+      class: task_real
+      kind: parent_video
+      paths: [datasets/raw/fire/archive_assets_legacy/楼宇/晨光大厦/视频/晨光楼较高视角环绕_可见L形顶部_002.mp4]
+      evidence:
+        - {manifest: datasets/annotated/fire/real_review_candidates_20261110/manifest.json}
+      capture_session: unknown
+      labels: {status: partial, note: 每视频 3 审核帧}
+      roles: [direct_target, geometry_reference]
+      split: {primary: test, status: proposed}
+      plan: null
+    - id: tr_fire_review_pool
+      class: task_real
+      kind: parent_photo_batch
+      paths: [datasets/annotated/fire/real_review_candidates_20261110]
+      evidence:
+        - {manifest: datasets/annotated/fire/real_review_candidates_20261110/manifest.json}
+      capture_session: unknown
+      labels: {status: candidate, note: 63 条审核候选，覆盖 17 视频；按视频分 split 前不得入计划}
+      roles: [direct_target, composite_target]
+      split: {primary: unassigned, status: proposed}
+      plan: null
+    - id: tr_car_real_fire
+      class: task_real
+      kind: parent_video
+      paths: [datasets/raw/car_real_capture_20261112/V_20261112_152304.mp4]
+      evidence:
+        - {manifest: datasets/annotated/car_real_capture_20261112/segments_v1/segments.csv}
+      capture_session: unknown
+      labels: {status: partial, note: 9 个 fire_sticker 片段，标签待重建}
+      roles: [direct_target, composite_target, composite_background]
+      split: {primary: test, status: proposed}
+      plan: null
+  backgrounds:
+    - id: bg_site_003
+      class: background
+      kind: parent_video
+      paths: [datasets/raw/site_archive_legacy/场景/三楼与场地视频/三栋楼_垃圾桶与路口_003.mp4]
+      evidence:
+        - {manifest: datasets/annotated/mixed_scene/v4_compositing_backgrounds_20261113/manifest.json}
+      review: {state: candidate_empty, method: contact_sheet, accepted_by: null}
+      labels: {status: unknown}
+      roles: [composite_background]
+      split: {primary: train, status: proposed}
+      plan: null
+    - id: bg_site_005
+      class: background
+      kind: parent_video
+      paths: [datasets/raw/site_archive_legacy/场景/三楼与场地视频/三栋楼_路口及垃圾桶_005.mp4]
+      evidence:
+        - {manifest: datasets/annotated/mixed_scene/v4_compositing_backgrounds_20261113/manifest.json}
+      review: {state: candidate_empty, method: contact_sheet, accepted_by: null}
+      labels: {status: unknown}
+      roles: [composite_background]
+      split: {primary: val, status: proposed}
+      plan: null
+    - id: bg_site_009
+      class: background
+      kind: parent_video
+      paths: [datasets/raw/site_archive_legacy/场景/三楼与场地视频/三栋楼侧向扫描_009.mp4]
+      evidence:
+        - {manifest: datasets/annotated/mixed_scene/v4_compositing_backgrounds_20261113/manifest.json}
+      review: {state: candidate_empty, method: contact_sheet, accepted_by: null}
+      labels: {status: unknown}
+      roles: [composite_background]
+      split: {primary: test, status: proposed}
+      plan: null
+    - id: bg_site_012
+      class: background
+      kind: parent_video
+      paths: [datasets/raw/e_bike/archive_assets_legacy/视频/人物立牌正背面_电动车直立_倒伏和遮挡_场地扫描_012.mp4]
+      evidence:
+        - {manifest: datasets/annotated/mixed_scene/v4_compositing_backgrounds_20261113/manifest.json}
+      review: {state: candidate_empty, method: contact_sheet, accepted_by: null}
+      labels: {status: unknown}
+      roles: [composite_background]
+      split: {primary: val, status: proposed}
+      plan: null
+    - id: bg_ebike_003
+      class: background
+      kind: parent_video
+      paths: [datasets/raw/e_bike/archive_assets_legacy/视频/场地多辆电动车_直立与倒伏混合_较低视角_003.mp4]
+      evidence:
+        - {manifest: datasets/annotated/mixed_scene/v4_compositing_backgrounds_20261113/manifest.json}
+      review: {state: unknown, method: contact_sheet, accepted_by: null}
+      labels: {status: unknown}
+      roles: [composite_background]
+      split: {primary: test, status: proposed}
+      plan: null
+    - id: bg_waste_004
+      class: background
+      kind: parent_video
+      paths: [datasets/raw/waste_bin/archive_assets_legacy/视频/四色桶较低视角_灰绿闭盖_红蓝开盖_004.mp4]
+      evidence:
+        - {manifest: datasets/annotated/mixed_scene/v4_compositing_backgrounds_20261113/manifest.json}
+      review: {state: unknown, method: contact_sheet, accepted_by: null}
+      labels: {status: unknown}
+      roles: [composite_background]
+      split: {primary: test, status: proposed}
+      plan: null
+  data_sources:
+    - id: ds_pattern
+      kind: fixed_artwork
+      path: datasets/raw/fire/team_assets/image1.png
+      parent_group: null
+      roles: [target_foreground]
+      split: {primary: shared, status: confirmed}
+    - id: ds_reference_photo
+      kind: fixed_artwork
+      path: datasets/raw/fire/team_assets/实拍.jpg
+      parent_group: null
+      roles: [material_reference]
+      split: {primary: shared, status: confirmed}
+  blender:
+    - id: bl_three_buildings
+      kind: blender_scene
+      path: datasets/assets/blender/fire/blender_buildings_v13/three_buildings.blend
+      role: target_scene
+      priority: primary
+      split: {primary: shared, status: confirmed, same_source_note: 与 building_name_paper 共享母场景}
+  captures: []
+  plan_bindings:
+    train: [datasets/scripts/fire/config/production_plan.json]
+    val: []
+    test: []

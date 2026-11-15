@@ -1,21 +1,149 @@
 import sys
 import unittest
 import random
+import tempfile
 from collections import Counter
 from pathlib import Path
+from types import SimpleNamespace
+from unittest import mock
 
 import cv2
 import numpy as np
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'scripts'))
+import synthesize_real_ground as compositor
+from lab.training_common.bayesian_allocation import plan_generation
 from synthesize_real_ground import (alpha_place, background_choice, background_kind_for, exposure,
+                                    car_foot_y, choose_v4_left, crop_v4, require_distinct_v4_people,
                                     has_requested_overlap, illumination_stratum, planar_warp,
+                                    planned_scene_indices,
                                     project_corners, sample_person_anchors, scenario_occurrence,
                                     scenarios, stratified_lighting_level, truncated_gauss,
-                                    validate_actor_placement, visible_masks, yolo_row)
+                                    validate_actor_placement, validate_person_production_plan,
+                                    visible_masks, yolo_row)
 
 
 class RealGroundSynthesisTest(unittest.TestCase):
+    def test_planned_production_uses_allocated_state_and_records_sample(self):
+        target = {'kind': 'single', 'people': 1, 'vehicles': 0, 'relation': 'none',
+                  'first_person_class': 'community', 'first_vehicle_class': None}
+        indices = planned_scene_indices('ground_only', target, 'normal')
+        state = {'id': 'single', 'planned_count': 2, 'sources': ['group'],
+                 'parameters': {'format': 'test'}}
+        run = SimpleNamespace(plan={'strata': [state]}, source_refs=[], record_sample=mock.Mock())
+        mask = np.ones((10, 10), dtype=bool)
+        def fake_scene(index, rng, *_):
+            image = np.full((10, 10, 3), rng.randint(0, 255), dtype=np.uint8)
+            objects = [{'kind': 'person', 'category': 'community', 'source': 'figure.png',
+                        'visible_bbox_xyxy': [0, 0, 10, 10]}]
+            return image, [mask], [mask], objects, {'image': 'bg'}, {'level': 'normal'}
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            with mock.patch.object(compositor, 'ROOT', root), \
+                 mock.patch.object(compositor, 'eligible_backgrounds', return_value=[]), \
+                 mock.patch.object(compositor, 'load_sources', return_value=({}, {})), \
+                 mock.patch.object(compositor, 'generate_one',
+                                   side_effect=fake_scene) as generate:
+                result = compositor._produce_planned_person(root/'batch', 42, run, {'single': indices})
+            self.assertEqual(result['completed'], 2)
+            self.assertEqual([call.args[0] for call in generate.call_args_list], list(indices[:2]))
+            self.assertTrue((root/'batch/labels/person_000001.txt').read_text().startswith('0 '))
+            first, second = run.record_sample.call_args_list
+            self.assertEqual(first.args, ('single',))
+            self.assertEqual(first.kwargs['actual']['cycle_index'], indices[0])
+            self.assertEqual(first.kwargs['sources'], ['group'])
+            self.assertNotEqual(first.kwargs['actual']['seed'], second.kwargs['actual']['seed'])
+
+    def test_person_plan_refuses_unimplemented_constraints_and_source_groups(self):
+        state = {'id': 's1', 'failure_event': 'miss', 'min_count': 1, 'max_count': 1,
+                 'prior': {'alpha': 1, 'beta': 1}, 'exposure_weight': 1, 'failure_cost': 1,
+                 'conditions': [], 'background': {'kind': 'ground_only'},
+                 'target': {'kind': 'occlusion', 'people': 1, 'vehicles': 1,
+                            'relation': 'vehicle_front', 'first_person_class': 'noncommunity',
+                            'first_vehicle_class': 'fallen'},
+                 'labels': {'person': 'visible_yolo', 'vehicle': 'not_emitted'},
+                 'augmentation': {'lighting': 'dim'},
+                 'parameters': {'resolution': [960, 480], 'geometry': 'bounded_planar',
+                                'sampling': 'bounded_gaussian'},
+                 'sources': ['scene_video_49s_shared', 'person.team_assets',
+                             'e_bike.multiview_masks_refined_20261110_v2']}
+        request = {'schema_version': 1, 'model_key': 'person', 'target_split': 'train',
+                   'purpose': 'contract test', 'budget': 1, 'uncertainty_weight': 0,
+                   'independence_basis': 'contract test only',
+                   'constraints': {'person_scope': 'near_frontal', 'person_box': 'visible',
+                                   'white_back': 'not_synthesized', 'distinct_person_sources': True},
+                   'strata': [state]}
+        self.assertTrue(validate_person_production_plan(request)['s1'])
+        self.assertEqual(plan_generation(request)['strata'][0]['planned_count'], 1)
+        with self.assertRaises(ValueError):
+            validate_person_production_plan({**request, 'strata': [{**state, 'conditions': ['rain']}]})
+        with self.assertRaises(ValueError):
+            validate_person_production_plan({**request, 'strata': [{**state, 'sources': ['other']}]})
+        with self.assertRaises(ValueError):
+            validate_person_production_plan({**request, 'strata': [{**state, 'observations': []}]})
+        with self.assertRaises(ValueError):
+            validate_person_production_plan({**request, 'constraints': {**request['constraints'], 'rain': True}})
+
+    def test_explicit_scene_state_selects_only_matching_cycle_indices(self):
+        target = {'kind': 'occlusion', 'people': 1, 'vehicles': 1,
+                  'relation': 'vehicle_front', 'first_person_class': 'noncommunity',
+                  'first_vehicle_class': 'fallen'}
+        indices = planned_scene_indices('ground_only', target, 'dim')
+        self.assertTrue(indices)
+        for index in indices:
+            self.assertEqual(scenarios(index), {key: target[key] for key in
+                             ('kind', 'people', 'vehicles', 'relation')})
+            self.assertEqual(background_kind_for(index, scenarios(index)), 'ground_only')
+            self.assertEqual(stratified_lighting_level(index), 'dim')
+            self.assertEqual(scenario_occurrence(index) % 2, 1)
+            self.assertEqual((scenario_occurrence(index) // 2) % 2, 1)
+        with self.assertRaises(ValueError):
+            planned_scene_indices('sign_context', {**target, 'people': 3}, 'dim')
+        with self.assertRaises(ValueError):
+            planned_scene_indices('ground_only', target, 'unimplemented')
+
+    def test_repeated_front_source_is_rejected(self):
+        require_distinct_v4_people([{'kind':'person', 'source':'a'},
+                                    {'kind':'person_back', 'source':{'foreground':'a'}}])
+        with self.assertRaises(ValueError):
+            require_distinct_v4_people([{'kind':'person', 'source':'a'}, {'kind':'person', 'source':'a'}])
+
+    def test_car_background_crop_preserves_native_pixels_and_foot_bounds(self):
+        source = np.random.default_rng(7).integers(0, 256, (480,640,3), dtype=np.uint8)
+        padded = cv2.copyMakeBorder(source, 0, 0, 160, 160, cv2.BORDER_REPLICATE)
+        image, _, _, _ = crop_v4(padded, [], [], [], 160)
+        self.assertTrue(np.array_equal(image, source))
+        rng = random.Random(11)
+        self.assertTrue(all(480*.73 <= car_foot_y(rng) <= 480*.94 for _ in range(100)))
+
+    def test_v4_crop_recomputes_visible_box_and_preserves_occlusion(self):
+        canvas = np.zeros((480, 960, 3), np.uint8)
+        person = np.zeros((480, 960), bool); person[100:300, 200:400] = True
+        vehicle = np.zeros_like(person); vehicle[200:320, 300:450] = True
+        shown = visible_masks([person, vehicle])
+        image, full, visible, meta = crop_v4(canvas, [person, vehicle], shown,
+                                             [{'kind':'person', 'foot_x':350}, {'kind':'vehicle'}], 250)
+        self.assertEqual(image.shape, (480, 640, 3))
+        self.assertEqual(meta[0]['visible_bbox_xyxy'], [0, 100, 150, 300])
+        self.assertFalse(np.any(visible[0] & visible[1]))
+        self.assertAlmostEqual(meta[0]['crop_retained_fraction'], .75)
+        self.assertEqual((meta[0]['foot_x_canvas_960'], meta[0]['foot_x']), (350, 100))
+        self.assertAlmostEqual(meta[0]['visible_fraction'], float(visible[0].sum()/full[0].sum()))
+
+    def test_v4_crop_planner_and_white_back_do_not_change_class_contract(self):
+        back = np.zeros((480,960), bool); back[100:260, 100:180] = True
+        person = np.zeros_like(back); person[110:300, 550:630] = True
+        left = choose_v4_left([back, person], random.Random(4))
+        self.assertLessEqual(left, 100)
+        self.assertGreaterEqual(left + 640, 630)
+        far = np.zeros_like(back); far[10:20,900:920] = True
+        with self.assertRaises(ValueError):
+            choose_v4_left([back,far], random.Random(0))
+        empty, _, _, result = crop_v4(np.zeros((480,960,3), np.uint8), [back], [back],
+                                      [{'kind':'person_back','category':'white_back'}], 0)
+        self.assertEqual(empty.shape[:2], (480,640))
+        self.assertEqual(result[0]['kind'], 'person_back')
+
     def test_planar_angles_keep_orientation_and_are_bounded(self):
         for yaw in (-12, 0, 12):
             for pitch in (-6, 0, 6):

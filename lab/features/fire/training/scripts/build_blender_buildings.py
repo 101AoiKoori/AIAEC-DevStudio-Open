@@ -4,8 +4,8 @@ Run from the workspace root with Blender 5.2::
 
     blender --background --factory-startup --python-exit-code 1 \
       --python lab/features/fire/training/scripts/build_blender_buildings.py -- \
-      --font datasets/annotated/fire/blender_buildings_v13/NotoSansSC.ttf \
-      --output datasets/annotated/fire/blender_buildings_new --seed 431
+      --font datasets/assets/blender/fire/blender_buildings_v13/NotoSansSC.ttf \
+      --output datasets/assets/blender/fire/blender_buildings_new --seed 431
 
 Physical dimensions are estimates derived from photographs and the user's
 average building dimensions.  This is a research reference, not a measured CAD
@@ -23,6 +23,9 @@ from mathutils import Vector
 
 
 ROOT = Path.cwd().resolve()
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+from lab.training_common.production_guard import generation_guard
 
 
 def parse_args():
@@ -37,14 +40,12 @@ def parse_args():
     parsed = parser.parse_args(args)
     parsed.output = (ROOT / parsed.output).resolve()
     parsed.font = (ROOT / parsed.font).resolve()
-    if not parsed.output.is_relative_to(ROOT / 'datasets' / 'annotated' / 'fire'):
-        parser.error('output must be under datasets/annotated/fire')
+    if not parsed.output.is_relative_to(ROOT / 'datasets' / 'assets' / 'blender' / 'fire'):
+        parser.error('output must be under datasets/assets/blender/fire')
     if not 1 <= parsed.samples <= 128:
         parser.error('samples must be between 1 and 128')
     if not .05 <= parsed.rect_depth <= .35:
         parser.error('rect-depth must be between 0.05 and 0.35 m')
-    if parsed.output.exists():
-        parser.error('output directory already exists')
     if not parsed.font.is_relative_to(ROOT) or not parsed.font.is_file():
         parser.error('font must be an existing workspace-local file')
     if not (parsed.font.parent / 'OFL.txt').is_file():
@@ -436,8 +437,7 @@ def add_light(name, energy, size, location, target):
     obj.location=location; obj.rotation_euler=(Vector(target)-obj.location).to_track_quat('-Z','Y').to_euler()
 
 
-def main():
-    args=parse_args()
+def _produce(args):
     artwork=ROOT/'datasets/raw/fire/team_assets/image1.png'
     if not artwork.is_file():
         raise FileNotFoundError('fire image missing')
@@ -564,6 +564,20 @@ def main():
         bpy.context.scene.camera=cam
         bpy.ops.wm.save_as_mainfile(filepath=str(args.output/(key+'_building.blend')))
     print('BUILT:',args.output/'three_buildings.blend')
+
+
+def main():
+    args = parse_args()
+    artwork = ROOT / 'datasets/raw/fire/team_assets/image1.png'
+    procedural = [args.font, args.font.parent / 'OFL.txt']
+    with generation_guard(
+        'fire.build_blender_buildings:' + args.output.relative_to(ROOT).as_posix(),
+        [artwork, *procedural], [args.output],
+        {'seed': args.seed, 'samples': args.samples, 'rect_depth': args.rect_depth},
+        code_paths=[Path(__file__)], procedural_inputs=procedural,
+    ) as run:
+        if not run.reused:
+            _produce(args)
 
 
 if __name__ == '__main__':

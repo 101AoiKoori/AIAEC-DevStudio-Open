@@ -1,11 +1,13 @@
 """Mark verified empty sticker footprints for synthetic fire images."""
 import argparse
 import json
+from pathlib import Path
 
 import cv2
 
 from generate_fire_dataset import read_image
 from prepare_fire_videos import ROOT, workspace_path
+from lab.training_common.production_guard import generation_guard
 
 
 def pick_quad(image):
@@ -43,19 +45,30 @@ def main():
     args = parser.parse_args()
     try:
         prepared, output = workspace_path(args.prepared), workspace_path(args.output)
-        if output.exists():
-            raise ValueError('输出文件已存在，请选择新文件名')
-        manifest = json.loads((prepared / 'manifest.json').read_text(encoding='utf-8'))
-        entries = []
-        action = ''
+        manifest_path = prepared / 'manifest.json'
+        manifest = json.loads(manifest_path.read_text(encoding='utf-8'))
+        frames = []
+        videos = set()
         for video in manifest:
-            video_id = video['video_id']
             if video['split'] != 'train':
                 continue
+            video_id = video['video_id']
             if not video_id.startswith('video_') or not video_id[6:].isdigit():
                 raise ValueError('视频清单格式错误')
-            for frame in sorted((prepared / 'images' / 'train' / video_id).glob('frame_*.png')):
-                print(f'\n{video_id} / {frame.name}')
+            if video.get('source'):
+                videos.add(workspace_path(video['source']))
+            frames.extend(sorted((prepared / 'images' / 'train' / video_id).glob('frame_*.png')))
+        with generation_guard('fire.annotate_fire_regions:' + output.relative_to(ROOT).as_posix(),
+                              [manifest_path, *frames, *sorted(videos)], [output], {'prepared': prepared.relative_to(ROOT).as_posix()},
+                              code_paths=[Path(__file__), ROOT / 'lab/features/fire/training/scripts/generate_fire_dataset.py',
+                                          ROOT / 'lab/features/fire/training/scripts/prepare_fire_videos.py'],
+                              procedural_inputs=[manifest_path], root=ROOT) as run:
+            if run.reused:
+                print('已复用已有标定')
+                return
+            entries = []
+            for frame in frames:
+                print(f'\n{frame.parent.name} / {frame.name}')
                 action = input('无火焰且贴面清晰，标定此帧？[y/回车/q]：').strip().lower()
                 if action == 'q':
                     break
@@ -65,15 +78,14 @@ def main():
                 while input('添加一个贴纸落点？[y/回车]：').strip().lower() == 'y':
                     quad = pick_quad(image)
                     if quad:
-                        entries.append({'image': frame.relative_to(ROOT).as_posix(),
-                                        'split': 'train', 'verified_empty': True, 'quad': quad})
-            if action == 'q':
-                break
-        if not entries:
-            raise ValueError('没有标定区域')
-        output.parent.mkdir(parents=True, exist_ok=True)
-        with output.open('x', encoding='utf-8') as stream:
-            json.dump(entries, stream, ensure_ascii=False, indent=2)
+                        image_path = frame.relative_to(ROOT).as_posix()
+                        entries.append({'image': image_path, 'split': 'train', 'verified_empty': True,
+                                        'quad': quad, 'source_references': run.source_refs[image_path]})
+            if not entries:
+                raise ValueError('没有标定区域')
+            output.parent.mkdir(parents=True, exist_ok=True)
+            with output.open('x', encoding='utf-8') as stream:
+                json.dump(entries, stream, ensure_ascii=False, indent=2)
         print(f'已保存 {len(entries)} 个区域；请核对后生成')
     except (ValueError, KeyError, OSError) as exc:
         parser.exit(2, f'失败：{exc}\n')

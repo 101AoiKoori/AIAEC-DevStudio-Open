@@ -2,9 +2,12 @@
 import argparse
 import json
 import subprocess
+import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[5]
+sys.path.insert(0, str(ROOT))
+from lab.training_common.production_guard import generation_guard
 SUFFIXES = {'.mp4', '.mov', '.avi', '.mkv', '.m4v'}
 
 
@@ -20,8 +23,6 @@ def workspace_path(text):
 def prepare(source, output, fps):
     if not source.is_dir():
         raise ValueError('视频目录不存在')
-    if output.exists():
-        raise ValueError('输出目录已存在，请选择新目录')
     if not 0 < fps <= 10:
         raise ValueError('抽帧频率必须大于 0 且不超过 10 帧/秒')
     groups = []
@@ -38,6 +39,17 @@ def prepare(source, output, fps):
     names = [p.name.casefold() for _, p in groups]
     if len(names) != len(set(names)):
         raise ValueError('视频文件名重复；请为各采集视频使用不同名称')
+    with generation_guard('fire.prepare_fire_videos:' + output.relative_to(ROOT).as_posix(),
+                          [path for _, path in groups], [output],
+                          {'fps': fps, 'groups': [(split, path.relative_to(ROOT).as_posix())
+                                                 for split, path in groups]},
+                          code_paths=[Path(__file__)], root=ROOT) as run:
+        if run.reused:
+            return json.loads((output / 'manifest.json').read_text(encoding='utf-8'))
+        return _prepare_groups(groups, output, fps, run.source_refs)
+
+
+def _prepare_groups(groups, output, fps, source_refs):
     output.mkdir(parents=True)
     manifest = []
     for index, (split, path) in enumerate(groups):
@@ -45,11 +57,12 @@ def prepare(source, output, fps):
         dest = output / 'images' / split / video_id
         dest.mkdir(parents=True)
         proc = subprocess.run(['ffmpeg', '-hide_banner', '-loglevel', 'error', '-nostdin',
-                               '-i', str(path), '-vf', f'fps={fps}', '-vsync', 'vfr',
+                               '-i', str(path), '-vf', f'fps={fps}', '-fps_mode:v', 'vfr',
                                str(dest / 'frame_%06d.png')], capture_output=True, text=True)
         frames = sorted(dest.glob('frame_*.png'))
         record = {'video_id': video_id, 'split': split, 'source': path.relative_to(ROOT).as_posix(),
-                  'fps': fps, 'frames': len(frames), 'status': 'pending_review'}
+                  'fps': fps, 'frames': len(frames), 'status': 'pending_review',
+                  'source_references': source_refs[path.relative_to(ROOT).as_posix()]}
         manifest.append(record)
         (output / 'manifest.json').write_text(json.dumps(manifest, ensure_ascii=False, indent=2), encoding='utf-8')
         if proc.returncode or not frames:

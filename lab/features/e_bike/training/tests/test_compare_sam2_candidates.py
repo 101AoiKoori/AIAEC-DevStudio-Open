@@ -1,3 +1,4 @@
+import argparse
 import importlib.util
 import json
 import tempfile
@@ -44,14 +45,15 @@ class CandidateValidationTest(unittest.TestCase):
             weights = root / 'sam2_t.pt'
             weights.write_bytes(b'dummy')
             output = root / 'output'
-            argv = ['compare', '--review', str(review), '--model', str(weights), '--output', str(output),
-                    '--indices', '1']
-            with mock.patch('sys.argv', argv), mock.patch.object(module, 'SAM', side_effect=RuntimeError('model failed')):
+            args = argparse.Namespace(review=str(review), model=str(weights), output=str(output), indices=[1], device='0')
+            parser = argparse.ArgumentParser()
+            with mock.patch.object(module, 'SAM', side_effect=RuntimeError('model failed')):
                 with self.assertRaises(SystemExit) as exit_code:
-                    module.main()
+                    module._compare(args, parser)
             self.assertEqual(exit_code.exception.code, 2)
             manifest = json.loads((output / 'manifest.json').read_text(encoding='utf-8'))
             self.assertEqual(manifest['status'], 'failed')
+            self.assertEqual(manifest['device'], '0')
             self.assertIn('model failed', manifest['error'])
             self.assertEqual(manifest['records'], [])
 

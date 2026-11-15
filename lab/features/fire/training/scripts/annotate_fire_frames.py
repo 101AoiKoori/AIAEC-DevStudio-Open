@@ -7,6 +7,7 @@ import cv2
 
 from generate_fire_dataset import read_image
 from prepare_fire_videos import ROOT, workspace_path
+from lab.training_common.production_guard import generation_guard
 
 
 def select_box(image, title):
@@ -59,12 +60,31 @@ def main():
     args = parser.parse_args()
     try:
         prepared, output = workspace_path(args.prepared), workspace_path(args.output)
-        entries = annotate(prepared, output)
-        if not entries:
-            raise ValueError('没有确认的标注')
-        output.parent.mkdir(parents=True, exist_ok=True)
-        with output.open('x', encoding='utf-8') as stream:
-            json.dump(entries, stream, ensure_ascii=False, indent=2)
+        manifest_path = prepared / 'manifest.json'
+        manifest = json.loads(manifest_path.read_text(encoding='utf-8'))
+        for video in manifest:
+            if (video['split'] not in ('train', 'val', 'test') or
+                    not video['video_id'].startswith('video_') or not video['video_id'][6:].isdigit()):
+                raise ValueError('视频清单格式错误')
+        frames = [frame for video in manifest
+                  for frame in sorted((prepared / 'images' / video['split'] / video['video_id']).glob('frame_*.png'))]
+        videos = sorted({workspace_path(video['source']) for video in manifest if video.get('source')})
+        with generation_guard('fire.annotate_fire_frames:' + output.relative_to(ROOT).as_posix(),
+                              [manifest_path, *frames, *videos], [output], {'prepared': prepared.relative_to(ROOT).as_posix()},
+                              code_paths=[Path(__file__), ROOT / 'lab/features/fire/training/scripts/generate_fire_dataset.py',
+                                          ROOT / 'lab/features/fire/training/scripts/prepare_fire_videos.py'],
+                              procedural_inputs=[manifest_path], root=ROOT) as run:
+            if run.reused:
+                print('已复用已有标注')
+                return
+            entries = annotate(prepared, output)
+            if not entries:
+                raise ValueError('没有确认的标注')
+            for entry in entries:
+                entry['source_references'] = run.source_refs[entry['image']]
+            output.parent.mkdir(parents=True, exist_ok=True)
+            with output.open('x', encoding='utf-8') as stream:
+                json.dump(entries, stream, ensure_ascii=False, indent=2)
         print(f'已保存 {len(entries)} 帧的标注')
     except (ValueError, KeyError, OSError) as exc:
         parser.exit(2, f'失败：{exc}\n')

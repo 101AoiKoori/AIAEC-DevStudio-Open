@@ -52,6 +52,31 @@ class RetrievalTests(unittest.TestCase):
         self.assertEqual(errors, [])
         self.assertEqual(results[0][1][0], 'docs/current.md')
 
+    def test_script_owner_readmes_are_indexed(self):
+        self.write('lab/scripts/README.md', '# 工具\n\n标注审计入口')
+        self.write('datasets/scripts/README.md', '# 数据工具\n\n父子源检查入口')
+        results, errors = retrieve.search(self.root, '标注审计', 5)
+        self.assertEqual(errors, [])
+        self.assertEqual(results[0][1][0], 'lab/scripts/README.md')
+        results, errors = retrieve.search(self.root, '父子源检查', 5)
+        self.assertEqual(errors, [])
+        self.assertEqual(results[0][1][0], 'datasets/scripts/README.md')
+
+    def test_model_and_runtime_docs_are_indexed_but_archive_is_not(self):
+        self.write('models/README.md', '# 模型\n\n部署权重台账')
+        self.write('ws/src/demo/README.md', '# 节点\n\n运行接口说明')
+        self.write('refs/provincial/README.md', '# 省赛\n\n历史来源')
+        self.write('refs/archive/old.md', '# 旧记录\n\nruntimehiddenword')
+        for query, expected in (
+            ('部署权重台账', 'models/README.md'),
+            ('运行接口说明', 'ws/src/demo/README.md'),
+            ('历史来源', 'refs/provincial/README.md'),
+        ):
+            results, errors = retrieve.search(self.root, query, 5)
+            self.assertEqual(errors, [])
+            self.assertEqual(results[0][1][0], expected)
+        self.assertEqual(retrieve.search(self.root, 'runtimehiddenword', 5)[0], [])
+
     def test_bad_config_reports_error_and_retains_other_matches(self):
         self.write('config/perception_tasks.json', '{broken')
         self.write('docs/current.md', '# 当前\n\n八点定位')

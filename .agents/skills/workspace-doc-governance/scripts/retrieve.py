@@ -24,8 +24,10 @@ def tokens(text):
 
 def sources(root):
     paths = [root / 'AGENTS.md', root / 'README.md', root / 'config/perception_tasks.json',
-             root / 'lab/README.md', root / 'ws/README.md', root / 'ws/src/aec_vision/README.md']
-    for folder in ('docs', 'lab/features'):
+             root / 'lab/README.md', root / 'models/README.md', root / 'refs/provincial/README.md',
+             root / 'ws/README.md', root / 'ws/src/aec_vision/README.md']
+    for folder in ('docs', 'lab/features', 'lab/scripts', 'datasets/scripts', 'models',
+                   'refs/provincial', 'ws'):
         paths.extend((root / folder).rglob('*.md'))
     paths.extend((root / 'datasets').glob('*.md'))
     return sorted(set(p for p in paths if p.is_file() and not p.is_symlink()))

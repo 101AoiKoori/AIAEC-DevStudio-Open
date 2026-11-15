@@ -1,0 +1,265 @@
+{
+  "schema_version": 1,
+  "task": "person",
+  "batch": "v4_background_calibration_20261115",
+  "purpose": "Bounded 24-frame background-review calibration for the person task. The user accepted all proposed clean, clutter and geometry_failed labels on 2026-11-15; measured geometry remains separately recorded.",
+  "proposed_allocation": {
+    "clean": 8,
+    "clutter": 8,
+    "geometry_failed": 8
+  },
+  "metrics_sources": [
+    "datasets/annotated/common/review/person/v4_review_20261115_b5/metrics.jsonl",
+    "datasets/annotated/common/review/person/v4_review_calibration_20261115_candidates/metrics.jsonl",
+    "datasets/annotated/common/review/person/v4_review_calibration_legacy_20261115/metrics.jsonl"
+  ],
+  "review_status": {
+    "state": "user_accepted_proposed_labels",
+    "accepted_by": "user_20261115",
+    "thresholds_frozen": true,
+    "acceptance_scope": "24 proposed class labels accepted by user; measured geometry retained separately",
+    "thresholds_file": "datasets/scripts/person/config/background_review_thresholds_20261115.json"
+  },
+  "cases": [
+    {
+      "id": "B01",
+      "path": "datasets/raw/person/teammate_submission_20261110/dataset/backgrounds/bg_00057_f00209.jpg",
+      "parent_video": "Archive/Assets/场景/综合视频/空场与场景物料_001.mp4",
+      "source_group": "legacy_empty_site",
+      "metrics_batch": "v4_review_20261115_b5",
+      "proposed_label": "clean",
+      "human_label": "clean",
+      "accepted_by": "user_20261115"
+    },
+    {
+      "id": "B02",
+      "path": "datasets/raw/person/teammate_submission_20261110/dataset/backgrounds/bg_00146_f00749.jpg",
+      "parent_video": "Archive/Assets/场景/综合视频/空场与场景物料_001.mp4",
+      "source_group": "legacy_empty_site",
+      "metrics_batch": "v4_review_20261115_b5",
+      "proposed_label": "clean",
+      "human_label": "clean",
+      "accepted_by": "user_20261115"
+    },
+    {
+      "id": "B03",
+      "path": "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_004001.png",
+      "parent_video": "datasets/raw/site_capture_20261112/videos/full_scene.mp4",
+      "source_group": "site_capture_full_scene",
+      "metrics_batch": "v4_review_20261115_b5",
+      "proposed_label": "clean",
+      "human_label": "clean",
+      "accepted_by": "user_20261115"
+    },
+    {
+      "id": "B04",
+      "path": "datasets/raw/person/teammate_submission_20261110/dataset/backgrounds/bg_00000_f00001.jpg",
+      "parent_video": "Archive/Assets/场景/综合视频/空场与场景物料_001.mp4",
+      "source_group": "legacy_empty_site",
+      "metrics_batch": "v4_review_20261115_b5",
+      "proposed_label": "clean",
+      "human_label": "clean",
+      "accepted_by": "user_20261115"
+    },
+    {
+      "id": "B05",
+      "path": "datasets/raw/person/teammate_submission_20261110/dataset/backgrounds/bg_00040_f00145.jpg",
+      "parent_video": "Archive/Assets/场景/综合视频/空场与场景物料_001.mp4",
+      "source_group": "legacy_empty_site",
+      "metrics_batch": "v4_review_20261115_b5",
+      "proposed_label": "clean",
+      "human_label": "clean",
+      "accepted_by": "user_20261115"
+    },
+    {
+      "id": "B06",
+      "path": "datasets/annotated/mixed_scene/v4_compositing_backgrounds_20261113/images/bins_004_019.jpg",
+      "parent_video": "Archive/Assets/垃圾桶/视频/四色桶较低视角_灰绿闭盖_红蓝开盖_004.mp4",
+      "source_group": "Archive/Assets/垃圾桶/视频/四色桶较低视角_灰绿闭盖_红蓝开盖_004.mp4",
+      "metrics_batch": "v4_review_calibration_20261115_candidates",
+      "proposed_label": "clean",
+      "human_label": "clean",
+      "accepted_by": "user_20261115"
+    },
+    {
+      "id": "B07",
+      "path": "datasets/raw/person/teammate_submission_20261110/dataset/backgrounds/bg_00017_f00064.jpg",
+      "parent_video": "Archive/Assets/场景/综合视频/空场与场景物料_001.mp4",
+      "source_group": "legacy_empty_site",
+      "metrics_batch": "v4_review_calibration_legacy_20261115",
+      "proposed_label": "clean",
+      "human_label": "clean",
+      "accepted_by": "user_20261115"
+    },
+    {
+      "id": "B08",
+      "path": "datasets/raw/person/teammate_submission_20261110/dataset/backgrounds/bg_00132_f00703.jpg",
+      "parent_video": "Archive/Assets/场景/综合视频/空场与场景物料_001.mp4",
+      "source_group": "legacy_empty_site",
+      "metrics_batch": "v4_review_calibration_legacy_20261115",
+      "proposed_label": "clean",
+      "human_label": "clean",
+      "accepted_by": "user_20261115"
+    },
+    {
+      "id": "B09",
+      "path": "datasets/raw/person/teammate_submission_20261110/dataset/backgrounds/bg_00232_f01290.jpg",
+      "parent_video": "Archive/Assets/场景/综合视频/空场与场景物料_001.mp4",
+      "source_group": "legacy_empty_site",
+      "metrics_batch": "v4_review_20261115_b5",
+      "proposed_label": "clutter",
+      "human_label": "clutter",
+      "accepted_by": "user_20261115"
+    },
+    {
+      "id": "B10",
+      "path": "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_006001.png",
+      "parent_video": "datasets/raw/site_capture_20261112/videos/full_scene.mp4",
+      "source_group": "site_capture_full_scene",
+      "metrics_batch": "v4_review_20261115_b5",
+      "proposed_label": "clutter",
+      "human_label": "clutter",
+      "accepted_by": "user_20261115"
+    },
+    {
+      "id": "B11",
+      "path": "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_007001.png",
+      "parent_video": "datasets/raw/site_capture_20261112/videos/full_scene.mp4",
+      "source_group": "site_capture_full_scene",
+      "metrics_batch": "v4_review_20261115_b5",
+      "proposed_label": "clutter",
+      "human_label": "clutter",
+      "accepted_by": "user_20261115"
+    },
+    {
+      "id": "B12",
+      "path": "datasets/raw/person/teammate_submission_20261110/dataset/backgrounds/bg_00240_f01318.jpg",
+      "parent_video": "Archive/Assets/场景/综合视频/空场与场景物料_001.mp4",
+      "source_group": "legacy_empty_site",
+      "metrics_batch": "v4_review_20261115_b5",
+      "proposed_label": "clutter",
+      "human_label": "clutter",
+      "accepted_by": "user_20261115"
+    },
+    {
+      "id": "B13",
+      "path": "datasets/raw/person/teammate_submission_20261110/dataset/backgrounds/bg_00280_f01474.jpg",
+      "parent_video": "Archive/Assets/场景/综合视频/空场与场景物料_001.mp4",
+      "source_group": "legacy_empty_site",
+      "metrics_batch": "v4_review_20261115_b5",
+      "proposed_label": "clutter",
+      "human_label": "clutter",
+      "accepted_by": "user_20261115"
+    },
+    {
+      "id": "B14",
+      "path": "datasets/annotated/mixed_scene/v4_compositing_backgrounds_20261113/images/junction_003_001.jpg",
+      "parent_video": "Archive/Assets/场景/三楼与场地视频/三栋楼_垃圾桶与路口_003.mp4",
+      "source_group": "Archive/Assets/场景/三楼与场地视频/三栋楼_垃圾桶与路口_003.mp4",
+      "metrics_batch": "v4_review_calibration_20261115_candidates",
+      "proposed_label": "clutter",
+      "human_label": "clutter",
+      "accepted_by": "user_20261115"
+    },
+    {
+      "id": "B15",
+      "path": "datasets/annotated/mixed_scene/v4_compositing_backgrounds_20261113/images/bins_004_007.jpg",
+      "parent_video": "Archive/Assets/垃圾桶/视频/四色桶较低视角_灰绿闭盖_红蓝开盖_004.mp4",
+      "source_group": "Archive/Assets/垃圾桶/视频/四色桶较低视角_灰绿闭盖_红蓝开盖_004.mp4",
+      "metrics_batch": "v4_review_calibration_20261115_candidates",
+      "proposed_label": "clutter",
+      "human_label": "clutter",
+      "accepted_by": "user_20261115"
+    },
+    {
+      "id": "B16",
+      "path": "datasets/annotated/mixed_scene/v4_compositing_backgrounds_20261113/images/facades_009_020.jpg",
+      "parent_video": "Archive/Assets/场景/三楼与场地视频/三栋楼侧向扫描_009.mp4",
+      "source_group": "Archive/Assets/场景/三楼与场地视频/三栋楼侧向扫描_009.mp4",
+      "metrics_batch": "v4_review_calibration_20261115_candidates",
+      "proposed_label": "clutter",
+      "human_label": "clutter",
+      "accepted_by": "user_20261115"
+    },
+    {
+      "id": "B17",
+      "path": "datasets/raw/person/teammate_submission_20261110/dataset/backgrounds/bg_00122_f00551.jpg",
+      "parent_video": "Archive/Assets/场景/综合视频/空场与场景物料_001.mp4",
+      "source_group": "legacy_empty_site",
+      "metrics_batch": "v4_review_20261115_b5",
+      "proposed_label": "geometry_failed",
+      "human_label": "geometry_failed",
+      "accepted_by": "user_20261115"
+    },
+    {
+      "id": "B18",
+      "path": "datasets/raw/person/teammate_submission_20261110/dataset/backgrounds/bg_00165_f00930.jpg",
+      "parent_video": "Archive/Assets/场景/综合视频/空场与场景物料_001.mp4",
+      "source_group": "legacy_empty_site",
+      "metrics_batch": "v4_review_20261115_b5",
+      "proposed_label": "geometry_failed",
+      "human_label": "geometry_failed",
+      "accepted_by": "user_20261115"
+    },
+    {
+      "id": "B19",
+      "path": "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_003001.png",
+      "parent_video": "datasets/raw/site_capture_20261112/videos/full_scene.mp4",
+      "source_group": "site_capture_full_scene",
+      "metrics_batch": "v4_review_20261115_b5",
+      "proposed_label": "geometry_failed",
+      "human_label": "geometry_failed",
+      "accepted_by": "user_20261115"
+    },
+    {
+      "id": "B20",
+      "path": "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_005001.png",
+      "parent_video": "datasets/raw/site_capture_20261112/videos/full_scene.mp4",
+      "source_group": "site_capture_full_scene",
+      "metrics_batch": "v4_review_20261115_b5",
+      "proposed_label": "geometry_failed",
+      "human_label": "geometry_failed",
+      "accepted_by": "user_20261115"
+    },
+    {
+      "id": "B21",
+      "path": "datasets/raw/person/teammate_submission_20261110/dataset/backgrounds/bg_00080_f00314.jpg",
+      "parent_video": "Archive/Assets/场景/综合视频/空场与场景物料_001.mp4",
+      "source_group": "legacy_empty_site",
+      "metrics_batch": "v4_review_20261115_b5",
+      "proposed_label": "geometry_failed",
+      "human_label": "geometry_failed",
+      "accepted_by": "user_20261115"
+    },
+    {
+      "id": "B22",
+      "path": "datasets/raw/person/teammate_submission_20261110/dataset/backgrounds/bg_00120_f00543.jpg",
+      "parent_video": "Archive/Assets/场景/综合视频/空场与场景物料_001.mp4",
+      "source_group": "legacy_empty_site",
+      "metrics_batch": "v4_review_20261115_b5",
+      "proposed_label": "geometry_failed",
+      "human_label": "geometry_failed",
+      "accepted_by": "user_20261115"
+    },
+    {
+      "id": "B23",
+      "path": "datasets/raw/person/teammate_submission_20261110/dataset/backgrounds/bg_00160_f00851.jpg",
+      "parent_video": "Archive/Assets/场景/综合视频/空场与场景物料_001.mp4",
+      "source_group": "legacy_empty_site",
+      "metrics_batch": "v4_review_20261115_b5",
+      "proposed_label": "geometry_failed",
+      "human_label": "geometry_failed",
+      "accepted_by": "user_20261115"
+    },
+    {
+      "id": "B24",
+      "path": "datasets/annotated/mixed_scene/v4_compositing_backgrounds_20261113/images/parking_003_001.jpg",
+      "parent_video": "Archive/Assets/电动车与人物/视频/场地多辆电动车_直立与倒伏混合_较低视角_003.mp4",
+      "source_group": "Archive/Assets/电动车与人物/视频/场地多辆电动车_直立与倒伏混合_较低视角_003.mp4",
+      "metrics_batch": "v4_review_calibration_20261115_candidates",
+      "proposed_label": "geometry_failed",
+      "human_label": "geometry_failed",
+      "accepted_by": "user_20261115"
+    }
+  ]
+}

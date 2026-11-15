@@ -1,0 +1,101 @@
+schema_version: 3
+task_id: waste_bin
+model_key: waste_sticker
+version: v4
+task: detect
+data: datasets/exports/waste_bin/waste_sticker_v4_reviewed_flat_20261113/data.yaml
+test_unavailable: false
+model: runs/waste_sticker/runs/waste_sticker/v3_20261111_151346_593593/training/weights/best.pt
+output_root: runs/waste_sticker
+description: V4 垃圾贴纸候选：平板及两桶合成数据，测试为共享图案的合成域候选。
+imgsz: 640
+epochs: 24
+batch: 16
+workers: 0
+patience: 0
+seed: 42
+device: '0'
+optimizer: AdamW
+lr0: 0.0002
+lrf: 0.08
+momentum: 0.9
+weight_decay: 0.0005
+warmup_epochs: 1.5
+cos_lr: true
+close_mosaic: 0
+amp: false
+deterministic: true
+max_det: 160
+diagnostic_conf: 0.25
+match_iou: 0.5
+nms_iou: 0.7
+preview_limit: 48
+evaluate_after_training: true
+augment:
+  degrees: 3.0
+  translate: 0.05
+  scale: 0.12
+  shear: 0.0
+  perspective: 0.0
+  flipud: 0.0
+  fliplr: 0.0
+  mosaic: 0.0
+  mixup: 0.0
+  copy_paste: 0.0
+  hsv_h: 0.005
+  hsv_s: 0.1
+  hsv_v: 0.12
+source_notes:
+- 来源范围、每 split 数量及 Blender 背景来源组见分发清单；测试不得用于调参或选模。
+- Blender 背景与屏幕空间目标为合成，母场景及图案可跨集合复用。
+- 实拍视频背景及其派生可跨集合复用，并共享原始父视频。
+class_names:
+- plastic_bottle
+- can
+- glass_bottle
+- newspaper
+- cardboard_box
+- clothes
+- leftover_food
+- vegetable_leaves
+- fruit_core
+- tea_leaves
+- bread
+- fish_bone
+- button_battery
+- fluorescent_lamp
+- mercury_thermometer
+- pill
+- paint
+- film
+- cigarette_butt
+- used_tissue
+- disposable_chopsticks
+- broken_ceramics
+- shell
+- discarded_glasses
+data_overrides:
+  train:
+  - images: datasets/exports/waste_bin/waste_sticker_v4_reviewed_two_bin_20261113/images/train
+    labels: datasets/exports/waste_bin/waste_sticker_v4_reviewed_two_bin_20261113/labels/train
+    source_group: reviewed_two_bin_train
+  - images: datasets/exports/waste_bin/waste_sticker_v4_arena_balanced_v4_20261113/images/train
+    labels: datasets/exports/waste_bin/waste_sticker_v4_arena_balanced_v4_20261113/labels/train
+    source_group: datasets/exports/waste_bin/waste_sticker_v4_arena_balanced_v4_20261113/manifest.json
+  - images: datasets/exports/waste_bin/waste_sticker_v4_real_group2_clear_detail_20261113/images/train
+    labels: datasets/exports/waste_bin/waste_sticker_v4_real_group2_clear_detail_20261113/labels/train
+    source_group: datasets/exports/waste_bin/waste_sticker_v4_real_group2_clear_detail_20261113/manifest.json
+  val:
+  - images: datasets/exports/waste_bin/waste_sticker_v4_arena_balanced_v4_20261113/images/val
+    labels: datasets/exports/waste_bin/waste_sticker_v4_arena_balanced_v4_20261113/labels/val
+    source_group: datasets/exports/waste_bin/waste_sticker_v4_arena_balanced_v4_20261113/manifest.json
+  - images: datasets/exports/waste_bin/waste_sticker_v4_real_group2_clear_detail_20261113/images/val
+    labels: datasets/exports/waste_bin/waste_sticker_v4_real_group2_clear_detail_20261113/labels/val
+    source_group: datasets/exports/waste_bin/waste_sticker_v4_real_group2_clear_detail_20261113/manifest.json
+  test:
+  - images: datasets/exports/waste_bin/waste_sticker_v4_arena_balanced_v4_20261113/images/test
+    labels: datasets/exports/waste_bin/waste_sticker_v4_arena_balanced_v4_20261113/labels/test
+    source_group: datasets/exports/waste_bin/waste_sticker_v4_arena_balanced_v4_20261113/manifest.json
+  - images: datasets/exports/waste_bin/waste_sticker_v4_real_group2_clear_detail_20261113/images/test
+    labels: datasets/exports/waste_bin/waste_sticker_v4_real_group2_clear_detail_20261113/labels/test
+    source_group: datasets/exports/waste_bin/waste_sticker_v4_real_group2_clear_detail_20261113/manifest.json

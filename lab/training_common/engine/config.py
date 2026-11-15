@@ -13,7 +13,7 @@ BASE_KEYS = {'schema_version', 'task_id', 'model_key', 'version', 'task', 'data'
              'device', 'train_limit', 'eval_limit', 'augment', 'data_overrides',
              'source_notes', 'time_hours', 'max_det', 'diagnostic_conf', 'match_iou',
              'preview_limit', 'evaluate_after_training', 'tune', 'description',
-             'amp_check_model', 'keypoint_names', 'class_names', 'nms_iou'}
+             'amp_check_model', 'keypoint_names', 'class_names', 'nms_iou', 'test_unavailable'}
 
 
 def read_yaml(path):
@@ -65,9 +65,15 @@ def validate(config):
     for key in ('evaluate_after_training', 'amp', 'cos_lr', 'deterministic'):
         if key in config and type(config[key]) is not bool:
             raise ValueError(key + ' must be boolean')
+    if type(config.get('test_unavailable', False)) is not bool:
+        raise ValueError('test_unavailable must be boolean')
+    if config.get('test_unavailable') and str(config.get('version', '')).lower() != 'v4':
+        raise ValueError('test_unavailable is supported only for V4')
     if config.get('time_hours') is not None and float(config['time_hours']) <= 0:
         raise ValueError('time_hours must be positive')
-    device = str(config.get('device', 'cpu'))
+    if str(config.get('version', '')).lower() == 'v4' and config.get('time_hours') is not None:
+        raise ValueError('V4 uses an external --wall-seconds limit; internal time_hours changes the schedule')
+    device = str(config.get('device', '0'))
     if ',' in device or isinstance(config.get('device'), list):
         raise ValueError('This portable runner supports one CPU or CUDA device per process')
     augment = config.get('augment', {})

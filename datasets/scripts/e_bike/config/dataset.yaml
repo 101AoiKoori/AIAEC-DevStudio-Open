@@ -1,0 +1,11 @@
+task: e_bike
+status: canonical_entry_sources_connected_production_paused
+allocation: {required: true, engine: datasets/scripts/common/bayesian.py, weights: per_plan_design_assumptions}
+goal: 识别并定位电动车，区分直立和倒伏，支持街区违停判断和停车区计数。
+states: [零车, 单车, 多车, 直立, 倒伏, 人车遮挡, 车车遮挡, 截断, 不同视面, 明暗, 饱和度]
+train_target_images: 4000
+source_mix_initial: {direct_real: 0.30, real_background_composite: 0.40, blender_background: 0.30}
+source_config: config/source.yaml
+sample_output: datasets/samples/e_bike
+dataset_output: datasets/exports/e_bike
+design_reference: docs/DATASET_DESIGN.md

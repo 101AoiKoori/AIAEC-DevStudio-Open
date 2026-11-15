@@ -1,5 +1,6 @@
 import importlib.util
 import tempfile
+import sys
 import unittest
 from pathlib import Path
 from unittest import mock
@@ -8,12 +9,13 @@ import numpy as np
 
 
 ROOT = Path(__file__).resolve().parents[5]
-SCRIPT = ROOT / 'lab/features/waste_bin/training/scripts/export_bin_candidates.py'
+sys.path.insert(0, str(ROOT))
+SCRIPT = ROOT / 'datasets/scripts/waste_bin_state/export_bin_candidates.py'
 spec = importlib.util.spec_from_file_location('export_bin_candidates', SCRIPT)
 exporter = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(exporter)
-import audit_bin_renders as auditor
-from bin_render_contract import STATE_CONTRACT, attach_state_evidence, decode_mask, measure_visibility
+from datasets.scripts.waste_bin_state import audit_bin_renders as auditor
+from datasets.scripts.waste_bin_state.bin_render_contract import STATE_CONTRACT, attach_state_evidence, decode_mask, measure_visibility
 
 
 def sample():
@@ -23,6 +25,17 @@ def sample():
 
 
 class ExportBinCandidatesTest(unittest.TestCase):
+    def test_selected_single_bin_and_empty_scene_do_not_require_four_bins(self):
+        single = sample()
+        single['labels'] = single['labels'][:1]
+        single['visible_bins'] = [single['labels'][0]['bin']]
+        empty = sample()
+        empty['labels'] = []
+        empty['visible_bins'] = []
+        included, excluded = exporter.plan_samples([single, empty])
+        self.assertEqual(included, [single, empty])
+        self.assertEqual(excluded, [])
+
     def test_only_four_known_eligible_lids_with_candidate_are_included(self):
         valid = sample()
         unknown = sample()

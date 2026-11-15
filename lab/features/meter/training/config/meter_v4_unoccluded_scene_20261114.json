@@ -1,0 +1,163 @@
+{
+  "schema_version": 1,
+  "model_key": "meter",
+  "target_split": "train",
+  "purpose": "One normal-view candidate state, no opaque point-ray occlusion in a Blender geometric inspection; not rendered or established as training truth.",
+  "budget": 1,
+  "uncertainty_weight": 0,
+  "independence_basis": "One fitted shared arena and one approximate parameterized meter station; no independent scene or capture claim.",
+  "constraints": {
+    "resolution": [
+      640,
+      480
+    ],
+    "label_policy": "candidate_pose",
+    "foreground": false
+  },
+  "strata": [
+    {
+      "id": "station_unoccluded_normal_01",
+      "failure_event": "dual_needle_pose_unreadable",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [],
+      "background": {
+        "kind": "arena_scene"
+      },
+      "target": {
+        "kind": "dual_needle_meter"
+      },
+      "labels": {
+        "kind": "candidate_pose"
+      },
+      "augmentation": {
+        "kind": "explicit_arena_parameters"
+      },
+      "sources": [
+        "datasets/assets/blender/shared/arena_4m2_pbr_20261112/arena_master_user_20261113.blend",
+        "datasets/assets/blender/meter/v4_parametric_station_v2_20261113/station.blend"
+      ],
+      "parameters": {
+        "temperature_fraction": 0.2,
+        "humidity_fraction": 0.25,
+        "ground_angle_deg": 65,
+        "station_x": -0.6,
+        "station_y": 0.15,
+        "camera_x": -0.6,
+        "camera_y": -0.75,
+        "camera_z": 0.42,
+        "exposure_ev": 0.0,
+        "saturation": 1.0
+      }
+    }
+  ],
+  "input_context": {
+    "station_face": "datasets/assets/blender/meter/v4_parametric_station_v2_20261113/face.png",
+    "background_registry_state": "shared_scene_candidate / active_candidate / approximate",
+    "station_registry_state": "task_model_candidate / active_candidate / approximate",
+    "face_and_scene_lineage": "synthetic fit; scene dimensions and physical tick correspondence are not measured",
+    "production_status": "plan_and_inputs_only; production is paused; no sample has been rendered"
+  },
+  "installation_and_view": {
+    "coordinate_frame": "Blender world; approximate scene units; not field calibration",
+    "assembly_root_location": [
+      -0.6,
+      0.15,
+      0.76765
+    ],
+    "assembly_root_scale": [
+      0.13,
+      0.13,
+      0.13
+    ],
+    "assembly_root_x_rotation_degrees": 90,
+    "dial_support_pivot_object": "Station dial tilt pivot",
+    "dial_support_pivot_world": [
+      -0.6,
+      0.1474,
+      0.63245
+    ],
+    "dial_ground_angle_degrees": 65,
+    "camera_object": "Vehicle camera",
+    "camera_world": [
+      -0.6,
+      -0.75,
+      0.42
+    ],
+    "camera_look_at_world": [
+      -0.6,
+      0.15,
+      0.55
+    ],
+    "support_scope": "pivot is the modeled installation anchor; world-scale contact with scene and real installation are not measured"
+  },
+  "geometry_observation": {
+    "method": "Blender 5.2.3; loaded arena and appended station in memory; projected eight marker positions and display corners, traced point rays; no render or file save",
+    "keypoint_xy_normalized_top_left": {
+      "temperature_pivot": [
+        0.4994835,
+        0.3357132
+      ],
+      "temperature_tip": [
+        0.4409567,
+        0.3203161
+      ],
+      "humidity_pivot": [
+        0.5005361,
+        0.3736999
+      ],
+      "humidity_tip": [
+        0.5249103,
+        0.3835676
+      ],
+      "temperature_min": [
+        0.4414629,
+        0.3753674
+      ],
+      "temperature_max": [
+        0.5602554,
+        0.3701735
+      ],
+      "humidity_min": [
+        0.5217526,
+        0.3572264
+      ],
+      "humidity_max": [
+        0.4778847,
+        0.3587402
+      ]
+    },
+    "all_eight_and_display_corners_in_frame": true,
+    "opaque_obstruction_detected_along_eight_point_rays": false,
+    "glass_cover_on_each_point_ray": true,
+    "scope": "point-ray evidence only; whole dial occlusion, reflections, pixel-level visibility and labels remain unknown"
+  },
+  "candidate_label_policy": {
+    "class_id": 0,
+    "keypoint_order": [
+      "temperature_pivot",
+      "temperature_tip",
+      "humidity_pivot",
+      "humidity_tip",
+      "temperature_min",
+      "temperature_max",
+      "humidity_min",
+      "humidity_max"
+    ],
+    "box": "rendered dial masks supply a candidate box when their geometric gate accepts it",
+    "visibility": "v0 outside; v1 weak or obstructed; v2 only qualifying unobstructed pivot cap with local image contrast",
+    "real_world_reading": "unknown; synthetic fraction is not a measured temperature or humidity",
+    "qualification": "geometry alone is not visibility truth; no raster or model outcome was evaluated"
+  },
+  "other_branches": [
+    "glare positioning and legibility are not controlled by this plan",
+    "photograph-based pose requires complete real-image label or unknown-capable handling",
+    "negative, crop and broader multi-source dataset combinations are outside this one-state plan"
+  ]
+}

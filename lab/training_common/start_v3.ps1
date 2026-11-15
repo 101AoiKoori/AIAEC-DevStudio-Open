@@ -4,6 +4,7 @@ param(
     [string]$Python = '',
     [ValidateRange(1,65535)][int]$Port = 6006,
     [string]$Config = 'config/train.yaml',
+    [double]$WallSeconds = 0,
     [switch]$NoWait
 )
 Set-StrictMode -Version Latest
@@ -12,6 +13,9 @@ $packageRoot = Split-Path -Parent $PSScriptRoot
 $launch = Join-Path $PSScriptRoot 'launch.py'
 $scriptArgs = @('--root', $packageRoot, '--port', "$Port", '--config', $Config)
 if ($NoWait) { $scriptArgs += '--no-wait' }
+if ($PSBoundParameters.ContainsKey('WallSeconds')) {
+    $scriptArgs += @('--wall-seconds', $WallSeconds.ToString('R', [System.Globalization.CultureInfo]::InvariantCulture))
+}
 if (-not $Environment) {
     foreach ($candidate in @((Join-Path $packageRoot 'portable_env'), (Join-Path (Split-Path -Parent $packageRoot) 'portable_env'))) {
         if (Test-Path -LiteralPath (Join-Path $candidate 'run.ps1') -PathType Leaf) {

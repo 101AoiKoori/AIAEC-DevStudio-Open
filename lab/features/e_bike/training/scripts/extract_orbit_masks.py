@@ -1,6 +1,7 @@
 """Extract unverified SAM2 masks from the two existing flat-background orbits."""
 import argparse
 import json
+import sys
 from pathlib import Path
 
 import cv2
@@ -10,14 +11,28 @@ from ultralytics import SAM
 ROOT = Path(__file__).resolve().parents[5]
 SOURCES = ROOT / 'datasets/annotated/e_bike/video_review_20261110/images'
 WEIGHTS = ROOT / 'models/weights/e_bike/sam2_t.pt'
+sys.path.insert(0, str(ROOT))
+from lab.training_common.production_guard import generation_guard
 
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--output', required=True)
-    parser.add_argument('--device', choices=('cpu', '0'), default='cpu')
+    parser.add_argument('--device', choices=('cpu', '0'), default='0')
     args = parser.parse_args()
     dest = (ROOT / args.output).resolve()
+    images = sorted((SOURCES / 'source_001').glob('*.jpg')) + sorted((SOURCES / 'source_002').glob('*.jpg'))
+    if not images:
+        parser.error('source frames are missing')
+    with generation_guard('e_bike.extract_orbit_masks:' + str(dest),
+                          [*images, WEIGHTS], [dest], {'device': args.device},
+                          code_paths=[Path(__file__)], procedural_inputs=[WEIGHTS]) as run:
+        if run.reused:
+            return
+        return _extract(args, parser, dest)
+
+
+def _extract(args, parser, dest):
     if not dest.is_relative_to(ROOT / 'datasets/annotated/e_bike') or dest.exists():
         parser.error('output must be a new directory in datasets/annotated/e_bike')
     if not WEIGHTS.is_file():

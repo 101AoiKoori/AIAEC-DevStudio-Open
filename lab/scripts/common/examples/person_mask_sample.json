@@ -1,0 +1,21 @@
+{
+  "schema_version": 1,
+  "task": "person",
+  "batch": "toolchain_20261115",
+  "records": [
+    {
+      "id": "vehicle_occluder_edge_review",
+      "image": "datasets/annotated/person/v4_vehicle_occluders_20261113/sam2_01_fallen.png",
+      "full_mask": "datasets/annotated/person/v4_vehicle_occluders_20261113/sam2_01_fallen.png",
+      "visible_mask": "datasets/annotated/person/v4_vehicle_occluders_20261113/sam2_01_fallen.png",
+      "occlusion_masks": [],
+      "params": {
+        "hole_max": 0.02,
+        "border_max": 0.15,
+        "components_max": 3,
+        "border_margin_px": 2
+      },
+      "note": "现有车辆遮挡裁片；full 与 visible 相同，只用于检查 alpha 边缘、孔洞、组件和可见区域。不是人物与车辆像素级遮挡分割验收。"
+    }
+  ]
+}

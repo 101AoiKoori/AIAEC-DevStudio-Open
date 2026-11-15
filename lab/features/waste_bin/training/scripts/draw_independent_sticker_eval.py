@@ -9,11 +9,14 @@ import argparse
 import json
 import math
 import random
+import sys
 from pathlib import Path
 
 from PIL import Image, ImageDraw, ImageFont
 
 ROOT = Path(__file__).resolve().parents[5]
+sys.path.insert(0, str(ROOT))
+from lab.training_common.production_guard import generation_guard
 CANDIDATE_CLASSES = (1, 3, 4, 5, 7, 8, 10, 11, 12, 15, 18, 23)
 
 
@@ -178,13 +181,27 @@ def main():
     p=argparse.ArgumentParser();p.add_argument('--out',type=Path,required=True)
     p.add_argument('--distinct-subset',action='store_true');args=p.parse_args()
     out=(ROOT/args.out).resolve()
-    if not out.is_relative_to((ROOT/'datasets/exports/waste_bin').resolve()) or out.exists():
-        p.error('output must be new and under datasets/exports/waste_bin')
+    if not out.is_relative_to((ROOT/'datasets/exports/waste_bin').resolve()):
+        p.error('output must be under datasets/exports/waste_bin')
+    font = ImageFont.truetype('msyh.ttc', 18)
+    font_stat = Path(font.path).stat()
+    font_info = {'name': list(font.getname()), 'bytes': font_stat.st_size,
+                 'modified_ns': font_stat.st_mtime_ns, 'size': 18}
+    config = ROOT/'config/perception_tasks.json'
+    operation = 'waste_sticker_draw_independent:' + out.relative_to(ROOT).as_posix()
+    with generation_guard(operation, [], [out], {'distinct_subset': args.distinct_subset, 'font': font_info},
+                          code_paths=[Path(__file__).resolve()], procedural_inputs=[config]) as run:
+        if run.reused:
+            print('Existing output reused:', out.relative_to(ROOT).as_posix())
+            return
+        _draw(args, out, font)
+
+
+def _draw(args, out, font):
     task=next(t for t in json.loads((ROOT/'config/perception_tasks.json').read_text(encoding='utf8'))['tasks'] if t['id']=='waste_bin')
     names=list(task['waste_items'])
     if len(names)!=24: raise ValueError('expected 24 classes')
     out.mkdir(parents=True)
-    font=ImageFont.truetype('msyh.ttc',18)
     manifest={'status':'preview_only','source':'new procedural vector drawings; no training icon files read',
               'shared_generator':'both sets share the same drawing program; distinct subset uses separate test drawing code', 'sets':{}}
     for variant in ('val','test'):

@@ -1,0 +1,71 @@
+# 八任务训练目标声明（不是组合轴）。
+# 训练目标是模型要学习的类别、关键点、OCR 或计数；组合轴是用于排除/
+# 平衡与目标无关噪声的干扰因素，见 config/combination_axes.yaml。
+# 修改后运行：python lab/scripts/contracts/state_coverage.py --write
+version: 1
+tasks:
+  person:
+    plans:
+      - config/production_plan.json
+    classes: [community, noncommunity]
+    counts: [empty, single, multi]
+    negatives: []
+    notes: 目标是人物类别与检测框；电动车直立/倒伏只是遮挡干扰，不是人物目标类别。
+  e_bike:
+    plans:
+      - config/production_plan.json
+      - config/direct_real_plan.json
+    classes: [upright, fallen]
+    counts: [empty, single, multi]
+    negatives: [empty]
+    notes: 目标是电动车及直立/倒伏类别；街道/停车区、视面、截断和遮挡属于干扰轴。
+  fire:
+    plans:
+      - config/production_plan.json
+    classes: [fire_sticker]
+    counts: [zero, single, multi]
+    negatives: [zero]
+    notes: 目标是指定火焰贴纸；真实火焰/烟雾不是正例，属于干扰轴或负例。
+  building_name_paper:
+    plans:
+      - config/production_plan.json
+      - config/blender_plan.json
+      - config/combination_plan.json
+      - config/rooftop_sources.json
+    classes: [paper]
+    ocr: text
+    counts: [zero, single, multi]
+    negatives: [zero]
+    notes: 目标是纸条检测与可辨文字；楼面、楼数、偏航、光照是干扰轴。
+  sign:
+    plans:
+      - config/production_plan.json
+    classes: [sign_fixture]
+    presence: [placed, absent]
+    negatives: [absent, ordinary_pole]
+    notes: 目标是牌具整体（含截断可辨部分）；无牌/普通立杆是负例或干扰。
+  waste_bin_state:
+    plans:
+      - config/render_plan.json
+    classes: [open, closed]
+    counts: [empty, single, multi]
+    negatives: [empty]
+    notes: 目标是桶体与开闭状态；颜色、桶位、邻桶遮挡是干扰轴。
+  waste_sticker:
+    plans:
+      - config/production_plan.json
+      - config/blender_plan.json
+      - config/direct_real_plan.json
+    classes: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23]
+    counts: [single, multi]
+    notes: 目标是 24 类物品贴纸；桶色、开闭、桶位、光照是干扰轴。
+  meter:
+    plans:
+      - config/render_plan.json
+      - config/production_plan.json
+    classes: [meter_dial]
+    keypoints: 8
+    needle_axes: [temperature, humidity]
+    presence: [single, absent]
+    negatives: [absent]
+    notes: 目标是表盘定位与 8 个关键点；反光、距离、视角是干扰轴。

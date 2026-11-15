@@ -1,0 +1,1479 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-11-15T20:24:29+08:00",
+  "kind": "person_direct_annotation_status_layers",
+  "task": "person",
+  "status": "auto_validated_with_pending",
+  "source_inventory": "datasets/annotated/common/review/person/auto_annotation_inventory_20261115.json",
+  "source_inventory_sha256": "d7966965e51fde3ccbcf0976802c07b76c8c995423a530eb86d60d2a007fc4de",
+  "acceptance_basis": "Each auto-validated record has an explicit complete_positive or complete_negative state in its source review manifest, and every referenced YOLO label exists and matches the reviewed boxes. Partial records remain pending with their candidate boxes intact.",
+  "summary": {
+    "records": 34,
+    "auto_validated_records": 23,
+    "complete_positive": 16,
+    "complete_negative": 7,
+    "positive_boxes": 46,
+    "candidate_boxes": 72,
+    "pending_partial_records": 11,
+    "status_layers": {
+      "source_available_records": 34,
+      "annotated_records": 23,
+      "candidate_records": 34,
+      "candidate_boxes": 72,
+      "auto_validated_records": 23,
+      "auto_validated_positive_boxes": 46,
+      "human_semantic_confirmed_records": 3,
+      "human_box_or_absence_confirmed_records": 0,
+      "human_box_confirmed_boxes": 0,
+      "training_admitted_records": 0,
+      "pending_partial_records": 11,
+      "pending_partial_candidate_boxes": 26,
+      "pending_human_semantic_confirmation_records": 31,
+      "pending_human_label_confirmation_records": 34,
+      "pending_human_box_confirmation_boxes": 46,
+      "pending_training_admission_records": 34
+    }
+  },
+  "records": [
+    {
+      "id": "person_000201",
+      "task": "person",
+      "source_batch": "v4_multivideo_review_20261112",
+      "source_manifest": "datasets/annotated/person/v4_multivideo_review_20261112/review_manifest.json",
+      "source_manifest_sha256": "882e3c5b4977a48622db6973e00f6462702648d88f4e5f1c9fb9dc5ebaf77ef6",
+      "image": "datasets/annotated/person/v4_multivideo_review_20261112/images/person_000201.png",
+      "canonical_image": "datasets/annotated/site_capture_20261112/sequence_v2/person_standees/frame_000201.png",
+      "state": "complete_negative",
+      "label": "datasets/annotated/person/v4_multivideo_review_20261112/labels/person_000201.txt",
+      "label_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "positive_boxes": 0,
+      "candidate_boxes": 0,
+      "status_layers": {
+        "source_available": true,
+        "annotated": true,
+        "candidate": true,
+        "auto_validated": true,
+        "human_confirmed": {
+          "semantic": true,
+          "box_or_absence": false,
+          "mask": false
+        },
+        "training_admitted": false
+      },
+      "pending": [
+        "human_box_or_absence_confirmation",
+        "training_admission"
+      ],
+      "human_semantic_confirmed": true
+    },
+    {
+      "id": "person_000401",
+      "task": "person",
+      "source_batch": "v4_multivideo_review_20261112",
+      "source_manifest": "datasets/annotated/person/v4_multivideo_review_20261112/review_manifest.json",
+      "source_manifest_sha256": "882e3c5b4977a48622db6973e00f6462702648d88f4e5f1c9fb9dc5ebaf77ef6",
+      "image": "datasets/annotated/person/v4_multivideo_review_20261112/images/person_000401.png",
+      "canonical_image": "datasets/annotated/site_capture_20261112/sequence_v2/person_standees/frame_000401.png",
+      "state": "complete_positive",
+      "label": "datasets/annotated/person/v4_multivideo_review_20261112/labels/person_000401.txt",
+      "label_sha256": "d278be586d6d8213a8844a47a804ad02c4bba060abfceb668bd15ab569c0c084",
+      "positive_boxes": 3,
+      "candidate_boxes": 3,
+      "status_layers": {
+        "source_available": true,
+        "annotated": true,
+        "candidate": true,
+        "auto_validated": true,
+        "human_confirmed": {
+          "semantic": true,
+          "box_or_absence": false,
+          "mask": false
+        },
+        "training_admitted": false
+      },
+      "pending": [
+        "human_box_or_absence_confirmation",
+        "training_admission"
+      ],
+      "human_semantic_confirmed": true
+    },
+    {
+      "id": "person_000601",
+      "task": "person",
+      "source_batch": "v4_multivideo_review_20261112",
+      "source_manifest": "datasets/annotated/person/v4_multivideo_review_20261112/review_manifest.json",
+      "source_manifest_sha256": "882e3c5b4977a48622db6973e00f6462702648d88f4e5f1c9fb9dc5ebaf77ef6",
+      "image": "datasets/annotated/person/v4_multivideo_review_20261112/images/person_000601.png",
+      "canonical_image": "datasets/annotated/site_capture_20261112/sequence_v2/person_standees/frame_000601.png",
+      "state": "complete_positive",
+      "label": "datasets/annotated/person/v4_multivideo_review_20261112/labels/person_000601.txt",
+      "label_sha256": "ab57969ff8e555756e8ff2f33d3ce85a89a6ef061337b4998413d15c3fe1179b",
+      "positive_boxes": 3,
+      "candidate_boxes": 3,
+      "status_layers": {
+        "source_available": true,
+        "annotated": true,
+        "candidate": true,
+        "auto_validated": true,
+        "human_confirmed": {
+          "semantic": true,
+          "box_or_absence": false,
+          "mask": false
+        },
+        "training_admitted": false
+      },
+      "pending": [
+        "human_box_or_absence_confirmation",
+        "training_admission"
+      ],
+      "human_semantic_confirmed": true
+    },
+    {
+      "id": "person_000901",
+      "task": "person",
+      "source_batch": "v4_multivideo_review_20261112",
+      "source_manifest": "datasets/annotated/person/v4_multivideo_review_20261112/review_manifest.json",
+      "source_manifest_sha256": "882e3c5b4977a48622db6973e00f6462702648d88f4e5f1c9fb9dc5ebaf77ef6",
+      "image": "datasets/annotated/person/v4_multivideo_review_20261112/images/person_000901.png",
+      "canonical_image": "datasets/annotated/site_capture_20261112/sequence_v2/person_standees/frame_000901.png",
+      "state": "complete_positive",
+      "label": "datasets/annotated/person/v4_multivideo_review_20261112/labels/person_000901.txt",
+      "label_sha256": "3d04b72cbfd61b5394b63015d9529ca65c09a363dfada4f53633c7ea5c7123d7",
+      "positive_boxes": 2,
+      "candidate_boxes": 2,
+      "status_layers": {
+        "source_available": true,
+        "annotated": true,
+        "candidate": true,
+        "auto_validated": true,
+        "human_confirmed": {
+          "semantic": false,
+          "box_or_absence": false,
+          "mask": false
+        },
+        "training_admitted": false
+      },
+      "pending": [
+        "human_semantic_confirmation",
+        "human_box_or_absence_confirmation",
+        "training_admission"
+      ],
+      "human_semantic_confirmed": false
+    },
+    {
+      "id": "person_001001",
+      "task": "person",
+      "source_batch": "v4_multivideo_review_20261112",
+      "source_manifest": "datasets/annotated/person/v4_multivideo_review_20261112/review_manifest.json",
+      "source_manifest_sha256": "882e3c5b4977a48622db6973e00f6462702648d88f4e5f1c9fb9dc5ebaf77ef6",
+      "image": "datasets/annotated/person/v4_multivideo_review_20261112/images/person_001001.png",
+      "canonical_image": "datasets/annotated/site_capture_20261112/sequence_v2/person_standees/frame_001001.png",
+      "state": "complete_positive",
+      "label": "datasets/annotated/person/v4_multivideo_review_20261112/labels/person_001001.txt",
+      "label_sha256": "2fdaab4b936d5a1154ab1bb789bb67431774a8508026d41b030434aafd7bde32",
+      "positive_boxes": 3,
+      "candidate_boxes": 3,
+      "status_layers": {
+        "source_available": true,
+        "annotated": true,
+        "candidate": true,
+        "auto_validated": true,
+        "human_confirmed": {
+          "semantic": false,
+          "box_or_absence": false,
+          "mask": false
+        },
+        "training_admitted": false
+      },
+      "pending": [
+        "human_semantic_confirmation",
+        "human_box_or_absence_confirmation",
+        "training_admission"
+      ],
+      "human_semantic_confirmed": false
+    },
+    {
+      "id": "person_001501",
+      "task": "person",
+      "source_batch": "v4_multivideo_review_20261112",
+      "source_manifest": "datasets/annotated/person/v4_multivideo_review_20261112/review_manifest.json",
+      "source_manifest_sha256": "882e3c5b4977a48622db6973e00f6462702648d88f4e5f1c9fb9dc5ebaf77ef6",
+      "image": "datasets/annotated/person/v4_multivideo_review_20261112/images/person_001501.png",
+      "canonical_image": "datasets/annotated/site_capture_20261112/sequence_v2/person_standees/frame_001501.png",
+      "state": "complete_positive",
+      "label": "datasets/annotated/person/v4_multivideo_review_20261112/labels/person_001501.txt",
+      "label_sha256": "c46a0b07c39e66ac9350dc894ae2e7f1108bbb4bd6f7ad846fee4c784cda7730",
+      "positive_boxes": 3,
+      "candidate_boxes": 3,
+      "status_layers": {
+        "source_available": true,
+        "annotated": true,
+        "candidate": true,
+        "auto_validated": true,
+        "human_confirmed": {
+          "semantic": false,
+          "box_or_absence": false,
+          "mask": false
+        },
+        "training_admitted": false
+      },
+      "pending": [
+        "human_semantic_confirmation",
+        "human_box_or_absence_confirmation",
+        "training_admission"
+      ],
+      "human_semantic_confirmed": false
+    },
+    {
+      "id": "frame_001291",
+      "task": "person",
+      "source_batch": "v4_full_scene_diverse_review_20261112",
+      "source_manifest": "datasets/annotated/person/v4_full_scene_diverse_review_20261112/review_manifest.json",
+      "source_manifest_sha256": "4e602e2f23ea727299a754b0646a4658ab8382cae53b3e0cb587fef72b285656",
+      "image": "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_001291.png",
+      "canonical_image": "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_001291.png",
+      "state": "complete_negative",
+      "label": "datasets/annotated/person/v4_full_scene_diverse_review_20261112/labels/frame_001291.txt",
+      "label_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "positive_boxes": 0,
+      "candidate_boxes": 0,
+      "status_layers": {
+        "source_available": true,
+        "annotated": true,
+        "candidate": true,
+        "auto_validated": true,
+        "human_confirmed": {
+          "semantic": false,
+          "box_or_absence": false,
+          "mask": false
+        },
+        "training_admitted": false
+      },
+      "pending": [
+        "human_semantic_confirmation",
+        "human_box_or_absence_confirmation",
+        "training_admission"
+      ],
+      "human_semantic_confirmed": false
+    },
+    {
+      "id": "frame_008221",
+      "task": "person",
+      "source_batch": "v4_full_scene_diverse_review_20261112",
+      "source_manifest": "datasets/annotated/person/v4_full_scene_diverse_review_20261112/review_manifest.json",
+      "source_manifest_sha256": "4e602e2f23ea727299a754b0646a4658ab8382cae53b3e0cb587fef72b285656",
+      "image": "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_008221.png",
+      "canonical_image": "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_008221.png",
+      "state": "complete_positive",
+      "label": "datasets/annotated/person/v4_full_scene_diverse_review_20261112/labels/frame_008221.txt",
+      "label_sha256": "aeb3672d1bcea628079fbee35e88481de79e6d3ecad9a36790bdbcab9a4c78b5",
+      "positive_boxes": 1,
+      "candidate_boxes": 1,
+      "status_layers": {
+        "source_available": true,
+        "annotated": true,
+        "candidate": true,
+        "auto_validated": true,
+        "human_confirmed": {
+          "semantic": false,
+          "box_or_absence": false,
+          "mask": false
+        },
+        "training_admitted": false
+      },
+      "pending": [
+        "human_semantic_confirmation",
+        "human_box_or_absence_confirmation",
+        "training_admission"
+      ],
+      "human_semantic_confirmed": false
+    },
+    {
+      "id": "frame_008521",
+      "task": "person",
+      "source_batch": "v4_full_scene_diverse_review_20261112",
+      "source_manifest": "datasets/annotated/person/v4_full_scene_diverse_review_20261112/review_manifest.json",
+      "source_manifest_sha256": "4e602e2f23ea727299a754b0646a4658ab8382cae53b3e0cb587fef72b285656",
+      "image": "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_008521.png",
+      "canonical_image": "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_008521.png",
+      "state": "complete_negative",
+      "label": "datasets/annotated/person/v4_full_scene_diverse_review_20261112/labels/frame_008521.txt",
+      "label_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "positive_boxes": 0,
+      "candidate_boxes": 0,
+      "status_layers": {
+        "source_available": true,
+        "annotated": true,
+        "candidate": true,
+        "auto_validated": true,
+        "human_confirmed": {
+          "semantic": false,
+          "box_or_absence": false,
+          "mask": false
+        },
+        "training_admitted": false
+      },
+      "pending": [
+        "human_semantic_confirmation",
+        "human_box_or_absence_confirmation",
+        "training_admission"
+      ],
+      "human_semantic_confirmed": false
+    },
+    {
+      "id": "frame_001201",
+      "task": "person",
+      "source_batch": "v4_vehicle_sequence_review_20261112",
+      "source_manifest": "datasets/annotated/person/v4_vehicle_sequence_review_20261112/review_manifest.json",
+      "source_manifest_sha256": "8ee98adc7b8c12f0fd26e2095b45a89440481488d461edf0313da97752781036",
+      "image": "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_001201.png",
+      "canonical_image": "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_001201.png",
+      "state": "complete_positive",
+      "label": "datasets/annotated/person/v4_vehicle_sequence_review_20261112/labels/frame_001201.txt",
+      "label_sha256": "ec2d7884f21e1b811b3534ea96168f4c800c2e78f8dfe01f7b048d29504bad16",
+      "positive_boxes": 3,
+      "candidate_boxes": 3,
+      "status_layers": {
+        "source_available": true,
+        "annotated": true,
+        "candidate": true,
+        "auto_validated": true,
+        "human_confirmed": {
+          "semantic": false,
+          "box_or_absence": false,
+          "mask": false
+        },
+        "training_admitted": false
+      },
+      "pending": [
+        "human_semantic_confirmation",
+        "human_box_or_absence_confirmation",
+        "training_admission"
+      ],
+      "human_semantic_confirmed": false
+    },
+    {
+      "id": "frame_003001",
+      "task": "person",
+      "source_batch": "v4_vehicle_sequence_review_20261112",
+      "source_manifest": "datasets/annotated/person/v4_vehicle_sequence_review_20261112/review_manifest.json",
+      "source_manifest_sha256": "8ee98adc7b8c12f0fd26e2095b45a89440481488d461edf0313da97752781036",
+      "image": "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_003001.png",
+      "canonical_image": "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_003001.png",
+      "state": "complete_positive",
+      "label": "datasets/annotated/person/v4_vehicle_sequence_review_20261112/labels/frame_003001.txt",
+      "label_sha256": "dd6f31ce4327efdfc3cdfb6ac88ae647109087736a329c0e77d64dc32eb2160e",
+      "positive_boxes": 4,
+      "candidate_boxes": 4,
+      "status_layers": {
+        "source_available": true,
+        "annotated": true,
+        "candidate": true,
+        "auto_validated": true,
+        "human_confirmed": {
+          "semantic": false,
+          "box_or_absence": false,
+          "mask": false
+        },
+        "training_admitted": false
+      },
+      "pending": [
+        "human_semantic_confirmation",
+        "human_box_or_absence_confirmation",
+        "training_admission"
+      ],
+      "human_semantic_confirmed": false
+    },
+    {
+      "id": "frame_007951",
+      "task": "person",
+      "source_batch": "v4_vehicle_sequence_review_20261112",
+      "source_manifest": "datasets/annotated/person/v4_vehicle_sequence_review_20261112/review_manifest.json",
+      "source_manifest_sha256": "8ee98adc7b8c12f0fd26e2095b45a89440481488d461edf0313da97752781036",
+      "image": "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_007951.png",
+      "canonical_image": "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_007951.png",
+      "state": "complete_positive",
+      "label": "datasets/annotated/person/v4_vehicle_sequence_review_20261112/labels/frame_007951.txt",
+      "label_sha256": "9aecb3d643cb3337a75870fccc48863ae5f62f2b4a1597f45076529924ece049",
+      "positive_boxes": 3,
+      "candidate_boxes": 3,
+      "status_layers": {
+        "source_available": true,
+        "annotated": true,
+        "candidate": true,
+        "auto_validated": true,
+        "human_confirmed": {
+          "semantic": false,
+          "box_or_absence": false,
+          "mask": false
+        },
+        "training_admitted": false
+      },
+      "pending": [
+        "human_semantic_confirmation",
+        "human_box_or_absence_confirmation",
+        "training_admission"
+      ],
+      "human_semantic_confirmed": false
+    },
+    {
+      "id": "frame_008401",
+      "task": "person",
+      "source_batch": "v4_vehicle_sequence_review_20261112",
+      "source_manifest": "datasets/annotated/person/v4_vehicle_sequence_review_20261112/review_manifest.json",
+      "source_manifest_sha256": "8ee98adc7b8c12f0fd26e2095b45a89440481488d461edf0313da97752781036",
+      "image": "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_008401.png",
+      "canonical_image": "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_008401.png",
+      "state": "complete_positive",
+      "label": "datasets/annotated/person/v4_vehicle_sequence_review_20261112/labels/frame_008401.txt",
+      "label_sha256": "f54616c3f08af654f8727aa7acc68a15983af68c253b6546e41b9dfd00b27a0f",
+      "positive_boxes": 3,
+      "candidate_boxes": 3,
+      "status_layers": {
+        "source_available": true,
+        "annotated": true,
+        "candidate": true,
+        "auto_validated": true,
+        "human_confirmed": {
+          "semantic": false,
+          "box_or_absence": false,
+          "mask": false
+        },
+        "training_admitted": false
+      },
+      "pending": [
+        "human_semantic_confirmation",
+        "human_box_or_absence_confirmation",
+        "training_admission"
+      ],
+      "human_semantic_confirmed": false
+    },
+    {
+      "id": "frame_008551",
+      "task": "person",
+      "source_batch": "v4_vehicle_sequence_review_20261112",
+      "source_manifest": "datasets/annotated/person/v4_vehicle_sequence_review_20261112/review_manifest.json",
+      "source_manifest_sha256": "8ee98adc7b8c12f0fd26e2095b45a89440481488d461edf0313da97752781036",
+      "image": "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_008551.png",
+      "canonical_image": "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_008551.png",
+      "state": "complete_negative",
+      "label": "datasets/annotated/person/v4_vehicle_sequence_review_20261112/labels/frame_008551.txt",
+      "label_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "positive_boxes": 0,
+      "candidate_boxes": 0,
+      "status_layers": {
+        "source_available": true,
+        "annotated": true,
+        "candidate": true,
+        "auto_validated": true,
+        "human_confirmed": {
+          "semantic": false,
+          "box_or_absence": false,
+          "mask": false
+        },
+        "training_admitted": false
+      },
+      "pending": [
+        "human_semantic_confirmation",
+        "human_box_or_absence_confirmation",
+        "training_admission"
+      ],
+      "human_semantic_confirmed": false
+    },
+    {
+      "id": "people_000391",
+      "task": "person",
+      "source_batch": "site_person_vehicle_v4_review",
+      "source_manifest": "datasets/annotated/site_capture_20261112/person_vehicle_v4_review/review_manifest.json",
+      "source_manifest_sha256": "ec6e781fad68df23524d5d37a9cb9df0a65e46bbbc47dfeadaad300027329ce0",
+      "image": "datasets/annotated/site_capture_20261112/sequence_v2/person_standees/frame_000391.png",
+      "canonical_image": "datasets/annotated/site_capture_20261112/sequence_v2/person_standees/frame_000391.png",
+      "state": "complete_positive",
+      "label": "datasets/annotated/site_capture_20261112/person_vehicle_v4_review/labels/person/people_000391.txt",
+      "label_sha256": "583843505baecc12a21dd2a5e8822e89ad5a6a43aa58f081cc895a5ddc53db34",
+      "positive_boxes": 3,
+      "candidate_boxes": 3,
+      "status_layers": {
+        "source_available": true,
+        "annotated": true,
+        "candidate": true,
+        "auto_validated": true,
+        "human_confirmed": {
+          "semantic": false,
+          "box_or_absence": false,
+          "mask": false
+        },
+        "training_admitted": false
+      },
+      "pending": [
+        "human_semantic_confirmation",
+        "human_box_or_absence_confirmation",
+        "training_admission"
+      ],
+      "human_semantic_confirmed": false
+    },
+    {
+      "id": "people_001051",
+      "task": "person",
+      "source_batch": "site_person_vehicle_v4_review",
+      "source_manifest": "datasets/annotated/site_capture_20261112/person_vehicle_v4_review/review_manifest.json",
+      "source_manifest_sha256": "ec6e781fad68df23524d5d37a9cb9df0a65e46bbbc47dfeadaad300027329ce0",
+      "image": "datasets/annotated/site_capture_20261112/sequence_v2/person_standees/frame_001051.png",
+      "canonical_image": "datasets/annotated/site_capture_20261112/sequence_v2/person_standees/frame_001051.png",
+      "state": "complete_positive",
+      "label": "datasets/annotated/site_capture_20261112/person_vehicle_v4_review/labels/person/people_001051.txt",
+      "label_sha256": "488b0b1face73426841c6404e3f32dcab3dcf0b58024ddebdbfb1bed560778ac",
+      "positive_boxes": 3,
+      "candidate_boxes": 3,
+      "status_layers": {
+        "source_available": true,
+        "annotated": true,
+        "candidate": true,
+        "auto_validated": true,
+        "human_confirmed": {
+          "semantic": false,
+          "box_or_absence": false,
+          "mask": false
+        },
+        "training_admitted": false
+      },
+      "pending": [
+        "human_semantic_confirmation",
+        "human_box_or_absence_confirmation",
+        "training_admission"
+      ],
+      "human_semantic_confirmed": false
+    },
+    {
+      "id": "people_001471",
+      "task": "person",
+      "source_batch": "site_person_vehicle_v4_review",
+      "source_manifest": "datasets/annotated/site_capture_20261112/person_vehicle_v4_review/review_manifest.json",
+      "source_manifest_sha256": "ec6e781fad68df23524d5d37a9cb9df0a65e46bbbc47dfeadaad300027329ce0",
+      "image": "datasets/annotated/site_capture_20261112/sequence_v2/person_standees/frame_001471.png",
+      "canonical_image": "datasets/annotated/site_capture_20261112/sequence_v2/person_standees/frame_001471.png",
+      "state": "complete_positive",
+      "label": "datasets/annotated/site_capture_20261112/person_vehicle_v4_review/labels/person/people_001471.txt",
+      "label_sha256": "b0389665e77965ecf83458609870c8e1263877a95c0d4459960e48d1d926f322",
+      "positive_boxes": 3,
+      "candidate_boxes": 3,
+      "status_layers": {
+        "source_available": true,
+        "annotated": true,
+        "candidate": true,
+        "auto_validated": true,
+        "human_confirmed": {
+          "semantic": false,
+          "box_or_absence": false,
+          "mask": false
+        },
+        "training_admitted": false
+      },
+      "pending": [
+        "human_semantic_confirmation",
+        "human_box_or_absence_confirmation",
+        "training_admission"
+      ],
+      "human_semantic_confirmed": false
+    },
+    {
+      "id": "scene_005401",
+      "task": "person",
+      "source_batch": "site_person_vehicle_v4_review",
+      "source_manifest": "datasets/annotated/site_capture_20261112/person_vehicle_v4_review/review_manifest.json",
+      "source_manifest_sha256": "ec6e781fad68df23524d5d37a9cb9df0a65e46bbbc47dfeadaad300027329ce0",
+      "image": "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_005401.png",
+      "canonical_image": "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_005401.png",
+      "state": "complete_negative",
+      "label": "datasets/annotated/site_capture_20261112/person_vehicle_v4_review/labels/person/scene_005401.txt",
+      "label_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "positive_boxes": 0,
+      "candidate_boxes": 0,
+      "status_layers": {
+        "source_available": true,
+        "annotated": true,
+        "candidate": true,
+        "auto_validated": true,
+        "human_confirmed": {
+          "semantic": false,
+          "box_or_absence": false,
+          "mask": false
+        },
+        "training_admitted": false
+      },
+      "pending": [
+        "human_semantic_confirmation",
+        "human_box_or_absence_confirmation",
+        "training_admission"
+      ],
+      "human_semantic_confirmed": false
+    },
+    {
+      "id": "scene_006361",
+      "task": "person",
+      "source_batch": "site_person_vehicle_v4_review",
+      "source_manifest": "datasets/annotated/site_capture_20261112/person_vehicle_v4_review/review_manifest.json",
+      "source_manifest_sha256": "ec6e781fad68df23524d5d37a9cb9df0a65e46bbbc47dfeadaad300027329ce0",
+      "image": "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_006361.png",
+      "canonical_image": "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_006361.png",
+      "state": "complete_negative",
+      "label": "datasets/annotated/site_capture_20261112/person_vehicle_v4_review/labels/person/scene_006361.txt",
+      "label_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "positive_boxes": 0,
+      "candidate_boxes": 0,
+      "status_layers": {
+        "source_available": true,
+        "annotated": true,
+        "candidate": true,
+        "auto_validated": true,
+        "human_confirmed": {
+          "semantic": false,
+          "box_or_absence": false,
+          "mask": false
+        },
+        "training_admitted": false
+      },
+      "pending": [
+        "human_semantic_confirmation",
+        "human_box_or_absence_confirmation",
+        "training_admission"
+      ],
+      "human_semantic_confirmed": false
+    },
+    {
+      "id": "car_P02_PS1",
+      "task": "person",
+      "source_batch": "site_person_vehicle_v4_review",
+      "source_manifest": "datasets/annotated/site_capture_20261112/person_vehicle_v4_review/review_manifest.json",
+      "source_manifest_sha256": "ec6e781fad68df23524d5d37a9cb9df0a65e46bbbc47dfeadaad300027329ce0",
+      "image": "datasets/raw/car_real_capture_20261112/P02_PS1.png",
+      "canonical_image": "datasets/raw/car_real_capture_20261112/P02_PS1.png",
+      "state": "complete_positive",
+      "label": "datasets/annotated/site_capture_20261112/person_vehicle_v4_review/labels/person/car_P02_PS1.txt",
+      "label_sha256": "d70bf16217fd025fc611f8e5855b048164604cc034f99544b6f415bbb2319646",
+      "positive_boxes": 3,
+      "candidate_boxes": 3,
+      "status_layers": {
+        "source_available": true,
+        "annotated": true,
+        "candidate": true,
+        "auto_validated": true,
+        "human_confirmed": {
+          "semantic": false,
+          "box_or_absence": false,
+          "mask": false
+        },
+        "training_admitted": false
+      },
+      "pending": [
+        "human_semantic_confirmation",
+        "human_box_or_absence_confirmation",
+        "training_admission"
+      ],
+      "human_semantic_confirmed": false
+    },
+    {
+      "id": "car_P07_PS3",
+      "task": "person",
+      "source_batch": "site_person_vehicle_v4_review",
+      "source_manifest": "datasets/annotated/site_capture_20261112/person_vehicle_v4_review/review_manifest.json",
+      "source_manifest_sha256": "ec6e781fad68df23524d5d37a9cb9df0a65e46bbbc47dfeadaad300027329ce0",
+      "image": "datasets/raw/car_real_capture_20261112/P07_PS3.png",
+      "canonical_image": "datasets/raw/car_real_capture_20261112/P07_PS3.png",
+      "state": "complete_positive",
+      "label": "datasets/annotated/site_capture_20261112/person_vehicle_v4_review/labels/person/car_P07_PS3.txt",
+      "label_sha256": "c8e55593d75d98dcae87be6cca1c25d3b637442003a8d0c166cc57171402c0bf",
+      "positive_boxes": 2,
+      "candidate_boxes": 2,
+      "status_layers": {
+        "source_available": true,
+        "annotated": true,
+        "candidate": true,
+        "auto_validated": true,
+        "human_confirmed": {
+          "semantic": false,
+          "box_or_absence": false,
+          "mask": false
+        },
+        "training_admitted": false
+      },
+      "pending": [
+        "human_semantic_confirmation",
+        "human_box_or_absence_confirmation",
+        "training_admission"
+      ],
+      "human_semantic_confirmed": false
+    },
+    {
+      "id": null,
+      "task": "person",
+      "source_batch": "v4_four_front_whiteback_candidate_20261113",
+      "source_manifest": "datasets/annotated/person/v4_four_front_whiteback_candidate_20261113/manifest.json",
+      "source_manifest_sha256": "13ee8a6c6ba3e871b1f2345f7ab8ddc504cf00e5691596ace4a1ca501e539480",
+      "image": "datasets/annotated/person/v4_four_front_whiteback_candidate_20261113/images/frame_001171.png",
+      "canonical_image": "datasets/annotated/site_capture_20261112/sequence_v2/person_standees/frame_001171.png",
+      "state": "complete_positive",
+      "label": "datasets/annotated/person/v4_four_front_whiteback_candidate_20261113/labels/frame_001171.txt",
+      "label_sha256": "aec55e48d17389658e998178a5a1e6d2e7b2e0924d7b9e3716060a80f3f5b7c5",
+      "positive_boxes": 4,
+      "candidate_boxes": 4,
+      "status_layers": {
+        "source_available": true,
+        "annotated": true,
+        "candidate": true,
+        "auto_validated": true,
+        "human_confirmed": {
+          "semantic": false,
+          "box_or_absence": false,
+          "mask": false
+        },
+        "training_admitted": false
+      },
+      "pending": [
+        "human_semantic_confirmation",
+        "human_box_or_absence_confirmation",
+        "training_admission"
+      ],
+      "human_semantic_confirmed": false
+    },
+    {
+      "id": null,
+      "task": "person",
+      "source_batch": "v4_whiteback_crop_candidate_20261113",
+      "source_manifest": "datasets/annotated/person/v4_whiteback_crop_candidate_20261113/manifest.json",
+      "source_manifest_sha256": "0663f3781d1028c249caeb3ae970358c352a344e8e2f38b983b3de89f7a10f44",
+      "image": "datasets/annotated/person/v4_whiteback_crop_candidate_20261113/images/whiteback_001306_crop.png",
+      "canonical_image": "datasets/annotated/site_capture_20261112/sequence_v2/person_standees/frame_001306.png",
+      "state": "complete_negative",
+      "label": "datasets/annotated/person/v4_whiteback_crop_candidate_20261113/labels/whiteback_001306_crop.txt",
+      "label_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "positive_boxes": 0,
+      "candidate_boxes": 0,
+      "status_layers": {
+        "source_available": true,
+        "annotated": true,
+        "candidate": true,
+        "auto_validated": true,
+        "human_confirmed": {
+          "semantic": false,
+          "box_or_absence": false,
+          "mask": false
+        },
+        "training_admitted": false
+      },
+      "pending": [
+        "human_semantic_confirmation",
+        "human_box_or_absence_confirmation",
+        "training_admission"
+      ],
+      "human_semantic_confirmed": false
+    },
+    {
+      "id": "person_000701",
+      "task": "person",
+      "source_batch": "v4_multivideo_review_20261112",
+      "source_manifest": "datasets/annotated/person/v4_multivideo_review_20261112/review_manifest.json",
+      "source_manifest_sha256": "882e3c5b4977a48622db6973e00f6462702648d88f4e5f1c9fb9dc5ebaf77ef6",
+      "image": "datasets/annotated/person/v4_multivideo_review_20261112/images/person_000701.png",
+      "canonical_image": "datasets/annotated/site_capture_20261112/sequence_v2/person_standees/frame_000701.png",
+      "state": "partial",
+      "label": null,
+      "label_sha256": null,
+      "positive_boxes": 0,
+      "candidate_boxes": 0,
+      "status_layers": {
+        "source_available": true,
+        "annotated": false,
+        "candidate": true,
+        "auto_validated": false,
+        "human_confirmed": {
+          "semantic": false,
+          "box_or_absence": false,
+          "mask": false
+        },
+        "training_admitted": false
+      },
+      "pending": [
+        "human_semantic_confirmation",
+        "human_box_or_absence_confirmation",
+        "training_admission"
+      ],
+      "human_semantic_confirmed": false
+    },
+    {
+      "id": "person_001201",
+      "task": "person",
+      "source_batch": "v4_multivideo_review_20261112",
+      "source_manifest": "datasets/annotated/person/v4_multivideo_review_20261112/review_manifest.json",
+      "source_manifest_sha256": "882e3c5b4977a48622db6973e00f6462702648d88f4e5f1c9fb9dc5ebaf77ef6",
+      "image": "datasets/annotated/person/v4_multivideo_review_20261112/images/person_001201.png",
+      "canonical_image": "datasets/annotated/site_capture_20261112/sequence_v2/person_standees/frame_001201.png",
+      "state": "partial",
+      "label": null,
+      "label_sha256": null,
+      "positive_boxes": 0,
+      "candidate_boxes": 4,
+      "status_layers": {
+        "source_available": true,
+        "annotated": false,
+        "candidate": true,
+        "auto_validated": false,
+        "human_confirmed": {
+          "semantic": false,
+          "box_or_absence": false,
+          "mask": false
+        },
+        "training_admitted": false
+      },
+      "pending": [
+        "human_semantic_confirmation",
+        "human_box_or_absence_confirmation",
+        "training_admission"
+      ],
+      "human_semantic_confirmed": false
+    },
+    {
+      "id": "frame_000751",
+      "task": "person",
+      "source_batch": "v4_full_scene_diverse_review_20261112",
+      "source_manifest": "datasets/annotated/person/v4_full_scene_diverse_review_20261112/review_manifest.json",
+      "source_manifest_sha256": "4e602e2f23ea727299a754b0646a4658ab8382cae53b3e0cb587fef72b285656",
+      "image": "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_000751.png",
+      "canonical_image": "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_000751.png",
+      "state": "partial",
+      "label": null,
+      "label_sha256": null,
+      "positive_boxes": 0,
+      "candidate_boxes": 1,
+      "status_layers": {
+        "source_available": true,
+        "annotated": false,
+        "candidate": true,
+        "auto_validated": false,
+        "human_confirmed": {
+          "semantic": false,
+          "box_or_absence": false,
+          "mask": false
+        },
+        "training_admitted": false
+      },
+      "pending": [
+        "human_semantic_confirmation",
+        "human_box_or_absence_confirmation",
+        "training_admission"
+      ],
+      "human_semantic_confirmed": false
+    },
+    {
+      "id": "frame_002911",
+      "task": "person",
+      "source_batch": "v4_full_scene_diverse_review_20261112",
+      "source_manifest": "datasets/annotated/person/v4_full_scene_diverse_review_20261112/review_manifest.json",
+      "source_manifest_sha256": "4e602e2f23ea727299a754b0646a4658ab8382cae53b3e0cb587fef72b285656",
+      "image": "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_002911.png",
+      "canonical_image": "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_002911.png",
+      "state": "partial",
+      "label": null,
+      "label_sha256": null,
+      "positive_boxes": 0,
+      "candidate_boxes": 4,
+      "status_layers": {
+        "source_available": true,
+        "annotated": false,
+        "candidate": true,
+        "auto_validated": false,
+        "human_confirmed": {
+          "semantic": false,
+          "box_or_absence": false,
+          "mask": false
+        },
+        "training_admitted": false
+      },
+      "pending": [
+        "human_semantic_confirmation",
+        "human_box_or_absence_confirmation",
+        "training_admission"
+      ],
+      "human_semantic_confirmed": false
+    },
+    {
+      "id": "frame_008701",
+      "task": "person",
+      "source_batch": "v4_full_scene_diverse_review_20261112",
+      "source_manifest": "datasets/annotated/person/v4_full_scene_diverse_review_20261112/review_manifest.json",
+      "source_manifest_sha256": "4e602e2f23ea727299a754b0646a4658ab8382cae53b3e0cb587fef72b285656",
+      "image": "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_008701.png",
+      "canonical_image": "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_008701.png",
+      "state": "partial",
+      "label": null,
+      "label_sha256": null,
+      "positive_boxes": 0,
+      "candidate_boxes": 3,
+      "status_layers": {
+        "source_available": true,
+        "annotated": false,
+        "candidate": true,
+        "auto_validated": false,
+        "human_confirmed": {
+          "semantic": false,
+          "box_or_absence": false,
+          "mask": false
+        },
+        "training_admitted": false
+      },
+      "pending": [
+        "human_semantic_confirmation",
+        "human_box_or_absence_confirmation",
+        "training_admission"
+      ],
+      "human_semantic_confirmed": false
+    },
+    {
+      "id": "frame_000451",
+      "task": "person",
+      "source_batch": "v4_vehicle_sequence_review_20261112",
+      "source_manifest": "datasets/annotated/person/v4_vehicle_sequence_review_20261112/review_manifest.json",
+      "source_manifest_sha256": "8ee98adc7b8c12f0fd26e2095b45a89440481488d461edf0313da97752781036",
+      "image": "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_000451.png",
+      "canonical_image": "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_000451.png",
+      "state": "partial",
+      "label": null,
+      "label_sha256": null,
+      "positive_boxes": 0,
+      "candidate_boxes": 2,
+      "status_layers": {
+        "source_available": true,
+        "annotated": false,
+        "candidate": true,
+        "auto_validated": false,
+        "human_confirmed": {
+          "semantic": false,
+          "box_or_absence": false,
+          "mask": false
+        },
+        "training_admitted": false
+      },
+      "pending": [
+        "human_semantic_confirmation",
+        "human_box_or_absence_confirmation",
+        "training_admission"
+      ],
+      "human_semantic_confirmed": false
+    },
+    {
+      "id": "frame_000601",
+      "task": "person",
+      "source_batch": "v4_vehicle_sequence_review_20261112",
+      "source_manifest": "datasets/annotated/person/v4_vehicle_sequence_review_20261112/review_manifest.json",
+      "source_manifest_sha256": "8ee98adc7b8c12f0fd26e2095b45a89440481488d461edf0313da97752781036",
+      "image": "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_000601.png",
+      "canonical_image": "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_000601.png",
+      "state": "partial",
+      "label": null,
+      "label_sha256": null,
+      "positive_boxes": 0,
+      "candidate_boxes": 3,
+      "status_layers": {
+        "source_available": true,
+        "annotated": false,
+        "candidate": true,
+        "auto_validated": false,
+        "human_confirmed": {
+          "semantic": false,
+          "box_or_absence": false,
+          "mask": false
+        },
+        "training_admitted": false
+      },
+      "pending": [
+        "human_semantic_confirmation",
+        "human_box_or_absence_confirmation",
+        "training_admission"
+      ],
+      "human_semantic_confirmed": false
+    },
+    {
+      "id": "frame_002851",
+      "task": "person",
+      "source_batch": "v4_vehicle_sequence_review_20261112",
+      "source_manifest": "datasets/annotated/person/v4_vehicle_sequence_review_20261112/review_manifest.json",
+      "source_manifest_sha256": "8ee98adc7b8c12f0fd26e2095b45a89440481488d461edf0313da97752781036",
+      "image": "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_002851.png",
+      "canonical_image": "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_002851.png",
+      "state": "partial",
+      "label": null,
+      "label_sha256": null,
+      "positive_boxes": 0,
+      "candidate_boxes": 3,
+      "status_layers": {
+        "source_available": true,
+        "annotated": false,
+        "candidate": true,
+        "auto_validated": false,
+        "human_confirmed": {
+          "semantic": false,
+          "box_or_absence": false,
+          "mask": false
+        },
+        "training_admitted": false
+      },
+      "pending": [
+        "human_semantic_confirmation",
+        "human_box_or_absence_confirmation",
+        "training_admission"
+      ],
+      "human_semantic_confirmed": false
+    },
+    {
+      "id": "frame_007651",
+      "task": "person",
+      "source_batch": "v4_vehicle_sequence_review_20261112",
+      "source_manifest": "datasets/annotated/person/v4_vehicle_sequence_review_20261112/review_manifest.json",
+      "source_manifest_sha256": "8ee98adc7b8c12f0fd26e2095b45a89440481488d461edf0313da97752781036",
+      "image": "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_007651.png",
+      "canonical_image": "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_007651.png",
+      "state": "partial",
+      "label": null,
+      "label_sha256": null,
+      "positive_boxes": 0,
+      "candidate_boxes": 2,
+      "status_layers": {
+        "source_available": true,
+        "annotated": false,
+        "candidate": true,
+        "auto_validated": false,
+        "human_confirmed": {
+          "semantic": false,
+          "box_or_absence": false,
+          "mask": false
+        },
+        "training_admitted": false
+      },
+      "pending": [
+        "human_semantic_confirmation",
+        "human_box_or_absence_confirmation",
+        "training_admission"
+      ],
+      "human_semantic_confirmed": false
+    },
+    {
+      "id": "frame_007801",
+      "task": "person",
+      "source_batch": "v4_vehicle_sequence_review_20261112",
+      "source_manifest": "datasets/annotated/person/v4_vehicle_sequence_review_20261112/review_manifest.json",
+      "source_manifest_sha256": "8ee98adc7b8c12f0fd26e2095b45a89440481488d461edf0313da97752781036",
+      "image": "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_007801.png",
+      "canonical_image": "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_007801.png",
+      "state": "partial",
+      "label": null,
+      "label_sha256": null,
+      "positive_boxes": 0,
+      "candidate_boxes": 3,
+      "status_layers": {
+        "source_available": true,
+        "annotated": false,
+        "candidate": true,
+        "auto_validated": false,
+        "human_confirmed": {
+          "semantic": false,
+          "box_or_absence": false,
+          "mask": false
+        },
+        "training_admitted": false
+      },
+      "pending": [
+        "human_semantic_confirmation",
+        "human_box_or_absence_confirmation",
+        "training_admission"
+      ],
+      "human_semantic_confirmed": false
+    },
+    {
+      "id": "frame_008251",
+      "task": "person",
+      "source_batch": "v4_vehicle_sequence_review_20261112",
+      "source_manifest": "datasets/annotated/person/v4_vehicle_sequence_review_20261112/review_manifest.json",
+      "source_manifest_sha256": "8ee98adc7b8c12f0fd26e2095b45a89440481488d461edf0313da97752781036",
+      "image": "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_008251.png",
+      "canonical_image": "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_008251.png",
+      "state": "partial",
+      "label": null,
+      "label_sha256": null,
+      "positive_boxes": 0,
+      "candidate_boxes": 1,
+      "status_layers": {
+        "source_available": true,
+        "annotated": false,
+        "candidate": true,
+        "auto_validated": false,
+        "human_confirmed": {
+          "semantic": false,
+          "box_or_absence": false,
+          "mask": false
+        },
+        "training_admitted": false
+      },
+      "pending": [
+        "human_semantic_confirmation",
+        "human_box_or_absence_confirmation",
+        "training_admission"
+      ],
+      "human_semantic_confirmed": false
+    }
+  ],
+  "pending_partial": [
+    {
+      "id": "person_000701",
+      "task": "person",
+      "source_batch": "v4_multivideo_review_20261112",
+      "source_manifest": "datasets/annotated/person/v4_multivideo_review_20261112/review_manifest.json",
+      "source_manifest_sha256": "882e3c5b4977a48622db6973e00f6462702648d88f4e5f1c9fb9dc5ebaf77ef6",
+      "image": "datasets/annotated/person/v4_multivideo_review_20261112/images/person_000701.png",
+      "canonical_image": "datasets/annotated/site_capture_20261112/sequence_v2/person_standees/frame_000701.png",
+      "state": "partial",
+      "label": null,
+      "label_sha256": null,
+      "positive_boxes": 0,
+      "candidate_boxes": 0,
+      "status_layers": {
+        "source_available": true,
+        "annotated": false,
+        "candidate": true,
+        "auto_validated": false,
+        "human_confirmed": {
+          "semantic": false,
+          "box_or_absence": false,
+          "mask": false
+        },
+        "training_admitted": false
+      },
+      "pending": [
+        "human_semantic_confirmation",
+        "human_box_or_absence_confirmation",
+        "training_admission"
+      ],
+      "human_semantic_confirmed": false
+    },
+    {
+      "id": "person_001201",
+      "task": "person",
+      "source_batch": "v4_multivideo_review_20261112",
+      "source_manifest": "datasets/annotated/person/v4_multivideo_review_20261112/review_manifest.json",
+      "source_manifest_sha256": "882e3c5b4977a48622db6973e00f6462702648d88f4e5f1c9fb9dc5ebaf77ef6",
+      "image": "datasets/annotated/person/v4_multivideo_review_20261112/images/person_001201.png",
+      "canonical_image": "datasets/annotated/site_capture_20261112/sequence_v2/person_standees/frame_001201.png",
+      "state": "partial",
+      "label": null,
+      "label_sha256": null,
+      "positive_boxes": 0,
+      "candidate_boxes": 4,
+      "status_layers": {
+        "source_available": true,
+        "annotated": false,
+        "candidate": true,
+        "auto_validated": false,
+        "human_confirmed": {
+          "semantic": false,
+          "box_or_absence": false,
+          "mask": false
+        },
+        "training_admitted": false
+      },
+      "pending": [
+        "human_semantic_confirmation",
+        "human_box_or_absence_confirmation",
+        "training_admission"
+      ],
+      "human_semantic_confirmed": false
+    },
+    {
+      "id": "frame_000751",
+      "task": "person",
+      "source_batch": "v4_full_scene_diverse_review_20261112",
+      "source_manifest": "datasets/annotated/person/v4_full_scene_diverse_review_20261112/review_manifest.json",
+      "source_manifest_sha256": "4e602e2f23ea727299a754b0646a4658ab8382cae53b3e0cb587fef72b285656",
+      "image": "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_000751.png",
+      "canonical_image": "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_000751.png",
+      "state": "partial",
+      "label": null,
+      "label_sha256": null,
+      "positive_boxes": 0,
+      "candidate_boxes": 1,
+      "status_layers": {
+        "source_available": true,
+        "annotated": false,
+        "candidate": true,
+        "auto_validated": false,
+        "human_confirmed": {
+          "semantic": false,
+          "box_or_absence": false,
+          "mask": false
+        },
+        "training_admitted": false
+      },
+      "pending": [
+        "human_semantic_confirmation",
+        "human_box_or_absence_confirmation",
+        "training_admission"
+      ],
+      "human_semantic_confirmed": false
+    },
+    {
+      "id": "frame_002911",
+      "task": "person",
+      "source_batch": "v4_full_scene_diverse_review_20261112",
+      "source_manifest": "datasets/annotated/person/v4_full_scene_diverse_review_20261112/review_manifest.json",
+      "source_manifest_sha256": "4e602e2f23ea727299a754b0646a4658ab8382cae53b3e0cb587fef72b285656",
+      "image": "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_002911.png",
+      "canonical_image": "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_002911.png",
+      "state": "partial",
+      "label": null,
+      "label_sha256": null,
+      "positive_boxes": 0,
+      "candidate_boxes": 4,
+      "status_layers": {
+        "source_available": true,
+        "annotated": false,
+        "candidate": true,
+        "auto_validated": false,
+        "human_confirmed": {
+          "semantic": false,
+          "box_or_absence": false,
+          "mask": false
+        },
+        "training_admitted": false
+      },
+      "pending": [
+        "human_semantic_confirmation",
+        "human_box_or_absence_confirmation",
+        "training_admission"
+      ],
+      "human_semantic_confirmed": false
+    },
+    {
+      "id": "frame_008701",
+      "task": "person",
+      "source_batch": "v4_full_scene_diverse_review_20261112",
+      "source_manifest": "datasets/annotated/person/v4_full_scene_diverse_review_20261112/review_manifest.json",
+      "source_manifest_sha256": "4e602e2f23ea727299a754b0646a4658ab8382cae53b3e0cb587fef72b285656",
+      "image": "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_008701.png",
+      "canonical_image": "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_008701.png",
+      "state": "partial",
+      "label": null,
+      "label_sha256": null,
+      "positive_boxes": 0,
+      "candidate_boxes": 3,
+      "status_layers": {
+        "source_available": true,
+        "annotated": false,
+        "candidate": true,
+        "auto_validated": false,
+        "human_confirmed": {
+          "semantic": false,
+          "box_or_absence": false,
+          "mask": false
+        },
+        "training_admitted": false
+      },
+      "pending": [
+        "human_semantic_confirmation",
+        "human_box_or_absence_confirmation",
+        "training_admission"
+      ],
+      "human_semantic_confirmed": false
+    },
+    {
+      "id": "frame_000451",
+      "task": "person",
+      "source_batch": "v4_vehicle_sequence_review_20261112",
+      "source_manifest": "datasets/annotated/person/v4_vehicle_sequence_review_20261112/review_manifest.json",
+      "source_manifest_sha256": "8ee98adc7b8c12f0fd26e2095b45a89440481488d461edf0313da97752781036",
+      "image": "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_000451.png",
+      "canonical_image": "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_000451.png",
+      "state": "partial",
+      "label": null,
+      "label_sha256": null,
+      "positive_boxes": 0,
+      "candidate_boxes": 2,
+      "status_layers": {
+        "source_available": true,
+        "annotated": false,
+        "candidate": true,
+        "auto_validated": false,
+        "human_confirmed": {
+          "semantic": false,
+          "box_or_absence": false,
+          "mask": false
+        },
+        "training_admitted": false
+      },
+      "pending": [
+        "human_semantic_confirmation",
+        "human_box_or_absence_confirmation",
+        "training_admission"
+      ],
+      "human_semantic_confirmed": false
+    },
+    {
+      "id": "frame_000601",
+      "task": "person",
+      "source_batch": "v4_vehicle_sequence_review_20261112",
+      "source_manifest": "datasets/annotated/person/v4_vehicle_sequence_review_20261112/review_manifest.json",
+      "source_manifest_sha256": "8ee98adc7b8c12f0fd26e2095b45a89440481488d461edf0313da97752781036",
+      "image": "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_000601.png",
+      "canonical_image": "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_000601.png",
+      "state": "partial",
+      "label": null,
+      "label_sha256": null,
+      "positive_boxes": 0,
+      "candidate_boxes": 3,
+      "status_layers": {
+        "source_available": true,
+        "annotated": false,
+        "candidate": true,
+        "auto_validated": false,
+        "human_confirmed": {
+          "semantic": false,
+          "box_or_absence": false,
+          "mask": false
+        },
+        "training_admitted": false
+      },
+      "pending": [
+        "human_semantic_confirmation",
+        "human_box_or_absence_confirmation",
+        "training_admission"
+      ],
+      "human_semantic_confirmed": false
+    },
+    {
+      "id": "frame_002851",
+      "task": "person",
+      "source_batch": "v4_vehicle_sequence_review_20261112",
+      "source_manifest": "datasets/annotated/person/v4_vehicle_sequence_review_20261112/review_manifest.json",
+      "source_manifest_sha256": "8ee98adc7b8c12f0fd26e2095b45a89440481488d461edf0313da97752781036",
+      "image": "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_002851.png",
+      "canonical_image": "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_002851.png",
+      "state": "partial",
+      "label": null,
+      "label_sha256": null,
+      "positive_boxes": 0,
+      "candidate_boxes": 3,
+      "status_layers": {
+        "source_available": true,
+        "annotated": false,
+        "candidate": true,
+        "auto_validated": false,
+        "human_confirmed": {
+          "semantic": false,
+          "box_or_absence": false,
+          "mask": false
+        },
+        "training_admitted": false
+      },
+      "pending": [
+        "human_semantic_confirmation",
+        "human_box_or_absence_confirmation",
+        "training_admission"
+      ],
+      "human_semantic_confirmed": false
+    },
+    {
+      "id": "frame_007651",
+      "task": "person",
+      "source_batch": "v4_vehicle_sequence_review_20261112",
+      "source_manifest": "datasets/annotated/person/v4_vehicle_sequence_review_20261112/review_manifest.json",
+      "source_manifest_sha256": "8ee98adc7b8c12f0fd26e2095b45a89440481488d461edf0313da97752781036",
+      "image": "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_007651.png",
+      "canonical_image": "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_007651.png",
+      "state": "partial",
+      "label": null,
+      "label_sha256": null,
+      "positive_boxes": 0,
+      "candidate_boxes": 2,
+      "status_layers": {
+        "source_available": true,
+        "annotated": false,
+        "candidate": true,
+        "auto_validated": false,
+        "human_confirmed": {
+          "semantic": false,
+          "box_or_absence": false,
+          "mask": false
+        },
+        "training_admitted": false
+      },
+      "pending": [
+        "human_semantic_confirmation",
+        "human_box_or_absence_confirmation",
+        "training_admission"
+      ],
+      "human_semantic_confirmed": false
+    },
+    {
+      "id": "frame_007801",
+      "task": "person",
+      "source_batch": "v4_vehicle_sequence_review_20261112",
+      "source_manifest": "datasets/annotated/person/v4_vehicle_sequence_review_20261112/review_manifest.json",
+      "source_manifest_sha256": "8ee98adc7b8c12f0fd26e2095b45a89440481488d461edf0313da97752781036",
+      "image": "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_007801.png",
+      "canonical_image": "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_007801.png",
+      "state": "partial",
+      "label": null,
+      "label_sha256": null,
+      "positive_boxes": 0,
+      "candidate_boxes": 3,
+      "status_layers": {
+        "source_available": true,
+        "annotated": false,
+        "candidate": true,
+        "auto_validated": false,
+        "human_confirmed": {
+          "semantic": false,
+          "box_or_absence": false,
+          "mask": false
+        },
+        "training_admitted": false
+      },
+      "pending": [
+        "human_semantic_confirmation",
+        "human_box_or_absence_confirmation",
+        "training_admission"
+      ],
+      "human_semantic_confirmed": false
+    },
+    {
+      "id": "frame_008251",
+      "task": "person",
+      "source_batch": "v4_vehicle_sequence_review_20261112",
+      "source_manifest": "datasets/annotated/person/v4_vehicle_sequence_review_20261112/review_manifest.json",
+      "source_manifest_sha256": "8ee98adc7b8c12f0fd26e2095b45a89440481488d461edf0313da97752781036",
+      "image": "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_008251.png",
+      "canonical_image": "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_008251.png",
+      "state": "partial",
+      "label": null,
+      "label_sha256": null,
+      "positive_boxes": 0,
+      "candidate_boxes": 1,
+      "status_layers": {
+        "source_available": true,
+        "annotated": false,
+        "candidate": true,
+        "auto_validated": false,
+        "human_confirmed": {
+          "semantic": false,
+          "box_or_absence": false,
+          "mask": false
+        },
+        "training_admitted": false
+      },
+      "pending": [
+        "human_semantic_confirmation",
+        "human_box_or_absence_confirmation",
+        "training_admission"
+      ],
+      "human_semantic_confirmed": false
+    }
+  ],
+  "boundary": "Programmatic validation records only matching auto-review labels. It does not populate human semantic, human box/absence or mask confirmation, or training admission. Pending records retain their previous annotations and candidate boxes."
+}

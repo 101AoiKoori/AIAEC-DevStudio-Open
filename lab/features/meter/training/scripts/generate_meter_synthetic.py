@@ -5,13 +5,23 @@ This is a synthetic training experiment, not a copy of the competition meter.
 The output directory must not exist. No real or independent validation data
 are created. Python 3.8+, NumPy and OpenCV are required.
 """
+
+if __name__ == "__main__":
+    raise SystemExit("Legacy dataset CLI is retired; use datasets/scripts/meter/. Production remains paused.")
+
 import argparse
 import json
 import math
+import sys
 from pathlib import Path
 
 import cv2
 import numpy as np
+
+ROOT = Path(__file__).resolve().parents[5]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+from lab.training_common.production_guard import generation_guard
 
 SIZE = 640
 KEYPOINTS = ('temperature_pivot', 'temperature_tip', 'humidity_pivot', 'humidity_tip',
@@ -31,7 +41,7 @@ def ip(point):
     return tuple(int(round(v)) for v in point)
 
 
-def draw_dial(rng):
+def draw_dial(rng, fractions=None):
     image = np.full((SIZE, SIZE, 3), (231, 235, 237), np.uint8)
     cv2.circle(image, (320, 320), 300, (50, 55, 60), -1, cv2.LINE_AA)
     cv2.circle(image, (320, 320), 287, (245, 245, 240), -1, cv2.LINE_AA)
@@ -54,7 +64,7 @@ def draw_dial(rng):
                             cv2.FONT_HERSHEY_SIMPLEX, .38 if name == 'temperature' else .27,
                             (40, 40, 40), 1, cv2.LINE_AA)
         tick_lines[name] = lines
-        frac = float(rng.uniform(.03, .97))
+        frac = float(rng.uniform(.03, .97)) if fractions is None else fractions[name]
         angle = a0 + frac * (a1 - a0)
         tip = polar(center, radius - 25, angle)
         tail = polar(center, 15, angle + 180)
@@ -78,9 +88,10 @@ def draw_dial(rng):
     return image, points, tick_lines, values, needle_masks
 
 
-def project_plane(rng):
+def project_plane(rng, planned=None):
     # Intrinsics and angles are synthetic experiment ranges, not field limits.
-    yaw, pitch, roll = rng.uniform(-20, 20, size=3)
+    yaw, pitch, roll = (rng.uniform(-20, 20, size=3) if planned is None else
+                        (planned['yaw_deg'], planned['pitch_deg'], planned['roll_deg']))
     yaw, pitch, roll = map(math.radians, (yaw, pitch, roll))
     rx = np.array([[1, 0, 0], [0, math.cos(pitch), -math.sin(pitch)],
                    [0, math.sin(pitch), math.cos(pitch)]], dtype=np.float64)
@@ -89,9 +100,10 @@ def project_plane(rng):
     rz = np.array([[math.cos(roll), -math.sin(roll), 0],
                    [math.sin(roll), math.cos(roll), 0], [0, 0, 1]], dtype=np.float64)
     rotation = rz @ ry @ rx
-    distance = float(rng.uniform(750, 920))
-    focal = float(rng.uniform(610, 740))
-    translation = np.array([rng.uniform(-20, 20), rng.uniform(-20, 20), distance])
+    distance = float(rng.uniform(750, 920)) if planned is None else planned['distance']
+    focal = float(rng.uniform(610, 740)) if planned is None else planned['focal_px']
+    translation = np.array([rng.uniform(-20, 20), rng.uniform(-20, 20), distance] if planned is None else
+                           [planned['translation_x'], planned['translation_y'], distance])
     corners = np.array([[-320, -320, 0], [319, -320, 0], [319, 319, 0], [-320, 319, 0]], np.float64)
     camera = (rotation @ corners.T).T + translation
     if np.any(camera[:, 2] <= 0):
@@ -127,18 +139,25 @@ def apply_glare(image, rng, mask):
     return np.clip(image * (1.0 - weight) + 255.0 * weight, 0, 255).astype(np.uint8), alpha, ellipses
 
 
-def sample(rng):
-    face, points, tick_lines, values, needle_masks = draw_dial(rng)
-    matrix, params = project_plane(rng)
+def sample(rng, planned=None):
+    fractions = None if planned is None else {'temperature': planned['temperature_fraction'],
+                                               'humidity': planned['humidity_fraction']}
+    face, points, tick_lines, values, needle_masks = draw_dial(rng, fractions)
+    matrix, params = project_plane(rng, planned)
     # Include random brightness without implying a real scene distribution.
-    background = np.full_like(face, tuple(int(v) for v in rng.integers(80, 180, size=3)))
+    color = tuple(int(v) for v in rng.integers(80, 180, size=3)) if planned is None else tuple(planned['background_bgr'])
+    background = np.full_like(face, color)
     face_mask = np.zeros((SIZE, SIZE), np.uint8)
     cv2.circle(face_mask, (320, 320), 300, 255, -1)
     warped_mask = cv2.warpPerspective(face_mask, matrix, (SIZE, SIZE), flags=cv2.INTER_NEAREST)
     warped = cv2.warpPerspective(face, matrix, (SIZE, SIZE), flags=cv2.INTER_LINEAR)
     image = np.where((warped_mask > 0)[..., None], warped, background)
-    image, glare, ellipses = apply_glare(image, rng, warped_mask)
-    gain = float(rng.uniform(.8, 1.12))
+    if planned is None:
+        image, glare, ellipses = apply_glare(image, rng, warped_mask)
+        gain = float(rng.uniform(.8, 1.12))
+    else:
+        glare, ellipses = np.zeros(image.shape[:2], np.uint8), []
+        gain = planned['brightness_gain']
     image = np.clip(image.astype(np.float32) * gain, 0, 255).astype(np.uint8)
     xy = map_points([points[k] for k in KEYPOINTS], matrix)
     warped_needles = {name: cv2.warpPerspective(mask, matrix, (SIZE, SIZE), flags=cv2.INTER_NEAREST)
@@ -228,12 +247,105 @@ def sample_reference(rng, source_image, reference):
                                   'reference_status': reference.get('status', 'unverified')}
 
 
-def generate(output, count, seed, source_image=None, reference=None):
+PLANNED_LIMITS = {'temperature_fraction': (.03, .97), 'humidity_fraction': (.03, .97),
+                  'yaw_deg': (-20, 20), 'pitch_deg': (-20, 20), 'roll_deg': (-20, 20),
+                  'distance': (750, 920), 'focal_px': (610, 740),
+                  'translation_x': (-20, 20), 'translation_y': (-20, 20),
+                  'brightness_gain': (.8, 1.12)}
+PROCEDURAL_SOURCE = 'procedural:meter_self_drawn'
+
+
+def validate_declaration(plan, count):
+    """Reject states the procedural renderer cannot execute as declared."""
+    if not isinstance(plan, dict) or plan.get('model_key') != 'meter' or plan.get('target_split') != 'train':
+        raise ValueError('plan must target meter train')
+    if type(count) is not int or count < 1 or plan.get('budget') != count:
+        raise ValueError('count must equal the positive plan budget')
+    if plan.get('constraints') != {'resolution': [640, 640], 'glare': 'none', 'label_policy': 'synthetic_pose'}:
+        raise ValueError('unsupported synthetic meter constraints')
+    states = plan.get('strata')
+    if not isinstance(states, list) or not states:
+        raise ValueError('plan must contain states')
+    seen = set()
+    for state in states:
+        if not isinstance(state, dict):
+            raise ValueError('state must be an object')
+        expected = {'background': {'kind': 'solid_bgr'}, 'target': {'kind': 'self_drawn_meter'},
+                    'labels': {'kind': 'synthetic_pose'}, 'augmentation': {'kind': 'explicit_projective_no_glare'}}
+        if any(state.get(k) != v for k, v in expected.items()):
+            raise ValueError('unsupported background, target, labels or augmentation')
+        if state.get('conditions') != [] or state.get('sources') != [PROCEDURAL_SOURCE]:
+            raise ValueError('state must use the procedural source and explicit parameters only')
+        if type(state.get('max_count')) is not int or not 0 <= state['max_count'] <= 1:
+            raise ValueError('each exact state has capacity at most one')
+        params = state.get('parameters')
+        if not isinstance(params, dict) or set(params) != set(PLANNED_LIMITS) | {'background_bgr'}:
+            raise ValueError('unsupported synthetic meter parameter fields')
+        for key, (low, high) in PLANNED_LIMITS.items():
+            value = params[key]
+            if type(value) not in (int, float) or not math.isfinite(value) or not low <= value <= high:
+                raise ValueError('unsupported parameter: ' + key)
+        color = params['background_bgr']
+        if not isinstance(color, list) or len(color) != 3 or any(type(x) is not int or not 0 <= x <= 255 for x in color):
+            raise ValueError('background_bgr must contain three integers from 0 to 255')
+        identity = tuple(float(params[k]) for k in sorted(PLANNED_LIMITS)) + tuple(color)
+        if identity in seen:
+            raise ValueError('duplicate exact parameter states')
+        seen.add(identity)
+        project_plane(None, params)  # geometric feasibility without producing image pixels
+
+
+def generate(output, count, seed, source_image=None, reference=None, *, production_plan=None):
+    """Generate a self-drawn batch only under an explicit production plan."""
+    if count < 1:
+        raise ValueError('count must be positive')
+    if (source_image is None) != (reference is None):
+        raise ValueError('source image and reference must be provided together')
+    if source_image is not None and not isinstance(source_image, (str, Path)):
+        raise ValueError('source image must be a traceable file path, not an in-memory image')
+    if reference is not None and not isinstance(reference, (str, Path)):
+        raise ValueError('reference must be a traceable file path')
+    if source_image is not None:
+        raise ValueError('photo augmentation has not been adapted to planned production')
+    validate_declaration(production_plan, count)
+    output = Path(output).resolve()
+    source_image = Path(source_image).resolve() if source_image is not None else None
+    reference = Path(reference).resolve() if reference is not None else None
+    media = [Path(source_image)] if source_image is not None else []
+    procedural = [Path(reference)] if reference is not None else [Path(__file__)]
+    with generation_guard('meter.generate_synthetic:' + str(Path(output).resolve()),
+                          media, [Path(output)], {'count': count, 'seed': seed},
+                          procedural_inputs=procedural, code_paths=[Path(__file__)],
+                          production_plan=production_plan, sample_output_paths=[output / 'images'],
+                          auxiliary_output_paths=[output / 'previews']) as run:
+        if run.reused:
+            print('REUSED', output)
+            return Path(output)
+        image, annotation = None, None
+        if source_image is not None:
+            image = cv2.imread(str(source_image))
+            if image is None:
+                raise ValueError('cannot read source image')
+            annotation = json.loads(Path(reference).read_text(encoding='utf-8-sig'))
+        return _generate(output, count, seed, image, annotation, run.source_refs, run)
+
+
+def _generate(output, count, seed, source_image=None, reference=None, source_refs=None, run=None):
     output = Path(output)
     if count < 1:
         raise ValueError('count must be positive')
     if (source_image is None) != (reference is None):
         raise ValueError('source image and reference must be provided together')
+    if run is None or run.plan is None:
+        raise ValueError('an active planned production guard is required')
+    states = []
+    for state in run.plan['strata']:
+        if type(state['planned_count']) is not int or state['planned_count'] not in (0, 1):
+            raise ValueError('each exact state can produce at most one sample')
+        if state['planned_count']:
+            states.append(state)
+    if len(states) != count:
+        raise ValueError('allocated count differs from budget')
     # Never delete or overwrite a previous run, including partial runs.
     output.mkdir(parents=True, exist_ok=False)
     image_dir, label_dir, preview_dir = (output / 'images' / 'train', output / 'labels' / 'train', output / 'previews')
@@ -241,12 +353,13 @@ def generate(output, count, seed, source_image=None, reference=None):
         directory.mkdir(parents=True)
     rng = np.random.default_rng(seed)
     manifest = {'purpose': 'augmentation smoke test only; no independent validation',
+                'input_source_refs': source_refs,
                 'source_type': 'annotated_single_image' if source_image is not None else 'self_drawn',
                 'source_description': reference.get('source', 'unspecified') if reference else 'procedurally drawn',
                 'seed': seed, 'keypoint_order': KEYPOINTS, 'samples': []}
     for i in range(count):
-        image, box, keypoints, info = (sample_reference(rng, source_image, reference)
-                                       if source_image is not None else sample(rng))
+        state = states[i]
+        image, box, keypoints, info = sample(rng, state['parameters'])
         name = 'meter_{:05d}'.format(i)
         if not cv2.imwrite(str(image_dir / (name + '.png')), image):
             raise RuntimeError('failed to write image ' + name)
@@ -262,7 +375,13 @@ def generate(output, count, seed, source_image=None, reference=None):
             if not cv2.imwrite(str(preview_dir / (name + '.png')), preview):
                 raise RuntimeError('failed to write preview ' + name)
         info['id'] = name
+        info['planned_state_id'] = state['id']
         manifest['samples'].append(info)
+        run.record_sample(state['id'], output=image_dir / (name + '.png'),
+                          sources=state['sources'], parameters=state['parameters'],
+                          actual={'source': PROCEDURAL_SOURCE, 'seed': seed, 'geometry': info['parameters'],
+                                  'brightness_gain': info['brightness_gain'], 'values': info['values'],
+                                  'visibility': info['visibility'], 'glare_ellipses': info['glare_ellipses']})
     (output / 'manifest.json').write_text(json.dumps(manifest, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
     return output
 
@@ -274,17 +393,17 @@ def main():
     parser.add_argument('--seed', type=int, default=20261106)
     parser.add_argument('--source-image', help='Optional annotated source photo')
     parser.add_argument('--reference', help='JSON reference annotation for source photo')
+    parser.add_argument('--production-plan', required=True, help='Workspace JSON declaration')
     args = parser.parse_args()
     try:
         if bool(args.source_image) != bool(args.reference):
             raise ValueError('--source-image and --reference are required together')
-        image, reference = None, None
-        if args.source_image:
-            image = cv2.imread(args.source_image)
-            if image is None:
-                raise ValueError('cannot read source image')
-            reference = json.loads(Path(args.reference).read_text(encoding='utf-8-sig'))
-        print('Generated {} experimental samples in {}'.format(args.count, generate(args.output, args.count, args.seed, image, reference)))
+        plan_path = Path(args.production_plan).resolve()
+        if not plan_path.is_relative_to(ROOT) or not plan_path.is_file():
+            raise ValueError('production plan must be an existing workspace JSON file')
+        plan = json.loads(plan_path.read_text(encoding='utf-8-sig'))
+        print('Output:', generate(args.output, args.count, args.seed,
+                                  args.source_image, args.reference, production_plan=plan))
     except (FileExistsError, ValueError) as exc:
         parser.error(str(exc))
 

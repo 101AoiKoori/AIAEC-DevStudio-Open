@@ -1,0 +1,324 @@
+{
+  "schema_version": 1,
+  "model_key": "building_name_paper",
+  "target_split": "train",
+  "purpose": "40 partial real-scene paper composites; each source quota min 10 max 30, neutral prior and equal costs/exposure when no calibrated distribution is available. Uniform brightness range follows a conservative subset of existing 0.8–1.15 candidate range; this is simulated, not measured. Seeded unique names, source schedule shuffled; original scene labels and OCR remain unknown.",
+  "budget": 40,
+  "uncertainty_weight": 0,
+  "independence_basis": "two recorded video parents, capture-session independence unknown; variants are not independent captures",
+  "constraints": {
+    "existing_background_targets": "unknown_partial",
+    "ocr_truth": "not_verified",
+    "text_mirror": false
+  },
+  "strata": [
+    {
+      "id": "scene_track",
+      "failure_event": "paper_or_background_label_uncertainty",
+      "min_count": 10,
+      "max_count": 30,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [
+        "background_other_targets_unknown",
+        "text_not_mirrored"
+      ],
+      "background": {
+        "source_key": "scene_track",
+        "source_image": "datasets/annotated/fire/real_review_candidates_20261110/images/0026.png",
+        "source_group": "three_buildings_road_003"
+      },
+      "target": {
+        "kind": "building_name_paper",
+        "text_policy": "unique_seeded_generator_indices",
+        "name_index_range": [
+          0,
+          9245
+        ],
+        "quad_xy": [
+          [
+            336,
+            61
+          ],
+          [
+            492,
+            62
+          ],
+          [
+            493,
+            94
+          ],
+          [
+            337,
+            94
+          ]
+        ]
+      },
+      "labels": {
+        "task": "paper_detection",
+        "class_id": 0,
+        "format": "yolo_v8",
+        "status": "partial_candidate",
+        "ocr_status": "not_verified"
+      },
+      "augmentation": {
+        "brightness_gain_range": [
+          0.85,
+          1.05
+        ],
+        "distribution": "uniform",
+        "output_size": [
+          960,
+          540
+        ]
+      },
+      "sources": [
+        "real_scene_background",
+        "name_font_asset"
+      ],
+      "parameters": {
+        "source_image": "datasets/annotated/fire/real_review_candidates_20261110/images/0026.png",
+        "source_key": "scene_track",
+        "seed": 20261114
+      }
+    },
+    {
+      "id": "scene_tile",
+      "failure_event": "paper_or_background_label_uncertainty",
+      "min_count": 10,
+      "max_count": 30,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [
+        "background_other_targets_unknown",
+        "text_not_mirrored"
+      ],
+      "background": {
+        "source_key": "scene_tile",
+        "source_image": "datasets/annotated/fire/real_review_candidates_20261110/images/0014.png",
+        "source_group": "jinxiu_indoor_tile_001"
+      },
+      "target": {
+        "kind": "building_name_paper",
+        "text_policy": "unique_seeded_generator_indices",
+        "name_index_range": [
+          0,
+          9245
+        ],
+        "quad_xy": [
+          [
+            373,
+            148
+          ],
+          [
+            524,
+            139
+          ],
+          [
+            527,
+            169
+          ],
+          [
+            377,
+            180
+          ]
+        ]
+      },
+      "labels": {
+        "task": "paper_detection",
+        "class_id": 0,
+        "format": "yolo_v8",
+        "status": "partial_candidate",
+        "ocr_status": "not_verified"
+      },
+      "augmentation": {
+        "brightness_gain_range": [
+          0.85,
+          1.05
+        ],
+        "distribution": "uniform",
+        "output_size": [
+          960,
+          540
+        ]
+      },
+      "sources": [
+        "real_scene_background",
+        "name_font_asset"
+      ],
+      "parameters": {
+        "source_image": "datasets/annotated/fire/real_review_candidates_20261110/images/0014.png",
+        "source_key": "scene_tile",
+        "seed": 20261114
+      }
+    }
+  ],
+  "v4_task_combination_plan": {
+    "status": "conditional_plan_not_produced",
+    "scope": "本字段为楼名任务 3000 张 train 的来源和组合规划；现有脚本不消费本字段。原有 40 张部分候选计划保持原值，属于实拍合成分支的子集，不重复计数。",
+    "selection_order": "先预留父视频及所有派生样本，再从其余来源选 train；父组内的不同有效构图帧单独计基底，但同一视频仍只计一个父组。",
+    "sampling_and_seed": {
+      "status": "planned_not_executed",
+      "source_pool_pointer": "$.v4_task_combination_plan.train_parent_groups",
+      "reservation_pointer": "$.v4_task_combination_plan.reserved_parent_groups",
+      "method": "先按每个父组已列出的 direct_quota、single_paper_quota、multi_paper_quota 定份额，再在该组已准入且相容的背景/名称/槽位组合中选取；每组候选按稳定标识排序后以种子随机抽取不重复组合，不能通过重复画面或微小调色充数。",
+      "seed": 20261114,
+      "seed_scope": "全任务拟使用的可复现抽样参数；实际执行时各分支和抽中来源写入回执。当前只有单楼单纸现存入口计划固化此种子。",
+      "entry_limit": "当前已有单楼入口计划仅包含一个父组、一张图和一个名称；现有入口不会读取本字段，也不会自动强制六父组份额或全局无重复抽样。按父组配额执行需把合格候选和各组数量转换为入口可读取的实际状态，不能把设计计划当作已执行。"
+    },
+    "checked_image_relation_scope": {
+      "plan": "datasets/scripts/building_name_paper/config/rooftop_sources.json",
+      "relations_pointer": "$.task_use_status",
+      "branch_pointer": "$.bounded_branch",
+      "snapshot_pointer": "$.relation_snapshot",
+      "parent_group": "train_jinxiu_indoor_001",
+      "single_paper_branch": "R_SINGLE_NAME",
+      "scope": "当前仅关联已核的 0014 图及其一个近似四角；该几何可作部分候选入口输入，不代表直接训练标签或全部父组就绪。"
+    },
+    "reserved_parent_groups": [
+      {
+        "id": "reserve_A_video_002",
+        "purpose": "未来观察不同父视频的楼名纸条；不声明未见物理楼宇或独立采集场次",
+        "path": "datasets/raw/fire/archive_assets_legacy/楼宇/开心大厦/视频/开心楼正侧背面绕拍_002.mp4",
+        "parent": "Archive/Assets/楼宇/开心大厦/视频/开心楼正侧背面绕拍_002.mp4",
+        "evidence": {"manifest": "datasets/source_copy_manifest.jsonl", "record_index": 3356},
+        "train_exclusion": "父视频及所有背景、前景、图像派生均不参与本计划 train",
+        "capture_session": "unknown"
+      },
+      {
+        "id": "reserve_B_video_002",
+        "purpose": "未来观察不同父视频的楼名纸条；不声明未见物理楼宇或独立采集场次",
+        "path": "datasets/raw/fire/archive_assets_legacy/楼宇/锦绣大厦/视频/锦绣楼在室内地砖上的多面绕拍_002.mp4",
+        "parent": "Archive/Assets/楼宇/锦绣大厦/视频/锦绣楼在室内地砖上的多面绕拍_002.mp4",
+        "evidence": {"manifest": "datasets/source_copy_manifest.jsonl", "record_index": 3402},
+        "train_exclusion": "父视频及所有背景、前景、图像派生均不参与本计划 train",
+        "capture_session": "unknown"
+      },
+      {
+        "id": "reserve_B_video_004",
+        "purpose": "与火焰任务共享预留，未来观察不同父视频；采集场次未知",
+        "path": "datasets/raw/fire/archive_assets_legacy/楼宇/锦绣大厦/视频/锦绣楼在赛道上的多面绕拍_004.mp4",
+        "parent": "Archive/Assets/楼宇/锦绣大厦/视频/锦绣楼在赛道上的多面绕拍_004.mp4",
+        "evidence": {"manifest": "datasets/source_copy_manifest.jsonl", "record_index": 3404},
+        "train_exclusion": "父视频及所有派生均不参与本计划 train"
+      },
+      {
+        "id": "reserve_C_video_002",
+        "purpose": "与火焰任务共享预留，未来观察不同父视频；采集场次未知",
+        "path": "datasets/raw/fire/archive_assets_legacy/楼宇/晨光大厦/视频/晨光楼较高视角环绕_可见L形顶部_002.mp4",
+        "parent": "Archive/Assets/楼宇/晨光大厦/视频/晨光楼较高视角环绕_可见L形顶部_002.mp4",
+        "evidence": {"manifest": "datasets/source_copy_manifest.jsonl", "record_index": 3382},
+        "train_exclusion": "父视频及所有派生均不参与本计划 train"
+      },
+      {
+        "id": "reserve_car_real_capture_20261112",
+        "purpose": "与火焰任务共享预留，未来考察车载采集域",
+        "source_group": "car_real_capture_20261112",
+        "path": "datasets/raw/car_real_capture_20261112",
+        "evidence": {"manifest": "datasets/source_copy_manifest.jsonl", "record_index": 789},
+        "train_exclusion": "车载工作副本、同源 Archive 原件及所有已知派生均不参与本计划 train"
+      },
+      {
+        "id": "reserve_vehicle_camera_delivery",
+        "purpose": "与火焰任务共享预留，未来考察车载交付照片；独立场次未知",
+        "source_group": "vehicle_camera_delivery_session_unverified",
+        "paths": ["datasets/raw/site_capture_20261112/onboard_camera_images/vehicle_0075.png", "datasets/raw/site_capture_20261112/onboard_camera_images/vehicle_0120.png"],
+        "evidence": {"manifest": "datasets/annotated/fire/fire_sticker_v4_arena_handoff_20261113/arena_source_and_generation_plan.json", "json_pointer": "$.current_source_selection_20261114.v4_combination_plan.reservations_first"},
+        "train_exclusion": "交付组及所有已知派生均不参与本计划 train"
+      },
+      {
+        "id": "reserve_arena_master",
+        "purpose": "与火焰任务共享预留，未来候选不同母场景；场景用途待确认",
+        "path": "datasets/assets/blender/shared/arena_4m2_pbr_20261112/arena_master_user_20261113.blend",
+        "registry": "datasets/blender_source_registry.sqlite3",
+        "asset_id": "blender:datasets/assets/blender/shared/arena_4m2_pbr_20261112/arena_master_user_20261113.blend",
+        "train_exclusion": "该母场景及所有已知派生均不参与本计划 train"
+      }
+    ],
+    "shared_roles": [
+      {"role": "楼宇背景", "with_tasks": ["fire_sticker"], "record": "datasets/annotated/fire/fire_sticker_v4_arena_handoff_20261113/arena_source_and_generation_plan.json", "pointer": "$.current_source_selection_20261114.background_candidates", "constraint": "各任务独立标注；共享画面不代表标签、预留或准入相同"},
+      {"role": "数字名称字体", "path": "datasets/assets/blender/fire/blender_buildings_v13/NotoSansSC.ttf", "parent": "字体来源未知；同目录存在 OFL.txt，字体与许可对应关系待核", "constraint": "数字文字不作为独立采集，生成文本不自动成为已核可读全文"},
+      {"role": "Blender 母场景", "path": "datasets/assets/blender/fire/blender_buildings_v13/three_buildings.blend", "with_tasks": ["fire_sticker"], "registry": "datasets/blender_source_registry.sqlite3", "asset_id": "blender:datasets/assets/blender/fire/blender_buildings_v13/three_buildings.blend", "constraint": "同一母场景多个视角仍为一个母来源；几何为 approximate"}
+    ],
+    "train_budget": {"total": 3000, "direct_camera": 900, "real_background_composite": 1200, "blender_background": 900, "basis": "初始设计份额，非已产出或实测分布；缺口不得以重复样本填满"},
+    "train_parent_groups": [
+      {
+        "id": "train_A_video_001", "role": "实拍背景及直接样本候选", "path": "datasets/raw/fire/archive_assets_legacy/楼宇/开心大厦/视频/开心楼正侧背面绕拍_001.mp4", "parent": "Archive/Assets/楼宇/开心大厦/视频/开心楼正侧背面绕拍_001.mp4", "evidence": {"manifest": "datasets/source_copy_manifest.jsonl", "record_index": 3355}, "basis_count_target": 12, "direct_quota": 150, "single_paper_quota": 167, "multi_paper_quota": 33, "state": "conditional", "gap": "帧号、楼顶四角、完整目标框和可辨全文尚未确定"
+      },
+      {
+        "id": "train_C_video_001", "role": "实拍背景及直接样本候选", "path": "datasets/raw/fire/archive_assets_legacy/楼宇/晨光大厦/视频/晨光楼环绕_正面和背面_001.mp4", "parent": "Archive/Assets/楼宇/晨光大厦/视频/晨光楼环绕_正面和背面_001.mp4", "evidence": {"manifest": "datasets/source_copy_manifest.jsonl", "record_index": 3381}, "basis_count_target": 12, "direct_quota": 150, "single_paper_quota": 167, "multi_paper_quota": 33, "state": "conditional", "gap": "帧号、楼顶四角、完整目标框和可辨全文尚未确定"
+      },
+      {
+        "id": "train_B_video_003", "role": "实拍背景及直接样本候选", "path": "datasets/raw/fire/archive_assets_legacy/楼宇/锦绣大厦/视频/锦绣楼在赛道上的多面绕拍_003.mp4", "parent": "Archive/Assets/楼宇/锦绣大厦/视频/锦绣楼在赛道上的多面绕拍_003.mp4", "evidence": {"manifest": "datasets/source_copy_manifest.jsonl", "record_index": 3403}, "basis_count_target": 12, "direct_quota": 150, "single_paper_quota": 167, "multi_paper_quota": 33, "state": "conditional", "gap": "帧号、楼顶四角、完整目标框和可辨全文尚未确定"
+      },
+      {
+        "id": "train_site_full_scene", "role": "跨任务全场视频的楼宇背景及直接样本候选", "path": "datasets/raw/site_capture_20261112/videos/full_scene.mp4", "parent": "datasets/raw/site_capture_20261112/videos/full_scene.mp4", "source_group": "site_capture_20261112_full_scene", "evidence": [{"manifest": "datasets/annotated/site_capture_20261112/fire_name_v4_review/review_manifest.json", "record_index": 3}], "candidate_frame": "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_003241.png", "frame_index": 3241, "parent_pts_time_seconds": 108.093467, "basis_count_target": 12, "direct_quota": 150, "single_paper_quota": 167, "multi_paper_quota": 33, "state": "conditional", "gap": "记录的 003241 帧纸边界不清、标签 partial 且历史用途 regression；另需符合楼宇构图的候选帧、与预留组的关系、放置区域与完整标签。未能排除预留父来源派生前不能纳入 train"
+      },
+      {
+        "id": "train_three_buildings_road_003", "role": "实拍背景及直接样本候选", "path": "datasets/annotated/fire/real_review_candidates_20261110/images/0026.png", "parent": "Archive/Assets/场景/三楼与场地视频/三栋楼_垃圾桶与路口_003.mp4", "evidence": {"manifest": "datasets/annotated/fire/real_review_candidates_20261110/manifest.json", "record_index": 25}, "basis_count_target": 12, "direct_quota": 150, "single_paper_quota": 166, "multi_paper_quota": 34, "state": "conditional", "gap": "旧帧原为待核评价候选；记录用途复用；其他 11 帧、完整标签和多楼区域待定"
+      },
+      {
+        "id": "train_jinxiu_indoor_001", "role": "实拍背景及直接样本候选", "path": "datasets/annotated/fire/real_review_candidates_20261110/images/0014.png", "parent": "Archive/Assets/楼宇/锦绣大厦/视频/锦绣楼在室内地砖上的多面绕拍_001.mp4", "evidence": {"manifest": "datasets/annotated/fire/real_review_candidates_20261110/manifest.json", "record_index": 13}, "basis_count_target": 12, "direct_quota": 150, "single_paper_quota": 166, "multi_paper_quota": 34, "state": "conditional", "gap": "旧帧原为待核评价候选；记录用途复用；其他 11 帧、完整标签和多楼区域待定"
+      }
+    ],
+    "combinations": [
+      {
+        "id": "D_READABLE", "quota": 702, "method": "direct_camera", "state": "conditional", "parent_group_quota": 117,
+        "roles": {"background": "train_parent_groups 的直接图或视频帧", "foreground": "现场原有楼名纸条", "occluder": "按图像实际记录"},
+        "region": "原图纸条可辨检测框；楼号关联按实际观察", "labels": "全图可辨纸条逐实例框，全文逐字确认", "entry": "package_car_candidates.py 或 package_real_candidates.py 仅产生未准入候选；二者不按本字段的预留和配额筛选", "gap": "702 张及其完整框、全文未核；package_real_candidates.py 现会选入预留 A_video_002 的派生样本，不得未经筛选直接按本计划运行；父组份额只是目标"
+      },
+      {
+        "id": "D_TEXT_UNKNOWN", "quota": 96, "method": "direct_camera", "state": "conditional", "parent_group_quota": 16,
+        "roles": {"background": "train_parent_groups 的直接图或视频帧", "foreground": "边界可辨、全文未知的真实纸条", "occluder": "按实际可见情况"},
+        "region": "原图可辨纸条框", "labels": "检测为正例；OCR 文本为空值并标 unknown，其他可辨框仍须标全", "entry": "compose_rooftop_papers.py 的 existing_annotation 支持框和 unknown 分离；原实拍打包入口不自动确认 OCR", "gap": "满足可辨框与全文未知的实际图及全图标签未核"
+      },
+      {
+        "id": "D_NO_PAPER", "quota": 102, "method": "direct_camera", "state": "conditional", "parent_group_quota": 17,
+        "roles": {"background": "train_parent_groups", "foreground": "无名称纸，允许窗格或火焰纸等干扰", "occluder": "按画面原有内容"},
+        "region": "全画面覆盖范围", "labels": "确认全图无名称纸后才写空标签", "entry": "package_car_candidates.py 仅包装待核候选", "gap": "没有对应 102 张全图已确认负例；不以空候选标签替代确认"
+      },
+      {
+        "id": "R_SINGLE_NAME", "quota": 1000, "method": "real_background_composite", "state": "conditional", "parent_groups": "train_parent_groups 的单纸份额依次 167,167,167,167,166,166",
+        "roles": {"background": "六个实拍父组按组各拟 12 张不同构图基底", "foreground": "同一字体按 vary_name_papers.py 的 make_name(0..13) 生成 14 个不同名称；名称不视为 14 个独立物理字体或实拍", "occluder": "无额外注入"},
+        "region": "每背景使用一个已指定的原图楼顶四角；原有纸条不得被漏标或无记录覆盖", "labels": "逐纸检测框；生成全文与实际 OCR 可读状态分开", "orthogonality": "同一楼面换名称，同一名称换不同楼面、视角；名称按配对清单轮换", "entry": "compose_rooftop_papers.py；旧 compose_real_scene_candidates.py 仅支持 0014/0026 两张并产生部分候选", "gap": "72 张基底、四角与标签尚未备齐；本计划不是入口可直接执行的生产声明"
+      },
+      {
+        "id": "R_MULTI_NAME", "quota": 200, "method": "real_background_composite", "state": "conditional", "parent_groups": "train_parent_groups 的多纸份额依次 33,33,33,33,34,34",
+        "roles": {"background": "六个实拍父组各拟 12 张具有多楼及可放区域的基底", "foreground": "两纸文字以 make_name 索引对应有序对 (0,1)、(2,3)、(4,5)", "occluder": "无额外注入"},
+        "region": "同一图至少两个独立楼顶四角；楼号逐纸记录，已有目标保留", "labels": "两纸分别检测与记录全文状态，不将名称当楼号", "entry": "compose_rooftop_papers.py 支持多 slot；输入清单和可行双楼区域缺失", "gap": "多楼同屏的真实背景和两个合适贴面尚未确认；200 张不可从单楼帧伪造"
+      },
+      {
+        "id": "B_SINGLE_NAME", "quota": 600, "method": "blender_background", "state": "conditional", "parent_groups": [{"group": "three_buildings.blend", "quota": 600}],
+        "roles": {"background": "三楼母场景，每栋拟 12 个背景视角", "foreground": "每栋楼面使用 make_name(0..16) 的 17 个不同名称", "occluder": "无额外注入"},
+        "region": "各楼楼顶纸面对应实例掩膜或四角", "labels": "检测框、楼号、生成文字及 OCR 未知状态", "entry": "compose_arena_name_v4.py 需合格 fire 渲染父批次，现无合格父批次", "gap": "36 个视角及实例掩膜尚未产出；场景、相机和标签可行性待按实际落实"
+      },
+      {
+        "id": "B_MULTI_NAME", "quota": 150, "method": "blender_background", "state": "conditional", "parent_groups": [{"group": "three_buildings.blend", "quota": 150}],
+        "roles": {"background": "母场景拟 4 个多楼视角", "foreground": "每视角使用 make_name 索引 0..13 的不同有序对，按索引字典序取前 38 对", "occluder": "无额外注入"},
+        "region": "同屏多个楼顶纸面实例及可见边界", "labels": "每纸独立框和所属楼，文字可读状态独立", "entry": "compose_arena_name_v4.py 当前跳过多纸；无可执行父批次", "gap": "多纸接口及 4 个可行多楼视角尚未落实"
+      },
+      {
+        "id": "B_NO_PAPER", "quota": 150, "method": "blender_background", "state": "conditional", "parent_groups": [{"group": "three_buildings.blend", "quota": 150}],
+        "roles": {"background": "母场景拟 40 个单楼或多楼视角", "foreground": "四种方案：不额外添加干扰、窗格、其他白纸、火焰纸；每种均无楼名纸条", "occluder": "按可见关系记录"},
+        "region": "完整画面，确认没有名称纸条", "labels": "全图无名称纸条时空标签", "entry": "现有 compose_arena_name_v4.py 不覆盖无纸条", "gap": "四种方案与场景的兼容及负例入口未确定；不可凭白色物体推断负例"
+      }
+    ],
+    "capacity_calculation": {
+      "real_single": {"target": 1000, "backgrounds_target": 72, "name_options_per_background": 14, "upper_bound": 1008, "formula": "6 groups * 12 bases * 14 names * 1 distinct layout = 1008; ceil(1000/14)=72", "status": "conditional_upper_bound_only"},
+      "real_multi": {"target": 200, "backgrounds_target": 72, "ordered_name_pairs_per_background": 3, "upper_bound": 216, "formula": "6 * 12 * 3 = 216; ceil(200/3)=67; same 72 bases are shared only where two valid slots exist", "status": "conditional_upper_bound_only"},
+      "blender_single": {"target": 600, "backgrounds_target": 36, "names_per_background": 17, "upper_bound": 612, "formula": "3 buildings * 12 views * 17 names = 612; each building target 200 and 12*17=204", "status": "conditional_upper_bound_only"},
+      "blender_multi": {"target": 150, "backgrounds_target": 4, "ordered_name_pairs_per_background": 38, "upper_bound": 152, "formula": "4 views * 38 distinct ordered name pairs = 152; 14 candidate names admit P(14,2)=182 pairs before geometry restrictions", "status": "conditional_upper_bound_only"},
+      "blender_negative": {"target": 150, "backgrounds_target": 40, "mutually_exclusive_scenes_per_background": 4, "upper_bound": 160, "formula": "40 views * 4 distinct negative scene choices = 160; ceil(150/4)=38; actual allowed combinations must be checked", "status": "conditional_upper_bound_only"},
+      "notes": "C(n,n)=1；不能把使用同一套素材的枚举顺序、微小调色或随机种子当额外基底。以上乘积均为计划上界，实用容量须对每个楼顶区域、槽位和标签的允许搭配求和；当前没有确认可训练的容量。"
+    },
+    "source_and_split_gaps": ["六个实拍背景父组的可用图和有效楼顶区域尚未达到目标，不以 Blender 或同视频帧冒充新的实拍父组。", "预留组排除工作副本及派生，已知复用和采集场次关系仍需按证据记录；package_real_candidates.py 当前 collect() 会选入预留 A_video_002 的派生图，package_car_candidates.py 的 car 来源包含预留 car_real_capture_20261112 同源帧，须先获得符合本计划的过滤方案，不可直接执行对应整体打包。", "旧 0014、0026 及全场候选帧曾用于评价或回归，现计划为 train 使用，需记录历史用途及同源复用，不作为独立评估。", "合成图上的新文字记录为 requested text；只有逐字可辨并确认后才能成为全文真值。", "可辨纸条全部标注；未确认全图无纸条的图不得输出完整空负例。", "新顶层字段只保存设计与来源信息，旧 40 张入口不读取 3000 张规划，实际可执行声明需符合入口字段并在来源就绪后构造。"]
+  }
+}

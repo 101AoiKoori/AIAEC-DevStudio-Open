@@ -22,14 +22,14 @@ class PrepareSourcesTest(unittest.TestCase):
                                 '-i', 'color=c=red:s=64x64:d=2:r=5', '-pix_fmt', 'yuv420p',
                                 str(video)], check=True)
             out = root / 'review'
-            records = module.prepare(videos, out, 1)
+            records = module._prepare(videos, out, 1)
             self.assertEqual([len(item['frames']) for item in records], [2, 2])
             self.assertTrue(all(item['split'] is None for item in records))
             self.assertTrue(all(item['status'] == 'pending_manual_review' for item in records))
             self.assertTrue(all((out / frame).is_file() for item in records for frame in item['frames']))
             self.assertTrue((out / 'review.html').is_file())
             with self.assertRaises(ValueError):
-                module.prepare(videos, out, 1)
+                module._prepare(videos, out, 1)
 
     def test_failed_video_is_not_treated_as_empty_success(self):
         with tempfile.TemporaryDirectory(dir=ROOT / 'tmp') as directory:
@@ -38,7 +38,7 @@ class PrepareSourcesTest(unittest.TestCase):
             video.write_bytes(b'not a video')
             out = root / 'review'
             with self.assertRaises(RuntimeError):
-                module.prepare([video], out, 1)
+                module._prepare([video], out, 1)
             manifest = json.loads((out / 'manifest.json').read_text(encoding='utf-8'))
             self.assertEqual(manifest['sources'][0]['status'], 'failed')
             self.assertNotEqual(manifest['sources'][0]['status'], 'pending_manual_review')

@@ -1,0 +1,817 @@
+{
+  "schema_version": 1,
+  "task": "person",
+  "calibration_batch": "v4_background_calibration_20261115",
+  "status": "accepted",
+  "accepted_by": [
+    "user_20261115"
+  ],
+  "counts": {
+    "clean": 8,
+    "clutter": 8,
+    "geometry_failed": 8
+  },
+  "thresholds": {
+    "max_object_ratio": 0.122,
+    "max_object_component_ratio": 0.08,
+    "max_vertical_ratio": 0.008,
+    "min_largest_free_rect_ratio": 0.484,
+    "min_valid_footpoint_ratio": 0.677,
+    "max_body_obstacle_ratio": 0.05,
+    "clutter_exclude_ratio": 0.179,
+    "confidence_min": 0.614,
+    "borderline_margin": 0.1
+  },
+  "separation": {
+    "clean_object_ratio_max": 0.0655,
+    "clutter_object_ratio_min": 0.179,
+    "other_metric_separation": {
+      "max_object_ratio": true,
+      "max_object_component_ratio": false,
+      "max_vertical_ratio": false,
+      "min_largest_free_rect_ratio": true,
+      "min_valid_footpoint_ratio": true,
+      "max_body_obstacle_ratio": false
+    }
+  },
+  "predictions": [
+    {
+      "id": "B01",
+      "human_label": "clean",
+      "predicted_label": "clean",
+      "match": true,
+      "evidence": {
+        "judge": "placement_usable",
+        "metrics": {
+          "object_ratio": 0.0,
+          "object_max_component_ratio": 0.0,
+          "vertical_structure_ratio": 0.0004,
+          "largest_free_rect_ratio": 1.0,
+          "valid_footpoint_ratio": 1.0,
+          "best_body_obstacle_ratio": 0.0,
+          "confidence": 0.9999
+        },
+        "thresholds": {
+          "max_object_ratio": 0.122,
+          "max_object_component_ratio": 0.08,
+          "max_vertical_ratio": 0.008,
+          "min_largest_free_rect_ratio": 0.484,
+          "min_valid_footpoint_ratio": 0.677,
+          "max_body_obstacle_ratio": 0.05,
+          "clutter_exclude_ratio": 0.179,
+          "confidence_min": 0.614,
+          "borderline_margin": 0.1
+        },
+        "missing": [],
+        "confidence": 0.9999
+      }
+    },
+    {
+      "id": "B02",
+      "human_label": "clean",
+      "predicted_label": "clean",
+      "match": true,
+      "evidence": {
+        "judge": "placement_usable",
+        "metrics": {
+          "object_ratio": 0.0369,
+          "object_max_component_ratio": 0.0,
+          "vertical_structure_ratio": 0.0017,
+          "largest_free_rect_ratio": 0.8921,
+          "valid_footpoint_ratio": 0.9407,
+          "best_body_obstacle_ratio": 0.0,
+          "confidence": 0.9141
+        },
+        "thresholds": {
+          "max_object_ratio": 0.122,
+          "max_object_component_ratio": 0.08,
+          "max_vertical_ratio": 0.008,
+          "min_largest_free_rect_ratio": 0.484,
+          "min_valid_footpoint_ratio": 0.677,
+          "max_body_obstacle_ratio": 0.05,
+          "clutter_exclude_ratio": 0.179,
+          "confidence_min": 0.614,
+          "borderline_margin": 0.1
+        },
+        "missing": [],
+        "confidence": 0.9141
+      }
+    },
+    {
+      "id": "B03",
+      "human_label": "clean",
+      "predicted_label": "clean",
+      "match": true,
+      "evidence": {
+        "judge": "placement_usable",
+        "metrics": {
+          "object_ratio": 0.049,
+          "object_max_component_ratio": 0.0,
+          "vertical_structure_ratio": 0.0,
+          "largest_free_rect_ratio": 0.8613,
+          "valid_footpoint_ratio": 0.9481,
+          "best_body_obstacle_ratio": 0.0,
+          "confidence": 0.9118
+        },
+        "thresholds": {
+          "max_object_ratio": 0.122,
+          "max_object_component_ratio": 0.08,
+          "max_vertical_ratio": 0.008,
+          "min_largest_free_rect_ratio": 0.484,
+          "min_valid_footpoint_ratio": 0.677,
+          "max_body_obstacle_ratio": 0.05,
+          "clutter_exclude_ratio": 0.179,
+          "confidence_min": 0.614,
+          "borderline_margin": 0.1
+        },
+        "missing": [],
+        "confidence": 0.9118
+      }
+    },
+    {
+      "id": "B04",
+      "human_label": "clean",
+      "predicted_label": "clean",
+      "match": true,
+      "evidence": {
+        "judge": "placement_usable",
+        "metrics": {
+          "object_ratio": 0.0,
+          "object_max_component_ratio": 0.0,
+          "vertical_structure_ratio": 0.0001,
+          "largest_free_rect_ratio": 1.0,
+          "valid_footpoint_ratio": 1.0,
+          "best_body_obstacle_ratio": 0.0,
+          "confidence": 0.994
+        },
+        "thresholds": {
+          "max_object_ratio": 0.122,
+          "max_object_component_ratio": 0.08,
+          "max_vertical_ratio": 0.008,
+          "min_largest_free_rect_ratio": 0.484,
+          "min_valid_footpoint_ratio": 0.677,
+          "max_body_obstacle_ratio": 0.05,
+          "clutter_exclude_ratio": 0.179,
+          "confidence_min": 0.614,
+          "borderline_margin": 0.1
+        },
+        "missing": [],
+        "confidence": 0.994
+      }
+    },
+    {
+      "id": "B05",
+      "human_label": "clean",
+      "predicted_label": "clean",
+      "match": true,
+      "evidence": {
+        "judge": "placement_usable",
+        "metrics": {
+          "object_ratio": 0.0401,
+          "object_max_component_ratio": 0.0,
+          "vertical_structure_ratio": 0.0,
+          "largest_free_rect_ratio": 0.875,
+          "valid_footpoint_ratio": 0.9185,
+          "best_body_obstacle_ratio": 0.0,
+          "confidence": 0.9621
+        },
+        "thresholds": {
+          "max_object_ratio": 0.122,
+          "max_object_component_ratio": 0.08,
+          "max_vertical_ratio": 0.008,
+          "min_largest_free_rect_ratio": 0.484,
+          "min_valid_footpoint_ratio": 0.677,
+          "max_body_obstacle_ratio": 0.05,
+          "clutter_exclude_ratio": 0.179,
+          "confidence_min": 0.614,
+          "borderline_margin": 0.1
+        },
+        "missing": [],
+        "confidence": 0.9621
+      }
+    },
+    {
+      "id": "B06",
+      "human_label": "clean",
+      "predicted_label": "clean",
+      "match": true,
+      "evidence": {
+        "judge": "placement_usable",
+        "metrics": {
+          "object_ratio": 0.0,
+          "object_max_component_ratio": 0.0,
+          "vertical_structure_ratio": 0.0001,
+          "largest_free_rect_ratio": 1.0,
+          "valid_footpoint_ratio": 1.0,
+          "best_body_obstacle_ratio": 0.0,
+          "confidence": 1.0
+        },
+        "thresholds": {
+          "max_object_ratio": 0.122,
+          "max_object_component_ratio": 0.08,
+          "max_vertical_ratio": 0.008,
+          "min_largest_free_rect_ratio": 0.484,
+          "min_valid_footpoint_ratio": 0.677,
+          "max_body_obstacle_ratio": 0.05,
+          "clutter_exclude_ratio": 0.179,
+          "confidence_min": 0.614,
+          "borderline_margin": 0.1
+        },
+        "missing": [],
+        "confidence": 1.0
+      }
+    },
+    {
+      "id": "B07",
+      "human_label": "clean",
+      "predicted_label": "clean",
+      "match": true,
+      "evidence": {
+        "judge": "placement_usable",
+        "metrics": {
+          "object_ratio": 0.0655,
+          "object_max_component_ratio": 0.0,
+          "vertical_structure_ratio": 0.0007,
+          "largest_free_rect_ratio": 0.75,
+          "valid_footpoint_ratio": 0.8741,
+          "best_body_obstacle_ratio": 0.0,
+          "confidence": 0.9577
+        },
+        "thresholds": {
+          "max_object_ratio": 0.122,
+          "max_object_component_ratio": 0.08,
+          "max_vertical_ratio": 0.008,
+          "min_largest_free_rect_ratio": 0.484,
+          "min_valid_footpoint_ratio": 0.677,
+          "max_body_obstacle_ratio": 0.05,
+          "clutter_exclude_ratio": 0.179,
+          "confidence_min": 0.614,
+          "borderline_margin": 0.1
+        },
+        "missing": [],
+        "confidence": 0.9577
+      }
+    },
+    {
+      "id": "B08",
+      "human_label": "clean",
+      "predicted_label": "clean",
+      "match": true,
+      "evidence": {
+        "judge": "placement_usable",
+        "metrics": {
+          "object_ratio": 0.0405,
+          "object_max_component_ratio": 0.0401,
+          "vertical_structure_ratio": 0.0009,
+          "largest_free_rect_ratio": 0.5603,
+          "valid_footpoint_ratio": 0.8519,
+          "best_body_obstacle_ratio": 0.0,
+          "confidence": 0.6142
+        },
+        "thresholds": {
+          "max_object_ratio": 0.122,
+          "max_object_component_ratio": 0.08,
+          "max_vertical_ratio": 0.008,
+          "min_largest_free_rect_ratio": 0.484,
+          "min_valid_footpoint_ratio": 0.677,
+          "max_body_obstacle_ratio": 0.05,
+          "clutter_exclude_ratio": 0.179,
+          "confidence_min": 0.614,
+          "borderline_margin": 0.1
+        },
+        "missing": [],
+        "confidence": 0.6142
+      }
+    },
+    {
+      "id": "B09",
+      "human_label": "clutter",
+      "predicted_label": "clutter",
+      "match": true,
+      "evidence": {
+        "judge": "placement_patch_cluttered",
+        "metrics": {
+          "object_ratio": 0.179,
+          "object_max_component_ratio": 0.1672,
+          "vertical_structure_ratio": 0.0125,
+          "largest_free_rect_ratio": 0.2,
+          "valid_footpoint_ratio": 0.4,
+          "best_body_obstacle_ratio": 0.0,
+          "confidence": 0.79
+        },
+        "thresholds": {
+          "max_object_ratio": 0.122,
+          "max_object_component_ratio": 0.08,
+          "max_vertical_ratio": 0.008,
+          "min_largest_free_rect_ratio": 0.484,
+          "min_valid_footpoint_ratio": 0.677,
+          "max_body_obstacle_ratio": 0.05,
+          "clutter_exclude_ratio": 0.179,
+          "confidence_min": 0.614,
+          "borderline_margin": 0.1
+        },
+        "missing": [],
+        "confidence": 0.79,
+        "failures": [
+          {
+            "check": "object_ratio_exceeded",
+            "value": 0.179,
+            "limit": 0.122
+          },
+          {
+            "check": "object_component_exceeded",
+            "value": 0.1672,
+            "limit": 0.08
+          },
+          {
+            "check": "vertical_structure_exceeded",
+            "value": 0.0125,
+            "limit": 0.008
+          },
+          {
+            "check": "largest_free_rect_too_small",
+            "value": 0.2,
+            "limit": 0.484
+          },
+          {
+            "check": "valid_footpoint_ratio_too_small",
+            "value": 0.4,
+            "limit": 0.677
+          }
+        ]
+      }
+    },
+    {
+      "id": "B10",
+      "human_label": "clutter",
+      "predicted_label": "clutter",
+      "match": true,
+      "evidence": {
+        "judge": "placement_patch_cluttered",
+        "metrics": {
+          "object_ratio": 0.2726,
+          "object_max_component_ratio": 0.2292,
+          "vertical_structure_ratio": 0.0502,
+          "largest_free_rect_ratio": 0.4087,
+          "valid_footpoint_ratio": 0.4593,
+          "best_body_obstacle_ratio": 0.0,
+          "confidence": 0.6968
+        },
+        "thresholds": {
+          "max_object_ratio": 0.122,
+          "max_object_component_ratio": 0.08,
+          "max_vertical_ratio": 0.008,
+          "min_largest_free_rect_ratio": 0.484,
+          "min_valid_footpoint_ratio": 0.677,
+          "max_body_obstacle_ratio": 0.05,
+          "clutter_exclude_ratio": 0.179,
+          "confidence_min": 0.614,
+          "borderline_margin": 0.1
+        },
+        "missing": [],
+        "confidence": 0.6968,
+        "failures": [
+          {
+            "check": "object_ratio_exceeded",
+            "value": 0.2726,
+            "limit": 0.122
+          },
+          {
+            "check": "object_component_exceeded",
+            "value": 0.2292,
+            "limit": 0.08
+          },
+          {
+            "check": "vertical_structure_exceeded",
+            "value": 0.0502,
+            "limit": 0.008
+          },
+          {
+            "check": "largest_free_rect_too_small",
+            "value": 0.4087,
+            "limit": 0.484
+          },
+          {
+            "check": "valid_footpoint_ratio_too_small",
+            "value": 0.4593,
+            "limit": 0.677
+          }
+        ]
+      }
+    },
+    {
+      "id": "B11",
+      "human_label": "clutter",
+      "predicted_label": "clutter",
+      "match": true,
+      "evidence": {
+        "judge": "placement_patch_cluttered",
+        "metrics": {
+          "object_ratio": 0.341,
+          "object_max_component_ratio": 0.2493,
+          "vertical_structure_ratio": 0.0097,
+          "largest_free_rect_ratio": 0.25,
+          "valid_footpoint_ratio": 0.4889,
+          "best_body_obstacle_ratio": 0.0,
+          "confidence": 0.877
+        },
+        "thresholds": {
+          "max_object_ratio": 0.122,
+          "max_object_component_ratio": 0.08,
+          "max_vertical_ratio": 0.008,
+          "min_largest_free_rect_ratio": 0.484,
+          "min_valid_footpoint_ratio": 0.677,
+          "max_body_obstacle_ratio": 0.05,
+          "clutter_exclude_ratio": 0.179,
+          "confidence_min": 0.614,
+          "borderline_margin": 0.1
+        },
+        "missing": [],
+        "confidence": 0.877,
+        "failures": [
+          {
+            "check": "object_ratio_exceeded",
+            "value": 0.341,
+            "limit": 0.122
+          },
+          {
+            "check": "object_component_exceeded",
+            "value": 0.2493,
+            "limit": 0.08
+          },
+          {
+            "check": "vertical_structure_exceeded",
+            "value": 0.0097,
+            "limit": 0.008
+          },
+          {
+            "check": "largest_free_rect_too_small",
+            "value": 0.25,
+            "limit": 0.484
+          },
+          {
+            "check": "valid_footpoint_ratio_too_small",
+            "value": 0.4889,
+            "limit": 0.677
+          }
+        ]
+      }
+    },
+    {
+      "id": "B12",
+      "human_label": "clutter",
+      "predicted_label": "clutter",
+      "match": true,
+      "evidence": {
+        "judge": "placement_patch_cluttered",
+        "metrics": {
+          "object_ratio": 0.248,
+          "object_max_component_ratio": 0.2052,
+          "vertical_structure_ratio": 0.0265,
+          "largest_free_rect_ratio": 0.1172,
+          "valid_footpoint_ratio": 0.3037,
+          "best_body_obstacle_ratio": 0.0,
+          "confidence": 0.8083
+        },
+        "thresholds": {
+          "max_object_ratio": 0.122,
+          "max_object_component_ratio": 0.08,
+          "max_vertical_ratio": 0.008,
+          "min_largest_free_rect_ratio": 0.484,
+          "min_valid_footpoint_ratio": 0.677,
+          "max_body_obstacle_ratio": 0.05,
+          "clutter_exclude_ratio": 0.179,
+          "confidence_min": 0.614,
+          "borderline_margin": 0.1
+        },
+        "missing": [],
+        "confidence": 0.8083,
+        "failures": [
+          {
+            "check": "object_ratio_exceeded",
+            "value": 0.248,
+            "limit": 0.122
+          },
+          {
+            "check": "object_component_exceeded",
+            "value": 0.2052,
+            "limit": 0.08
+          },
+          {
+            "check": "vertical_structure_exceeded",
+            "value": 0.0265,
+            "limit": 0.008
+          },
+          {
+            "check": "largest_free_rect_too_small",
+            "value": 0.1172,
+            "limit": 0.484
+          },
+          {
+            "check": "valid_footpoint_ratio_too_small",
+            "value": 0.3037,
+            "limit": 0.677
+          }
+        ]
+      }
+    },
+    {
+      "id": "B13",
+      "human_label": "clutter",
+      "predicted_label": "clutter",
+      "match": true,
+      "evidence": {
+        "judge": "placement_patch_cluttered",
+        "metrics": {
+          "object_ratio": 0.2474,
+          "object_max_component_ratio": 0.0297,
+          "vertical_structure_ratio": 0.0,
+          "largest_free_rect_ratio": 0.2754,
+          "valid_footpoint_ratio": 0.5037,
+          "best_body_obstacle_ratio": 0.0,
+          "confidence": 0.8233
+        },
+        "thresholds": {
+          "max_object_ratio": 0.122,
+          "max_object_component_ratio": 0.08,
+          "max_vertical_ratio": 0.008,
+          "min_largest_free_rect_ratio": 0.484,
+          "min_valid_footpoint_ratio": 0.677,
+          "max_body_obstacle_ratio": 0.05,
+          "clutter_exclude_ratio": 0.179,
+          "confidence_min": 0.614,
+          "borderline_margin": 0.1
+        },
+        "missing": [],
+        "confidence": 0.8233,
+        "failures": [
+          {
+            "check": "object_ratio_exceeded",
+            "value": 0.2474,
+            "limit": 0.122
+          },
+          {
+            "check": "largest_free_rect_too_small",
+            "value": 0.2754,
+            "limit": 0.484
+          },
+          {
+            "check": "valid_footpoint_ratio_too_small",
+            "value": 0.5037,
+            "limit": 0.677
+          }
+        ]
+      }
+    },
+    {
+      "id": "B14",
+      "human_label": "clutter",
+      "predicted_label": "clutter",
+      "match": true,
+      "evidence": {
+        "judge": "placement_patch_cluttered",
+        "metrics": {
+          "object_ratio": 0.5972,
+          "object_max_component_ratio": 0.552,
+          "vertical_structure_ratio": 0.0565,
+          "largest_free_rect_ratio": 0.022,
+          "valid_footpoint_ratio": 0.0074,
+          "best_body_obstacle_ratio": 0.0329,
+          "confidence": 0.7156
+        },
+        "thresholds": {
+          "max_object_ratio": 0.122,
+          "max_object_component_ratio": 0.08,
+          "max_vertical_ratio": 0.008,
+          "min_largest_free_rect_ratio": 0.484,
+          "min_valid_footpoint_ratio": 0.677,
+          "max_body_obstacle_ratio": 0.05,
+          "clutter_exclude_ratio": 0.179,
+          "confidence_min": 0.614,
+          "borderline_margin": 0.1
+        },
+        "missing": [],
+        "confidence": 0.7156,
+        "failures": [
+          {
+            "check": "object_ratio_exceeded",
+            "value": 0.5972,
+            "limit": 0.122
+          },
+          {
+            "check": "object_component_exceeded",
+            "value": 0.552,
+            "limit": 0.08
+          },
+          {
+            "check": "vertical_structure_exceeded",
+            "value": 0.0565,
+            "limit": 0.008
+          },
+          {
+            "check": "largest_free_rect_too_small",
+            "value": 0.022,
+            "limit": 0.484
+          },
+          {
+            "check": "valid_footpoint_ratio_too_small",
+            "value": 0.0074,
+            "limit": 0.677
+          }
+        ]
+      }
+    },
+    {
+      "id": "B15",
+      "human_label": "clutter",
+      "predicted_label": "clutter",
+      "match": true,
+      "evidence": {
+        "judge": "placement_patch_cluttered",
+        "metrics": {
+          "object_ratio": 0.2112,
+          "object_max_component_ratio": 0.1132,
+          "vertical_structure_ratio": 0.0172,
+          "largest_free_rect_ratio": 0.2021,
+          "valid_footpoint_ratio": 0.2222,
+          "best_body_obstacle_ratio": 0.0,
+          "confidence": 0.8564
+        },
+        "thresholds": {
+          "max_object_ratio": 0.122,
+          "max_object_component_ratio": 0.08,
+          "max_vertical_ratio": 0.008,
+          "min_largest_free_rect_ratio": 0.484,
+          "min_valid_footpoint_ratio": 0.677,
+          "max_body_obstacle_ratio": 0.05,
+          "clutter_exclude_ratio": 0.179,
+          "confidence_min": 0.614,
+          "borderline_margin": 0.1
+        },
+        "missing": [],
+        "confidence": 0.8564,
+        "failures": [
+          {
+            "check": "object_ratio_exceeded",
+            "value": 0.2112,
+            "limit": 0.122
+          },
+          {
+            "check": "object_component_exceeded",
+            "value": 0.1132,
+            "limit": 0.08
+          },
+          {
+            "check": "vertical_structure_exceeded",
+            "value": 0.0172,
+            "limit": 0.008
+          },
+          {
+            "check": "largest_free_rect_too_small",
+            "value": 0.2021,
+            "limit": 0.484
+          },
+          {
+            "check": "valid_footpoint_ratio_too_small",
+            "value": 0.2222,
+            "limit": 0.677
+          }
+        ]
+      }
+    },
+    {
+      "id": "B16",
+      "human_label": "clutter",
+      "predicted_label": "clutter",
+      "match": true,
+      "evidence": {
+        "judge": "placement_patch_cluttered",
+        "metrics": {
+          "object_ratio": 0.6094,
+          "object_max_component_ratio": 0.6094,
+          "vertical_structure_ratio": 0.0588,
+          "largest_free_rect_ratio": 0.0513,
+          "valid_footpoint_ratio": 0.0296,
+          "best_body_obstacle_ratio": 0.0101,
+          "confidence": 0.7011
+        },
+        "thresholds": {
+          "max_object_ratio": 0.122,
+          "max_object_component_ratio": 0.08,
+          "max_vertical_ratio": 0.008,
+          "min_largest_free_rect_ratio": 0.484,
+          "min_valid_footpoint_ratio": 0.677,
+          "max_body_obstacle_ratio": 0.05,
+          "clutter_exclude_ratio": 0.179,
+          "confidence_min": 0.614,
+          "borderline_margin": 0.1
+        },
+        "missing": [],
+        "confidence": 0.7011,
+        "failures": [
+          {
+            "check": "object_ratio_exceeded",
+            "value": 0.6094,
+            "limit": 0.122
+          },
+          {
+            "check": "object_component_exceeded",
+            "value": 0.6094,
+            "limit": 0.08
+          },
+          {
+            "check": "vertical_structure_exceeded",
+            "value": 0.0588,
+            "limit": 0.008
+          },
+          {
+            "check": "largest_free_rect_too_small",
+            "value": 0.0513,
+            "limit": 0.484
+          },
+          {
+            "check": "valid_footpoint_ratio_too_small",
+            "value": 0.0296,
+            "limit": 0.677
+          }
+        ]
+      }
+    },
+    {
+      "id": "B17",
+      "human_label": "geometry_failed",
+      "predicted_label": "geometry_failed",
+      "match": true,
+      "evidence": {
+        "patch_detail": "missing"
+      }
+    },
+    {
+      "id": "B18",
+      "human_label": "geometry_failed",
+      "predicted_label": "geometry_failed",
+      "match": true,
+      "evidence": {
+        "patch_detail": "missing"
+      }
+    },
+    {
+      "id": "B19",
+      "human_label": "geometry_failed",
+      "predicted_label": "geometry_failed",
+      "match": true,
+      "evidence": {
+        "patch_detail": "missing"
+      }
+    },
+    {
+      "id": "B20",
+      "human_label": "geometry_failed",
+      "predicted_label": "geometry_failed",
+      "match": true,
+      "evidence": {
+        "patch_detail": "missing"
+      }
+    },
+    {
+      "id": "B21",
+      "human_label": "geometry_failed",
+      "predicted_label": "geometry_failed",
+      "match": true,
+      "evidence": {
+        "patch_detail": "missing"
+      }
+    },
+    {
+      "id": "B22",
+      "human_label": "geometry_failed",
+      "predicted_label": "geometry_failed",
+      "match": true,
+      "evidence": {
+        "patch_detail": "missing"
+      }
+    },
+    {
+      "id": "B23",
+      "human_label": "geometry_failed",
+      "predicted_label": "geometry_failed",
+      "match": true,
+      "evidence": {
+        "patch_detail": "missing"
+      }
+    },
+    {
+      "id": "B24",
+      "human_label": "geometry_failed",
+      "predicted_label": "geometry_failed",
+      "match": true,
+      "evidence": {
+        "patch_detail": "missing"
+      }
+    }
+  ],
+  "mismatches": [],
+  "boundary": "Thresholds are fitted to 24 human-labelled background frames. They are not model accuracy evidence and are not valid for other tasks without separate calibration.",
+  "config": "datasets/scripts/person/config/background_review_calibration_20261115.json",
+  "config_sha256": "ca2a4dce2770cdfe5f4b98cbef8cd9bcda24aacd546d47d8d0d230816ef2f573"
+}

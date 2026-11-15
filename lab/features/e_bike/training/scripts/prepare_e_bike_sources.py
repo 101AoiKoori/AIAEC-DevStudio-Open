@@ -3,9 +3,12 @@ import argparse
 import html
 import json
 import subprocess
+import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[5]
+sys.path.insert(0, str(ROOT))
+from lab.training_common.production_guard import generation_guard
 VIDEO_SUFFIXES = {'.mp4', '.mov', '.m4v', '.avi', '.mkv'}
 
 
@@ -49,6 +52,15 @@ def write_gallery(output, records):
 
 
 def prepare(videos, output, fps):
+    with generation_guard('e_bike.prepare_sources:' + str(output.resolve()), videos, [output],
+                          {'fps': fps, 'videos': [str(x) for x in videos]},
+                          code_paths=[Path(__file__)]) as run:
+        if run.reused:
+            return json.loads((output / 'manifest.json').read_text(encoding='utf-8'))['sources']
+        return _prepare(videos, output, fps)
+
+
+def _prepare(videos, output, fps):
     if output.exists():
         raise ValueError('输出目录已存在，请选择新目录')
     if not 0 < fps <= 2:

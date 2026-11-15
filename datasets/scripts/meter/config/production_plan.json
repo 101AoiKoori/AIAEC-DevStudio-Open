@@ -1,0 +1,1288 @@
+{
+  "schema_version": 1,
+  "model_key": "meter",
+  "target_split": "train",
+  "budget": 36,
+  "uncertainty_weight": 0,
+  "purpose": "Three recorded real-background candidates crossed with twelve declared future meter foregrounds; labels retain recorded candidate/visibility semantics.",
+  "independence_basis": "Three temporal frames share full_scene.mp4; rendered foregrounds share one arena and one model.",
+  "constraints": {
+    "resolution": [
+      640,
+      480
+    ],
+    "geometry": "identity",
+    "label_policy": "candidate_pose"
+  },
+  "strata": [
+    {
+      "id": "background_0_foreground_00",
+      "failure_event": "meter_pose_or_background_ambiguity",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [],
+      "background": {
+        "kind": "real_captured_scene"
+      },
+      "target": {
+        "kind": "rendered_station"
+      },
+      "labels": {
+        "kind": "candidate_pose"
+      },
+      "augmentation": {
+        "kind": "alpha_composite_identity"
+      },
+      "sources": [
+        "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_003601.png",
+        "datasets/raw/site_capture_20261112/videos/full_scene.mp4",
+        "datasets/samples/meter/images/arena_meter_00000.png",
+        "datasets/samples/meter/foreground/arena_meter_00000.png"
+      ],
+      "parameters": {
+        "background_image": "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_003601.png",
+        "foreground_id": "arena_meter_00000"
+      }
+    },
+    {
+      "id": "background_0_foreground_01",
+      "failure_event": "meter_pose_or_background_ambiguity",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [],
+      "background": {
+        "kind": "real_captured_scene"
+      },
+      "target": {
+        "kind": "rendered_station"
+      },
+      "labels": {
+        "kind": "candidate_pose"
+      },
+      "augmentation": {
+        "kind": "alpha_composite_identity"
+      },
+      "sources": [
+        "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_003601.png",
+        "datasets/raw/site_capture_20261112/videos/full_scene.mp4",
+        "datasets/samples/meter/images/arena_meter_00001.png",
+        "datasets/samples/meter/foreground/arena_meter_00001.png"
+      ],
+      "parameters": {
+        "background_image": "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_003601.png",
+        "foreground_id": "arena_meter_00001"
+      }
+    },
+    {
+      "id": "background_0_foreground_02",
+      "failure_event": "meter_pose_or_background_ambiguity",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [],
+      "background": {
+        "kind": "real_captured_scene"
+      },
+      "target": {
+        "kind": "rendered_station"
+      },
+      "labels": {
+        "kind": "candidate_pose"
+      },
+      "augmentation": {
+        "kind": "alpha_composite_identity"
+      },
+      "sources": [
+        "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_003601.png",
+        "datasets/raw/site_capture_20261112/videos/full_scene.mp4",
+        "datasets/samples/meter/images/arena_meter_00002.png",
+        "datasets/samples/meter/foreground/arena_meter_00002.png"
+      ],
+      "parameters": {
+        "background_image": "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_003601.png",
+        "foreground_id": "arena_meter_00002"
+      }
+    },
+    {
+      "id": "background_0_foreground_03",
+      "failure_event": "meter_pose_or_background_ambiguity",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [],
+      "background": {
+        "kind": "real_captured_scene"
+      },
+      "target": {
+        "kind": "rendered_station"
+      },
+      "labels": {
+        "kind": "candidate_pose"
+      },
+      "augmentation": {
+        "kind": "alpha_composite_identity"
+      },
+      "sources": [
+        "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_003601.png",
+        "datasets/raw/site_capture_20261112/videos/full_scene.mp4",
+        "datasets/samples/meter/images/arena_meter_00003.png",
+        "datasets/samples/meter/foreground/arena_meter_00003.png"
+      ],
+      "parameters": {
+        "background_image": "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_003601.png",
+        "foreground_id": "arena_meter_00003"
+      }
+    },
+    {
+      "id": "background_0_foreground_04",
+      "failure_event": "meter_pose_or_background_ambiguity",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [],
+      "background": {
+        "kind": "real_captured_scene"
+      },
+      "target": {
+        "kind": "rendered_station"
+      },
+      "labels": {
+        "kind": "candidate_pose"
+      },
+      "augmentation": {
+        "kind": "alpha_composite_identity"
+      },
+      "sources": [
+        "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_003601.png",
+        "datasets/raw/site_capture_20261112/videos/full_scene.mp4",
+        "datasets/samples/meter/images/arena_meter_00004.png",
+        "datasets/samples/meter/foreground/arena_meter_00004.png"
+      ],
+      "parameters": {
+        "background_image": "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_003601.png",
+        "foreground_id": "arena_meter_00004"
+      }
+    },
+    {
+      "id": "background_0_foreground_05",
+      "failure_event": "meter_pose_or_background_ambiguity",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [],
+      "background": {
+        "kind": "real_captured_scene"
+      },
+      "target": {
+        "kind": "rendered_station"
+      },
+      "labels": {
+        "kind": "candidate_pose"
+      },
+      "augmentation": {
+        "kind": "alpha_composite_identity"
+      },
+      "sources": [
+        "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_003601.png",
+        "datasets/raw/site_capture_20261112/videos/full_scene.mp4",
+        "datasets/samples/meter/images/arena_meter_00005.png",
+        "datasets/samples/meter/foreground/arena_meter_00005.png"
+      ],
+      "parameters": {
+        "background_image": "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_003601.png",
+        "foreground_id": "arena_meter_00005"
+      }
+    },
+    {
+      "id": "background_0_foreground_06",
+      "failure_event": "meter_pose_or_background_ambiguity",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [],
+      "background": {
+        "kind": "real_captured_scene"
+      },
+      "target": {
+        "kind": "rendered_station"
+      },
+      "labels": {
+        "kind": "candidate_pose"
+      },
+      "augmentation": {
+        "kind": "alpha_composite_identity"
+      },
+      "sources": [
+        "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_003601.png",
+        "datasets/raw/site_capture_20261112/videos/full_scene.mp4",
+        "datasets/samples/meter/images/arena_meter_00006.png",
+        "datasets/samples/meter/foreground/arena_meter_00006.png"
+      ],
+      "parameters": {
+        "background_image": "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_003601.png",
+        "foreground_id": "arena_meter_00006"
+      }
+    },
+    {
+      "id": "background_0_foreground_07",
+      "failure_event": "meter_pose_or_background_ambiguity",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [],
+      "background": {
+        "kind": "real_captured_scene"
+      },
+      "target": {
+        "kind": "rendered_station"
+      },
+      "labels": {
+        "kind": "candidate_pose"
+      },
+      "augmentation": {
+        "kind": "alpha_composite_identity"
+      },
+      "sources": [
+        "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_003601.png",
+        "datasets/raw/site_capture_20261112/videos/full_scene.mp4",
+        "datasets/samples/meter/images/arena_meter_00007.png",
+        "datasets/samples/meter/foreground/arena_meter_00007.png"
+      ],
+      "parameters": {
+        "background_image": "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_003601.png",
+        "foreground_id": "arena_meter_00007"
+      }
+    },
+    {
+      "id": "background_0_foreground_08",
+      "failure_event": "meter_pose_or_background_ambiguity",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [],
+      "background": {
+        "kind": "real_captured_scene"
+      },
+      "target": {
+        "kind": "rendered_station"
+      },
+      "labels": {
+        "kind": "candidate_pose"
+      },
+      "augmentation": {
+        "kind": "alpha_composite_identity"
+      },
+      "sources": [
+        "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_003601.png",
+        "datasets/raw/site_capture_20261112/videos/full_scene.mp4",
+        "datasets/samples/meter/images/arena_meter_00008.png",
+        "datasets/samples/meter/foreground/arena_meter_00008.png"
+      ],
+      "parameters": {
+        "background_image": "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_003601.png",
+        "foreground_id": "arena_meter_00008"
+      }
+    },
+    {
+      "id": "background_0_foreground_09",
+      "failure_event": "meter_pose_or_background_ambiguity",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [],
+      "background": {
+        "kind": "real_captured_scene"
+      },
+      "target": {
+        "kind": "rendered_station"
+      },
+      "labels": {
+        "kind": "candidate_pose"
+      },
+      "augmentation": {
+        "kind": "alpha_composite_identity"
+      },
+      "sources": [
+        "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_003601.png",
+        "datasets/raw/site_capture_20261112/videos/full_scene.mp4",
+        "datasets/samples/meter/images/arena_meter_00009.png",
+        "datasets/samples/meter/foreground/arena_meter_00009.png"
+      ],
+      "parameters": {
+        "background_image": "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_003601.png",
+        "foreground_id": "arena_meter_00009"
+      }
+    },
+    {
+      "id": "background_0_foreground_10",
+      "failure_event": "meter_pose_or_background_ambiguity",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [],
+      "background": {
+        "kind": "real_captured_scene"
+      },
+      "target": {
+        "kind": "rendered_station"
+      },
+      "labels": {
+        "kind": "candidate_pose"
+      },
+      "augmentation": {
+        "kind": "alpha_composite_identity"
+      },
+      "sources": [
+        "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_003601.png",
+        "datasets/raw/site_capture_20261112/videos/full_scene.mp4",
+        "datasets/samples/meter/images/arena_meter_00010.png",
+        "datasets/samples/meter/foreground/arena_meter_00010.png"
+      ],
+      "parameters": {
+        "background_image": "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_003601.png",
+        "foreground_id": "arena_meter_00010"
+      }
+    },
+    {
+      "id": "background_0_foreground_11",
+      "failure_event": "meter_pose_or_background_ambiguity",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [],
+      "background": {
+        "kind": "real_captured_scene"
+      },
+      "target": {
+        "kind": "rendered_station"
+      },
+      "labels": {
+        "kind": "candidate_pose"
+      },
+      "augmentation": {
+        "kind": "alpha_composite_identity"
+      },
+      "sources": [
+        "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_003601.png",
+        "datasets/raw/site_capture_20261112/videos/full_scene.mp4",
+        "datasets/samples/meter/images/arena_meter_00011.png",
+        "datasets/samples/meter/foreground/arena_meter_00011.png"
+      ],
+      "parameters": {
+        "background_image": "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_003601.png",
+        "foreground_id": "arena_meter_00011"
+      }
+    },
+    {
+      "id": "background_1_foreground_00",
+      "failure_event": "meter_pose_or_background_ambiguity",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [],
+      "background": {
+        "kind": "real_captured_scene"
+      },
+      "target": {
+        "kind": "rendered_station"
+      },
+      "labels": {
+        "kind": "candidate_pose"
+      },
+      "augmentation": {
+        "kind": "alpha_composite_identity"
+      },
+      "sources": [
+        "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_009901.png",
+        "datasets/raw/site_capture_20261112/videos/full_scene.mp4",
+        "datasets/samples/meter/images/arena_meter_00000.png",
+        "datasets/samples/meter/foreground/arena_meter_00000.png"
+      ],
+      "parameters": {
+        "background_image": "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_009901.png",
+        "foreground_id": "arena_meter_00000"
+      }
+    },
+    {
+      "id": "background_1_foreground_01",
+      "failure_event": "meter_pose_or_background_ambiguity",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [],
+      "background": {
+        "kind": "real_captured_scene"
+      },
+      "target": {
+        "kind": "rendered_station"
+      },
+      "labels": {
+        "kind": "candidate_pose"
+      },
+      "augmentation": {
+        "kind": "alpha_composite_identity"
+      },
+      "sources": [
+        "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_009901.png",
+        "datasets/raw/site_capture_20261112/videos/full_scene.mp4",
+        "datasets/samples/meter/images/arena_meter_00001.png",
+        "datasets/samples/meter/foreground/arena_meter_00001.png"
+      ],
+      "parameters": {
+        "background_image": "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_009901.png",
+        "foreground_id": "arena_meter_00001"
+      }
+    },
+    {
+      "id": "background_1_foreground_02",
+      "failure_event": "meter_pose_or_background_ambiguity",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [],
+      "background": {
+        "kind": "real_captured_scene"
+      },
+      "target": {
+        "kind": "rendered_station"
+      },
+      "labels": {
+        "kind": "candidate_pose"
+      },
+      "augmentation": {
+        "kind": "alpha_composite_identity"
+      },
+      "sources": [
+        "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_009901.png",
+        "datasets/raw/site_capture_20261112/videos/full_scene.mp4",
+        "datasets/samples/meter/images/arena_meter_00002.png",
+        "datasets/samples/meter/foreground/arena_meter_00002.png"
+      ],
+      "parameters": {
+        "background_image": "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_009901.png",
+        "foreground_id": "arena_meter_00002"
+      }
+    },
+    {
+      "id": "background_1_foreground_03",
+      "failure_event": "meter_pose_or_background_ambiguity",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [],
+      "background": {
+        "kind": "real_captured_scene"
+      },
+      "target": {
+        "kind": "rendered_station"
+      },
+      "labels": {
+        "kind": "candidate_pose"
+      },
+      "augmentation": {
+        "kind": "alpha_composite_identity"
+      },
+      "sources": [
+        "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_009901.png",
+        "datasets/raw/site_capture_20261112/videos/full_scene.mp4",
+        "datasets/samples/meter/images/arena_meter_00003.png",
+        "datasets/samples/meter/foreground/arena_meter_00003.png"
+      ],
+      "parameters": {
+        "background_image": "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_009901.png",
+        "foreground_id": "arena_meter_00003"
+      }
+    },
+    {
+      "id": "background_1_foreground_04",
+      "failure_event": "meter_pose_or_background_ambiguity",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [],
+      "background": {
+        "kind": "real_captured_scene"
+      },
+      "target": {
+        "kind": "rendered_station"
+      },
+      "labels": {
+        "kind": "candidate_pose"
+      },
+      "augmentation": {
+        "kind": "alpha_composite_identity"
+      },
+      "sources": [
+        "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_009901.png",
+        "datasets/raw/site_capture_20261112/videos/full_scene.mp4",
+        "datasets/samples/meter/images/arena_meter_00004.png",
+        "datasets/samples/meter/foreground/arena_meter_00004.png"
+      ],
+      "parameters": {
+        "background_image": "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_009901.png",
+        "foreground_id": "arena_meter_00004"
+      }
+    },
+    {
+      "id": "background_1_foreground_05",
+      "failure_event": "meter_pose_or_background_ambiguity",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [],
+      "background": {
+        "kind": "real_captured_scene"
+      },
+      "target": {
+        "kind": "rendered_station"
+      },
+      "labels": {
+        "kind": "candidate_pose"
+      },
+      "augmentation": {
+        "kind": "alpha_composite_identity"
+      },
+      "sources": [
+        "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_009901.png",
+        "datasets/raw/site_capture_20261112/videos/full_scene.mp4",
+        "datasets/samples/meter/images/arena_meter_00005.png",
+        "datasets/samples/meter/foreground/arena_meter_00005.png"
+      ],
+      "parameters": {
+        "background_image": "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_009901.png",
+        "foreground_id": "arena_meter_00005"
+      }
+    },
+    {
+      "id": "background_1_foreground_06",
+      "failure_event": "meter_pose_or_background_ambiguity",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [],
+      "background": {
+        "kind": "real_captured_scene"
+      },
+      "target": {
+        "kind": "rendered_station"
+      },
+      "labels": {
+        "kind": "candidate_pose"
+      },
+      "augmentation": {
+        "kind": "alpha_composite_identity"
+      },
+      "sources": [
+        "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_009901.png",
+        "datasets/raw/site_capture_20261112/videos/full_scene.mp4",
+        "datasets/samples/meter/images/arena_meter_00006.png",
+        "datasets/samples/meter/foreground/arena_meter_00006.png"
+      ],
+      "parameters": {
+        "background_image": "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_009901.png",
+        "foreground_id": "arena_meter_00006"
+      }
+    },
+    {
+      "id": "background_1_foreground_07",
+      "failure_event": "meter_pose_or_background_ambiguity",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [],
+      "background": {
+        "kind": "real_captured_scene"
+      },
+      "target": {
+        "kind": "rendered_station"
+      },
+      "labels": {
+        "kind": "candidate_pose"
+      },
+      "augmentation": {
+        "kind": "alpha_composite_identity"
+      },
+      "sources": [
+        "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_009901.png",
+        "datasets/raw/site_capture_20261112/videos/full_scene.mp4",
+        "datasets/samples/meter/images/arena_meter_00007.png",
+        "datasets/samples/meter/foreground/arena_meter_00007.png"
+      ],
+      "parameters": {
+        "background_image": "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_009901.png",
+        "foreground_id": "arena_meter_00007"
+      }
+    },
+    {
+      "id": "background_1_foreground_08",
+      "failure_event": "meter_pose_or_background_ambiguity",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [],
+      "background": {
+        "kind": "real_captured_scene"
+      },
+      "target": {
+        "kind": "rendered_station"
+      },
+      "labels": {
+        "kind": "candidate_pose"
+      },
+      "augmentation": {
+        "kind": "alpha_composite_identity"
+      },
+      "sources": [
+        "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_009901.png",
+        "datasets/raw/site_capture_20261112/videos/full_scene.mp4",
+        "datasets/samples/meter/images/arena_meter_00008.png",
+        "datasets/samples/meter/foreground/arena_meter_00008.png"
+      ],
+      "parameters": {
+        "background_image": "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_009901.png",
+        "foreground_id": "arena_meter_00008"
+      }
+    },
+    {
+      "id": "background_1_foreground_09",
+      "failure_event": "meter_pose_or_background_ambiguity",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [],
+      "background": {
+        "kind": "real_captured_scene"
+      },
+      "target": {
+        "kind": "rendered_station"
+      },
+      "labels": {
+        "kind": "candidate_pose"
+      },
+      "augmentation": {
+        "kind": "alpha_composite_identity"
+      },
+      "sources": [
+        "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_009901.png",
+        "datasets/raw/site_capture_20261112/videos/full_scene.mp4",
+        "datasets/samples/meter/images/arena_meter_00009.png",
+        "datasets/samples/meter/foreground/arena_meter_00009.png"
+      ],
+      "parameters": {
+        "background_image": "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_009901.png",
+        "foreground_id": "arena_meter_00009"
+      }
+    },
+    {
+      "id": "background_1_foreground_10",
+      "failure_event": "meter_pose_or_background_ambiguity",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [],
+      "background": {
+        "kind": "real_captured_scene"
+      },
+      "target": {
+        "kind": "rendered_station"
+      },
+      "labels": {
+        "kind": "candidate_pose"
+      },
+      "augmentation": {
+        "kind": "alpha_composite_identity"
+      },
+      "sources": [
+        "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_009901.png",
+        "datasets/raw/site_capture_20261112/videos/full_scene.mp4",
+        "datasets/samples/meter/images/arena_meter_00010.png",
+        "datasets/samples/meter/foreground/arena_meter_00010.png"
+      ],
+      "parameters": {
+        "background_image": "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_009901.png",
+        "foreground_id": "arena_meter_00010"
+      }
+    },
+    {
+      "id": "background_1_foreground_11",
+      "failure_event": "meter_pose_or_background_ambiguity",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [],
+      "background": {
+        "kind": "real_captured_scene"
+      },
+      "target": {
+        "kind": "rendered_station"
+      },
+      "labels": {
+        "kind": "candidate_pose"
+      },
+      "augmentation": {
+        "kind": "alpha_composite_identity"
+      },
+      "sources": [
+        "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_009901.png",
+        "datasets/raw/site_capture_20261112/videos/full_scene.mp4",
+        "datasets/samples/meter/images/arena_meter_00011.png",
+        "datasets/samples/meter/foreground/arena_meter_00011.png"
+      ],
+      "parameters": {
+        "background_image": "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_009901.png",
+        "foreground_id": "arena_meter_00011"
+      }
+    },
+    {
+      "id": "background_2_foreground_00",
+      "failure_event": "meter_pose_or_background_ambiguity",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [],
+      "background": {
+        "kind": "real_captured_scene"
+      },
+      "target": {
+        "kind": "rendered_station"
+      },
+      "labels": {
+        "kind": "candidate_pose"
+      },
+      "augmentation": {
+        "kind": "alpha_composite_identity"
+      },
+      "sources": [
+        "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_010501.png",
+        "datasets/raw/site_capture_20261112/videos/full_scene.mp4",
+        "datasets/samples/meter/images/arena_meter_00000.png",
+        "datasets/samples/meter/foreground/arena_meter_00000.png"
+      ],
+      "parameters": {
+        "background_image": "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_010501.png",
+        "foreground_id": "arena_meter_00000"
+      }
+    },
+    {
+      "id": "background_2_foreground_01",
+      "failure_event": "meter_pose_or_background_ambiguity",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [],
+      "background": {
+        "kind": "real_captured_scene"
+      },
+      "target": {
+        "kind": "rendered_station"
+      },
+      "labels": {
+        "kind": "candidate_pose"
+      },
+      "augmentation": {
+        "kind": "alpha_composite_identity"
+      },
+      "sources": [
+        "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_010501.png",
+        "datasets/raw/site_capture_20261112/videos/full_scene.mp4",
+        "datasets/samples/meter/images/arena_meter_00001.png",
+        "datasets/samples/meter/foreground/arena_meter_00001.png"
+      ],
+      "parameters": {
+        "background_image": "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_010501.png",
+        "foreground_id": "arena_meter_00001"
+      }
+    },
+    {
+      "id": "background_2_foreground_02",
+      "failure_event": "meter_pose_or_background_ambiguity",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [],
+      "background": {
+        "kind": "real_captured_scene"
+      },
+      "target": {
+        "kind": "rendered_station"
+      },
+      "labels": {
+        "kind": "candidate_pose"
+      },
+      "augmentation": {
+        "kind": "alpha_composite_identity"
+      },
+      "sources": [
+        "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_010501.png",
+        "datasets/raw/site_capture_20261112/videos/full_scene.mp4",
+        "datasets/samples/meter/images/arena_meter_00002.png",
+        "datasets/samples/meter/foreground/arena_meter_00002.png"
+      ],
+      "parameters": {
+        "background_image": "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_010501.png",
+        "foreground_id": "arena_meter_00002"
+      }
+    },
+    {
+      "id": "background_2_foreground_03",
+      "failure_event": "meter_pose_or_background_ambiguity",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [],
+      "background": {
+        "kind": "real_captured_scene"
+      },
+      "target": {
+        "kind": "rendered_station"
+      },
+      "labels": {
+        "kind": "candidate_pose"
+      },
+      "augmentation": {
+        "kind": "alpha_composite_identity"
+      },
+      "sources": [
+        "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_010501.png",
+        "datasets/raw/site_capture_20261112/videos/full_scene.mp4",
+        "datasets/samples/meter/images/arena_meter_00003.png",
+        "datasets/samples/meter/foreground/arena_meter_00003.png"
+      ],
+      "parameters": {
+        "background_image": "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_010501.png",
+        "foreground_id": "arena_meter_00003"
+      }
+    },
+    {
+      "id": "background_2_foreground_04",
+      "failure_event": "meter_pose_or_background_ambiguity",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [],
+      "background": {
+        "kind": "real_captured_scene"
+      },
+      "target": {
+        "kind": "rendered_station"
+      },
+      "labels": {
+        "kind": "candidate_pose"
+      },
+      "augmentation": {
+        "kind": "alpha_composite_identity"
+      },
+      "sources": [
+        "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_010501.png",
+        "datasets/raw/site_capture_20261112/videos/full_scene.mp4",
+        "datasets/samples/meter/images/arena_meter_00004.png",
+        "datasets/samples/meter/foreground/arena_meter_00004.png"
+      ],
+      "parameters": {
+        "background_image": "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_010501.png",
+        "foreground_id": "arena_meter_00004"
+      }
+    },
+    {
+      "id": "background_2_foreground_05",
+      "failure_event": "meter_pose_or_background_ambiguity",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [],
+      "background": {
+        "kind": "real_captured_scene"
+      },
+      "target": {
+        "kind": "rendered_station"
+      },
+      "labels": {
+        "kind": "candidate_pose"
+      },
+      "augmentation": {
+        "kind": "alpha_composite_identity"
+      },
+      "sources": [
+        "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_010501.png",
+        "datasets/raw/site_capture_20261112/videos/full_scene.mp4",
+        "datasets/samples/meter/images/arena_meter_00005.png",
+        "datasets/samples/meter/foreground/arena_meter_00005.png"
+      ],
+      "parameters": {
+        "background_image": "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_010501.png",
+        "foreground_id": "arena_meter_00005"
+      }
+    },
+    {
+      "id": "background_2_foreground_06",
+      "failure_event": "meter_pose_or_background_ambiguity",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [],
+      "background": {
+        "kind": "real_captured_scene"
+      },
+      "target": {
+        "kind": "rendered_station"
+      },
+      "labels": {
+        "kind": "candidate_pose"
+      },
+      "augmentation": {
+        "kind": "alpha_composite_identity"
+      },
+      "sources": [
+        "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_010501.png",
+        "datasets/raw/site_capture_20261112/videos/full_scene.mp4",
+        "datasets/samples/meter/images/arena_meter_00006.png",
+        "datasets/samples/meter/foreground/arena_meter_00006.png"
+      ],
+      "parameters": {
+        "background_image": "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_010501.png",
+        "foreground_id": "arena_meter_00006"
+      }
+    },
+    {
+      "id": "background_2_foreground_07",
+      "failure_event": "meter_pose_or_background_ambiguity",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [],
+      "background": {
+        "kind": "real_captured_scene"
+      },
+      "target": {
+        "kind": "rendered_station"
+      },
+      "labels": {
+        "kind": "candidate_pose"
+      },
+      "augmentation": {
+        "kind": "alpha_composite_identity"
+      },
+      "sources": [
+        "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_010501.png",
+        "datasets/raw/site_capture_20261112/videos/full_scene.mp4",
+        "datasets/samples/meter/images/arena_meter_00007.png",
+        "datasets/samples/meter/foreground/arena_meter_00007.png"
+      ],
+      "parameters": {
+        "background_image": "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_010501.png",
+        "foreground_id": "arena_meter_00007"
+      }
+    },
+    {
+      "id": "background_2_foreground_08",
+      "failure_event": "meter_pose_or_background_ambiguity",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [],
+      "background": {
+        "kind": "real_captured_scene"
+      },
+      "target": {
+        "kind": "rendered_station"
+      },
+      "labels": {
+        "kind": "candidate_pose"
+      },
+      "augmentation": {
+        "kind": "alpha_composite_identity"
+      },
+      "sources": [
+        "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_010501.png",
+        "datasets/raw/site_capture_20261112/videos/full_scene.mp4",
+        "datasets/samples/meter/images/arena_meter_00008.png",
+        "datasets/samples/meter/foreground/arena_meter_00008.png"
+      ],
+      "parameters": {
+        "background_image": "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_010501.png",
+        "foreground_id": "arena_meter_00008"
+      }
+    },
+    {
+      "id": "background_2_foreground_09",
+      "failure_event": "meter_pose_or_background_ambiguity",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [],
+      "background": {
+        "kind": "real_captured_scene"
+      },
+      "target": {
+        "kind": "rendered_station"
+      },
+      "labels": {
+        "kind": "candidate_pose"
+      },
+      "augmentation": {
+        "kind": "alpha_composite_identity"
+      },
+      "sources": [
+        "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_010501.png",
+        "datasets/raw/site_capture_20261112/videos/full_scene.mp4",
+        "datasets/samples/meter/images/arena_meter_00009.png",
+        "datasets/samples/meter/foreground/arena_meter_00009.png"
+      ],
+      "parameters": {
+        "background_image": "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_010501.png",
+        "foreground_id": "arena_meter_00009"
+      }
+    },
+    {
+      "id": "background_2_foreground_10",
+      "failure_event": "meter_pose_or_background_ambiguity",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [],
+      "background": {
+        "kind": "real_captured_scene"
+      },
+      "target": {
+        "kind": "rendered_station"
+      },
+      "labels": {
+        "kind": "candidate_pose"
+      },
+      "augmentation": {
+        "kind": "alpha_composite_identity"
+      },
+      "sources": [
+        "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_010501.png",
+        "datasets/raw/site_capture_20261112/videos/full_scene.mp4",
+        "datasets/samples/meter/images/arena_meter_00010.png",
+        "datasets/samples/meter/foreground/arena_meter_00010.png"
+      ],
+      "parameters": {
+        "background_image": "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_010501.png",
+        "foreground_id": "arena_meter_00010"
+      }
+    },
+    {
+      "id": "background_2_foreground_11",
+      "failure_event": "meter_pose_or_background_ambiguity",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [],
+      "background": {
+        "kind": "real_captured_scene"
+      },
+      "target": {
+        "kind": "rendered_station"
+      },
+      "labels": {
+        "kind": "candidate_pose"
+      },
+      "augmentation": {
+        "kind": "alpha_composite_identity"
+      },
+      "sources": [
+        "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_010501.png",
+        "datasets/raw/site_capture_20261112/videos/full_scene.mp4",
+        "datasets/samples/meter/images/arena_meter_00011.png",
+        "datasets/samples/meter/foreground/arena_meter_00011.png"
+      ],
+      "parameters": {
+        "background_image": "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_010501.png",
+        "foreground_id": "arena_meter_00011"
+      }
+    }
+  ],
+  "execution": {
+    "entry": "datasets/scripts/meter/compose_meter_real_background_v4.py",
+    "foreground_batch": "datasets/samples/meter",
+    "output": "datasets/exports/meter/train",
+    "count": 36,
+    "prerequisite": "datasets/scripts/meter/config/render_plan.json",
+    "dependency_status": "render_only_after_user_resumes_production",
+    "actual_generated_count": 0
+  }
+}

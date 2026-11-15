@@ -3,13 +3,23 @@
 Each base is assigned to one split before augmentation. Pitch/yaw are simulated
 by a planar homography; this does not re-render 3-D glass, needles, or shadows.
 """
+
+if __name__ == "__main__":
+    raise SystemExit("Legacy dataset CLI is retired; use datasets/scripts/meter/. Production remains paused.")
+
 import argparse
 import json
 import math
+import sys
 from pathlib import Path
 import cv2
 import numpy as np
 from audit_meter_source_quality import needle_contrast
+
+ROOT = Path(__file__).resolve().parents[5]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+from lab.training_common.production_guard import generation_guard
 
 SIZE=1024
 LIGHTING = {'dim': (.89, .025, .84, .93),
@@ -63,6 +73,31 @@ def main():
     p.add_argument('--overwrite-existing',action='store_true',
                    help='Regenerate this exact existing dataset after verifying its manifest')
     a=p.parse_args()
+    a.sources, a.output = a.sources.resolve(), a.output.resolve()
+    manifest_path = a.sources / 'manifest.json'
+    quality_path = a.sources / 'quality_report.json'
+    manifest_bytes, quality_bytes = manifest_path.read_bytes(), quality_path.read_bytes()
+    source_manifest = json.loads(manifest_bytes.decode('utf8'))
+    quality = json.loads(quality_bytes.decode('utf8'))
+    eligible = {r['id'] for r in quality['samples'] if r.get('eligible')}
+    selected = [r for r in source_manifest['samples'] if r['id'] in eligible]
+    images = [a.sources / 'images' / (r['id'] + '.png') for r in selected]
+    labels = [a.sources / 'labels' / (r['id'] + '.txt') for r in selected]
+    params = {'count': a.count, 'seed': a.seed, 'balanced_lighting': a.balanced_lighting,
+              'overwrite_existing': a.overwrite_existing}
+    with generation_guard('meter.generate_from_renders:' + str(a.output.resolve()),
+                          images, [a.output], params,
+                          procedural_inputs=[manifest_path, quality_path, *labels],
+                          code_paths=[Path(__file__), Path(__file__).with_name('audit_meter_source_quality.py')]) as run:
+        if manifest_path.read_bytes() != manifest_bytes or quality_path.read_bytes() != quality_bytes:
+            raise ValueError('source manifest or quality report changed during input enumeration')
+        if run.reused:
+            print('REUSED', a.output)
+            return
+        _produce(a, p, run.source_refs, source_manifest, quality)
+
+
+def _produce(a, p, source_refs, source_manifest, quality):
     if a.count<10 or a.count%10:
         p.error('count must be >= 10 and divisible by 10')
     if a.output.exists():
@@ -84,11 +119,9 @@ def main():
                     p.error('existing dataset file names do not match expected split '+split)
     elif a.overwrite_existing:
         p.error('--overwrite-existing requires an existing generated dataset')
-    source_manifest=json.loads((a.sources/'manifest.json').read_text(encoding='utf8'))
     quality_path=(a.sources/'quality_report.json').resolve()
     if not quality_path.is_file():
         p.error('source contrast quality report missing; run audit_meter_source_quality.py')
-    quality=json.loads(quality_path.read_text(encoding='utf8'))
     if quality.get('source_manifest')!=str((a.sources/'manifest.json').resolve()):
         p.error('source quality report points to a different source manifest')
     quality_by_id={r['id']:r for r in quality['samples']}
@@ -114,6 +147,7 @@ def main():
     rng=np.random.default_rng(a.seed)
     quota={'train':a.count*8//10,'val':a.count//10,'test':a.count//10}
     manifest={'purpose':'Rendered image OpenCV augmentation candidate; not independent real-world validation',
+              'input_source_refs':source_refs,
               'source_manifest':str((a.sources/'manifest.json').resolve()),'seed':a.seed,
               'source_quality_report':str(quality_path),
               'source_screening':'local tick and needle contrast heuristic; review required',

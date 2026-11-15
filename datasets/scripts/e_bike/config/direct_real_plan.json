@@ -1,0 +1,601 @@
+{
+  "schema_version": 1,
+  "model_key": "e_bike",
+  "target_split": "train",
+  "purpose": "Current direct-camera branch using four complete existing label candidates; tone variants retain the same parent video.",
+  "budget": 8,
+  "uncertainty_weight": 0,
+  "independence_basis": "Four frames from one low-angle multi-vehicle recording; not independent sessions.",
+  "constraints": {
+    "complete_candidate_only": true,
+    "max_width": 640,
+    "max_height": 480
+  },
+  "strata": [
+    {
+      "id": "direct_0_original",
+      "failure_event": "real_multibike_missed",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 3
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [],
+      "background": {
+        "image": "datasets/annotated/e_bike/v4_low_angle_multibike_review_20261112/candidate_images/frame_001.png",
+        "crop_xyxy": [
+          0,
+          0,
+          640,
+          360
+        ]
+      },
+      "target": {
+        "classes": [
+          "fallen",
+          "upright"
+        ]
+      },
+      "labels": {
+        "format": "yolo_visible_box",
+        "classes": {
+          "upright": 0,
+          "fallen": 1
+        }
+      },
+      "augmentation": {
+        "tone": "original"
+      },
+      "parameters": {
+        "value_gain": 1.0,
+        "saturation_gain": 1.0
+      },
+      "sources": [
+        "datasets/annotated/e_bike/v4_low_angle_multibike_review_20261112/candidate_images/frame_001.png",
+        "datasets/annotated/e_bike/v4_low_angle_multibike_review_20261112/images/frame_001.png",
+        "datasets/raw/e_bike/archive_assets_legacy/视频/场地多辆电动车_直立与倒伏混合_较低视角_003.mp4"
+      ]
+    },
+    {
+      "id": "direct_0_mild",
+      "failure_event": "real_multibike_missed",
+      "min_count": 0,
+      "max_count": 1,
+      "prior": {
+        "alpha": 2,
+        "beta": 3
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [],
+      "background": {
+        "image": "datasets/annotated/e_bike/v4_low_angle_multibike_review_20261112/candidate_images/frame_001.png",
+        "crop_xyxy": [
+          0,
+          0,
+          640,
+          360
+        ]
+      },
+      "target": {
+        "classes": [
+          "fallen",
+          "upright"
+        ]
+      },
+      "labels": {
+        "format": "yolo_visible_box",
+        "classes": {
+          "upright": 0,
+          "fallen": 1
+        }
+      },
+      "augmentation": {
+        "tone": "mild"
+      },
+      "parameters": {
+        "value_gain": 0.9,
+        "saturation_gain": 0.85
+      },
+      "sources": [
+        "datasets/annotated/e_bike/v4_low_angle_multibike_review_20261112/candidate_images/frame_001.png",
+        "datasets/annotated/e_bike/v4_low_angle_multibike_review_20261112/images/frame_001.png",
+        "datasets/raw/e_bike/archive_assets_legacy/视频/场地多辆电动车_直立与倒伏混合_较低视角_003.mp4"
+      ]
+    },
+    {
+      "id": "direct_0_moderate",
+      "failure_event": "real_multibike_missed",
+      "min_count": 0,
+      "max_count": 1,
+      "prior": {
+        "alpha": 2,
+        "beta": 3
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [],
+      "background": {
+        "image": "datasets/annotated/e_bike/v4_low_angle_multibike_review_20261112/candidate_images/frame_001.png",
+        "crop_xyxy": [
+          0,
+          0,
+          640,
+          360
+        ]
+      },
+      "target": {
+        "classes": [
+          "fallen",
+          "upright"
+        ]
+      },
+      "labels": {
+        "format": "yolo_visible_box",
+        "classes": {
+          "upright": 0,
+          "fallen": 1
+        }
+      },
+      "augmentation": {
+        "tone": "moderate"
+      },
+      "parameters": {
+        "value_gain": 0.7,
+        "saturation_gain": 0.6
+      },
+      "sources": [
+        "datasets/annotated/e_bike/v4_low_angle_multibike_review_20261112/candidate_images/frame_001.png",
+        "datasets/annotated/e_bike/v4_low_angle_multibike_review_20261112/images/frame_001.png",
+        "datasets/raw/e_bike/archive_assets_legacy/视频/场地多辆电动车_直立与倒伏混合_较低视角_003.mp4"
+      ]
+    },
+    {
+      "id": "direct_1_original",
+      "failure_event": "real_multibike_missed",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 3
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [],
+      "background": {
+        "image": "datasets/annotated/e_bike/v4_low_angle_multibike_review_20261112/candidate_images/frame_002.png",
+        "crop_xyxy": [
+          0,
+          0,
+          620,
+          360
+        ]
+      },
+      "target": {
+        "classes": [
+          "upright",
+          "upright",
+          "upright",
+          "fallen"
+        ]
+      },
+      "labels": {
+        "format": "yolo_visible_box",
+        "classes": {
+          "upright": 0,
+          "fallen": 1
+        }
+      },
+      "augmentation": {
+        "tone": "original"
+      },
+      "parameters": {
+        "value_gain": 1.0,
+        "saturation_gain": 1.0
+      },
+      "sources": [
+        "datasets/annotated/e_bike/v4_low_angle_multibike_review_20261112/candidate_images/frame_002.png",
+        "datasets/annotated/e_bike/v4_low_angle_multibike_review_20261112/images/frame_002.png",
+        "datasets/raw/e_bike/archive_assets_legacy/视频/场地多辆电动车_直立与倒伏混合_较低视角_003.mp4"
+      ]
+    },
+    {
+      "id": "direct_1_mild",
+      "failure_event": "real_multibike_missed",
+      "min_count": 0,
+      "max_count": 1,
+      "prior": {
+        "alpha": 2,
+        "beta": 3
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [],
+      "background": {
+        "image": "datasets/annotated/e_bike/v4_low_angle_multibike_review_20261112/candidate_images/frame_002.png",
+        "crop_xyxy": [
+          0,
+          0,
+          620,
+          360
+        ]
+      },
+      "target": {
+        "classes": [
+          "upright",
+          "upright",
+          "upright",
+          "fallen"
+        ]
+      },
+      "labels": {
+        "format": "yolo_visible_box",
+        "classes": {
+          "upright": 0,
+          "fallen": 1
+        }
+      },
+      "augmentation": {
+        "tone": "mild"
+      },
+      "parameters": {
+        "value_gain": 0.9,
+        "saturation_gain": 0.85
+      },
+      "sources": [
+        "datasets/annotated/e_bike/v4_low_angle_multibike_review_20261112/candidate_images/frame_002.png",
+        "datasets/annotated/e_bike/v4_low_angle_multibike_review_20261112/images/frame_002.png",
+        "datasets/raw/e_bike/archive_assets_legacy/视频/场地多辆电动车_直立与倒伏混合_较低视角_003.mp4"
+      ]
+    },
+    {
+      "id": "direct_1_moderate",
+      "failure_event": "real_multibike_missed",
+      "min_count": 0,
+      "max_count": 1,
+      "prior": {
+        "alpha": 2,
+        "beta": 3
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [],
+      "background": {
+        "image": "datasets/annotated/e_bike/v4_low_angle_multibike_review_20261112/candidate_images/frame_002.png",
+        "crop_xyxy": [
+          0,
+          0,
+          620,
+          360
+        ]
+      },
+      "target": {
+        "classes": [
+          "upright",
+          "upright",
+          "upright",
+          "fallen"
+        ]
+      },
+      "labels": {
+        "format": "yolo_visible_box",
+        "classes": {
+          "upright": 0,
+          "fallen": 1
+        }
+      },
+      "augmentation": {
+        "tone": "moderate"
+      },
+      "parameters": {
+        "value_gain": 0.7,
+        "saturation_gain": 0.6
+      },
+      "sources": [
+        "datasets/annotated/e_bike/v4_low_angle_multibike_review_20261112/candidate_images/frame_002.png",
+        "datasets/annotated/e_bike/v4_low_angle_multibike_review_20261112/images/frame_002.png",
+        "datasets/raw/e_bike/archive_assets_legacy/视频/场地多辆电动车_直立与倒伏混合_较低视角_003.mp4"
+      ]
+    },
+    {
+      "id": "direct_2_original",
+      "failure_event": "real_multibike_missed",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 3
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [],
+      "background": {
+        "image": "datasets/annotated/e_bike/v4_low_angle_multibike_review_20261112/candidate_images/frame_003.png",
+        "crop_xyxy": [
+          0,
+          0,
+          620,
+          360
+        ]
+      },
+      "target": {
+        "classes": [
+          "fallen",
+          "fallen",
+          "upright",
+          "upright"
+        ]
+      },
+      "labels": {
+        "format": "yolo_visible_box",
+        "classes": {
+          "upright": 0,
+          "fallen": 1
+        }
+      },
+      "augmentation": {
+        "tone": "original"
+      },
+      "parameters": {
+        "value_gain": 1.0,
+        "saturation_gain": 1.0
+      },
+      "sources": [
+        "datasets/annotated/e_bike/v4_low_angle_multibike_review_20261112/candidate_images/frame_003.png",
+        "datasets/annotated/e_bike/v4_low_angle_multibike_review_20261112/images/frame_003.png",
+        "datasets/raw/e_bike/archive_assets_legacy/视频/场地多辆电动车_直立与倒伏混合_较低视角_003.mp4"
+      ]
+    },
+    {
+      "id": "direct_2_mild",
+      "failure_event": "real_multibike_missed",
+      "min_count": 0,
+      "max_count": 1,
+      "prior": {
+        "alpha": 2,
+        "beta": 3
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [],
+      "background": {
+        "image": "datasets/annotated/e_bike/v4_low_angle_multibike_review_20261112/candidate_images/frame_003.png",
+        "crop_xyxy": [
+          0,
+          0,
+          620,
+          360
+        ]
+      },
+      "target": {
+        "classes": [
+          "fallen",
+          "fallen",
+          "upright",
+          "upright"
+        ]
+      },
+      "labels": {
+        "format": "yolo_visible_box",
+        "classes": {
+          "upright": 0,
+          "fallen": 1
+        }
+      },
+      "augmentation": {
+        "tone": "mild"
+      },
+      "parameters": {
+        "value_gain": 0.9,
+        "saturation_gain": 0.85
+      },
+      "sources": [
+        "datasets/annotated/e_bike/v4_low_angle_multibike_review_20261112/candidate_images/frame_003.png",
+        "datasets/annotated/e_bike/v4_low_angle_multibike_review_20261112/images/frame_003.png",
+        "datasets/raw/e_bike/archive_assets_legacy/视频/场地多辆电动车_直立与倒伏混合_较低视角_003.mp4"
+      ]
+    },
+    {
+      "id": "direct_2_moderate",
+      "failure_event": "real_multibike_missed",
+      "min_count": 0,
+      "max_count": 1,
+      "prior": {
+        "alpha": 2,
+        "beta": 3
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [],
+      "background": {
+        "image": "datasets/annotated/e_bike/v4_low_angle_multibike_review_20261112/candidate_images/frame_003.png",
+        "crop_xyxy": [
+          0,
+          0,
+          620,
+          360
+        ]
+      },
+      "target": {
+        "classes": [
+          "fallen",
+          "fallen",
+          "upright",
+          "upright"
+        ]
+      },
+      "labels": {
+        "format": "yolo_visible_box",
+        "classes": {
+          "upright": 0,
+          "fallen": 1
+        }
+      },
+      "augmentation": {
+        "tone": "moderate"
+      },
+      "parameters": {
+        "value_gain": 0.7,
+        "saturation_gain": 0.6
+      },
+      "sources": [
+        "datasets/annotated/e_bike/v4_low_angle_multibike_review_20261112/candidate_images/frame_003.png",
+        "datasets/annotated/e_bike/v4_low_angle_multibike_review_20261112/images/frame_003.png",
+        "datasets/raw/e_bike/archive_assets_legacy/视频/场地多辆电动车_直立与倒伏混合_较低视角_003.mp4"
+      ]
+    },
+    {
+      "id": "direct_3_original",
+      "failure_event": "real_multibike_missed",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 3
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [],
+      "background": {
+        "image": "datasets/annotated/e_bike/v4_low_angle_multibike_review_20261112/candidate_images/frame_004.png",
+        "crop_xyxy": [
+          0,
+          0,
+          640,
+          360
+        ]
+      },
+      "target": {
+        "classes": [
+          "fallen",
+          "fallen",
+          "upright",
+          "upright",
+          "upright"
+        ]
+      },
+      "labels": {
+        "format": "yolo_visible_box",
+        "classes": {
+          "upright": 0,
+          "fallen": 1
+        }
+      },
+      "augmentation": {
+        "tone": "original"
+      },
+      "parameters": {
+        "value_gain": 1.0,
+        "saturation_gain": 1.0
+      },
+      "sources": [
+        "datasets/annotated/e_bike/v4_low_angle_multibike_review_20261112/candidate_images/frame_004.png",
+        "datasets/annotated/e_bike/v4_low_angle_multibike_review_20261112/images/frame_004.png",
+        "datasets/raw/e_bike/archive_assets_legacy/视频/场地多辆电动车_直立与倒伏混合_较低视角_003.mp4"
+      ]
+    },
+    {
+      "id": "direct_3_mild",
+      "failure_event": "real_multibike_missed",
+      "min_count": 0,
+      "max_count": 1,
+      "prior": {
+        "alpha": 2,
+        "beta": 3
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [],
+      "background": {
+        "image": "datasets/annotated/e_bike/v4_low_angle_multibike_review_20261112/candidate_images/frame_004.png",
+        "crop_xyxy": [
+          0,
+          0,
+          640,
+          360
+        ]
+      },
+      "target": {
+        "classes": [
+          "fallen",
+          "fallen",
+          "upright",
+          "upright",
+          "upright"
+        ]
+      },
+      "labels": {
+        "format": "yolo_visible_box",
+        "classes": {
+          "upright": 0,
+          "fallen": 1
+        }
+      },
+      "augmentation": {
+        "tone": "mild"
+      },
+      "parameters": {
+        "value_gain": 0.9,
+        "saturation_gain": 0.85
+      },
+      "sources": [
+        "datasets/annotated/e_bike/v4_low_angle_multibike_review_20261112/candidate_images/frame_004.png",
+        "datasets/annotated/e_bike/v4_low_angle_multibike_review_20261112/images/frame_004.png",
+        "datasets/raw/e_bike/archive_assets_legacy/视频/场地多辆电动车_直立与倒伏混合_较低视角_003.mp4"
+      ]
+    },
+    {
+      "id": "direct_3_moderate",
+      "failure_event": "real_multibike_missed",
+      "min_count": 0,
+      "max_count": 1,
+      "prior": {
+        "alpha": 2,
+        "beta": 3
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [],
+      "background": {
+        "image": "datasets/annotated/e_bike/v4_low_angle_multibike_review_20261112/candidate_images/frame_004.png",
+        "crop_xyxy": [
+          0,
+          0,
+          640,
+          360
+        ]
+      },
+      "target": {
+        "classes": [
+          "fallen",
+          "fallen",
+          "upright",
+          "upright",
+          "upright"
+        ]
+      },
+      "labels": {
+        "format": "yolo_visible_box",
+        "classes": {
+          "upright": 0,
+          "fallen": 1
+        }
+      },
+      "augmentation": {
+        "tone": "moderate"
+      },
+      "parameters": {
+        "value_gain": 0.7,
+        "saturation_gain": 0.6
+      },
+      "sources": [
+        "datasets/annotated/e_bike/v4_low_angle_multibike_review_20261112/candidate_images/frame_004.png",
+        "datasets/annotated/e_bike/v4_low_angle_multibike_review_20261112/images/frame_004.png",
+        "datasets/raw/e_bike/archive_assets_legacy/视频/场地多辆电动车_直立与倒伏混合_较低视角_003.mp4"
+      ]
+    }
+  ]
+}

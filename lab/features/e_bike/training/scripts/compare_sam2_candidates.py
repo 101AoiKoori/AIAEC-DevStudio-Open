@@ -2,6 +2,7 @@
 import argparse
 import json
 import math
+import sys
 from pathlib import Path
 
 import cv2
@@ -9,6 +10,8 @@ import numpy as np
 from ultralytics import SAM
 
 ROOT = Path(__file__).resolve().parents[5]
+sys.path.insert(0, str(ROOT))
+from lab.training_common.production_guard import generation_guard
 
 
 def local_path(value):
@@ -52,13 +55,13 @@ def validate_annotation(review, annotation):
     return frame
 
 
-def write_manifest(output, weights, records, status, error=None):
+def write_manifest(output, weights, records, status, device, error=None):
     manifest = {
         'purpose': 'limited mask comparison; not verified ground truth',
         'model': weights.relative_to(ROOT).as_posix(),
         'model_source': 'https://github.com/ultralytics/assets/releases/download/v8.2.0/sam2_t.pt',
         'model_license': 'SAM2 checkpoints Apache-2.0; ultralytics package AGPL-3.0',
-        'device': 'cpu', 'status': status, 'records': records,
+        'device': device, 'status': status, 'records': records,
     }
     if error is not None:
         manifest['error'] = error
@@ -71,7 +74,30 @@ def main():
     parser.add_argument('--model', required=True, help='工作空间内 SAM2 权重路径')
     parser.add_argument('--output', required=True, help='不存在的输出目录')
     parser.add_argument('--indices', nargs='+', type=int, required=True, help='候选框的 1 起始编号')
+    parser.add_argument('--device', choices=('cpu', '0'), default='0', help='默认 CUDA 设备 0；CPU 须显式指定')
     args = parser.parse_args()
+    review, weights, output = map(local_path, (args.review, args.model, args.output))
+    selection = review / 'box_candidates.json'
+    annotations = json.loads(selection.read_text(encoding='utf-8'))['annotations']
+    if not args.indices or len(args.indices) > 6 or len(set(args.indices)) != len(args.indices):
+        parser.error('请选择 1 到 6 个不重复编号')
+    if any(index < 1 or index > len(annotations) for index in args.indices):
+        parser.error('候选编号超出范围')
+    media = []
+    for index in args.indices:
+        annotation = annotations[index - 1]
+        media.extend([validate_annotation(review, annotation), review / 'cutout_candidates' /
+                      f'candidate_{index:02d}_{annotation["class"]}.png'])
+    media = list(dict.fromkeys(media))
+    with generation_guard('e_bike.compare_sam2:' + str(output), [*media, selection, weights],
+                          [output], {'indices': args.indices, 'device': args.device}, code_paths=[Path(__file__)],
+                          procedural_inputs=[selection, weights]) as run:
+        if run.reused:
+            return
+        return _compare(args, parser)
+
+
+def _compare(args, parser):
     output = None
     records = []
     started = False
@@ -88,7 +114,7 @@ def main():
         frames = {index: validate_annotation(review, annotations[index - 1]) for index in args.indices}
         output.mkdir(parents=True)
         started = True
-        write_manifest(output, weights, records, 'running')
+        write_manifest(output, weights, records, 'running', args.device)
         model = SAM(str(weights))
         sheets = []
         for index in args.indices:
@@ -100,7 +126,7 @@ def main():
             sh, sw = small.shape[:2]
             x1, y1, x2, y2 = annotation['bbox_xyxy_normalized']
             box = [x1 * sw, y1 * sh, x2 * sw, y2 * sh]
-            result = model.predict(small, bboxes=[box], device='cpu', imgsz=1024, verbose=False)[0]
+            result = model.predict(small, bboxes=[box], device=args.device, imgsz=1024, verbose=False)[0]
             if result.masks is None or len(result.masks.data) != 1:
                 raise RuntimeError(f'候选 {index} 未产生唯一掩码')
             mask = result.masks.data[0].cpu().numpy().astype(np.uint8) * 255
@@ -118,17 +144,17 @@ def main():
             records.append({'source_frame': annotation['image'], 'class': annotation['class'],
                             'bbox_xyxy_normalized': annotation['bbox_xyxy_normalized'],
                             'sam2_candidate': file, 'status': 'unreviewed'})
-            write_manifest(output, weights, records, 'running')
+            write_manifest(output, weights, records, 'running', args.device)
         cv2.imencode('.jpg', np.vstack(sheets))[1].tofile(str(output / 'comparison.jpg'))
-        write_manifest(output, weights, records, 'complete')
+        write_manifest(output, weights, records, 'complete', args.device)
         print(f'完成 {len(records)} 帧对照；掩码待人工复核')
     except KeyboardInterrupt:
         if started:
-            write_manifest(output, weights, records, 'interrupted', '用户或进程中断')
+            write_manifest(output, weights, records, 'interrupted', args.device, '用户或进程中断')
         raise
     except Exception as exc:
         if started:
-            write_manifest(output, weights, records, 'failed', f'{type(exc).__name__}: {exc}')
+            write_manifest(output, weights, records, 'failed', args.device, f'{type(exc).__name__}: {exc}')
         parser.exit(2, f'失败：{type(exc).__name__}: {exc}\n')
 
 

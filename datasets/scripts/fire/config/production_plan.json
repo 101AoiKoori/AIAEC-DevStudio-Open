@@ -1,0 +1,510 @@
+{
+  "schema_version": 1,
+  "model_key": "fire_sticker",
+  "target_split": "train",
+  "purpose": "real facade crop composition; design priors",
+  "budget": 18,
+  "uncertainty_weight": 0.5,
+  "independence_basis": "three parent photo paths; capture independence unknown",
+  "constraints": {
+    "labels": "crop_candidate",
+    "counts": [
+      0,
+      1
+    ]
+  },
+  "strata": [
+    {
+      "id": "facade_A_04_count_0",
+      "failure_event": "fire_sticker_missed_or_false_positive",
+      "min_count": 0,
+      "max_count": 18,
+      "prior": {
+        "alpha": 1,
+        "beta": 4
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [
+        "facade_A_04",
+        "count:0"
+      ],
+      "background": {
+        "image": "datasets/raw/fire/archive_assets_legacy/楼宇/开心大厦/照片/另一侧斜视_整体_013.jpg",
+        "parent": "Archive/Assets/楼宇/开心大厦/照片/另一侧斜视_整体_013.jpg",
+        "crop_xyxy": [
+          1354,
+          1452,
+          2430,
+          2259
+        ],
+        "review_state": "no_recognizable_target_in_crop_candidate"
+      },
+      "target": {
+        "kind": "fire_sticker",
+        "count": 0,
+        "quad": [
+          [
+            180,
+            80
+          ],
+          [
+            220,
+            82
+          ],
+          [
+            220,
+            138
+          ],
+          [
+            180,
+            136
+          ]
+        ],
+        "artwork": "datasets/raw/fire/team_assets/image1.png"
+      },
+      "labels": {
+        "class_id": 0,
+        "format": "yolo",
+        "status": "crop_candidate"
+      },
+      "augmentation": {
+        "contrast": [
+          0.9,
+          1.1
+        ],
+        "brightness": [
+          -8.0,
+          8.0
+        ],
+        "saturation": [
+          0.8,
+          1.2
+        ],
+        "patch_scale": [
+          0.78,
+          0.88
+        ]
+      },
+      "sources": [
+        "datasets/raw/fire/archive_assets_legacy/楼宇/开心大厦/照片/另一侧斜视_整体_013.jpg",
+        "Archive/Assets/楼宇/开心大厦/照片/另一侧斜视_整体_013.jpg",
+        "datasets/raw/fire/team_assets/image1.png"
+      ],
+      "parameters": {
+        "seed": 431,
+        "source_id": "facade_A_04"
+      }
+    },
+    {
+      "id": "facade_A_04_count_1",
+      "failure_event": "fire_sticker_missed_or_false_positive",
+      "min_count": 0,
+      "max_count": 18,
+      "prior": {
+        "alpha": 2,
+        "beta": 4
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1.2,
+      "conditions": [
+        "facade_A_04",
+        "count:1"
+      ],
+      "background": {
+        "image": "datasets/raw/fire/archive_assets_legacy/楼宇/开心大厦/照片/另一侧斜视_整体_013.jpg",
+        "parent": "Archive/Assets/楼宇/开心大厦/照片/另一侧斜视_整体_013.jpg",
+        "crop_xyxy": [
+          1354,
+          1452,
+          2430,
+          2259
+        ],
+        "review_state": "no_recognizable_target_in_crop_candidate"
+      },
+      "target": {
+        "kind": "fire_sticker",
+        "count": 1,
+        "quad": [
+          [
+            180,
+            80
+          ],
+          [
+            220,
+            82
+          ],
+          [
+            220,
+            138
+          ],
+          [
+            180,
+            136
+          ]
+        ],
+        "artwork": "datasets/raw/fire/team_assets/image1.png"
+      },
+      "labels": {
+        "class_id": 0,
+        "format": "yolo",
+        "status": "crop_candidate"
+      },
+      "augmentation": {
+        "contrast": [
+          0.9,
+          1.1
+        ],
+        "brightness": [
+          -8.0,
+          8.0
+        ],
+        "saturation": [
+          0.8,
+          1.2
+        ],
+        "patch_scale": [
+          0.78,
+          0.88
+        ]
+      },
+      "sources": [
+        "datasets/raw/fire/archive_assets_legacy/楼宇/开心大厦/照片/另一侧斜视_整体_013.jpg",
+        "Archive/Assets/楼宇/开心大厦/照片/另一侧斜视_整体_013.jpg",
+        "datasets/raw/fire/team_assets/image1.png"
+      ],
+      "parameters": {
+        "seed": 431,
+        "source_id": "facade_A_04"
+      }
+    },
+    {
+      "id": "facade_B_51_count_0",
+      "failure_event": "fire_sticker_missed_or_false_positive",
+      "min_count": 0,
+      "max_count": 18,
+      "prior": {
+        "alpha": 1,
+        "beta": 4
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [
+        "facade_B_51",
+        "count:0"
+      ],
+      "background": {
+        "image": "datasets/raw/fire/archive_assets_legacy/楼宇/锦绣大厦/照片/中距离斜视_楼体和格栅_004.jpg",
+        "parent": "Archive/Assets/楼宇/锦绣大厦/照片/中距离斜视_楼体和格栅_004.jpg",
+        "crop_xyxy": [
+          1354,
+          1452,
+          2430,
+          2259
+        ],
+        "review_state": "no_recognizable_target_in_crop_candidate"
+      },
+      "target": {
+        "kind": "fire_sticker",
+        "count": 0,
+        "quad": [
+          [
+            318,
+            150
+          ],
+          [
+            334,
+            150
+          ],
+          [
+            334,
+            174
+          ],
+          [
+            318,
+            174
+          ]
+        ],
+        "artwork": "datasets/raw/fire/team_assets/image1.png"
+      },
+      "labels": {
+        "class_id": 0,
+        "format": "yolo",
+        "status": "crop_candidate"
+      },
+      "augmentation": {
+        "contrast": [
+          0.9,
+          1.1
+        ],
+        "brightness": [
+          -8.0,
+          8.0
+        ],
+        "saturation": [
+          0.8,
+          1.2
+        ],
+        "patch_scale": [
+          0.78,
+          0.88
+        ]
+      },
+      "sources": [
+        "datasets/raw/fire/archive_assets_legacy/楼宇/锦绣大厦/照片/中距离斜视_楼体和格栅_004.jpg",
+        "Archive/Assets/楼宇/锦绣大厦/照片/中距离斜视_楼体和格栅_004.jpg",
+        "datasets/raw/fire/team_assets/image1.png"
+      ],
+      "parameters": {
+        "seed": 431,
+        "source_id": "facade_B_51"
+      }
+    },
+    {
+      "id": "facade_B_51_count_1",
+      "failure_event": "fire_sticker_missed_or_false_positive",
+      "min_count": 0,
+      "max_count": 18,
+      "prior": {
+        "alpha": 2,
+        "beta": 4
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1.2,
+      "conditions": [
+        "facade_B_51",
+        "count:1"
+      ],
+      "background": {
+        "image": "datasets/raw/fire/archive_assets_legacy/楼宇/锦绣大厦/照片/中距离斜视_楼体和格栅_004.jpg",
+        "parent": "Archive/Assets/楼宇/锦绣大厦/照片/中距离斜视_楼体和格栅_004.jpg",
+        "crop_xyxy": [
+          1354,
+          1452,
+          2430,
+          2259
+        ],
+        "review_state": "no_recognizable_target_in_crop_candidate"
+      },
+      "target": {
+        "kind": "fire_sticker",
+        "count": 1,
+        "quad": [
+          [
+            318,
+            150
+          ],
+          [
+            334,
+            150
+          ],
+          [
+            334,
+            174
+          ],
+          [
+            318,
+            174
+          ]
+        ],
+        "artwork": "datasets/raw/fire/team_assets/image1.png"
+      },
+      "labels": {
+        "class_id": 0,
+        "format": "yolo",
+        "status": "crop_candidate"
+      },
+      "augmentation": {
+        "contrast": [
+          0.9,
+          1.1
+        ],
+        "brightness": [
+          -8.0,
+          8.0
+        ],
+        "saturation": [
+          0.8,
+          1.2
+        ],
+        "patch_scale": [
+          0.78,
+          0.88
+        ]
+      },
+      "sources": [
+        "datasets/raw/fire/archive_assets_legacy/楼宇/锦绣大厦/照片/中距离斜视_楼体和格栅_004.jpg",
+        "Archive/Assets/楼宇/锦绣大厦/照片/中距离斜视_楼体和格栅_004.jpg",
+        "datasets/raw/fire/team_assets/image1.png"
+      ],
+      "parameters": {
+        "seed": 431,
+        "source_id": "facade_B_51"
+      }
+    },
+    {
+      "id": "facade_C_33_count_0",
+      "failure_event": "fire_sticker_missed_or_false_positive",
+      "min_count": 0,
+      "max_count": 18,
+      "prior": {
+        "alpha": 1,
+        "beta": 4
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [
+        "facade_C_33",
+        "count:0"
+      ],
+      "background": {
+        "image": "datasets/raw/fire/archive_assets_legacy/楼宇/晨光大厦/照片/正侧斜视_L形窗格立面_006.jpg",
+        "parent": "Archive/Assets/楼宇/晨光大厦/照片/正侧斜视_L形窗格立面_006.jpg",
+        "crop_xyxy": [
+          1354,
+          1452,
+          2430,
+          2259
+        ],
+        "review_state": "no_recognizable_target_in_crop_candidate"
+      },
+      "target": {
+        "kind": "fire_sticker",
+        "count": 0,
+        "quad": [
+          [
+            230,
+            125
+          ],
+          [
+            248,
+            125
+          ],
+          [
+            248,
+            150
+          ],
+          [
+            230,
+            150
+          ]
+        ],
+        "artwork": "datasets/raw/fire/team_assets/image1.png"
+      },
+      "labels": {
+        "class_id": 0,
+        "format": "yolo",
+        "status": "crop_candidate"
+      },
+      "augmentation": {
+        "contrast": [
+          0.9,
+          1.1
+        ],
+        "brightness": [
+          -8.0,
+          8.0
+        ],
+        "saturation": [
+          0.8,
+          1.2
+        ],
+        "patch_scale": [
+          0.78,
+          0.88
+        ]
+      },
+      "sources": [
+        "datasets/raw/fire/archive_assets_legacy/楼宇/晨光大厦/照片/正侧斜视_L形窗格立面_006.jpg",
+        "Archive/Assets/楼宇/晨光大厦/照片/正侧斜视_L形窗格立面_006.jpg",
+        "datasets/raw/fire/team_assets/image1.png"
+      ],
+      "parameters": {
+        "seed": 431,
+        "source_id": "facade_C_33"
+      }
+    },
+    {
+      "id": "facade_C_33_count_1",
+      "failure_event": "fire_sticker_missed_or_false_positive",
+      "min_count": 0,
+      "max_count": 18,
+      "prior": {
+        "alpha": 2,
+        "beta": 4
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1.2,
+      "conditions": [
+        "facade_C_33",
+        "count:1"
+      ],
+      "background": {
+        "image": "datasets/raw/fire/archive_assets_legacy/楼宇/晨光大厦/照片/正侧斜视_L形窗格立面_006.jpg",
+        "parent": "Archive/Assets/楼宇/晨光大厦/照片/正侧斜视_L形窗格立面_006.jpg",
+        "crop_xyxy": [
+          1354,
+          1452,
+          2430,
+          2259
+        ],
+        "review_state": "no_recognizable_target_in_crop_candidate"
+      },
+      "target": {
+        "kind": "fire_sticker",
+        "count": 1,
+        "quad": [
+          [
+            230,
+            125
+          ],
+          [
+            248,
+            125
+          ],
+          [
+            248,
+            150
+          ],
+          [
+            230,
+            150
+          ]
+        ],
+        "artwork": "datasets/raw/fire/team_assets/image1.png"
+      },
+      "labels": {
+        "class_id": 0,
+        "format": "yolo",
+        "status": "crop_candidate"
+      },
+      "augmentation": {
+        "contrast": [
+          0.9,
+          1.1
+        ],
+        "brightness": [
+          -8.0,
+          8.0
+        ],
+        "saturation": [
+          0.8,
+          1.2
+        ],
+        "patch_scale": [
+          0.78,
+          0.88
+        ]
+      },
+      "sources": [
+        "datasets/raw/fire/archive_assets_legacy/楼宇/晨光大厦/照片/正侧斜视_L形窗格立面_006.jpg",
+        "Archive/Assets/楼宇/晨光大厦/照片/正侧斜视_L形窗格立面_006.jpg",
+        "datasets/raw/fire/team_assets/image1.png"
+      ],
+      "parameters": {
+        "seed": 431,
+        "source_id": "facade_C_33"
+      }
+    }
+  ]
+}

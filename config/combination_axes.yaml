@@ -1,0 +1,115 @@
+# 八任务组合轴声明（噪声/干扰，不是训练目标）。
+# 这些轴用于人为排除与 YOLOv8 目标特征无关的条件，设计覆盖、交叉和干扰方案；
+# 它们不是类别、关键点、OCR 或计数目标。训练目标见 config/task_targets.yaml。
+# 修改后运行：python lab/scripts/contracts/state_coverage.py --write
+version: 1
+tasks:
+  person:
+    plans:
+      - config/production_plan.json
+    axes:
+      background: dynamic
+      position: dynamic
+      view: [front, oblique, side, back]
+      lighting: [normal, dark, bright]
+      saturation: [normal, low, high]
+      mutual_occlusion: [none, present]
+      vehicle_occlusion: [none, upright, fallen]
+      scale: [near, far, unknown]
+      crop: [complete, cropped]
+    notes: 电动车直立/倒伏在这里只是人物目标的遮挡干扰，不是人物类别。
+  e_bike:
+    plans:
+      - config/production_plan.json
+      - config/direct_real_plan.json
+    axes:
+      background: dynamic
+      location: [street, parking, unknown]
+      view: [front, side, back, unknown]
+      distance: [near, far, unknown]
+      truncation: [none, partial, unknown]
+      person_occlusion: [none, present, unknown]
+      vehicle_occlusion: [none, present, unknown]
+      lighting: [normal, adjusted]
+      saturation: [normal, adjusted]
+    notes: 直立/倒伏是电动车任务的目标类别，不放在组合轴；这里只放场景和遮挡噪声。
+  fire:
+    plans:
+      - config/production_plan.json
+    axes:
+      facade: dynamic
+      position: dynamic
+      scale: [normal, enlarged, reduced, unknown]
+      yaw: [frontal, oblique, unknown]
+      occlusion: [none, present, unknown]
+      lighting: [normal, adjusted, unknown]
+      saturation: [normal, adjusted, unknown]
+      crop: [complete, cropped, unknown]
+    notes: 零/单/多贴是目标计数；真实火焰、烟雾、楼面和贴放位置是干扰/场景条件。
+  building_name_paper:
+    plans:
+      - config/production_plan.json
+      - config/blender_plan.json
+      - config/combination_plan.json
+      - config/rooftop_sources.json
+    axes:
+      building: dynamic
+      building_count: [single, multi, unknown]
+      yaw: [frontal, oblique, unknown]
+      lighting: [normal, adjusted, unknown]
+      saturation: [normal, adjusted, unknown]
+      reflection: [none, present, unknown]
+      crop: [complete, cropped, unknown]
+    notes: 纸条有无和文字是训练目标；楼面、楼数、偏航、光照是干扰轴。
+  sign:
+    plans:
+      - config/production_plan.json
+    axes:
+      background: dynamic
+      view: [front, oblique, side, back, unknown]
+      distance: [near, far, unknown]
+      truncation: [none, partial, pole_only, unknown]
+      ordinary_pole: [no, yes, unknown]
+      occlusion: [none, present, unknown]
+      lighting: [normal, dark, adjusted, unknown]
+      saturation: [normal, low, adjusted, unknown]
+    notes: 有牌/无牌是目标/负例；视面、截断、普通立杆和遮挡是干扰轴。
+  waste_bin_state:
+    plans:
+      - config/render_plan.json
+    axes:
+      color: [blue, red, green, gray, not_applicable]
+      position: dynamic
+      neighbor_occlusion: [none, present, unknown]
+      view: [normal, low, unknown]
+      lighting: [normal, adjusted, unknown]
+      saturation: [normal, adjusted, unknown]
+    notes: 开/闭是目标状态；颜色、桶位、数量、邻桶遮挡和视角是干扰轴。
+  waste_sticker:
+    plans:
+      - config/production_plan.json
+      - config/blender_plan.json
+      - config/direct_real_plan.json
+    axes:
+      bin_color: [red, blue, green, gray, unknown]
+      position: dynamic
+      bin_state: [open, closed, unknown]
+      yaw: [frontal, oblique, unknown]
+      lighting: [normal, adjusted, unknown]
+      saturation: [normal, adjusted, unknown]
+      reflection: [none, present, unknown]
+      occlusion: [none, present, unknown]
+    notes: 24 类物品是目标；桶色、开闭、桶位和光照不得决定物品类别。
+  meter:
+    plans:
+      - config/render_plan.json
+      - config/production_plan.json
+    axes:
+      background: dynamic
+      distance: dynamic
+      yaw: [frontal, oblique, unknown]
+      lighting: [normal, dark, bright, adjusted, unknown]
+      saturation: [normal, low, high, adjusted, unknown]
+      reflection: [none, present, unknown]
+      occlusion: [none, present, unknown]
+    notes: 表盘和 8 个关键点是目标；针位是目标关键点值，不放在组合轴。

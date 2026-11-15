@@ -1,0 +1,538 @@
+{
+  "schema_version": 1,
+  "model_key": "building_name_paper",
+  "target_split": "train",
+  "budget": 45,
+  "uncertainty_weight": 0,
+  "purpose": "First resumed bounded input: five directly recorded complete-detection candidates and forty generated-text replacements within the two existing positive paper boxes.",
+  "independence_basis": "Five temporal frames of the same parent video; synthetic replacements are derived views, not independent captures.",
+  "constraints": {
+    "route_context": "building_facade",
+    "traffic_signal_injection": "none",
+    "text_mirror": false,
+    "label_usage": "preserve_source_coverage_and_generated_truth"
+  },
+  "strata": [
+    {
+      "id": "direct_frame_004921",
+      "failure_event": "paper_or_background_label_uncertainty",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [
+        "rooftop_paper",
+        "no_added_occlusion"
+      ],
+      "background": {
+        "sampling": "uniform_group_then_image",
+        "candidates": [
+          {
+            "image": "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_004921.png",
+            "source_group": "site_capture_20261112_full_scene",
+            "parent_source": "datasets/raw/site_capture_20261112/videos/full_scene.mp4",
+            "generation_method": "video_decoded_area_downscale",
+            "image_size": [
+              640,
+              360
+            ],
+            "coverage": "complete_candidate",
+            "coverage_evidence": "datasets/annotated/site_capture_20261112/fire_name_v4_review/review_manifest.json#images[5].tasks.building_name_paper",
+            "existing_papers": [],
+            "regions": []
+          }
+        ]
+      },
+      "target": {
+        "kind": "building_name_paper",
+        "papers": []
+      },
+      "labels": {
+        "task": "paper_detection",
+        "class_id": 0,
+        "format": "yolo_v8",
+        "status": "source_recorded_or_generated_detection",
+        "generated_ocr": "generated_string"
+      },
+      "augmentation": {
+        "mode": "none"
+      },
+      "sources": [
+        "real_scene_background",
+        "name_font_asset"
+      ],
+      "parameters": {
+        "seed": 20261114
+      }
+    },
+    {
+      "id": "direct_frame_002701",
+      "failure_event": "paper_or_background_label_uncertainty",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [
+        "rooftop_paper",
+        "no_added_occlusion"
+      ],
+      "background": {
+        "sampling": "uniform_group_then_image",
+        "candidates": [
+          {
+            "image": "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_002701.png",
+            "source_group": "site_capture_20261112_full_scene",
+            "parent_source": "datasets/raw/site_capture_20261112/videos/full_scene.mp4",
+            "generation_method": "video_decoded_area_downscale",
+            "image_size": [
+              640,
+              360
+            ],
+            "coverage": "complete_candidate",
+            "coverage_evidence": "datasets/annotated/site_capture_20261112/fire_name_v4_review/review_manifest.json#images[2].tasks.building_name_paper",
+            "existing_papers": [],
+            "regions": []
+          }
+        ]
+      },
+      "target": {
+        "kind": "building_name_paper",
+        "papers": []
+      },
+      "labels": {
+        "task": "paper_detection",
+        "class_id": 0,
+        "format": "yolo_v8",
+        "status": "source_recorded_or_generated_detection",
+        "generated_ocr": "generated_string"
+      },
+      "augmentation": {
+        "mode": "none"
+      },
+      "sources": [
+        "real_scene_background",
+        "name_font_asset"
+      ],
+      "parameters": {
+        "seed": 20261115
+      }
+    },
+    {
+      "id": "direct_frame_005101",
+      "failure_event": "paper_or_background_label_uncertainty",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [
+        "rooftop_paper",
+        "no_added_occlusion"
+      ],
+      "background": {
+        "sampling": "uniform_group_then_image",
+        "candidates": [
+          {
+            "image": "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_005101.png",
+            "source_group": "site_capture_20261112_full_scene",
+            "parent_source": "datasets/raw/site_capture_20261112/videos/full_scene.mp4",
+            "generation_method": "video_decoded_area_downscale",
+            "image_size": [
+              640,
+              360
+            ],
+            "coverage": "complete_candidate",
+            "coverage_evidence": "datasets/annotated/site_capture_20261112/fire_name_v4_review/review_manifest.json#images[6].tasks.building_name_paper",
+            "existing_papers": [
+              {
+                "building_id": "frame_005101_paper_0",
+                "box_xyxy": [
+                  297,
+                  31,
+                  431,
+                  75
+                ],
+                "ocr_status": "unknown",
+                "text": null,
+                "evidence": "datasets/annotated/site_capture_20261112/fire_name_v4_review/review_manifest.json#images[6].tasks.building_name_paper"
+              }
+            ],
+            "regions": []
+          }
+        ]
+      },
+      "target": {
+        "kind": "building_name_paper",
+        "papers": []
+      },
+      "labels": {
+        "task": "paper_detection",
+        "class_id": 0,
+        "format": "yolo_v8",
+        "status": "source_recorded_or_generated_detection",
+        "generated_ocr": "generated_string"
+      },
+      "augmentation": {
+        "mode": "none"
+      },
+      "sources": [
+        "real_scene_background",
+        "name_font_asset"
+      ],
+      "parameters": {
+        "seed": 20261116
+      }
+    },
+    {
+      "id": "direct_frame_002551",
+      "failure_event": "paper_or_background_label_uncertainty",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [
+        "rooftop_paper",
+        "no_added_occlusion"
+      ],
+      "background": {
+        "sampling": "uniform_group_then_image",
+        "candidates": [
+          {
+            "image": "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_002551.png",
+            "source_group": "site_capture_20261112_full_scene",
+            "parent_source": "datasets/raw/site_capture_20261112/videos/full_scene.mp4",
+            "generation_method": "video_decoded_area_downscale",
+            "image_size": [
+              640,
+              360
+            ],
+            "coverage": "complete_candidate",
+            "coverage_evidence": "datasets/annotated/site_capture_20261112/fire_name_v4_review/review_manifest.json#images[1].tasks.building_name_paper",
+            "existing_papers": [],
+            "regions": []
+          }
+        ]
+      },
+      "target": {
+        "kind": "building_name_paper",
+        "papers": []
+      },
+      "labels": {
+        "task": "paper_detection",
+        "class_id": 0,
+        "format": "yolo_v8",
+        "status": "source_recorded_or_generated_detection",
+        "generated_ocr": "generated_string"
+      },
+      "augmentation": {
+        "mode": "none"
+      },
+      "sources": [
+        "real_scene_background",
+        "name_font_asset"
+      ],
+      "parameters": {
+        "seed": 20261117
+      }
+    },
+    {
+      "id": "direct_frame_003391",
+      "failure_event": "paper_or_background_label_uncertainty",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [
+        "rooftop_paper",
+        "no_added_occlusion"
+      ],
+      "background": {
+        "sampling": "uniform_group_then_image",
+        "candidates": [
+          {
+            "image": "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_003391.png",
+            "source_group": "site_capture_20261112_full_scene",
+            "parent_source": "datasets/raw/site_capture_20261112/videos/full_scene.mp4",
+            "generation_method": "video_decoded_area_downscale",
+            "image_size": [
+              640,
+              360
+            ],
+            "coverage": "complete_candidate",
+            "coverage_evidence": "datasets/annotated/site_capture_20261112/fire_name_v4_review/review_manifest.json#images[4].tasks.building_name_paper",
+            "existing_papers": [
+              {
+                "building_id": "frame_003391_paper_0",
+                "box_xyxy": [
+                  369,
+                  89,
+                  522,
+                  130
+                ],
+                "ocr_status": "unknown",
+                "text": null,
+                "evidence": "datasets/annotated/site_capture_20261112/fire_name_v4_review/review_manifest.json#images[4].tasks.building_name_paper"
+              }
+            ],
+            "regions": []
+          }
+        ]
+      },
+      "target": {
+        "kind": "building_name_paper",
+        "papers": []
+      },
+      "labels": {
+        "task": "paper_detection",
+        "class_id": 0,
+        "format": "yolo_v8",
+        "status": "source_recorded_or_generated_detection",
+        "generated_ocr": "generated_string"
+      },
+      "augmentation": {
+        "mode": "none"
+      },
+      "sources": [
+        "real_scene_background",
+        "name_font_asset"
+      ],
+      "parameters": {
+        "seed": 20261118
+      }
+    },
+    {
+      "id": "replace_0",
+      "failure_event": "paper_or_background_label_uncertainty",
+      "min_count": 10,
+      "max_count": 30,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [
+        "rooftop_paper",
+        "no_added_occlusion"
+      ],
+      "background": {
+        "sampling": "uniform_group_then_image",
+        "candidates": [
+          {
+            "image": "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_005101.png",
+            "source_group": "site_capture_20261112_full_scene",
+            "parent_source": "datasets/raw/site_capture_20261112/videos/full_scene.mp4",
+            "generation_method": "video_decoded_area_downscale",
+            "image_size": [
+              640,
+              360
+            ],
+            "coverage": "complete_candidate",
+            "coverage_evidence": "datasets/annotated/site_capture_20261112/fire_name_v4_review/review_manifest.json#images[6].tasks.building_name_paper",
+            "existing_papers": [
+              {
+                "building_id": "frame_005101_paper_0",
+                "box_xyxy": [
+                  297,
+                  31,
+                  431,
+                  75
+                ],
+                "ocr_status": "unknown",
+                "text": null,
+                "evidence": "datasets/annotated/site_capture_20261112/fire_name_v4_review/review_manifest.json#images[6].tasks.building_name_paper"
+              }
+            ],
+            "regions": [
+              {
+                "slot_id": "replace",
+                "building_id": "frame_005101_paper_0",
+                "quad_xy": [
+                  [
+                    297,
+                    31
+                  ],
+                  [
+                    431,
+                    31
+                  ],
+                  [
+                    431,
+                    75
+                  ],
+                  [
+                    297,
+                    75
+                  ]
+                ],
+                "evidence": "datasets/annotated/site_capture_20261112/fire_name_v4_review/review_manifest.json#images[6].tasks.building_name_paper",
+                "replacement_of": "frame_005101_paper_0"
+              }
+            ]
+          }
+        ]
+      },
+      "target": {
+        "kind": "building_name_paper",
+        "papers": [
+          {
+            "slot_id": "replace",
+            "text": "清和大厦"
+          }
+        ]
+      },
+      "labels": {
+        "task": "paper_detection",
+        "class_id": 0,
+        "format": "yolo_v8",
+        "status": "source_recorded_or_generated_detection",
+        "generated_ocr": "generated_string"
+      },
+      "augmentation": {
+        "mode": "scene_bounded_v1"
+      },
+      "sources": [
+        "real_scene_background",
+        "name_font_asset"
+      ],
+      "parameters": {
+        "seed": 20261130
+      }
+    },
+    {
+      "id": "replace_1",
+      "failure_event": "paper_or_background_label_uncertainty",
+      "min_count": 10,
+      "max_count": 30,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [
+        "rooftop_paper",
+        "no_added_occlusion"
+      ],
+      "background": {
+        "sampling": "uniform_group_then_image",
+        "candidates": [
+          {
+            "image": "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_003391.png",
+            "source_group": "site_capture_20261112_full_scene",
+            "parent_source": "datasets/raw/site_capture_20261112/videos/full_scene.mp4",
+            "generation_method": "video_decoded_area_downscale",
+            "image_size": [
+              640,
+              360
+            ],
+            "coverage": "complete_candidate",
+            "coverage_evidence": "datasets/annotated/site_capture_20261112/fire_name_v4_review/review_manifest.json#images[4].tasks.building_name_paper",
+            "existing_papers": [
+              {
+                "building_id": "frame_003391_paper_0",
+                "box_xyxy": [
+                  369,
+                  89,
+                  522,
+                  130
+                ],
+                "ocr_status": "unknown",
+                "text": null,
+                "evidence": "datasets/annotated/site_capture_20261112/fire_name_v4_review/review_manifest.json#images[4].tasks.building_name_paper"
+              }
+            ],
+            "regions": [
+              {
+                "slot_id": "replace",
+                "building_id": "frame_003391_paper_0",
+                "quad_xy": [
+                  [
+                    369,
+                    89
+                  ],
+                  [
+                    522,
+                    89
+                  ],
+                  [
+                    522,
+                    130
+                  ],
+                  [
+                    369,
+                    130
+                  ]
+                ],
+                "evidence": "datasets/annotated/site_capture_20261112/fire_name_v4_review/review_manifest.json#images[4].tasks.building_name_paper",
+                "replacement_of": "frame_003391_paper_0"
+              }
+            ]
+          }
+        ]
+      },
+      "target": {
+        "kind": "building_name_paper",
+        "papers": [
+          {
+            "slot_id": "replace",
+            "text": "清和大厦"
+          }
+        ]
+      },
+      "labels": {
+        "task": "paper_detection",
+        "class_id": 0,
+        "format": "yolo_v8",
+        "status": "source_recorded_or_generated_detection",
+        "generated_ocr": "generated_string"
+      },
+      "augmentation": {
+        "mode": "scene_bounded_v1"
+      },
+      "sources": [
+        "real_scene_background",
+        "name_font_asset"
+      ],
+      "parameters": {
+        "seed": 20261131
+      }
+    }
+  ],
+  "input_scope": {
+    "direct_positive_count": 2,
+    "direct_negative_count": 3,
+    "generated_replacement_budget": 40,
+    "original_ocr_supervision": "excluded: unknown transcription",
+    "excluded_previous_real_composite_states": 1200,
+    "exclusion_reason": "unknown full-frame paper coverage; retained only in design/reference config",
+    "separate_blender_plan": "datasets/scripts/building_name_paper/config/blender_plan.json",
+    "separate_blender_budget": 900,
+    "actual_generated_count": 0,
+    "dataset_target_unchanged": true
+  },
+  "execution": {
+    "entry": "datasets/scripts/building_name_paper/compose_rooftop_papers.py",
+    "output": "datasets/exports/building_name_paper/train",
+    "production_paused": true
+  }
+}

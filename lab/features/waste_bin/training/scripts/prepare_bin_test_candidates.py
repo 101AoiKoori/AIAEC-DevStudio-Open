@@ -7,6 +7,7 @@ variant shares one original photograph and is one test source group.
 import argparse
 import json
 import random
+import sys
 from collections import Counter
 from pathlib import Path
 
@@ -16,7 +17,7 @@ import numpy as np
 import composite_bin_real_scene as core
 
 ROOT = Path(__file__).resolve().parents[5]
-PHOTO = ROOT / 'Archive/Assets/垃圾桶/照片/四色桶正面_闭盖_分类标志_001.jpg'
+PHOTO = ROOT / 'datasets/raw/waste_bin/archive_assets_legacy/照片/四色桶正面_闭盖_分类标志_001.jpg'
 # Rectangles in a 960×540 resizing of the source image, estimated from the
 # visible bin extents; subsequent manual review is needed for exact bounds.
 BINS = [
@@ -32,7 +33,7 @@ def normalize_box(box):
     return ((x1+x2)/1920, (y1+y2)/1080, (x2-x1)/960, (y2-y1)/540)
 
 
-def main():
+def _generate():
     parser = argparse.ArgumentParser()
     parser.add_argument('--out', type=Path, required=True)
     parser.add_argument('--count', type=int, required=True)
@@ -103,6 +104,33 @@ def main():
         'lighting':dict(lights),'description':'real photo with programmatically placed paper stickers; photo-derived synthetic test candidates'},ensure_ascii=False,indent=2),encoding='utf-8')
     (out/'run.json').write_text(json.dumps({'status':'complete_candidates','count':args.count}),encoding='utf-8')
     print('complete:',args.count)
+
+
+def _guard_inputs():
+    config = core.yaml.safe_load(core.CLASSES.read_text(encoding='utf8'))
+    media = [PHOTO] + [core.CACHE / (item['name'] + '.npz') for item in config['items']]
+    media += [ROOT / 'datasets/raw/waste_bin/toolkit/SourcePic' / (item['name'] + '.png')
+              for item in config['items']]
+    return media, [core.CLASSES, ROOT / 'config/perception_tasks.json']
+
+
+def main():
+    parser=argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--out',type=Path,required=True)
+    parser.add_argument('--count',type=int,required=True)
+    parser.add_argument('--seed',type=int,default=20261120)
+    args,_=parser.parse_known_args()
+    out=(ROOT/args.out).resolve()
+    media,procedural=_guard_inputs()
+    sys.path.insert(0,str(ROOT))
+    from lab.training_common.production_guard import generation_guard
+    with generation_guard('waste_bin.prepare_test_candidates:'+str(out.relative_to(ROOT)),
+                          media,[out],{'argv':sys.argv[1:]},
+                          code_paths=[Path(__file__).resolve(),Path(core.__file__).resolve()],
+                          procedural_inputs=procedural,root=ROOT) as run:
+        if run.reused:
+            return
+        _generate()
 
 
 if __name__=='__main__':

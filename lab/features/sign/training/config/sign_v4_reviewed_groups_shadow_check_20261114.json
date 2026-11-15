@@ -1,0 +1,1036 @@
+{
+  "schema_version": 1,
+  "model_key": "sign",
+  "target_split": "train",
+  "constraints": {
+    "image_size": [
+      640,
+      480
+    ],
+    "label_kind": "visible_fixture_box"
+  },
+  "budget": 12,
+  "sampling_seed": 1918,
+  "uncertainty_weight": 0,
+  "purpose": "按背景父源和光照状态分配候选生成预算",
+  "independence_basis": "每背景对应一个父视频；牌具同一视频",
+  "background_inputs": [
+    {
+      "image": "datasets/annotated/mixed_scene/v4_compositing_backgrounds_20261113/images/junction_003_001.jpg",
+      "parent_image": "datasets/annotated/mixed_scene/v4_compositing_backgrounds_20261113/images/junction_003_001.jpg",
+      "parent_video": "Archive/Assets/场景/三楼与场地视频/三栋楼_垃圾桶与路口_003.mp4",
+      "pts_seconds": 1.0,
+      "workspace_image": true,
+      "crop_xyxy": [
+        80,
+        0,
+        560,
+        360
+      ],
+      "sign_absence": "confirmed",
+      "sign_absence_evidence": "原 640×360 帧目视无可辨牌具；不推断画外。",
+      "source_evidence": {
+        "manifest": "datasets/annotated/mixed_scene/v4_compositing_backgrounds_20261113/manifest.json",
+        "record_index": 0
+      },
+      "ground_evidence": "两栋楼之间的可见路面，避开左右建筑；原图目视近似区域。",
+      "support_rectangle_xyxy": [
+        220,
+        390,
+        315,
+        440
+      ],
+      "task_use_status": [
+        {
+          "task": "sign",
+          "split": "train",
+          "role": "background",
+          "status": "candidate",
+          "evidence": "两栋楼之间的可见路面，避开左右建筑；原图目视近似区域。"
+        }
+      ]
+    },
+    {
+      "image": "datasets/annotated/mixed_scene/v4_compositing_backgrounds_20261113/images/parking_003_001.jpg",
+      "parent_image": "datasets/annotated/mixed_scene/v4_compositing_backgrounds_20261113/images/parking_003_001.jpg",
+      "parent_video": "Archive/Assets/电动车与人物/视频/场地多辆电动车_直立与倒伏混合_较低视角_003.mp4",
+      "pts_seconds": 1.333233333,
+      "workspace_image": true,
+      "crop_xyxy": [
+        80,
+        0,
+        560,
+        360
+      ],
+      "sign_absence": "confirmed",
+      "sign_absence_evidence": "原 640×360 帧目视无可辨牌具；不推断画外。",
+      "source_evidence": {
+        "manifest": "datasets/annotated/mixed_scene/v4_compositing_backgrounds_20261113/manifest.json",
+        "record_index": 80
+      },
+      "ground_evidence": "右侧可见路面，避开左侧两辆电动车；原图目视近似区域。",
+      "support_rectangle_xyxy": [
+        380,
+        295,
+        550,
+        355
+      ],
+      "task_use_status": [
+        {
+          "task": "sign",
+          "split": "train",
+          "role": "background",
+          "status": "candidate",
+          "evidence": "右侧可见路面，避开左侧两辆电动车；原图目视近似区域。"
+        }
+      ]
+    }
+  ],
+  "group_allocation": {
+    "schema_version": 1,
+    "status": "planned_not_produced",
+    "purpose": "按背景父源和光照状态分配候选生成预算",
+    "model_key": "sign",
+    "target_split": "train",
+    "budget": 12,
+    "planned_total": 12,
+    "environment": {
+      "python": "3.12.14",
+      "scipy": "1.14.1"
+    },
+    "independence_basis": "每背景对应一个父视频；牌具同一视频",
+    "uncertainty_weight": 0.0,
+    "formula": "weight = exposure_weight * failure_cost * (posterior_mean + uncertainty_weight * posterior_std); minimums first, remainder capped-proportional with deterministic largest remainders",
+    "scope": "Quotas and planned fractions are production heuristics, not state occurrence probabilities, data, measured coverage or a quality guarantee. Prior-only states have no observations. Group independence is an assumption, not proved by IDs; groups can overlap across strata. Test performance is never inferred here. Small floating-point differences across library versions are possible.",
+    "strata": [
+      {
+        "id": "0_normal",
+        "failure_event": "候选牌具漏检或定位失败",
+        "conditions": [
+          "junction_003_001.jpg",
+          "normal"
+        ],
+        "min_count": 1,
+        "max_count": 12,
+        "prior": {
+          "alpha": 1.0,
+          "beta": 2.0
+        },
+        "observation_status": "prior_only",
+        "observed_groups": 0,
+        "failed_groups": 0,
+        "group_observations": [],
+        "posterior": {
+          "alpha": 1.0,
+          "beta": 2.0,
+          "mean": 0.3333333333333333,
+          "std": 0.23570226039551584,
+          "equal_tail_95": [
+            0.01257911709342505,
+            0.841886116991581
+          ],
+          "interpretation": "prior_only_not_observed_or_test_performance"
+        },
+        "exposure_weight": 1.0,
+        "failure_cost": 1.0,
+        "risk_weight": 0.3333333333333333,
+        "uncertainty_component": 0.0,
+        "allocation_weight": 0.3333333333333333,
+        "planned_count": 2,
+        "planned_fraction": 0.16666666666666666
+      },
+      {
+        "id": "0_dark_low_saturation",
+        "failure_event": "候选牌具漏检或定位失败",
+        "conditions": [
+          "junction_003_001.jpg",
+          "dark_low_saturation"
+        ],
+        "min_count": 1,
+        "max_count": 12,
+        "prior": {
+          "alpha": 2.0,
+          "beta": 2.0
+        },
+        "observation_status": "prior_only",
+        "observed_groups": 0,
+        "failed_groups": 0,
+        "group_observations": [],
+        "posterior": {
+          "alpha": 2.0,
+          "beta": 2.0,
+          "mean": 0.5,
+          "std": 0.22360679774997896,
+          "equal_tail_95": [
+            0.09429932405024609,
+            0.9057006759497539
+          ],
+          "interpretation": "prior_only_not_observed_or_test_performance"
+        },
+        "exposure_weight": 1.0,
+        "failure_cost": 1.5,
+        "risk_weight": 0.75,
+        "uncertainty_component": 0.0,
+        "allocation_weight": 0.75,
+        "planned_count": 4,
+        "planned_fraction": 0.3333333333333333
+      },
+      {
+        "id": "1_normal",
+        "failure_event": "候选牌具漏检或定位失败",
+        "conditions": [
+          "parking_003_001.jpg",
+          "normal"
+        ],
+        "min_count": 1,
+        "max_count": 12,
+        "prior": {
+          "alpha": 1.0,
+          "beta": 2.0
+        },
+        "observation_status": "prior_only",
+        "observed_groups": 0,
+        "failed_groups": 0,
+        "group_observations": [],
+        "posterior": {
+          "alpha": 1.0,
+          "beta": 2.0,
+          "mean": 0.3333333333333333,
+          "std": 0.23570226039551584,
+          "equal_tail_95": [
+            0.01257911709342505,
+            0.841886116991581
+          ],
+          "interpretation": "prior_only_not_observed_or_test_performance"
+        },
+        "exposure_weight": 1.0,
+        "failure_cost": 1.0,
+        "risk_weight": 0.3333333333333333,
+        "uncertainty_component": 0.0,
+        "allocation_weight": 0.3333333333333333,
+        "planned_count": 2,
+        "planned_fraction": 0.16666666666666666
+      },
+      {
+        "id": "1_dark_low_saturation",
+        "failure_event": "候选牌具漏检或定位失败",
+        "conditions": [
+          "parking_003_001.jpg",
+          "dark_low_saturation"
+        ],
+        "min_count": 1,
+        "max_count": 12,
+        "prior": {
+          "alpha": 2.0,
+          "beta": 2.0
+        },
+        "observation_status": "prior_only",
+        "observed_groups": 0,
+        "failed_groups": 0,
+        "group_observations": [],
+        "posterior": {
+          "alpha": 2.0,
+          "beta": 2.0,
+          "mean": 0.5,
+          "std": 0.22360679774997896,
+          "equal_tail_95": [
+            0.09429932405024609,
+            0.9057006759497539
+          ],
+          "interpretation": "prior_only_not_observed_or_test_performance"
+        },
+        "exposure_weight": 1.0,
+        "failure_cost": 1.5,
+        "risk_weight": 0.75,
+        "uncertainty_component": 0.0,
+        "allocation_weight": 0.75,
+        "planned_count": 4,
+        "planned_fraction": 0.3333333333333333
+      }
+    ]
+  },
+  "allocation_explanation": "分组先执行有弹性上下限的贝叶斯先验/代价配额，再生成不重复的单次具体状态；无模型反馈。",
+  "source_and_geometry_limits": "仅两帧目视近似路面，候选前景来自同一视频；非测量或验收。",
+  "strata": [
+    {
+      "id": "g0_normal_0000",
+      "failure_event": "候选牌具漏检或定位失败",
+      "conditions": [
+        "placed",
+        "front",
+        "normal"
+      ],
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "background": {
+        "image": "datasets/annotated/mixed_scene/v4_compositing_backgrounds_20261113/images/junction_003_001.jpg"
+      },
+      "target": {
+        "state": "placed",
+        "mask": "train_20.png"
+      },
+      "labels": {
+        "class_id": 0,
+        "kind": "visible_fixture_box"
+      },
+      "augmentation": {
+        "tone": "normal"
+      },
+      "parameters": {
+        "height": 82,
+        "left": 252,
+        "top": 326,
+        "ground_polygon": [
+          [
+            220,
+            390
+          ],
+          [
+            315,
+            390
+          ],
+          [
+            315,
+            440
+          ],
+          [
+            220,
+            440
+          ]
+        ],
+        "occlusion_polygons": [],
+        "visible_kind": "fixture",
+        "shadow_strength": 0.192,
+        "visibility_evidence": "原候选掩膜牌面、立杆及底座完整；生成标签仍为候选。"
+      },
+      "sources": [
+        "datasets/annotated/mixed_scene/v4_compositing_backgrounds_20261113/images/junction_003_001.jpg",
+        "Archive/Assets/场景/三楼与场地视频/三栋楼_垃圾桶与路口_003.mp4",
+        "datasets/annotated/sign/sam2_fixture_candidates_20261110/train_20.png",
+        "datasets/annotated/sign/video_candidates_20261110/images/sign_0299.png",
+        "datasets/raw/sign/archive_assets_legacy/视频/禁止直行牌视频.mp4"
+      ]
+    },
+    {
+      "id": "g0_normal_0001",
+      "failure_event": "候选牌具漏检或定位失败",
+      "conditions": [
+        "placed",
+        "front",
+        "normal"
+      ],
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "background": {
+        "image": "datasets/annotated/mixed_scene/v4_compositing_backgrounds_20261113/images/junction_003_001.jpg"
+      },
+      "target": {
+        "state": "placed",
+        "mask": "train_20.png"
+      },
+      "labels": {
+        "class_id": 0,
+        "kind": "visible_fixture_box"
+      },
+      "augmentation": {
+        "tone": "normal"
+      },
+      "parameters": {
+        "height": 86,
+        "left": 244,
+        "top": 320,
+        "ground_polygon": [
+          [
+            220,
+            390
+          ],
+          [
+            315,
+            390
+          ],
+          [
+            315,
+            440
+          ],
+          [
+            220,
+            440
+          ]
+        ],
+        "occlusion_polygons": [],
+        "visible_kind": "fixture",
+        "shadow_strength": 0.165,
+        "visibility_evidence": "原候选掩膜牌面、立杆及底座完整；生成标签仍为候选。"
+      },
+      "sources": [
+        "datasets/annotated/mixed_scene/v4_compositing_backgrounds_20261113/images/junction_003_001.jpg",
+        "Archive/Assets/场景/三楼与场地视频/三栋楼_垃圾桶与路口_003.mp4",
+        "datasets/annotated/sign/sam2_fixture_candidates_20261110/train_20.png",
+        "datasets/annotated/sign/video_candidates_20261110/images/sign_0299.png",
+        "datasets/raw/sign/archive_assets_legacy/视频/禁止直行牌视频.mp4"
+      ]
+    },
+    {
+      "id": "g0_dark_low_saturation_0000",
+      "failure_event": "候选牌具漏检或定位失败",
+      "conditions": [
+        "placed",
+        "front",
+        "dark_low_saturation"
+      ],
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "background": {
+        "image": "datasets/annotated/mixed_scene/v4_compositing_backgrounds_20261113/images/junction_003_001.jpg"
+      },
+      "target": {
+        "state": "placed",
+        "mask": "train_20.png"
+      },
+      "labels": {
+        "class_id": 0,
+        "kind": "visible_fixture_box"
+      },
+      "augmentation": {
+        "tone": "dark_low_saturation"
+      },
+      "parameters": {
+        "height": 90,
+        "left": 243,
+        "top": 320,
+        "ground_polygon": [
+          [
+            220,
+            390
+          ],
+          [
+            315,
+            390
+          ],
+          [
+            315,
+            440
+          ],
+          [
+            220,
+            440
+          ]
+        ],
+        "occlusion_polygons": [],
+        "visible_kind": "fixture",
+        "shadow_strength": 0.171,
+        "visibility_evidence": "原候选掩膜牌面、立杆及底座完整；生成标签仍为候选。"
+      },
+      "sources": [
+        "datasets/annotated/mixed_scene/v4_compositing_backgrounds_20261113/images/junction_003_001.jpg",
+        "Archive/Assets/场景/三楼与场地视频/三栋楼_垃圾桶与路口_003.mp4",
+        "datasets/annotated/sign/sam2_fixture_candidates_20261110/train_20.png",
+        "datasets/annotated/sign/video_candidates_20261110/images/sign_0299.png",
+        "datasets/raw/sign/archive_assets_legacy/视频/禁止直行牌视频.mp4"
+      ]
+    },
+    {
+      "id": "g0_dark_low_saturation_0001",
+      "failure_event": "候选牌具漏检或定位失败",
+      "conditions": [
+        "placed",
+        "front",
+        "dark_low_saturation"
+      ],
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "background": {
+        "image": "datasets/annotated/mixed_scene/v4_compositing_backgrounds_20261113/images/junction_003_001.jpg"
+      },
+      "target": {
+        "state": "placed",
+        "mask": "train_20.png"
+      },
+      "labels": {
+        "class_id": 0,
+        "kind": "visible_fixture_box"
+      },
+      "augmentation": {
+        "tone": "dark_low_saturation"
+      },
+      "parameters": {
+        "height": 89,
+        "left": 244,
+        "top": 332,
+        "ground_polygon": [
+          [
+            220,
+            390
+          ],
+          [
+            315,
+            390
+          ],
+          [
+            315,
+            440
+          ],
+          [
+            220,
+            440
+          ]
+        ],
+        "occlusion_polygons": [],
+        "visible_kind": "fixture",
+        "shadow_strength": 0.183,
+        "visibility_evidence": "原候选掩膜牌面、立杆及底座完整；生成标签仍为候选。"
+      },
+      "sources": [
+        "datasets/annotated/mixed_scene/v4_compositing_backgrounds_20261113/images/junction_003_001.jpg",
+        "Archive/Assets/场景/三楼与场地视频/三栋楼_垃圾桶与路口_003.mp4",
+        "datasets/annotated/sign/sam2_fixture_candidates_20261110/train_20.png",
+        "datasets/annotated/sign/video_candidates_20261110/images/sign_0299.png",
+        "datasets/raw/sign/archive_assets_legacy/视频/禁止直行牌视频.mp4"
+      ]
+    },
+    {
+      "id": "g0_dark_low_saturation_0002",
+      "failure_event": "候选牌具漏检或定位失败",
+      "conditions": [
+        "placed",
+        "front",
+        "dark_low_saturation"
+      ],
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "background": {
+        "image": "datasets/annotated/mixed_scene/v4_compositing_backgrounds_20261113/images/junction_003_001.jpg"
+      },
+      "target": {
+        "state": "placed",
+        "mask": "train_20.png"
+      },
+      "labels": {
+        "class_id": 0,
+        "kind": "visible_fixture_box"
+      },
+      "augmentation": {
+        "tone": "dark_low_saturation"
+      },
+      "parameters": {
+        "height": 89,
+        "left": 238,
+        "top": 321,
+        "ground_polygon": [
+          [
+            220,
+            390
+          ],
+          [
+            315,
+            390
+          ],
+          [
+            315,
+            440
+          ],
+          [
+            220,
+            440
+          ]
+        ],
+        "occlusion_polygons": [],
+        "visible_kind": "fixture",
+        "shadow_strength": 0.223,
+        "visibility_evidence": "原候选掩膜牌面、立杆及底座完整；生成标签仍为候选。"
+      },
+      "sources": [
+        "datasets/annotated/mixed_scene/v4_compositing_backgrounds_20261113/images/junction_003_001.jpg",
+        "Archive/Assets/场景/三楼与场地视频/三栋楼_垃圾桶与路口_003.mp4",
+        "datasets/annotated/sign/sam2_fixture_candidates_20261110/train_20.png",
+        "datasets/annotated/sign/video_candidates_20261110/images/sign_0299.png",
+        "datasets/raw/sign/archive_assets_legacy/视频/禁止直行牌视频.mp4"
+      ]
+    },
+    {
+      "id": "g0_dark_low_saturation_0003",
+      "failure_event": "候选牌具漏检或定位失败",
+      "conditions": [
+        "placed",
+        "front",
+        "dark_low_saturation"
+      ],
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "background": {
+        "image": "datasets/annotated/mixed_scene/v4_compositing_backgrounds_20261113/images/junction_003_001.jpg"
+      },
+      "target": {
+        "state": "placed",
+        "mask": "train_20.png"
+      },
+      "labels": {
+        "class_id": 0,
+        "kind": "visible_fixture_box"
+      },
+      "augmentation": {
+        "tone": "dark_low_saturation"
+      },
+      "parameters": {
+        "height": 97,
+        "left": 246,
+        "top": 337,
+        "ground_polygon": [
+          [
+            220,
+            390
+          ],
+          [
+            315,
+            390
+          ],
+          [
+            315,
+            440
+          ],
+          [
+            220,
+            440
+          ]
+        ],
+        "occlusion_polygons": [],
+        "visible_kind": "fixture",
+        "shadow_strength": 0.224,
+        "visibility_evidence": "原候选掩膜牌面、立杆及底座完整；生成标签仍为候选。"
+      },
+      "sources": [
+        "datasets/annotated/mixed_scene/v4_compositing_backgrounds_20261113/images/junction_003_001.jpg",
+        "Archive/Assets/场景/三楼与场地视频/三栋楼_垃圾桶与路口_003.mp4",
+        "datasets/annotated/sign/sam2_fixture_candidates_20261110/train_20.png",
+        "datasets/annotated/sign/video_candidates_20261110/images/sign_0299.png",
+        "datasets/raw/sign/archive_assets_legacy/视频/禁止直行牌视频.mp4"
+      ]
+    },
+    {
+      "id": "g1_normal_0000",
+      "failure_event": "候选牌具漏检或定位失败",
+      "conditions": [
+        "placed",
+        "front",
+        "normal"
+      ],
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "background": {
+        "image": "datasets/annotated/mixed_scene/v4_compositing_backgrounds_20261113/images/parking_003_001.jpg"
+      },
+      "target": {
+        "state": "placed",
+        "mask": "train_20.png"
+      },
+      "labels": {
+        "class_id": 0,
+        "kind": "visible_fixture_box"
+      },
+      "augmentation": {
+        "tone": "normal"
+      },
+      "parameters": {
+        "height": 162,
+        "left": 441,
+        "top": 147,
+        "ground_polygon": [
+          [
+            380,
+            295
+          ],
+          [
+            550,
+            295
+          ],
+          [
+            550,
+            355
+          ],
+          [
+            380,
+            355
+          ]
+        ],
+        "occlusion_polygons": [],
+        "visible_kind": "fixture",
+        "shadow_strength": 0.144,
+        "visibility_evidence": "原候选掩膜牌面、立杆及底座完整；生成标签仍为候选。"
+      },
+      "sources": [
+        "datasets/annotated/mixed_scene/v4_compositing_backgrounds_20261113/images/parking_003_001.jpg",
+        "Archive/Assets/电动车与人物/视频/场地多辆电动车_直立与倒伏混合_较低视角_003.mp4",
+        "datasets/annotated/sign/sam2_fixture_candidates_20261110/train_20.png",
+        "datasets/annotated/sign/video_candidates_20261110/images/sign_0299.png",
+        "datasets/raw/sign/archive_assets_legacy/视频/禁止直行牌视频.mp4"
+      ]
+    },
+    {
+      "id": "g1_normal_0001",
+      "failure_event": "候选牌具漏检或定位失败",
+      "conditions": [
+        "placed",
+        "front",
+        "normal"
+      ],
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "background": {
+        "image": "datasets/annotated/mixed_scene/v4_compositing_backgrounds_20261113/images/parking_003_001.jpg"
+      },
+      "target": {
+        "state": "placed",
+        "mask": "train_20.png"
+      },
+      "labels": {
+        "class_id": 0,
+        "kind": "visible_fixture_box"
+      },
+      "augmentation": {
+        "tone": "normal"
+      },
+      "parameters": {
+        "height": 138,
+        "left": 416,
+        "top": 200,
+        "ground_polygon": [
+          [
+            380,
+            295
+          ],
+          [
+            550,
+            295
+          ],
+          [
+            550,
+            355
+          ],
+          [
+            380,
+            355
+          ]
+        ],
+        "occlusion_polygons": [],
+        "visible_kind": "fixture",
+        "shadow_strength": 0.129,
+        "visibility_evidence": "原候选掩膜牌面、立杆及底座完整；生成标签仍为候选。"
+      },
+      "sources": [
+        "datasets/annotated/mixed_scene/v4_compositing_backgrounds_20261113/images/parking_003_001.jpg",
+        "Archive/Assets/电动车与人物/视频/场地多辆电动车_直立与倒伏混合_较低视角_003.mp4",
+        "datasets/annotated/sign/sam2_fixture_candidates_20261110/train_20.png",
+        "datasets/annotated/sign/video_candidates_20261110/images/sign_0299.png",
+        "datasets/raw/sign/archive_assets_legacy/视频/禁止直行牌视频.mp4"
+      ]
+    },
+    {
+      "id": "g1_dark_low_saturation_0000",
+      "failure_event": "候选牌具漏检或定位失败",
+      "conditions": [
+        "placed",
+        "front",
+        "dark_low_saturation"
+      ],
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "background": {
+        "image": "datasets/annotated/mixed_scene/v4_compositing_backgrounds_20261113/images/parking_003_001.jpg"
+      },
+      "target": {
+        "state": "placed",
+        "mask": "train_20.png"
+      },
+      "labels": {
+        "class_id": 0,
+        "kind": "visible_fixture_box"
+      },
+      "augmentation": {
+        "tone": "dark_low_saturation"
+      },
+      "parameters": {
+        "height": 157,
+        "left": 419,
+        "top": 173,
+        "ground_polygon": [
+          [
+            380,
+            295
+          ],
+          [
+            550,
+            295
+          ],
+          [
+            550,
+            355
+          ],
+          [
+            380,
+            355
+          ]
+        ],
+        "occlusion_polygons": [],
+        "visible_kind": "fixture",
+        "shadow_strength": 0.247,
+        "visibility_evidence": "原候选掩膜牌面、立杆及底座完整；生成标签仍为候选。"
+      },
+      "sources": [
+        "datasets/annotated/mixed_scene/v4_compositing_backgrounds_20261113/images/parking_003_001.jpg",
+        "Archive/Assets/电动车与人物/视频/场地多辆电动车_直立与倒伏混合_较低视角_003.mp4",
+        "datasets/annotated/sign/sam2_fixture_candidates_20261110/train_20.png",
+        "datasets/annotated/sign/video_candidates_20261110/images/sign_0299.png",
+        "datasets/raw/sign/archive_assets_legacy/视频/禁止直行牌视频.mp4"
+      ]
+    },
+    {
+      "id": "g1_dark_low_saturation_0001",
+      "failure_event": "候选牌具漏检或定位失败",
+      "conditions": [
+        "placed",
+        "front",
+        "dark_low_saturation"
+      ],
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "background": {
+        "image": "datasets/annotated/mixed_scene/v4_compositing_backgrounds_20261113/images/parking_003_001.jpg"
+      },
+      "target": {
+        "state": "placed",
+        "mask": "train_20.png"
+      },
+      "labels": {
+        "class_id": 0,
+        "kind": "visible_fixture_box"
+      },
+      "augmentation": {
+        "tone": "dark_low_saturation"
+      },
+      "parameters": {
+        "height": 129,
+        "left": 449,
+        "top": 205,
+        "ground_polygon": [
+          [
+            380,
+            295
+          ],
+          [
+            550,
+            295
+          ],
+          [
+            550,
+            355
+          ],
+          [
+            380,
+            355
+          ]
+        ],
+        "occlusion_polygons": [],
+        "visible_kind": "fixture",
+        "shadow_strength": 0.242,
+        "visibility_evidence": "原候选掩膜牌面、立杆及底座完整；生成标签仍为候选。"
+      },
+      "sources": [
+        "datasets/annotated/mixed_scene/v4_compositing_backgrounds_20261113/images/parking_003_001.jpg",
+        "Archive/Assets/电动车与人物/视频/场地多辆电动车_直立与倒伏混合_较低视角_003.mp4",
+        "datasets/annotated/sign/sam2_fixture_candidates_20261110/train_20.png",
+        "datasets/annotated/sign/video_candidates_20261110/images/sign_0299.png",
+        "datasets/raw/sign/archive_assets_legacy/视频/禁止直行牌视频.mp4"
+      ]
+    },
+    {
+      "id": "g1_dark_low_saturation_0002",
+      "failure_event": "候选牌具漏检或定位失败",
+      "conditions": [
+        "placed",
+        "front",
+        "dark_low_saturation"
+      ],
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "background": {
+        "image": "datasets/annotated/mixed_scene/v4_compositing_backgrounds_20261113/images/parking_003_001.jpg"
+      },
+      "target": {
+        "state": "placed",
+        "mask": "train_20.png"
+      },
+      "labels": {
+        "class_id": 0,
+        "kind": "visible_fixture_box"
+      },
+      "augmentation": {
+        "tone": "dark_low_saturation"
+      },
+      "parameters": {
+        "height": 132,
+        "left": 435,
+        "top": 201,
+        "ground_polygon": [
+          [
+            380,
+            295
+          ],
+          [
+            550,
+            295
+          ],
+          [
+            550,
+            355
+          ],
+          [
+            380,
+            355
+          ]
+        ],
+        "occlusion_polygons": [],
+        "visible_kind": "fixture",
+        "shadow_strength": 0.147,
+        "visibility_evidence": "原候选掩膜牌面、立杆及底座完整；生成标签仍为候选。"
+      },
+      "sources": [
+        "datasets/annotated/mixed_scene/v4_compositing_backgrounds_20261113/images/parking_003_001.jpg",
+        "Archive/Assets/电动车与人物/视频/场地多辆电动车_直立与倒伏混合_较低视角_003.mp4",
+        "datasets/annotated/sign/sam2_fixture_candidates_20261110/train_20.png",
+        "datasets/annotated/sign/video_candidates_20261110/images/sign_0299.png",
+        "datasets/raw/sign/archive_assets_legacy/视频/禁止直行牌视频.mp4"
+      ]
+    },
+    {
+      "id": "g1_dark_low_saturation_0003",
+      "failure_event": "候选牌具漏检或定位失败",
+      "conditions": [
+        "placed",
+        "front",
+        "dark_low_saturation"
+      ],
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "background": {
+        "image": "datasets/annotated/mixed_scene/v4_compositing_backgrounds_20261113/images/parking_003_001.jpg"
+      },
+      "target": {
+        "state": "placed",
+        "mask": "train_20.png"
+      },
+      "labels": {
+        "class_id": 0,
+        "kind": "visible_fixture_box"
+      },
+      "augmentation": {
+        "tone": "dark_low_saturation"
+      },
+      "parameters": {
+        "height": 152,
+        "left": 407,
+        "top": 184,
+        "ground_polygon": [
+          [
+            380,
+            295
+          ],
+          [
+            550,
+            295
+          ],
+          [
+            550,
+            355
+          ],
+          [
+            380,
+            355
+          ]
+        ],
+        "occlusion_polygons": [],
+        "visible_kind": "fixture",
+        "shadow_strength": 0.183,
+        "visibility_evidence": "原候选掩膜牌面、立杆及底座完整；生成标签仍为候选。"
+      },
+      "sources": [
+        "datasets/annotated/mixed_scene/v4_compositing_backgrounds_20261113/images/parking_003_001.jpg",
+        "Archive/Assets/电动车与人物/视频/场地多辆电动车_直立与倒伏混合_较低视角_003.mp4",
+        "datasets/annotated/sign/sam2_fixture_candidates_20261110/train_20.png",
+        "datasets/annotated/sign/video_candidates_20261110/images/sign_0299.png",
+        "datasets/raw/sign/archive_assets_legacy/视频/禁止直行牌视频.mp4"
+      ]
+    }
+  ]
+}

@@ -1,6 +1,7 @@
 """Create a bounded, unsplit set of auditable occlusion candidates."""
 import argparse
 import json
+import sys
 from pathlib import Path
 
 import cv2
@@ -19,6 +20,28 @@ def write_manifest(output, config, samples, status, error=None):
 
 
 def build(selection, output):
+    selection = Path(selection).resolve()
+    output = Path(output).resolve()
+    config = json.loads(selection.read_text(encoding='utf-8'))
+    review = core.workspace_path(config['review_manifest'])
+    procedural = [selection, review]
+    media = [core.workspace_path(item['path']) for item in config['people'] + config['vehicles']]
+    media += [core.workspace_path(item[key]) for item in config['vehicles']
+              for key in ('source_frame', 'source_video')]
+    media += [core.workspace_path(path) for path in config.get('approved_source_videos', [])]
+    inputs = list(dict.fromkeys(procedural + media))
+    sys.path.insert(0, str(core.ROOT))
+    from lab.training_common.production_guard import generation_guard
+    operation = 'e_bike.build_occlusion_candidates:' + output.relative_to(core.ROOT).as_posix()
+    with generation_guard(operation, inputs, [output], {},
+                          code_paths=[Path(__file__), Path(core.__file__), core.ROOT / 'lab/training_common/production_guard.py'],
+                          procedural_inputs=procedural, root=core.ROOT) as run:
+        if run.reused:
+            return json.loads((output / 'manifest.json').read_text(encoding='utf-8'))['samples']
+        return _build(selection, output)
+
+
+def _build(selection, output):
     if output.exists():
         raise ValueError('输出目录已存在，请选择新目录')
     config = json.loads(selection.read_text(encoding='utf-8'))

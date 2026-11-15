@@ -1,0 +1,3281 @@
+{
+  "schema_version": 1,
+  "model_key": "e_bike",
+  "target_split": "train",
+  "purpose": "Current bounded restart plan: four known backgrounds, four reviewed mask candidates, empty/upright/fallen and tone/pose; production remains paused.",
+  "budget": 40,
+  "uncertainty_weight": 0,
+  "independence_basis": "Four backgrounds share a full_scene video at different times; four foreground views share two posture videos. No independent-capture claim.",
+  "constraints": {
+    "ground_contact": true,
+    "minimum_visible_pixels": 120,
+    "minimum_visible_fraction": 0.7,
+    "allow_truncation": false
+  },
+  "strata": [
+    {
+      "id": "restart_000",
+      "failure_event": "false_positive_empty",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 3
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [],
+      "background": {
+        "id": "frame_005751",
+        "image": "datasets/annotated/e_bike/v4_complex_backgrounds_20261112/background_005751.png"
+      },
+      "target": {
+        "vehicles": []
+      },
+      "labels": {
+        "format": "yolo_visible_box",
+        "classes": {
+          "upright": 0,
+          "fallen": 1
+        }
+      },
+      "augmentation": {
+        "tone": "original"
+      },
+      "parameters": {
+        "actors": [],
+        "value_gain": 1.0,
+        "saturation_gain": 1.0
+      },
+      "sources": [
+        "datasets/annotated/e_bike/v4_complex_backgrounds_20261112/background_005751.png",
+        "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_005751.png",
+        "datasets/raw/site_capture_20261112/videos/full_scene.mp4"
+      ]
+    },
+    {
+      "id": "restart_001",
+      "failure_event": "false_positive_empty",
+      "min_count": 0,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 3
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [],
+      "background": {
+        "id": "frame_005751",
+        "image": "datasets/annotated/e_bike/v4_complex_backgrounds_20261112/background_005751.png"
+      },
+      "target": {
+        "vehicles": []
+      },
+      "labels": {
+        "format": "yolo_visible_box",
+        "classes": {
+          "upright": 0,
+          "fallen": 1
+        }
+      },
+      "augmentation": {
+        "tone": "mild"
+      },
+      "parameters": {
+        "actors": [],
+        "value_gain": 0.9,
+        "saturation_gain": 0.85
+      },
+      "sources": [
+        "datasets/annotated/e_bike/v4_complex_backgrounds_20261112/background_005751.png",
+        "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_005751.png",
+        "datasets/raw/site_capture_20261112/videos/full_scene.mp4"
+      ]
+    },
+    {
+      "id": "restart_002",
+      "failure_event": "false_positive_empty",
+      "min_count": 0,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 3
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [],
+      "background": {
+        "id": "frame_005751",
+        "image": "datasets/annotated/e_bike/v4_complex_backgrounds_20261112/background_005751.png"
+      },
+      "target": {
+        "vehicles": []
+      },
+      "labels": {
+        "format": "yolo_visible_box",
+        "classes": {
+          "upright": 0,
+          "fallen": 1
+        }
+      },
+      "augmentation": {
+        "tone": "moderate"
+      },
+      "parameters": {
+        "actors": [],
+        "value_gain": 0.7,
+        "saturation_gain": 0.6
+      },
+      "sources": [
+        "datasets/annotated/e_bike/v4_complex_backgrounds_20261112/background_005751.png",
+        "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_005751.png",
+        "datasets/raw/site_capture_20261112/videos/full_scene.mp4"
+      ]
+    },
+    {
+      "id": "restart_003",
+      "failure_event": "miss_fallen",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 2,
+        "beta": 3
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [],
+      "background": {
+        "id": "frame_005751",
+        "image": "datasets/annotated/e_bike/v4_complex_backgrounds_20261112/background_005751.png"
+      },
+      "target": {
+        "vehicles": [
+          {
+            "class": "fallen",
+            "source": "datasets/annotated/e_bike/multiview_masks_refined_20261110_v2/sam2_01_fallen.png"
+          }
+        ]
+      },
+      "labels": {
+        "format": "yolo_visible_box",
+        "classes": {
+          "upright": 0,
+          "fallen": 1
+        }
+      },
+      "augmentation": {
+        "tone": "original"
+      },
+      "parameters": {
+        "actors": [
+          {
+            "foot_x": 150,
+            "foot_y": 425,
+            "size_px": 120,
+            "yaw": -4,
+            "pitch": -1,
+            "roll": 0,
+            "relative_exposure": 1.0
+          }
+        ],
+        "value_gain": 1.0,
+        "saturation_gain": 1.0
+      },
+      "sources": [
+        "datasets/annotated/e_bike/multiview_masks_refined_20261110_v2/sam2_01_fallen.png",
+        "datasets/annotated/e_bike/v4_complex_backgrounds_20261112/background_005751.png",
+        "datasets/annotated/e_bike/video_review_20261110/images/source_001/frame_000001.jpg",
+        "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_005751.png",
+        "datasets/raw/e_bike/archive_assets_legacy/视频/浅色背景单辆倒伏车_平视旋转_008.mp4",
+        "datasets/raw/site_capture_20261112/videos/full_scene.mp4"
+      ]
+    },
+    {
+      "id": "restart_004",
+      "failure_event": "miss_fallen",
+      "min_count": 0,
+      "max_count": 1,
+      "prior": {
+        "alpha": 2,
+        "beta": 3
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [],
+      "background": {
+        "id": "frame_005751",
+        "image": "datasets/annotated/e_bike/v4_complex_backgrounds_20261112/background_005751.png"
+      },
+      "target": {
+        "vehicles": [
+          {
+            "class": "fallen",
+            "source": "datasets/annotated/e_bike/multiview_masks_refined_20261110_v2/sam2_01_fallen.png"
+          }
+        ]
+      },
+      "labels": {
+        "format": "yolo_visible_box",
+        "classes": {
+          "upright": 0,
+          "fallen": 1
+        }
+      },
+      "augmentation": {
+        "tone": "mild"
+      },
+      "parameters": {
+        "actors": [
+          {
+            "foot_x": 150,
+            "foot_y": 425,
+            "size_px": 120,
+            "yaw": 0,
+            "pitch": 0,
+            "roll": 0,
+            "relative_exposure": 0.95
+          }
+        ],
+        "value_gain": 0.9,
+        "saturation_gain": 0.85
+      },
+      "sources": [
+        "datasets/annotated/e_bike/multiview_masks_refined_20261110_v2/sam2_01_fallen.png",
+        "datasets/annotated/e_bike/v4_complex_backgrounds_20261112/background_005751.png",
+        "datasets/annotated/e_bike/video_review_20261110/images/source_001/frame_000001.jpg",
+        "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_005751.png",
+        "datasets/raw/e_bike/archive_assets_legacy/视频/浅色背景单辆倒伏车_平视旋转_008.mp4",
+        "datasets/raw/site_capture_20261112/videos/full_scene.mp4"
+      ]
+    },
+    {
+      "id": "restart_005",
+      "failure_event": "miss_fallen",
+      "min_count": 0,
+      "max_count": 1,
+      "prior": {
+        "alpha": 2,
+        "beta": 3
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [],
+      "background": {
+        "id": "frame_005751",
+        "image": "datasets/annotated/e_bike/v4_complex_backgrounds_20261112/background_005751.png"
+      },
+      "target": {
+        "vehicles": [
+          {
+            "class": "fallen",
+            "source": "datasets/annotated/e_bike/multiview_masks_refined_20261110_v2/sam2_01_fallen.png"
+          }
+        ]
+      },
+      "labels": {
+        "format": "yolo_visible_box",
+        "classes": {
+          "upright": 0,
+          "fallen": 1
+        }
+      },
+      "augmentation": {
+        "tone": "moderate"
+      },
+      "parameters": {
+        "actors": [
+          {
+            "foot_x": 150,
+            "foot_y": 425,
+            "size_px": 120,
+            "yaw": 4,
+            "pitch": 1,
+            "roll": 0,
+            "relative_exposure": 1.05
+          }
+        ],
+        "value_gain": 0.7,
+        "saturation_gain": 0.6
+      },
+      "sources": [
+        "datasets/annotated/e_bike/multiview_masks_refined_20261110_v2/sam2_01_fallen.png",
+        "datasets/annotated/e_bike/v4_complex_backgrounds_20261112/background_005751.png",
+        "datasets/annotated/e_bike/video_review_20261110/images/source_001/frame_000001.jpg",
+        "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_005751.png",
+        "datasets/raw/e_bike/archive_assets_legacy/视频/浅色背景单辆倒伏车_平视旋转_008.mp4",
+        "datasets/raw/site_capture_20261112/videos/full_scene.mp4"
+      ]
+    },
+    {
+      "id": "restart_006",
+      "failure_event": "miss_fallen",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 2,
+        "beta": 3
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [],
+      "background": {
+        "id": "frame_005751",
+        "image": "datasets/annotated/e_bike/v4_complex_backgrounds_20261112/background_005751.png"
+      },
+      "target": {
+        "vehicles": [
+          {
+            "class": "fallen",
+            "source": "datasets/annotated/e_bike/multiview_masks_refined_20261110_v2/sam2_03_fallen.png"
+          }
+        ]
+      },
+      "labels": {
+        "format": "yolo_visible_box",
+        "classes": {
+          "upright": 0,
+          "fallen": 1
+        }
+      },
+      "augmentation": {
+        "tone": "original"
+      },
+      "parameters": {
+        "actors": [
+          {
+            "foot_x": 150,
+            "foot_y": 425,
+            "size_px": 120,
+            "yaw": -4,
+            "pitch": -1,
+            "roll": 0,
+            "relative_exposure": 1.0
+          }
+        ],
+        "value_gain": 1.0,
+        "saturation_gain": 1.0
+      },
+      "sources": [
+        "datasets/annotated/e_bike/multiview_masks_refined_20261110_v2/sam2_03_fallen.png",
+        "datasets/annotated/e_bike/v4_complex_backgrounds_20261112/background_005751.png",
+        "datasets/annotated/e_bike/video_review_20261110/images/source_001/frame_000008.jpg",
+        "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_005751.png",
+        "datasets/raw/e_bike/archive_assets_legacy/视频/浅色背景单辆倒伏车_平视旋转_008.mp4",
+        "datasets/raw/site_capture_20261112/videos/full_scene.mp4"
+      ]
+    },
+    {
+      "id": "restart_007",
+      "failure_event": "miss_fallen",
+      "min_count": 0,
+      "max_count": 1,
+      "prior": {
+        "alpha": 2,
+        "beta": 3
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [],
+      "background": {
+        "id": "frame_005751",
+        "image": "datasets/annotated/e_bike/v4_complex_backgrounds_20261112/background_005751.png"
+      },
+      "target": {
+        "vehicles": [
+          {
+            "class": "fallen",
+            "source": "datasets/annotated/e_bike/multiview_masks_refined_20261110_v2/sam2_03_fallen.png"
+          }
+        ]
+      },
+      "labels": {
+        "format": "yolo_visible_box",
+        "classes": {
+          "upright": 0,
+          "fallen": 1
+        }
+      },
+      "augmentation": {
+        "tone": "mild"
+      },
+      "parameters": {
+        "actors": [
+          {
+            "foot_x": 150,
+            "foot_y": 425,
+            "size_px": 120,
+            "yaw": 0,
+            "pitch": 0,
+            "roll": 0,
+            "relative_exposure": 0.95
+          }
+        ],
+        "value_gain": 0.9,
+        "saturation_gain": 0.85
+      },
+      "sources": [
+        "datasets/annotated/e_bike/multiview_masks_refined_20261110_v2/sam2_03_fallen.png",
+        "datasets/annotated/e_bike/v4_complex_backgrounds_20261112/background_005751.png",
+        "datasets/annotated/e_bike/video_review_20261110/images/source_001/frame_000008.jpg",
+        "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_005751.png",
+        "datasets/raw/e_bike/archive_assets_legacy/视频/浅色背景单辆倒伏车_平视旋转_008.mp4",
+        "datasets/raw/site_capture_20261112/videos/full_scene.mp4"
+      ]
+    },
+    {
+      "id": "restart_008",
+      "failure_event": "miss_fallen",
+      "min_count": 0,
+      "max_count": 1,
+      "prior": {
+        "alpha": 2,
+        "beta": 3
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [],
+      "background": {
+        "id": "frame_005751",
+        "image": "datasets/annotated/e_bike/v4_complex_backgrounds_20261112/background_005751.png"
+      },
+      "target": {
+        "vehicles": [
+          {
+            "class": "fallen",
+            "source": "datasets/annotated/e_bike/multiview_masks_refined_20261110_v2/sam2_03_fallen.png"
+          }
+        ]
+      },
+      "labels": {
+        "format": "yolo_visible_box",
+        "classes": {
+          "upright": 0,
+          "fallen": 1
+        }
+      },
+      "augmentation": {
+        "tone": "moderate"
+      },
+      "parameters": {
+        "actors": [
+          {
+            "foot_x": 150,
+            "foot_y": 425,
+            "size_px": 120,
+            "yaw": 4,
+            "pitch": 1,
+            "roll": 0,
+            "relative_exposure": 1.05
+          }
+        ],
+        "value_gain": 0.7,
+        "saturation_gain": 0.6
+      },
+      "sources": [
+        "datasets/annotated/e_bike/multiview_masks_refined_20261110_v2/sam2_03_fallen.png",
+        "datasets/annotated/e_bike/v4_complex_backgrounds_20261112/background_005751.png",
+        "datasets/annotated/e_bike/video_review_20261110/images/source_001/frame_000008.jpg",
+        "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_005751.png",
+        "datasets/raw/e_bike/archive_assets_legacy/视频/浅色背景单辆倒伏车_平视旋转_008.mp4",
+        "datasets/raw/site_capture_20261112/videos/full_scene.mp4"
+      ]
+    },
+    {
+      "id": "restart_009",
+      "failure_event": "miss_upright",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 3
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [],
+      "background": {
+        "id": "frame_005751",
+        "image": "datasets/annotated/e_bike/v4_complex_backgrounds_20261112/background_005751.png"
+      },
+      "target": {
+        "vehicles": [
+          {
+            "class": "upright",
+            "source": "datasets/annotated/e_bike/multiview_masks_refined_20261110_v2/sam2_04_upright.png"
+          }
+        ]
+      },
+      "labels": {
+        "format": "yolo_visible_box",
+        "classes": {
+          "upright": 0,
+          "fallen": 1
+        }
+      },
+      "augmentation": {
+        "tone": "original"
+      },
+      "parameters": {
+        "actors": [
+          {
+            "foot_x": 150,
+            "foot_y": 425,
+            "size_px": 95,
+            "yaw": -4,
+            "pitch": -1,
+            "roll": 0,
+            "relative_exposure": 1.0
+          }
+        ],
+        "value_gain": 1.0,
+        "saturation_gain": 1.0
+      },
+      "sources": [
+        "datasets/annotated/e_bike/multiview_masks_refined_20261110_v2/sam2_04_upright.png",
+        "datasets/annotated/e_bike/v4_complex_backgrounds_20261112/background_005751.png",
+        "datasets/annotated/e_bike/video_review_20261110/images/source_002/frame_000003.jpg",
+        "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_005751.png",
+        "datasets/raw/e_bike/archive_assets_legacy/视频/浅色背景单辆直立车_平视旋转_009.mp4",
+        "datasets/raw/site_capture_20261112/videos/full_scene.mp4"
+      ]
+    },
+    {
+      "id": "restart_010",
+      "failure_event": "miss_upright",
+      "min_count": 0,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 3
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [],
+      "background": {
+        "id": "frame_005751",
+        "image": "datasets/annotated/e_bike/v4_complex_backgrounds_20261112/background_005751.png"
+      },
+      "target": {
+        "vehicles": [
+          {
+            "class": "upright",
+            "source": "datasets/annotated/e_bike/multiview_masks_refined_20261110_v2/sam2_04_upright.png"
+          }
+        ]
+      },
+      "labels": {
+        "format": "yolo_visible_box",
+        "classes": {
+          "upright": 0,
+          "fallen": 1
+        }
+      },
+      "augmentation": {
+        "tone": "mild"
+      },
+      "parameters": {
+        "actors": [
+          {
+            "foot_x": 150,
+            "foot_y": 425,
+            "size_px": 95,
+            "yaw": 0,
+            "pitch": 0,
+            "roll": 0,
+            "relative_exposure": 0.95
+          }
+        ],
+        "value_gain": 0.9,
+        "saturation_gain": 0.85
+      },
+      "sources": [
+        "datasets/annotated/e_bike/multiview_masks_refined_20261110_v2/sam2_04_upright.png",
+        "datasets/annotated/e_bike/v4_complex_backgrounds_20261112/background_005751.png",
+        "datasets/annotated/e_bike/video_review_20261110/images/source_002/frame_000003.jpg",
+        "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_005751.png",
+        "datasets/raw/e_bike/archive_assets_legacy/视频/浅色背景单辆直立车_平视旋转_009.mp4",
+        "datasets/raw/site_capture_20261112/videos/full_scene.mp4"
+      ]
+    },
+    {
+      "id": "restart_011",
+      "failure_event": "miss_upright",
+      "min_count": 0,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 3
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [],
+      "background": {
+        "id": "frame_005751",
+        "image": "datasets/annotated/e_bike/v4_complex_backgrounds_20261112/background_005751.png"
+      },
+      "target": {
+        "vehicles": [
+          {
+            "class": "upright",
+            "source": "datasets/annotated/e_bike/multiview_masks_refined_20261110_v2/sam2_04_upright.png"
+          }
+        ]
+      },
+      "labels": {
+        "format": "yolo_visible_box",
+        "classes": {
+          "upright": 0,
+          "fallen": 1
+        }
+      },
+      "augmentation": {
+        "tone": "moderate"
+      },
+      "parameters": {
+        "actors": [
+          {
+            "foot_x": 150,
+            "foot_y": 425,
+            "size_px": 95,
+            "yaw": 4,
+            "pitch": 1,
+            "roll": 0,
+            "relative_exposure": 1.05
+          }
+        ],
+        "value_gain": 0.7,
+        "saturation_gain": 0.6
+      },
+      "sources": [
+        "datasets/annotated/e_bike/multiview_masks_refined_20261110_v2/sam2_04_upright.png",
+        "datasets/annotated/e_bike/v4_complex_backgrounds_20261112/background_005751.png",
+        "datasets/annotated/e_bike/video_review_20261110/images/source_002/frame_000003.jpg",
+        "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_005751.png",
+        "datasets/raw/e_bike/archive_assets_legacy/视频/浅色背景单辆直立车_平视旋转_009.mp4",
+        "datasets/raw/site_capture_20261112/videos/full_scene.mp4"
+      ]
+    },
+    {
+      "id": "restart_012",
+      "failure_event": "miss_upright",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 3
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [],
+      "background": {
+        "id": "frame_005751",
+        "image": "datasets/annotated/e_bike/v4_complex_backgrounds_20261112/background_005751.png"
+      },
+      "target": {
+        "vehicles": [
+          {
+            "class": "upright",
+            "source": "datasets/annotated/e_bike/multiview_masks_refined_20261110_v2/sam2_06_upright.png"
+          }
+        ]
+      },
+      "labels": {
+        "format": "yolo_visible_box",
+        "classes": {
+          "upright": 0,
+          "fallen": 1
+        }
+      },
+      "augmentation": {
+        "tone": "original"
+      },
+      "parameters": {
+        "actors": [
+          {
+            "foot_x": 150,
+            "foot_y": 425,
+            "size_px": 95,
+            "yaw": -4,
+            "pitch": -1,
+            "roll": 0,
+            "relative_exposure": 1.0
+          }
+        ],
+        "value_gain": 1.0,
+        "saturation_gain": 1.0
+      },
+      "sources": [
+        "datasets/annotated/e_bike/multiview_masks_refined_20261110_v2/sam2_06_upright.png",
+        "datasets/annotated/e_bike/v4_complex_backgrounds_20261112/background_005751.png",
+        "datasets/annotated/e_bike/video_review_20261110/images/source_002/frame_000010.jpg",
+        "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_005751.png",
+        "datasets/raw/e_bike/archive_assets_legacy/视频/浅色背景单辆直立车_平视旋转_009.mp4",
+        "datasets/raw/site_capture_20261112/videos/full_scene.mp4"
+      ]
+    },
+    {
+      "id": "restart_013",
+      "failure_event": "miss_upright",
+      "min_count": 0,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 3
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [],
+      "background": {
+        "id": "frame_005751",
+        "image": "datasets/annotated/e_bike/v4_complex_backgrounds_20261112/background_005751.png"
+      },
+      "target": {
+        "vehicles": [
+          {
+            "class": "upright",
+            "source": "datasets/annotated/e_bike/multiview_masks_refined_20261110_v2/sam2_06_upright.png"
+          }
+        ]
+      },
+      "labels": {
+        "format": "yolo_visible_box",
+        "classes": {
+          "upright": 0,
+          "fallen": 1
+        }
+      },
+      "augmentation": {
+        "tone": "mild"
+      },
+      "parameters": {
+        "actors": [
+          {
+            "foot_x": 150,
+            "foot_y": 425,
+            "size_px": 95,
+            "yaw": 0,
+            "pitch": 0,
+            "roll": 0,
+            "relative_exposure": 0.95
+          }
+        ],
+        "value_gain": 0.9,
+        "saturation_gain": 0.85
+      },
+      "sources": [
+        "datasets/annotated/e_bike/multiview_masks_refined_20261110_v2/sam2_06_upright.png",
+        "datasets/annotated/e_bike/v4_complex_backgrounds_20261112/background_005751.png",
+        "datasets/annotated/e_bike/video_review_20261110/images/source_002/frame_000010.jpg",
+        "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_005751.png",
+        "datasets/raw/e_bike/archive_assets_legacy/视频/浅色背景单辆直立车_平视旋转_009.mp4",
+        "datasets/raw/site_capture_20261112/videos/full_scene.mp4"
+      ]
+    },
+    {
+      "id": "restart_014",
+      "failure_event": "miss_upright",
+      "min_count": 0,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 3
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [],
+      "background": {
+        "id": "frame_005751",
+        "image": "datasets/annotated/e_bike/v4_complex_backgrounds_20261112/background_005751.png"
+      },
+      "target": {
+        "vehicles": [
+          {
+            "class": "upright",
+            "source": "datasets/annotated/e_bike/multiview_masks_refined_20261110_v2/sam2_06_upright.png"
+          }
+        ]
+      },
+      "labels": {
+        "format": "yolo_visible_box",
+        "classes": {
+          "upright": 0,
+          "fallen": 1
+        }
+      },
+      "augmentation": {
+        "tone": "moderate"
+      },
+      "parameters": {
+        "actors": [
+          {
+            "foot_x": 150,
+            "foot_y": 425,
+            "size_px": 95,
+            "yaw": 4,
+            "pitch": 1,
+            "roll": 0,
+            "relative_exposure": 1.05
+          }
+        ],
+        "value_gain": 0.7,
+        "saturation_gain": 0.6
+      },
+      "sources": [
+        "datasets/annotated/e_bike/multiview_masks_refined_20261110_v2/sam2_06_upright.png",
+        "datasets/annotated/e_bike/v4_complex_backgrounds_20261112/background_005751.png",
+        "datasets/annotated/e_bike/video_review_20261110/images/source_002/frame_000010.jpg",
+        "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_005751.png",
+        "datasets/raw/e_bike/archive_assets_legacy/视频/浅色背景单辆直立车_平视旋转_009.mp4",
+        "datasets/raw/site_capture_20261112/videos/full_scene.mp4"
+      ]
+    },
+    {
+      "id": "restart_015",
+      "failure_event": "false_positive_empty",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 3
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [],
+      "background": {
+        "id": "frame_002850",
+        "image": "datasets/annotated/e_bike/v4_complex_backgrounds_20261112/background_002850.png"
+      },
+      "target": {
+        "vehicles": []
+      },
+      "labels": {
+        "format": "yolo_visible_box",
+        "classes": {
+          "upright": 0,
+          "fallen": 1
+        }
+      },
+      "augmentation": {
+        "tone": "original"
+      },
+      "parameters": {
+        "actors": [],
+        "value_gain": 1.0,
+        "saturation_gain": 1.0
+      },
+      "sources": [
+        "datasets/annotated/e_bike/v4_complex_backgrounds_20261112/background_002850.png",
+        "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_002850.png",
+        "datasets/raw/site_capture_20261112/videos/full_scene.mp4"
+      ]
+    },
+    {
+      "id": "restart_016",
+      "failure_event": "false_positive_empty",
+      "min_count": 0,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 3
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [],
+      "background": {
+        "id": "frame_002850",
+        "image": "datasets/annotated/e_bike/v4_complex_backgrounds_20261112/background_002850.png"
+      },
+      "target": {
+        "vehicles": []
+      },
+      "labels": {
+        "format": "yolo_visible_box",
+        "classes": {
+          "upright": 0,
+          "fallen": 1
+        }
+      },
+      "augmentation": {
+        "tone": "mild"
+      },
+      "parameters": {
+        "actors": [],
+        "value_gain": 0.9,
+        "saturation_gain": 0.85
+      },
+      "sources": [
+        "datasets/annotated/e_bike/v4_complex_backgrounds_20261112/background_002850.png",
+        "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_002850.png",
+        "datasets/raw/site_capture_20261112/videos/full_scene.mp4"
+      ]
+    },
+    {
+      "id": "restart_017",
+      "failure_event": "false_positive_empty",
+      "min_count": 0,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 3
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [],
+      "background": {
+        "id": "frame_002850",
+        "image": "datasets/annotated/e_bike/v4_complex_backgrounds_20261112/background_002850.png"
+      },
+      "target": {
+        "vehicles": []
+      },
+      "labels": {
+        "format": "yolo_visible_box",
+        "classes": {
+          "upright": 0,
+          "fallen": 1
+        }
+      },
+      "augmentation": {
+        "tone": "moderate"
+      },
+      "parameters": {
+        "actors": [],
+        "value_gain": 0.7,
+        "saturation_gain": 0.6
+      },
+      "sources": [
+        "datasets/annotated/e_bike/v4_complex_backgrounds_20261112/background_002850.png",
+        "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_002850.png",
+        "datasets/raw/site_capture_20261112/videos/full_scene.mp4"
+      ]
+    },
+    {
+      "id": "restart_018",
+      "failure_event": "miss_fallen",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 2,
+        "beta": 3
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [],
+      "background": {
+        "id": "frame_002850",
+        "image": "datasets/annotated/e_bike/v4_complex_backgrounds_20261112/background_002850.png"
+      },
+      "target": {
+        "vehicles": [
+          {
+            "class": "fallen",
+            "source": "datasets/annotated/e_bike/multiview_masks_refined_20261110_v2/sam2_01_fallen.png"
+          }
+        ]
+      },
+      "labels": {
+        "format": "yolo_visible_box",
+        "classes": {
+          "upright": 0,
+          "fallen": 1
+        }
+      },
+      "augmentation": {
+        "tone": "original"
+      },
+      "parameters": {
+        "actors": [
+          {
+            "foot_x": 260,
+            "foot_y": 410,
+            "size_px": 120,
+            "yaw": -4,
+            "pitch": -1,
+            "roll": 0,
+            "relative_exposure": 1.0
+          }
+        ],
+        "value_gain": 1.0,
+        "saturation_gain": 1.0
+      },
+      "sources": [
+        "datasets/annotated/e_bike/multiview_masks_refined_20261110_v2/sam2_01_fallen.png",
+        "datasets/annotated/e_bike/v4_complex_backgrounds_20261112/background_002850.png",
+        "datasets/annotated/e_bike/video_review_20261110/images/source_001/frame_000001.jpg",
+        "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_002850.png",
+        "datasets/raw/e_bike/archive_assets_legacy/视频/浅色背景单辆倒伏车_平视旋转_008.mp4",
+        "datasets/raw/site_capture_20261112/videos/full_scene.mp4"
+      ]
+    },
+    {
+      "id": "restart_019",
+      "failure_event": "miss_fallen",
+      "min_count": 0,
+      "max_count": 1,
+      "prior": {
+        "alpha": 2,
+        "beta": 3
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [],
+      "background": {
+        "id": "frame_002850",
+        "image": "datasets/annotated/e_bike/v4_complex_backgrounds_20261112/background_002850.png"
+      },
+      "target": {
+        "vehicles": [
+          {
+            "class": "fallen",
+            "source": "datasets/annotated/e_bike/multiview_masks_refined_20261110_v2/sam2_01_fallen.png"
+          }
+        ]
+      },
+      "labels": {
+        "format": "yolo_visible_box",
+        "classes": {
+          "upright": 0,
+          "fallen": 1
+        }
+      },
+      "augmentation": {
+        "tone": "mild"
+      },
+      "parameters": {
+        "actors": [
+          {
+            "foot_x": 260,
+            "foot_y": 410,
+            "size_px": 120,
+            "yaw": 0,
+            "pitch": 0,
+            "roll": 0,
+            "relative_exposure": 0.95
+          }
+        ],
+        "value_gain": 0.9,
+        "saturation_gain": 0.85
+      },
+      "sources": [
+        "datasets/annotated/e_bike/multiview_masks_refined_20261110_v2/sam2_01_fallen.png",
+        "datasets/annotated/e_bike/v4_complex_backgrounds_20261112/background_002850.png",
+        "datasets/annotated/e_bike/video_review_20261110/images/source_001/frame_000001.jpg",
+        "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_002850.png",
+        "datasets/raw/e_bike/archive_assets_legacy/视频/浅色背景单辆倒伏车_平视旋转_008.mp4",
+        "datasets/raw/site_capture_20261112/videos/full_scene.mp4"
+      ]
+    },
+    {
+      "id": "restart_020",
+      "failure_event": "miss_fallen",
+      "min_count": 0,
+      "max_count": 1,
+      "prior": {
+        "alpha": 2,
+        "beta": 3
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [],
+      "background": {
+        "id": "frame_002850",
+        "image": "datasets/annotated/e_bike/v4_complex_backgrounds_20261112/background_002850.png"
+      },
+      "target": {
+        "vehicles": [
+          {
+            "class": "fallen",
+            "source": "datasets/annotated/e_bike/multiview_masks_refined_20261110_v2/sam2_01_fallen.png"
+          }
+        ]
+      },
+      "labels": {
+        "format": "yolo_visible_box",
+        "classes": {
+          "upright": 0,
+          "fallen": 1
+        }
+      },
+      "augmentation": {
+        "tone": "moderate"
+      },
+      "parameters": {
+        "actors": [
+          {
+            "foot_x": 260,
+            "foot_y": 410,
+            "size_px": 120,
+            "yaw": 4,
+            "pitch": 1,
+            "roll": 0,
+            "relative_exposure": 1.05
+          }
+        ],
+        "value_gain": 0.7,
+        "saturation_gain": 0.6
+      },
+      "sources": [
+        "datasets/annotated/e_bike/multiview_masks_refined_20261110_v2/sam2_01_fallen.png",
+        "datasets/annotated/e_bike/v4_complex_backgrounds_20261112/background_002850.png",
+        "datasets/annotated/e_bike/video_review_20261110/images/source_001/frame_000001.jpg",
+        "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_002850.png",
+        "datasets/raw/e_bike/archive_assets_legacy/视频/浅色背景单辆倒伏车_平视旋转_008.mp4",
+        "datasets/raw/site_capture_20261112/videos/full_scene.mp4"
+      ]
+    },
+    {
+      "id": "restart_021",
+      "failure_event": "miss_fallen",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 2,
+        "beta": 3
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [],
+      "background": {
+        "id": "frame_002850",
+        "image": "datasets/annotated/e_bike/v4_complex_backgrounds_20261112/background_002850.png"
+      },
+      "target": {
+        "vehicles": [
+          {
+            "class": "fallen",
+            "source": "datasets/annotated/e_bike/multiview_masks_refined_20261110_v2/sam2_03_fallen.png"
+          }
+        ]
+      },
+      "labels": {
+        "format": "yolo_visible_box",
+        "classes": {
+          "upright": 0,
+          "fallen": 1
+        }
+      },
+      "augmentation": {
+        "tone": "original"
+      },
+      "parameters": {
+        "actors": [
+          {
+            "foot_x": 260,
+            "foot_y": 410,
+            "size_px": 120,
+            "yaw": -4,
+            "pitch": -1,
+            "roll": 0,
+            "relative_exposure": 1.0
+          }
+        ],
+        "value_gain": 1.0,
+        "saturation_gain": 1.0
+      },
+      "sources": [
+        "datasets/annotated/e_bike/multiview_masks_refined_20261110_v2/sam2_03_fallen.png",
+        "datasets/annotated/e_bike/v4_complex_backgrounds_20261112/background_002850.png",
+        "datasets/annotated/e_bike/video_review_20261110/images/source_001/frame_000008.jpg",
+        "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_002850.png",
+        "datasets/raw/e_bike/archive_assets_legacy/视频/浅色背景单辆倒伏车_平视旋转_008.mp4",
+        "datasets/raw/site_capture_20261112/videos/full_scene.mp4"
+      ]
+    },
+    {
+      "id": "restart_022",
+      "failure_event": "miss_fallen",
+      "min_count": 0,
+      "max_count": 1,
+      "prior": {
+        "alpha": 2,
+        "beta": 3
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [],
+      "background": {
+        "id": "frame_002850",
+        "image": "datasets/annotated/e_bike/v4_complex_backgrounds_20261112/background_002850.png"
+      },
+      "target": {
+        "vehicles": [
+          {
+            "class": "fallen",
+            "source": "datasets/annotated/e_bike/multiview_masks_refined_20261110_v2/sam2_03_fallen.png"
+          }
+        ]
+      },
+      "labels": {
+        "format": "yolo_visible_box",
+        "classes": {
+          "upright": 0,
+          "fallen": 1
+        }
+      },
+      "augmentation": {
+        "tone": "mild"
+      },
+      "parameters": {
+        "actors": [
+          {
+            "foot_x": 260,
+            "foot_y": 410,
+            "size_px": 120,
+            "yaw": 0,
+            "pitch": 0,
+            "roll": 0,
+            "relative_exposure": 0.95
+          }
+        ],
+        "value_gain": 0.9,
+        "saturation_gain": 0.85
+      },
+      "sources": [
+        "datasets/annotated/e_bike/multiview_masks_refined_20261110_v2/sam2_03_fallen.png",
+        "datasets/annotated/e_bike/v4_complex_backgrounds_20261112/background_002850.png",
+        "datasets/annotated/e_bike/video_review_20261110/images/source_001/frame_000008.jpg",
+        "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_002850.png",
+        "datasets/raw/e_bike/archive_assets_legacy/视频/浅色背景单辆倒伏车_平视旋转_008.mp4",
+        "datasets/raw/site_capture_20261112/videos/full_scene.mp4"
+      ]
+    },
+    {
+      "id": "restart_023",
+      "failure_event": "miss_fallen",
+      "min_count": 0,
+      "max_count": 1,
+      "prior": {
+        "alpha": 2,
+        "beta": 3
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [],
+      "background": {
+        "id": "frame_002850",
+        "image": "datasets/annotated/e_bike/v4_complex_backgrounds_20261112/background_002850.png"
+      },
+      "target": {
+        "vehicles": [
+          {
+            "class": "fallen",
+            "source": "datasets/annotated/e_bike/multiview_masks_refined_20261110_v2/sam2_03_fallen.png"
+          }
+        ]
+      },
+      "labels": {
+        "format": "yolo_visible_box",
+        "classes": {
+          "upright": 0,
+          "fallen": 1
+        }
+      },
+      "augmentation": {
+        "tone": "moderate"
+      },
+      "parameters": {
+        "actors": [
+          {
+            "foot_x": 260,
+            "foot_y": 410,
+            "size_px": 120,
+            "yaw": 4,
+            "pitch": 1,
+            "roll": 0,
+            "relative_exposure": 1.05
+          }
+        ],
+        "value_gain": 0.7,
+        "saturation_gain": 0.6
+      },
+      "sources": [
+        "datasets/annotated/e_bike/multiview_masks_refined_20261110_v2/sam2_03_fallen.png",
+        "datasets/annotated/e_bike/v4_complex_backgrounds_20261112/background_002850.png",
+        "datasets/annotated/e_bike/video_review_20261110/images/source_001/frame_000008.jpg",
+        "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_002850.png",
+        "datasets/raw/e_bike/archive_assets_legacy/视频/浅色背景单辆倒伏车_平视旋转_008.mp4",
+        "datasets/raw/site_capture_20261112/videos/full_scene.mp4"
+      ]
+    },
+    {
+      "id": "restart_024",
+      "failure_event": "miss_upright",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 3
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [],
+      "background": {
+        "id": "frame_002850",
+        "image": "datasets/annotated/e_bike/v4_complex_backgrounds_20261112/background_002850.png"
+      },
+      "target": {
+        "vehicles": [
+          {
+            "class": "upright",
+            "source": "datasets/annotated/e_bike/multiview_masks_refined_20261110_v2/sam2_04_upright.png"
+          }
+        ]
+      },
+      "labels": {
+        "format": "yolo_visible_box",
+        "classes": {
+          "upright": 0,
+          "fallen": 1
+        }
+      },
+      "augmentation": {
+        "tone": "original"
+      },
+      "parameters": {
+        "actors": [
+          {
+            "foot_x": 260,
+            "foot_y": 410,
+            "size_px": 95,
+            "yaw": -4,
+            "pitch": -1,
+            "roll": 0,
+            "relative_exposure": 1.0
+          }
+        ],
+        "value_gain": 1.0,
+        "saturation_gain": 1.0
+      },
+      "sources": [
+        "datasets/annotated/e_bike/multiview_masks_refined_20261110_v2/sam2_04_upright.png",
+        "datasets/annotated/e_bike/v4_complex_backgrounds_20261112/background_002850.png",
+        "datasets/annotated/e_bike/video_review_20261110/images/source_002/frame_000003.jpg",
+        "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_002850.png",
+        "datasets/raw/e_bike/archive_assets_legacy/视频/浅色背景单辆直立车_平视旋转_009.mp4",
+        "datasets/raw/site_capture_20261112/videos/full_scene.mp4"
+      ]
+    },
+    {
+      "id": "restart_025",
+      "failure_event": "miss_upright",
+      "min_count": 0,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 3
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [],
+      "background": {
+        "id": "frame_002850",
+        "image": "datasets/annotated/e_bike/v4_complex_backgrounds_20261112/background_002850.png"
+      },
+      "target": {
+        "vehicles": [
+          {
+            "class": "upright",
+            "source": "datasets/annotated/e_bike/multiview_masks_refined_20261110_v2/sam2_04_upright.png"
+          }
+        ]
+      },
+      "labels": {
+        "format": "yolo_visible_box",
+        "classes": {
+          "upright": 0,
+          "fallen": 1
+        }
+      },
+      "augmentation": {
+        "tone": "mild"
+      },
+      "parameters": {
+        "actors": [
+          {
+            "foot_x": 260,
+            "foot_y": 410,
+            "size_px": 95,
+            "yaw": 0,
+            "pitch": 0,
+            "roll": 0,
+            "relative_exposure": 0.95
+          }
+        ],
+        "value_gain": 0.9,
+        "saturation_gain": 0.85
+      },
+      "sources": [
+        "datasets/annotated/e_bike/multiview_masks_refined_20261110_v2/sam2_04_upright.png",
+        "datasets/annotated/e_bike/v4_complex_backgrounds_20261112/background_002850.png",
+        "datasets/annotated/e_bike/video_review_20261110/images/source_002/frame_000003.jpg",
+        "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_002850.png",
+        "datasets/raw/e_bike/archive_assets_legacy/视频/浅色背景单辆直立车_平视旋转_009.mp4",
+        "datasets/raw/site_capture_20261112/videos/full_scene.mp4"
+      ]
+    },
+    {
+      "id": "restart_026",
+      "failure_event": "miss_upright",
+      "min_count": 0,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 3
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [],
+      "background": {
+        "id": "frame_002850",
+        "image": "datasets/annotated/e_bike/v4_complex_backgrounds_20261112/background_002850.png"
+      },
+      "target": {
+        "vehicles": [
+          {
+            "class": "upright",
+            "source": "datasets/annotated/e_bike/multiview_masks_refined_20261110_v2/sam2_04_upright.png"
+          }
+        ]
+      },
+      "labels": {
+        "format": "yolo_visible_box",
+        "classes": {
+          "upright": 0,
+          "fallen": 1
+        }
+      },
+      "augmentation": {
+        "tone": "moderate"
+      },
+      "parameters": {
+        "actors": [
+          {
+            "foot_x": 260,
+            "foot_y": 410,
+            "size_px": 95,
+            "yaw": 4,
+            "pitch": 1,
+            "roll": 0,
+            "relative_exposure": 1.05
+          }
+        ],
+        "value_gain": 0.7,
+        "saturation_gain": 0.6
+      },
+      "sources": [
+        "datasets/annotated/e_bike/multiview_masks_refined_20261110_v2/sam2_04_upright.png",
+        "datasets/annotated/e_bike/v4_complex_backgrounds_20261112/background_002850.png",
+        "datasets/annotated/e_bike/video_review_20261110/images/source_002/frame_000003.jpg",
+        "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_002850.png",
+        "datasets/raw/e_bike/archive_assets_legacy/视频/浅色背景单辆直立车_平视旋转_009.mp4",
+        "datasets/raw/site_capture_20261112/videos/full_scene.mp4"
+      ]
+    },
+    {
+      "id": "restart_027",
+      "failure_event": "miss_upright",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 3
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [],
+      "background": {
+        "id": "frame_002850",
+        "image": "datasets/annotated/e_bike/v4_complex_backgrounds_20261112/background_002850.png"
+      },
+      "target": {
+        "vehicles": [
+          {
+            "class": "upright",
+            "source": "datasets/annotated/e_bike/multiview_masks_refined_20261110_v2/sam2_06_upright.png"
+          }
+        ]
+      },
+      "labels": {
+        "format": "yolo_visible_box",
+        "classes": {
+          "upright": 0,
+          "fallen": 1
+        }
+      },
+      "augmentation": {
+        "tone": "original"
+      },
+      "parameters": {
+        "actors": [
+          {
+            "foot_x": 260,
+            "foot_y": 410,
+            "size_px": 95,
+            "yaw": -4,
+            "pitch": -1,
+            "roll": 0,
+            "relative_exposure": 1.0
+          }
+        ],
+        "value_gain": 1.0,
+        "saturation_gain": 1.0
+      },
+      "sources": [
+        "datasets/annotated/e_bike/multiview_masks_refined_20261110_v2/sam2_06_upright.png",
+        "datasets/annotated/e_bike/v4_complex_backgrounds_20261112/background_002850.png",
+        "datasets/annotated/e_bike/video_review_20261110/images/source_002/frame_000010.jpg",
+        "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_002850.png",
+        "datasets/raw/e_bike/archive_assets_legacy/视频/浅色背景单辆直立车_平视旋转_009.mp4",
+        "datasets/raw/site_capture_20261112/videos/full_scene.mp4"
+      ]
+    },
+    {
+      "id": "restart_028",
+      "failure_event": "miss_upright",
+      "min_count": 0,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 3
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [],
+      "background": {
+        "id": "frame_002850",
+        "image": "datasets/annotated/e_bike/v4_complex_backgrounds_20261112/background_002850.png"
+      },
+      "target": {
+        "vehicles": [
+          {
+            "class": "upright",
+            "source": "datasets/annotated/e_bike/multiview_masks_refined_20261110_v2/sam2_06_upright.png"
+          }
+        ]
+      },
+      "labels": {
+        "format": "yolo_visible_box",
+        "classes": {
+          "upright": 0,
+          "fallen": 1
+        }
+      },
+      "augmentation": {
+        "tone": "mild"
+      },
+      "parameters": {
+        "actors": [
+          {
+            "foot_x": 260,
+            "foot_y": 410,
+            "size_px": 95,
+            "yaw": 0,
+            "pitch": 0,
+            "roll": 0,
+            "relative_exposure": 0.95
+          }
+        ],
+        "value_gain": 0.9,
+        "saturation_gain": 0.85
+      },
+      "sources": [
+        "datasets/annotated/e_bike/multiview_masks_refined_20261110_v2/sam2_06_upright.png",
+        "datasets/annotated/e_bike/v4_complex_backgrounds_20261112/background_002850.png",
+        "datasets/annotated/e_bike/video_review_20261110/images/source_002/frame_000010.jpg",
+        "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_002850.png",
+        "datasets/raw/e_bike/archive_assets_legacy/视频/浅色背景单辆直立车_平视旋转_009.mp4",
+        "datasets/raw/site_capture_20261112/videos/full_scene.mp4"
+      ]
+    },
+    {
+      "id": "restart_029",
+      "failure_event": "miss_upright",
+      "min_count": 0,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 3
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [],
+      "background": {
+        "id": "frame_002850",
+        "image": "datasets/annotated/e_bike/v4_complex_backgrounds_20261112/background_002850.png"
+      },
+      "target": {
+        "vehicles": [
+          {
+            "class": "upright",
+            "source": "datasets/annotated/e_bike/multiview_masks_refined_20261110_v2/sam2_06_upright.png"
+          }
+        ]
+      },
+      "labels": {
+        "format": "yolo_visible_box",
+        "classes": {
+          "upright": 0,
+          "fallen": 1
+        }
+      },
+      "augmentation": {
+        "tone": "moderate"
+      },
+      "parameters": {
+        "actors": [
+          {
+            "foot_x": 260,
+            "foot_y": 410,
+            "size_px": 95,
+            "yaw": 4,
+            "pitch": 1,
+            "roll": 0,
+            "relative_exposure": 1.05
+          }
+        ],
+        "value_gain": 0.7,
+        "saturation_gain": 0.6
+      },
+      "sources": [
+        "datasets/annotated/e_bike/multiview_masks_refined_20261110_v2/sam2_06_upright.png",
+        "datasets/annotated/e_bike/v4_complex_backgrounds_20261112/background_002850.png",
+        "datasets/annotated/e_bike/video_review_20261110/images/source_002/frame_000010.jpg",
+        "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_002850.png",
+        "datasets/raw/e_bike/archive_assets_legacy/视频/浅色背景单辆直立车_平视旋转_009.mp4",
+        "datasets/raw/site_capture_20261112/videos/full_scene.mp4"
+      ]
+    },
+    {
+      "id": "restart_030",
+      "failure_event": "false_positive_empty",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 3
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [],
+      "background": {
+        "id": "frame_007000",
+        "image": "datasets/annotated/e_bike/v4_complex_backgrounds_20261112/background_007000.png"
+      },
+      "target": {
+        "vehicles": []
+      },
+      "labels": {
+        "format": "yolo_visible_box",
+        "classes": {
+          "upright": 0,
+          "fallen": 1
+        }
+      },
+      "augmentation": {
+        "tone": "original"
+      },
+      "parameters": {
+        "actors": [],
+        "value_gain": 1.0,
+        "saturation_gain": 1.0
+      },
+      "sources": [
+        "datasets/annotated/e_bike/v4_complex_backgrounds_20261112/background_007000.png",
+        "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_007000.png",
+        "datasets/raw/site_capture_20261112/videos/full_scene.mp4"
+      ]
+    },
+    {
+      "id": "restart_031",
+      "failure_event": "false_positive_empty",
+      "min_count": 0,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 3
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [],
+      "background": {
+        "id": "frame_007000",
+        "image": "datasets/annotated/e_bike/v4_complex_backgrounds_20261112/background_007000.png"
+      },
+      "target": {
+        "vehicles": []
+      },
+      "labels": {
+        "format": "yolo_visible_box",
+        "classes": {
+          "upright": 0,
+          "fallen": 1
+        }
+      },
+      "augmentation": {
+        "tone": "mild"
+      },
+      "parameters": {
+        "actors": [],
+        "value_gain": 0.9,
+        "saturation_gain": 0.85
+      },
+      "sources": [
+        "datasets/annotated/e_bike/v4_complex_backgrounds_20261112/background_007000.png",
+        "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_007000.png",
+        "datasets/raw/site_capture_20261112/videos/full_scene.mp4"
+      ]
+    },
+    {
+      "id": "restart_032",
+      "failure_event": "false_positive_empty",
+      "min_count": 0,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 3
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [],
+      "background": {
+        "id": "frame_007000",
+        "image": "datasets/annotated/e_bike/v4_complex_backgrounds_20261112/background_007000.png"
+      },
+      "target": {
+        "vehicles": []
+      },
+      "labels": {
+        "format": "yolo_visible_box",
+        "classes": {
+          "upright": 0,
+          "fallen": 1
+        }
+      },
+      "augmentation": {
+        "tone": "moderate"
+      },
+      "parameters": {
+        "actors": [],
+        "value_gain": 0.7,
+        "saturation_gain": 0.6
+      },
+      "sources": [
+        "datasets/annotated/e_bike/v4_complex_backgrounds_20261112/background_007000.png",
+        "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_007000.png",
+        "datasets/raw/site_capture_20261112/videos/full_scene.mp4"
+      ]
+    },
+    {
+      "id": "restart_033",
+      "failure_event": "miss_fallen",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 2,
+        "beta": 3
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [],
+      "background": {
+        "id": "frame_007000",
+        "image": "datasets/annotated/e_bike/v4_complex_backgrounds_20261112/background_007000.png"
+      },
+      "target": {
+        "vehicles": [
+          {
+            "class": "fallen",
+            "source": "datasets/annotated/e_bike/multiview_masks_refined_20261110_v2/sam2_01_fallen.png"
+          }
+        ]
+      },
+      "labels": {
+        "format": "yolo_visible_box",
+        "classes": {
+          "upright": 0,
+          "fallen": 1
+        }
+      },
+      "augmentation": {
+        "tone": "original"
+      },
+      "parameters": {
+        "actors": [
+          {
+            "foot_x": 500,
+            "foot_y": 420,
+            "size_px": 120,
+            "yaw": -4,
+            "pitch": -1,
+            "roll": 0,
+            "relative_exposure": 1.0
+          }
+        ],
+        "value_gain": 1.0,
+        "saturation_gain": 1.0
+      },
+      "sources": [
+        "datasets/annotated/e_bike/multiview_masks_refined_20261110_v2/sam2_01_fallen.png",
+        "datasets/annotated/e_bike/v4_complex_backgrounds_20261112/background_007000.png",
+        "datasets/annotated/e_bike/video_review_20261110/images/source_001/frame_000001.jpg",
+        "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_007000.png",
+        "datasets/raw/e_bike/archive_assets_legacy/视频/浅色背景单辆倒伏车_平视旋转_008.mp4",
+        "datasets/raw/site_capture_20261112/videos/full_scene.mp4"
+      ]
+    },
+    {
+      "id": "restart_034",
+      "failure_event": "miss_fallen",
+      "min_count": 0,
+      "max_count": 1,
+      "prior": {
+        "alpha": 2,
+        "beta": 3
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [],
+      "background": {
+        "id": "frame_007000",
+        "image": "datasets/annotated/e_bike/v4_complex_backgrounds_20261112/background_007000.png"
+      },
+      "target": {
+        "vehicles": [
+          {
+            "class": "fallen",
+            "source": "datasets/annotated/e_bike/multiview_masks_refined_20261110_v2/sam2_01_fallen.png"
+          }
+        ]
+      },
+      "labels": {
+        "format": "yolo_visible_box",
+        "classes": {
+          "upright": 0,
+          "fallen": 1
+        }
+      },
+      "augmentation": {
+        "tone": "mild"
+      },
+      "parameters": {
+        "actors": [
+          {
+            "foot_x": 500,
+            "foot_y": 420,
+            "size_px": 120,
+            "yaw": 0,
+            "pitch": 0,
+            "roll": 0,
+            "relative_exposure": 0.95
+          }
+        ],
+        "value_gain": 0.9,
+        "saturation_gain": 0.85
+      },
+      "sources": [
+        "datasets/annotated/e_bike/multiview_masks_refined_20261110_v2/sam2_01_fallen.png",
+        "datasets/annotated/e_bike/v4_complex_backgrounds_20261112/background_007000.png",
+        "datasets/annotated/e_bike/video_review_20261110/images/source_001/frame_000001.jpg",
+        "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_007000.png",
+        "datasets/raw/e_bike/archive_assets_legacy/视频/浅色背景单辆倒伏车_平视旋转_008.mp4",
+        "datasets/raw/site_capture_20261112/videos/full_scene.mp4"
+      ]
+    },
+    {
+      "id": "restart_035",
+      "failure_event": "miss_fallen",
+      "min_count": 0,
+      "max_count": 1,
+      "prior": {
+        "alpha": 2,
+        "beta": 3
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [],
+      "background": {
+        "id": "frame_007000",
+        "image": "datasets/annotated/e_bike/v4_complex_backgrounds_20261112/background_007000.png"
+      },
+      "target": {
+        "vehicles": [
+          {
+            "class": "fallen",
+            "source": "datasets/annotated/e_bike/multiview_masks_refined_20261110_v2/sam2_01_fallen.png"
+          }
+        ]
+      },
+      "labels": {
+        "format": "yolo_visible_box",
+        "classes": {
+          "upright": 0,
+          "fallen": 1
+        }
+      },
+      "augmentation": {
+        "tone": "moderate"
+      },
+      "parameters": {
+        "actors": [
+          {
+            "foot_x": 500,
+            "foot_y": 420,
+            "size_px": 120,
+            "yaw": 4,
+            "pitch": 1,
+            "roll": 0,
+            "relative_exposure": 1.05
+          }
+        ],
+        "value_gain": 0.7,
+        "saturation_gain": 0.6
+      },
+      "sources": [
+        "datasets/annotated/e_bike/multiview_masks_refined_20261110_v2/sam2_01_fallen.png",
+        "datasets/annotated/e_bike/v4_complex_backgrounds_20261112/background_007000.png",
+        "datasets/annotated/e_bike/video_review_20261110/images/source_001/frame_000001.jpg",
+        "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_007000.png",
+        "datasets/raw/e_bike/archive_assets_legacy/视频/浅色背景单辆倒伏车_平视旋转_008.mp4",
+        "datasets/raw/site_capture_20261112/videos/full_scene.mp4"
+      ]
+    },
+    {
+      "id": "restart_036",
+      "failure_event": "miss_fallen",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 2,
+        "beta": 3
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [],
+      "background": {
+        "id": "frame_007000",
+        "image": "datasets/annotated/e_bike/v4_complex_backgrounds_20261112/background_007000.png"
+      },
+      "target": {
+        "vehicles": [
+          {
+            "class": "fallen",
+            "source": "datasets/annotated/e_bike/multiview_masks_refined_20261110_v2/sam2_03_fallen.png"
+          }
+        ]
+      },
+      "labels": {
+        "format": "yolo_visible_box",
+        "classes": {
+          "upright": 0,
+          "fallen": 1
+        }
+      },
+      "augmentation": {
+        "tone": "original"
+      },
+      "parameters": {
+        "actors": [
+          {
+            "foot_x": 500,
+            "foot_y": 420,
+            "size_px": 120,
+            "yaw": -4,
+            "pitch": -1,
+            "roll": 0,
+            "relative_exposure": 1.0
+          }
+        ],
+        "value_gain": 1.0,
+        "saturation_gain": 1.0
+      },
+      "sources": [
+        "datasets/annotated/e_bike/multiview_masks_refined_20261110_v2/sam2_03_fallen.png",
+        "datasets/annotated/e_bike/v4_complex_backgrounds_20261112/background_007000.png",
+        "datasets/annotated/e_bike/video_review_20261110/images/source_001/frame_000008.jpg",
+        "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_007000.png",
+        "datasets/raw/e_bike/archive_assets_legacy/视频/浅色背景单辆倒伏车_平视旋转_008.mp4",
+        "datasets/raw/site_capture_20261112/videos/full_scene.mp4"
+      ]
+    },
+    {
+      "id": "restart_037",
+      "failure_event": "miss_fallen",
+      "min_count": 0,
+      "max_count": 1,
+      "prior": {
+        "alpha": 2,
+        "beta": 3
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [],
+      "background": {
+        "id": "frame_007000",
+        "image": "datasets/annotated/e_bike/v4_complex_backgrounds_20261112/background_007000.png"
+      },
+      "target": {
+        "vehicles": [
+          {
+            "class": "fallen",
+            "source": "datasets/annotated/e_bike/multiview_masks_refined_20261110_v2/sam2_03_fallen.png"
+          }
+        ]
+      },
+      "labels": {
+        "format": "yolo_visible_box",
+        "classes": {
+          "upright": 0,
+          "fallen": 1
+        }
+      },
+      "augmentation": {
+        "tone": "mild"
+      },
+      "parameters": {
+        "actors": [
+          {
+            "foot_x": 500,
+            "foot_y": 420,
+            "size_px": 120,
+            "yaw": 0,
+            "pitch": 0,
+            "roll": 0,
+            "relative_exposure": 0.95
+          }
+        ],
+        "value_gain": 0.9,
+        "saturation_gain": 0.85
+      },
+      "sources": [
+        "datasets/annotated/e_bike/multiview_masks_refined_20261110_v2/sam2_03_fallen.png",
+        "datasets/annotated/e_bike/v4_complex_backgrounds_20261112/background_007000.png",
+        "datasets/annotated/e_bike/video_review_20261110/images/source_001/frame_000008.jpg",
+        "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_007000.png",
+        "datasets/raw/e_bike/archive_assets_legacy/视频/浅色背景单辆倒伏车_平视旋转_008.mp4",
+        "datasets/raw/site_capture_20261112/videos/full_scene.mp4"
+      ]
+    },
+    {
+      "id": "restart_038",
+      "failure_event": "miss_fallen",
+      "min_count": 0,
+      "max_count": 1,
+      "prior": {
+        "alpha": 2,
+        "beta": 3
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [],
+      "background": {
+        "id": "frame_007000",
+        "image": "datasets/annotated/e_bike/v4_complex_backgrounds_20261112/background_007000.png"
+      },
+      "target": {
+        "vehicles": [
+          {
+            "class": "fallen",
+            "source": "datasets/annotated/e_bike/multiview_masks_refined_20261110_v2/sam2_03_fallen.png"
+          }
+        ]
+      },
+      "labels": {
+        "format": "yolo_visible_box",
+        "classes": {
+          "upright": 0,
+          "fallen": 1
+        }
+      },
+      "augmentation": {
+        "tone": "moderate"
+      },
+      "parameters": {
+        "actors": [
+          {
+            "foot_x": 500,
+            "foot_y": 420,
+            "size_px": 120,
+            "yaw": 4,
+            "pitch": 1,
+            "roll": 0,
+            "relative_exposure": 1.05
+          }
+        ],
+        "value_gain": 0.7,
+        "saturation_gain": 0.6
+      },
+      "sources": [
+        "datasets/annotated/e_bike/multiview_masks_refined_20261110_v2/sam2_03_fallen.png",
+        "datasets/annotated/e_bike/v4_complex_backgrounds_20261112/background_007000.png",
+        "datasets/annotated/e_bike/video_review_20261110/images/source_001/frame_000008.jpg",
+        "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_007000.png",
+        "datasets/raw/e_bike/archive_assets_legacy/视频/浅色背景单辆倒伏车_平视旋转_008.mp4",
+        "datasets/raw/site_capture_20261112/videos/full_scene.mp4"
+      ]
+    },
+    {
+      "id": "restart_039",
+      "failure_event": "miss_upright",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 3
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [],
+      "background": {
+        "id": "frame_007000",
+        "image": "datasets/annotated/e_bike/v4_complex_backgrounds_20261112/background_007000.png"
+      },
+      "target": {
+        "vehicles": [
+          {
+            "class": "upright",
+            "source": "datasets/annotated/e_bike/multiview_masks_refined_20261110_v2/sam2_04_upright.png"
+          }
+        ]
+      },
+      "labels": {
+        "format": "yolo_visible_box",
+        "classes": {
+          "upright": 0,
+          "fallen": 1
+        }
+      },
+      "augmentation": {
+        "tone": "original"
+      },
+      "parameters": {
+        "actors": [
+          {
+            "foot_x": 500,
+            "foot_y": 420,
+            "size_px": 95,
+            "yaw": -4,
+            "pitch": -1,
+            "roll": 0,
+            "relative_exposure": 1.0
+          }
+        ],
+        "value_gain": 1.0,
+        "saturation_gain": 1.0
+      },
+      "sources": [
+        "datasets/annotated/e_bike/multiview_masks_refined_20261110_v2/sam2_04_upright.png",
+        "datasets/annotated/e_bike/v4_complex_backgrounds_20261112/background_007000.png",
+        "datasets/annotated/e_bike/video_review_20261110/images/source_002/frame_000003.jpg",
+        "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_007000.png",
+        "datasets/raw/e_bike/archive_assets_legacy/视频/浅色背景单辆直立车_平视旋转_009.mp4",
+        "datasets/raw/site_capture_20261112/videos/full_scene.mp4"
+      ]
+    },
+    {
+      "id": "restart_040",
+      "failure_event": "miss_upright",
+      "min_count": 0,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 3
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [],
+      "background": {
+        "id": "frame_007000",
+        "image": "datasets/annotated/e_bike/v4_complex_backgrounds_20261112/background_007000.png"
+      },
+      "target": {
+        "vehicles": [
+          {
+            "class": "upright",
+            "source": "datasets/annotated/e_bike/multiview_masks_refined_20261110_v2/sam2_04_upright.png"
+          }
+        ]
+      },
+      "labels": {
+        "format": "yolo_visible_box",
+        "classes": {
+          "upright": 0,
+          "fallen": 1
+        }
+      },
+      "augmentation": {
+        "tone": "mild"
+      },
+      "parameters": {
+        "actors": [
+          {
+            "foot_x": 500,
+            "foot_y": 420,
+            "size_px": 95,
+            "yaw": 0,
+            "pitch": 0,
+            "roll": 0,
+            "relative_exposure": 0.95
+          }
+        ],
+        "value_gain": 0.9,
+        "saturation_gain": 0.85
+      },
+      "sources": [
+        "datasets/annotated/e_bike/multiview_masks_refined_20261110_v2/sam2_04_upright.png",
+        "datasets/annotated/e_bike/v4_complex_backgrounds_20261112/background_007000.png",
+        "datasets/annotated/e_bike/video_review_20261110/images/source_002/frame_000003.jpg",
+        "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_007000.png",
+        "datasets/raw/e_bike/archive_assets_legacy/视频/浅色背景单辆直立车_平视旋转_009.mp4",
+        "datasets/raw/site_capture_20261112/videos/full_scene.mp4"
+      ]
+    },
+    {
+      "id": "restart_041",
+      "failure_event": "miss_upright",
+      "min_count": 0,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 3
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [],
+      "background": {
+        "id": "frame_007000",
+        "image": "datasets/annotated/e_bike/v4_complex_backgrounds_20261112/background_007000.png"
+      },
+      "target": {
+        "vehicles": [
+          {
+            "class": "upright",
+            "source": "datasets/annotated/e_bike/multiview_masks_refined_20261110_v2/sam2_04_upright.png"
+          }
+        ]
+      },
+      "labels": {
+        "format": "yolo_visible_box",
+        "classes": {
+          "upright": 0,
+          "fallen": 1
+        }
+      },
+      "augmentation": {
+        "tone": "moderate"
+      },
+      "parameters": {
+        "actors": [
+          {
+            "foot_x": 500,
+            "foot_y": 420,
+            "size_px": 95,
+            "yaw": 4,
+            "pitch": 1,
+            "roll": 0,
+            "relative_exposure": 1.05
+          }
+        ],
+        "value_gain": 0.7,
+        "saturation_gain": 0.6
+      },
+      "sources": [
+        "datasets/annotated/e_bike/multiview_masks_refined_20261110_v2/sam2_04_upright.png",
+        "datasets/annotated/e_bike/v4_complex_backgrounds_20261112/background_007000.png",
+        "datasets/annotated/e_bike/video_review_20261110/images/source_002/frame_000003.jpg",
+        "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_007000.png",
+        "datasets/raw/e_bike/archive_assets_legacy/视频/浅色背景单辆直立车_平视旋转_009.mp4",
+        "datasets/raw/site_capture_20261112/videos/full_scene.mp4"
+      ]
+    },
+    {
+      "id": "restart_042",
+      "failure_event": "miss_upright",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 3
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [],
+      "background": {
+        "id": "frame_007000",
+        "image": "datasets/annotated/e_bike/v4_complex_backgrounds_20261112/background_007000.png"
+      },
+      "target": {
+        "vehicles": [
+          {
+            "class": "upright",
+            "source": "datasets/annotated/e_bike/multiview_masks_refined_20261110_v2/sam2_06_upright.png"
+          }
+        ]
+      },
+      "labels": {
+        "format": "yolo_visible_box",
+        "classes": {
+          "upright": 0,
+          "fallen": 1
+        }
+      },
+      "augmentation": {
+        "tone": "original"
+      },
+      "parameters": {
+        "actors": [
+          {
+            "foot_x": 500,
+            "foot_y": 420,
+            "size_px": 95,
+            "yaw": -4,
+            "pitch": -1,
+            "roll": 0,
+            "relative_exposure": 1.0
+          }
+        ],
+        "value_gain": 1.0,
+        "saturation_gain": 1.0
+      },
+      "sources": [
+        "datasets/annotated/e_bike/multiview_masks_refined_20261110_v2/sam2_06_upright.png",
+        "datasets/annotated/e_bike/v4_complex_backgrounds_20261112/background_007000.png",
+        "datasets/annotated/e_bike/video_review_20261110/images/source_002/frame_000010.jpg",
+        "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_007000.png",
+        "datasets/raw/e_bike/archive_assets_legacy/视频/浅色背景单辆直立车_平视旋转_009.mp4",
+        "datasets/raw/site_capture_20261112/videos/full_scene.mp4"
+      ]
+    },
+    {
+      "id": "restart_043",
+      "failure_event": "miss_upright",
+      "min_count": 0,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 3
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [],
+      "background": {
+        "id": "frame_007000",
+        "image": "datasets/annotated/e_bike/v4_complex_backgrounds_20261112/background_007000.png"
+      },
+      "target": {
+        "vehicles": [
+          {
+            "class": "upright",
+            "source": "datasets/annotated/e_bike/multiview_masks_refined_20261110_v2/sam2_06_upright.png"
+          }
+        ]
+      },
+      "labels": {
+        "format": "yolo_visible_box",
+        "classes": {
+          "upright": 0,
+          "fallen": 1
+        }
+      },
+      "augmentation": {
+        "tone": "mild"
+      },
+      "parameters": {
+        "actors": [
+          {
+            "foot_x": 500,
+            "foot_y": 420,
+            "size_px": 95,
+            "yaw": 0,
+            "pitch": 0,
+            "roll": 0,
+            "relative_exposure": 0.95
+          }
+        ],
+        "value_gain": 0.9,
+        "saturation_gain": 0.85
+      },
+      "sources": [
+        "datasets/annotated/e_bike/multiview_masks_refined_20261110_v2/sam2_06_upright.png",
+        "datasets/annotated/e_bike/v4_complex_backgrounds_20261112/background_007000.png",
+        "datasets/annotated/e_bike/video_review_20261110/images/source_002/frame_000010.jpg",
+        "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_007000.png",
+        "datasets/raw/e_bike/archive_assets_legacy/视频/浅色背景单辆直立车_平视旋转_009.mp4",
+        "datasets/raw/site_capture_20261112/videos/full_scene.mp4"
+      ]
+    },
+    {
+      "id": "restart_044",
+      "failure_event": "miss_upright",
+      "min_count": 0,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 3
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [],
+      "background": {
+        "id": "frame_007000",
+        "image": "datasets/annotated/e_bike/v4_complex_backgrounds_20261112/background_007000.png"
+      },
+      "target": {
+        "vehicles": [
+          {
+            "class": "upright",
+            "source": "datasets/annotated/e_bike/multiview_masks_refined_20261110_v2/sam2_06_upright.png"
+          }
+        ]
+      },
+      "labels": {
+        "format": "yolo_visible_box",
+        "classes": {
+          "upright": 0,
+          "fallen": 1
+        }
+      },
+      "augmentation": {
+        "tone": "moderate"
+      },
+      "parameters": {
+        "actors": [
+          {
+            "foot_x": 500,
+            "foot_y": 420,
+            "size_px": 95,
+            "yaw": 4,
+            "pitch": 1,
+            "roll": 0,
+            "relative_exposure": 1.05
+          }
+        ],
+        "value_gain": 0.7,
+        "saturation_gain": 0.6
+      },
+      "sources": [
+        "datasets/annotated/e_bike/multiview_masks_refined_20261110_v2/sam2_06_upright.png",
+        "datasets/annotated/e_bike/v4_complex_backgrounds_20261112/background_007000.png",
+        "datasets/annotated/e_bike/video_review_20261110/images/source_002/frame_000010.jpg",
+        "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_007000.png",
+        "datasets/raw/e_bike/archive_assets_legacy/视频/浅色背景单辆直立车_平视旋转_009.mp4",
+        "datasets/raw/site_capture_20261112/videos/full_scene.mp4"
+      ]
+    },
+    {
+      "id": "restart_045",
+      "failure_event": "false_positive_empty",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 3
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [],
+      "background": {
+        "id": "frame_007045",
+        "image": "datasets/annotated/e_bike/v4_complex_backgrounds_20261112/background_007045.png"
+      },
+      "target": {
+        "vehicles": []
+      },
+      "labels": {
+        "format": "yolo_visible_box",
+        "classes": {
+          "upright": 0,
+          "fallen": 1
+        }
+      },
+      "augmentation": {
+        "tone": "original"
+      },
+      "parameters": {
+        "actors": [],
+        "value_gain": 1.0,
+        "saturation_gain": 1.0
+      },
+      "sources": [
+        "datasets/annotated/e_bike/v4_complex_backgrounds_20261112/background_007045.png",
+        "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_007045.png",
+        "datasets/raw/site_capture_20261112/videos/full_scene.mp4"
+      ]
+    },
+    {
+      "id": "restart_046",
+      "failure_event": "false_positive_empty",
+      "min_count": 0,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 3
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [],
+      "background": {
+        "id": "frame_007045",
+        "image": "datasets/annotated/e_bike/v4_complex_backgrounds_20261112/background_007045.png"
+      },
+      "target": {
+        "vehicles": []
+      },
+      "labels": {
+        "format": "yolo_visible_box",
+        "classes": {
+          "upright": 0,
+          "fallen": 1
+        }
+      },
+      "augmentation": {
+        "tone": "mild"
+      },
+      "parameters": {
+        "actors": [],
+        "value_gain": 0.9,
+        "saturation_gain": 0.85
+      },
+      "sources": [
+        "datasets/annotated/e_bike/v4_complex_backgrounds_20261112/background_007045.png",
+        "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_007045.png",
+        "datasets/raw/site_capture_20261112/videos/full_scene.mp4"
+      ]
+    },
+    {
+      "id": "restart_047",
+      "failure_event": "false_positive_empty",
+      "min_count": 0,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 3
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [],
+      "background": {
+        "id": "frame_007045",
+        "image": "datasets/annotated/e_bike/v4_complex_backgrounds_20261112/background_007045.png"
+      },
+      "target": {
+        "vehicles": []
+      },
+      "labels": {
+        "format": "yolo_visible_box",
+        "classes": {
+          "upright": 0,
+          "fallen": 1
+        }
+      },
+      "augmentation": {
+        "tone": "moderate"
+      },
+      "parameters": {
+        "actors": [],
+        "value_gain": 0.7,
+        "saturation_gain": 0.6
+      },
+      "sources": [
+        "datasets/annotated/e_bike/v4_complex_backgrounds_20261112/background_007045.png",
+        "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_007045.png",
+        "datasets/raw/site_capture_20261112/videos/full_scene.mp4"
+      ]
+    },
+    {
+      "id": "restart_048",
+      "failure_event": "miss_fallen",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 2,
+        "beta": 3
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [],
+      "background": {
+        "id": "frame_007045",
+        "image": "datasets/annotated/e_bike/v4_complex_backgrounds_20261112/background_007045.png"
+      },
+      "target": {
+        "vehicles": [
+          {
+            "class": "fallen",
+            "source": "datasets/annotated/e_bike/multiview_masks_refined_20261110_v2/sam2_01_fallen.png"
+          }
+        ]
+      },
+      "labels": {
+        "format": "yolo_visible_box",
+        "classes": {
+          "upright": 0,
+          "fallen": 1
+        }
+      },
+      "augmentation": {
+        "tone": "original"
+      },
+      "parameters": {
+        "actors": [
+          {
+            "foot_x": 480,
+            "foot_y": 420,
+            "size_px": 120,
+            "yaw": -4,
+            "pitch": -1,
+            "roll": 0,
+            "relative_exposure": 1.0
+          }
+        ],
+        "value_gain": 1.0,
+        "saturation_gain": 1.0
+      },
+      "sources": [
+        "datasets/annotated/e_bike/multiview_masks_refined_20261110_v2/sam2_01_fallen.png",
+        "datasets/annotated/e_bike/v4_complex_backgrounds_20261112/background_007045.png",
+        "datasets/annotated/e_bike/video_review_20261110/images/source_001/frame_000001.jpg",
+        "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_007045.png",
+        "datasets/raw/e_bike/archive_assets_legacy/视频/浅色背景单辆倒伏车_平视旋转_008.mp4",
+        "datasets/raw/site_capture_20261112/videos/full_scene.mp4"
+      ]
+    },
+    {
+      "id": "restart_049",
+      "failure_event": "miss_fallen",
+      "min_count": 0,
+      "max_count": 1,
+      "prior": {
+        "alpha": 2,
+        "beta": 3
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [],
+      "background": {
+        "id": "frame_007045",
+        "image": "datasets/annotated/e_bike/v4_complex_backgrounds_20261112/background_007045.png"
+      },
+      "target": {
+        "vehicles": [
+          {
+            "class": "fallen",
+            "source": "datasets/annotated/e_bike/multiview_masks_refined_20261110_v2/sam2_01_fallen.png"
+          }
+        ]
+      },
+      "labels": {
+        "format": "yolo_visible_box",
+        "classes": {
+          "upright": 0,
+          "fallen": 1
+        }
+      },
+      "augmentation": {
+        "tone": "mild"
+      },
+      "parameters": {
+        "actors": [
+          {
+            "foot_x": 480,
+            "foot_y": 420,
+            "size_px": 120,
+            "yaw": 0,
+            "pitch": 0,
+            "roll": 0,
+            "relative_exposure": 0.95
+          }
+        ],
+        "value_gain": 0.9,
+        "saturation_gain": 0.85
+      },
+      "sources": [
+        "datasets/annotated/e_bike/multiview_masks_refined_20261110_v2/sam2_01_fallen.png",
+        "datasets/annotated/e_bike/v4_complex_backgrounds_20261112/background_007045.png",
+        "datasets/annotated/e_bike/video_review_20261110/images/source_001/frame_000001.jpg",
+        "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_007045.png",
+        "datasets/raw/e_bike/archive_assets_legacy/视频/浅色背景单辆倒伏车_平视旋转_008.mp4",
+        "datasets/raw/site_capture_20261112/videos/full_scene.mp4"
+      ]
+    },
+    {
+      "id": "restart_050",
+      "failure_event": "miss_fallen",
+      "min_count": 0,
+      "max_count": 1,
+      "prior": {
+        "alpha": 2,
+        "beta": 3
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [],
+      "background": {
+        "id": "frame_007045",
+        "image": "datasets/annotated/e_bike/v4_complex_backgrounds_20261112/background_007045.png"
+      },
+      "target": {
+        "vehicles": [
+          {
+            "class": "fallen",
+            "source": "datasets/annotated/e_bike/multiview_masks_refined_20261110_v2/sam2_01_fallen.png"
+          }
+        ]
+      },
+      "labels": {
+        "format": "yolo_visible_box",
+        "classes": {
+          "upright": 0,
+          "fallen": 1
+        }
+      },
+      "augmentation": {
+        "tone": "moderate"
+      },
+      "parameters": {
+        "actors": [
+          {
+            "foot_x": 480,
+            "foot_y": 420,
+            "size_px": 120,
+            "yaw": 4,
+            "pitch": 1,
+            "roll": 0,
+            "relative_exposure": 1.05
+          }
+        ],
+        "value_gain": 0.7,
+        "saturation_gain": 0.6
+      },
+      "sources": [
+        "datasets/annotated/e_bike/multiview_masks_refined_20261110_v2/sam2_01_fallen.png",
+        "datasets/annotated/e_bike/v4_complex_backgrounds_20261112/background_007045.png",
+        "datasets/annotated/e_bike/video_review_20261110/images/source_001/frame_000001.jpg",
+        "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_007045.png",
+        "datasets/raw/e_bike/archive_assets_legacy/视频/浅色背景单辆倒伏车_平视旋转_008.mp4",
+        "datasets/raw/site_capture_20261112/videos/full_scene.mp4"
+      ]
+    },
+    {
+      "id": "restart_051",
+      "failure_event": "miss_fallen",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 2,
+        "beta": 3
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [],
+      "background": {
+        "id": "frame_007045",
+        "image": "datasets/annotated/e_bike/v4_complex_backgrounds_20261112/background_007045.png"
+      },
+      "target": {
+        "vehicles": [
+          {
+            "class": "fallen",
+            "source": "datasets/annotated/e_bike/multiview_masks_refined_20261110_v2/sam2_03_fallen.png"
+          }
+        ]
+      },
+      "labels": {
+        "format": "yolo_visible_box",
+        "classes": {
+          "upright": 0,
+          "fallen": 1
+        }
+      },
+      "augmentation": {
+        "tone": "original"
+      },
+      "parameters": {
+        "actors": [
+          {
+            "foot_x": 480,
+            "foot_y": 420,
+            "size_px": 120,
+            "yaw": -4,
+            "pitch": -1,
+            "roll": 0,
+            "relative_exposure": 1.0
+          }
+        ],
+        "value_gain": 1.0,
+        "saturation_gain": 1.0
+      },
+      "sources": [
+        "datasets/annotated/e_bike/multiview_masks_refined_20261110_v2/sam2_03_fallen.png",
+        "datasets/annotated/e_bike/v4_complex_backgrounds_20261112/background_007045.png",
+        "datasets/annotated/e_bike/video_review_20261110/images/source_001/frame_000008.jpg",
+        "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_007045.png",
+        "datasets/raw/e_bike/archive_assets_legacy/视频/浅色背景单辆倒伏车_平视旋转_008.mp4",
+        "datasets/raw/site_capture_20261112/videos/full_scene.mp4"
+      ]
+    },
+    {
+      "id": "restart_052",
+      "failure_event": "miss_fallen",
+      "min_count": 0,
+      "max_count": 1,
+      "prior": {
+        "alpha": 2,
+        "beta": 3
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [],
+      "background": {
+        "id": "frame_007045",
+        "image": "datasets/annotated/e_bike/v4_complex_backgrounds_20261112/background_007045.png"
+      },
+      "target": {
+        "vehicles": [
+          {
+            "class": "fallen",
+            "source": "datasets/annotated/e_bike/multiview_masks_refined_20261110_v2/sam2_03_fallen.png"
+          }
+        ]
+      },
+      "labels": {
+        "format": "yolo_visible_box",
+        "classes": {
+          "upright": 0,
+          "fallen": 1
+        }
+      },
+      "augmentation": {
+        "tone": "mild"
+      },
+      "parameters": {
+        "actors": [
+          {
+            "foot_x": 480,
+            "foot_y": 420,
+            "size_px": 120,
+            "yaw": 0,
+            "pitch": 0,
+            "roll": 0,
+            "relative_exposure": 0.95
+          }
+        ],
+        "value_gain": 0.9,
+        "saturation_gain": 0.85
+      },
+      "sources": [
+        "datasets/annotated/e_bike/multiview_masks_refined_20261110_v2/sam2_03_fallen.png",
+        "datasets/annotated/e_bike/v4_complex_backgrounds_20261112/background_007045.png",
+        "datasets/annotated/e_bike/video_review_20261110/images/source_001/frame_000008.jpg",
+        "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_007045.png",
+        "datasets/raw/e_bike/archive_assets_legacy/视频/浅色背景单辆倒伏车_平视旋转_008.mp4",
+        "datasets/raw/site_capture_20261112/videos/full_scene.mp4"
+      ]
+    },
+    {
+      "id": "restart_053",
+      "failure_event": "miss_fallen",
+      "min_count": 0,
+      "max_count": 1,
+      "prior": {
+        "alpha": 2,
+        "beta": 3
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [],
+      "background": {
+        "id": "frame_007045",
+        "image": "datasets/annotated/e_bike/v4_complex_backgrounds_20261112/background_007045.png"
+      },
+      "target": {
+        "vehicles": [
+          {
+            "class": "fallen",
+            "source": "datasets/annotated/e_bike/multiview_masks_refined_20261110_v2/sam2_03_fallen.png"
+          }
+        ]
+      },
+      "labels": {
+        "format": "yolo_visible_box",
+        "classes": {
+          "upright": 0,
+          "fallen": 1
+        }
+      },
+      "augmentation": {
+        "tone": "moderate"
+      },
+      "parameters": {
+        "actors": [
+          {
+            "foot_x": 480,
+            "foot_y": 420,
+            "size_px": 120,
+            "yaw": 4,
+            "pitch": 1,
+            "roll": 0,
+            "relative_exposure": 1.05
+          }
+        ],
+        "value_gain": 0.7,
+        "saturation_gain": 0.6
+      },
+      "sources": [
+        "datasets/annotated/e_bike/multiview_masks_refined_20261110_v2/sam2_03_fallen.png",
+        "datasets/annotated/e_bike/v4_complex_backgrounds_20261112/background_007045.png",
+        "datasets/annotated/e_bike/video_review_20261110/images/source_001/frame_000008.jpg",
+        "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_007045.png",
+        "datasets/raw/e_bike/archive_assets_legacy/视频/浅色背景单辆倒伏车_平视旋转_008.mp4",
+        "datasets/raw/site_capture_20261112/videos/full_scene.mp4"
+      ]
+    },
+    {
+      "id": "restart_054",
+      "failure_event": "miss_upright",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 3
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [],
+      "background": {
+        "id": "frame_007045",
+        "image": "datasets/annotated/e_bike/v4_complex_backgrounds_20261112/background_007045.png"
+      },
+      "target": {
+        "vehicles": [
+          {
+            "class": "upright",
+            "source": "datasets/annotated/e_bike/multiview_masks_refined_20261110_v2/sam2_04_upright.png"
+          }
+        ]
+      },
+      "labels": {
+        "format": "yolo_visible_box",
+        "classes": {
+          "upright": 0,
+          "fallen": 1
+        }
+      },
+      "augmentation": {
+        "tone": "original"
+      },
+      "parameters": {
+        "actors": [
+          {
+            "foot_x": 480,
+            "foot_y": 420,
+            "size_px": 95,
+            "yaw": -4,
+            "pitch": -1,
+            "roll": 0,
+            "relative_exposure": 1.0
+          }
+        ],
+        "value_gain": 1.0,
+        "saturation_gain": 1.0
+      },
+      "sources": [
+        "datasets/annotated/e_bike/multiview_masks_refined_20261110_v2/sam2_04_upright.png",
+        "datasets/annotated/e_bike/v4_complex_backgrounds_20261112/background_007045.png",
+        "datasets/annotated/e_bike/video_review_20261110/images/source_002/frame_000003.jpg",
+        "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_007045.png",
+        "datasets/raw/e_bike/archive_assets_legacy/视频/浅色背景单辆直立车_平视旋转_009.mp4",
+        "datasets/raw/site_capture_20261112/videos/full_scene.mp4"
+      ]
+    },
+    {
+      "id": "restart_055",
+      "failure_event": "miss_upright",
+      "min_count": 0,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 3
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [],
+      "background": {
+        "id": "frame_007045",
+        "image": "datasets/annotated/e_bike/v4_complex_backgrounds_20261112/background_007045.png"
+      },
+      "target": {
+        "vehicles": [
+          {
+            "class": "upright",
+            "source": "datasets/annotated/e_bike/multiview_masks_refined_20261110_v2/sam2_04_upright.png"
+          }
+        ]
+      },
+      "labels": {
+        "format": "yolo_visible_box",
+        "classes": {
+          "upright": 0,
+          "fallen": 1
+        }
+      },
+      "augmentation": {
+        "tone": "mild"
+      },
+      "parameters": {
+        "actors": [
+          {
+            "foot_x": 480,
+            "foot_y": 420,
+            "size_px": 95,
+            "yaw": 0,
+            "pitch": 0,
+            "roll": 0,
+            "relative_exposure": 0.95
+          }
+        ],
+        "value_gain": 0.9,
+        "saturation_gain": 0.85
+      },
+      "sources": [
+        "datasets/annotated/e_bike/multiview_masks_refined_20261110_v2/sam2_04_upright.png",
+        "datasets/annotated/e_bike/v4_complex_backgrounds_20261112/background_007045.png",
+        "datasets/annotated/e_bike/video_review_20261110/images/source_002/frame_000003.jpg",
+        "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_007045.png",
+        "datasets/raw/e_bike/archive_assets_legacy/视频/浅色背景单辆直立车_平视旋转_009.mp4",
+        "datasets/raw/site_capture_20261112/videos/full_scene.mp4"
+      ]
+    },
+    {
+      "id": "restart_056",
+      "failure_event": "miss_upright",
+      "min_count": 0,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 3
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [],
+      "background": {
+        "id": "frame_007045",
+        "image": "datasets/annotated/e_bike/v4_complex_backgrounds_20261112/background_007045.png"
+      },
+      "target": {
+        "vehicles": [
+          {
+            "class": "upright",
+            "source": "datasets/annotated/e_bike/multiview_masks_refined_20261110_v2/sam2_04_upright.png"
+          }
+        ]
+      },
+      "labels": {
+        "format": "yolo_visible_box",
+        "classes": {
+          "upright": 0,
+          "fallen": 1
+        }
+      },
+      "augmentation": {
+        "tone": "moderate"
+      },
+      "parameters": {
+        "actors": [
+          {
+            "foot_x": 480,
+            "foot_y": 420,
+            "size_px": 95,
+            "yaw": 4,
+            "pitch": 1,
+            "roll": 0,
+            "relative_exposure": 1.05
+          }
+        ],
+        "value_gain": 0.7,
+        "saturation_gain": 0.6
+      },
+      "sources": [
+        "datasets/annotated/e_bike/multiview_masks_refined_20261110_v2/sam2_04_upright.png",
+        "datasets/annotated/e_bike/v4_complex_backgrounds_20261112/background_007045.png",
+        "datasets/annotated/e_bike/video_review_20261110/images/source_002/frame_000003.jpg",
+        "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_007045.png",
+        "datasets/raw/e_bike/archive_assets_legacy/视频/浅色背景单辆直立车_平视旋转_009.mp4",
+        "datasets/raw/site_capture_20261112/videos/full_scene.mp4"
+      ]
+    },
+    {
+      "id": "restart_057",
+      "failure_event": "miss_upright",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 3
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [],
+      "background": {
+        "id": "frame_007045",
+        "image": "datasets/annotated/e_bike/v4_complex_backgrounds_20261112/background_007045.png"
+      },
+      "target": {
+        "vehicles": [
+          {
+            "class": "upright",
+            "source": "datasets/annotated/e_bike/multiview_masks_refined_20261110_v2/sam2_06_upright.png"
+          }
+        ]
+      },
+      "labels": {
+        "format": "yolo_visible_box",
+        "classes": {
+          "upright": 0,
+          "fallen": 1
+        }
+      },
+      "augmentation": {
+        "tone": "original"
+      },
+      "parameters": {
+        "actors": [
+          {
+            "foot_x": 480,
+            "foot_y": 420,
+            "size_px": 95,
+            "yaw": -4,
+            "pitch": -1,
+            "roll": 0,
+            "relative_exposure": 1.0
+          }
+        ],
+        "value_gain": 1.0,
+        "saturation_gain": 1.0
+      },
+      "sources": [
+        "datasets/annotated/e_bike/multiview_masks_refined_20261110_v2/sam2_06_upright.png",
+        "datasets/annotated/e_bike/v4_complex_backgrounds_20261112/background_007045.png",
+        "datasets/annotated/e_bike/video_review_20261110/images/source_002/frame_000010.jpg",
+        "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_007045.png",
+        "datasets/raw/e_bike/archive_assets_legacy/视频/浅色背景单辆直立车_平视旋转_009.mp4",
+        "datasets/raw/site_capture_20261112/videos/full_scene.mp4"
+      ]
+    },
+    {
+      "id": "restart_058",
+      "failure_event": "miss_upright",
+      "min_count": 0,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 3
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [],
+      "background": {
+        "id": "frame_007045",
+        "image": "datasets/annotated/e_bike/v4_complex_backgrounds_20261112/background_007045.png"
+      },
+      "target": {
+        "vehicles": [
+          {
+            "class": "upright",
+            "source": "datasets/annotated/e_bike/multiview_masks_refined_20261110_v2/sam2_06_upright.png"
+          }
+        ]
+      },
+      "labels": {
+        "format": "yolo_visible_box",
+        "classes": {
+          "upright": 0,
+          "fallen": 1
+        }
+      },
+      "augmentation": {
+        "tone": "mild"
+      },
+      "parameters": {
+        "actors": [
+          {
+            "foot_x": 480,
+            "foot_y": 420,
+            "size_px": 95,
+            "yaw": 0,
+            "pitch": 0,
+            "roll": 0,
+            "relative_exposure": 0.95
+          }
+        ],
+        "value_gain": 0.9,
+        "saturation_gain": 0.85
+      },
+      "sources": [
+        "datasets/annotated/e_bike/multiview_masks_refined_20261110_v2/sam2_06_upright.png",
+        "datasets/annotated/e_bike/v4_complex_backgrounds_20261112/background_007045.png",
+        "datasets/annotated/e_bike/video_review_20261110/images/source_002/frame_000010.jpg",
+        "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_007045.png",
+        "datasets/raw/e_bike/archive_assets_legacy/视频/浅色背景单辆直立车_平视旋转_009.mp4",
+        "datasets/raw/site_capture_20261112/videos/full_scene.mp4"
+      ]
+    },
+    {
+      "id": "restart_059",
+      "failure_event": "miss_upright",
+      "min_count": 0,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 3
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [],
+      "background": {
+        "id": "frame_007045",
+        "image": "datasets/annotated/e_bike/v4_complex_backgrounds_20261112/background_007045.png"
+      },
+      "target": {
+        "vehicles": [
+          {
+            "class": "upright",
+            "source": "datasets/annotated/e_bike/multiview_masks_refined_20261110_v2/sam2_06_upright.png"
+          }
+        ]
+      },
+      "labels": {
+        "format": "yolo_visible_box",
+        "classes": {
+          "upright": 0,
+          "fallen": 1
+        }
+      },
+      "augmentation": {
+        "tone": "moderate"
+      },
+      "parameters": {
+        "actors": [
+          {
+            "foot_x": 480,
+            "foot_y": 420,
+            "size_px": 95,
+            "yaw": 4,
+            "pitch": 1,
+            "roll": 0,
+            "relative_exposure": 1.05
+          }
+        ],
+        "value_gain": 0.7,
+        "saturation_gain": 0.6
+      },
+      "sources": [
+        "datasets/annotated/e_bike/multiview_masks_refined_20261110_v2/sam2_06_upright.png",
+        "datasets/annotated/e_bike/v4_complex_backgrounds_20261112/background_007045.png",
+        "datasets/annotated/e_bike/video_review_20261110/images/source_002/frame_000010.jpg",
+        "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_007045.png",
+        "datasets/raw/e_bike/archive_assets_legacy/视频/浅色背景单辆直立车_平视旋转_009.mp4",
+        "datasets/raw/site_capture_20261112/videos/full_scene.mp4"
+      ]
+    }
+  ]
+}

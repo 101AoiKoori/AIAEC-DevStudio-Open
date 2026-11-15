@@ -6,10 +6,16 @@ Projected labels and detected ticks are candidates, not reviewed ground truth.
 import argparse
 import json
 import subprocess
+import sys
 from pathlib import Path
 
 import cv2
 import numpy as np
+
+ROOT = Path(__file__).resolve().parents[5]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+from lab.training_common.production_guard import generation_guard
 
 
 TIMES = (2.0, 3.0, 5.0, 8.7, 9.0, 9.5, 10.0, 11.0, 12.0, 13.0)
@@ -111,6 +117,17 @@ def main():
     parser.add_argument("--video", type=Path, required=True)
     parser.add_argument("--output", type=Path, required=True)
     args = parser.parse_args()
+    args.video, args.output = args.video.resolve(), args.output.resolve()
+    with generation_guard('meter.prepare_real_meter_validation:' + str(args.output.resolve()),
+                          [args.video], [args.output], {'times': TIMES},
+                          code_paths=[Path(__file__)]) as run:
+        if run.reused:
+            print('REUSED', args.output)
+            return
+        _produce(args, run.source_refs)
+
+
+def _produce(args, source_refs):
     args.output.mkdir(parents=True, exist_ok=False)
     for sub in ("images", "annotations", "previews"):
         (args.output / sub).mkdir()
@@ -169,6 +186,7 @@ def main():
         records.append({k: record[k] for k in ("id", "seconds", "status", "homography_matches", "homography_inliers")})
     (args.output / "manifest.json").write_text(json.dumps({
         "source": str(args.video), "source_group": args.video.name,
+        "input_source_refs": source_refs,
         "description": "One capture session and one fixed needle state; all labels are unreviewed candidates.",
         "reference": "frame_009000", "tick_candidates_reference": len(ticks),
         "frames": records}, ensure_ascii=False, indent=2), encoding="utf-8")

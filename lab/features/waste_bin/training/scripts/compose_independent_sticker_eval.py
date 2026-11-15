@@ -5,6 +5,10 @@ real-print acceptance set. Val and test use different generated artwork files
 and different scene sources, but the physical object and session relationships
 are not established. All labels remain candidates for visual review.
 """
+
+if __name__ == "__main__":
+    raise SystemExit("Legacy dataset CLI is retired; use datasets/scripts/waste_bin_state or waste_sticker/. Production remains paused.")
+
 import argparse
 import json
 import random
@@ -27,9 +31,35 @@ def main():
     parser=argparse.ArgumentParser();parser.add_argument('--out',type=Path,required=True)
     parser.add_argument('--split',choices=('val','test'),required=True);parser.add_argument('--count',type=int,default=120)
     parser.add_argument('--seed',type=int,default=20261124);args=parser.parse_args()
+    # Resolve all consumed media before reserving any output.
+    output = (ROOT / args.out).resolve()
+    owner = (ROOT / 'datasets/exports/waste_bin').resolve()
+    if not output.is_relative_to(owner) or output == owner or args.count < 1:
+        parser.error('output must be under datasets/exports/waste_bin and count positive')
+    source = SOURCE[args.split]
+    manifest = source / 'manifest.jsonl'
+    records = [json.loads(line) for line in manifest.read_text(encoding='utf8').splitlines()]
+    media = [source / 'state/images' / row['image'] for row in records if not row.get('state_empty')]
+    media += [ART / args.split / f'{i:02d}.png' for i in CANDIDATE_CLASSES]
+    procedural = [manifest, source / 'classes.json']
+    parameters = {'split': args.split, 'count': args.count, 'seed': args.seed}
+    import sys
+    if str(ROOT) not in sys.path:
+        sys.path.insert(0, str(ROOT))
+    from lab.training_common.production_guard import generation_guard
+    declared = list(dict.fromkeys(media + procedural))
+    with generation_guard('waste_bin/compose_independent_sticker_eval.py/' + output.relative_to(ROOT).as_posix(),
+                          declared, [output], parameters,
+                          code_paths=[Path(__file__), ROOT / 'lab/features/waste_bin/training/scripts/composite_bin_real_scene.py', ROOT / 'lab/features/waste_bin/training/scripts/draw_independent_sticker_eval.py'], procedural_inputs=procedural) as run:
+        if run.reused:
+            return
+        return _produce(args)
+
+
+def _produce(args):
     out=(ROOT/args.out).resolve()
-    if not out.is_relative_to((ROOT/'datasets/exports/waste_bin').resolve()) or out.exists() or args.count<1:
-        parser.error('new output must be under datasets/exports/waste_bin')
+    if not out.is_relative_to((ROOT/'datasets/exports/waste_bin').resolve()) or args.count<1:
+        raise ValueError('output must be under datasets/exports/waste_bin and count positive')
     source=SOURCE[args.split]
     records=[json.loads(line) for line in (source/'manifest.jsonl').read_text(encoding='utf8').splitlines()]
     records=[r for r in records if not r.get('state_empty')]

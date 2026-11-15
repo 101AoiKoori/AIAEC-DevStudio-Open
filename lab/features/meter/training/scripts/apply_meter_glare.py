@@ -7,9 +7,15 @@ import argparse
 import json
 import math
 import random
+import sys
 from pathlib import Path
 import cv2
 import numpy as np
+
+ROOT = Path(__file__).resolve().parents[5]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+from lab.training_common.production_guard import generation_guard
 
 
 def main():
@@ -17,9 +23,27 @@ def main():
     parser.add_argument('dataset',type=Path)
     parser.add_argument('--seed',type=int,default=20261107)
     args=parser.parse_args()
+    args.dataset = args.dataset.resolve()
     root=args.dataset
     manifest_path=root/'manifest.json'
-    manifest=json.loads(manifest_path.read_text(encoding='utf8'))
+    manifest_bytes=manifest_path.read_bytes()
+    manifest=json.loads(manifest_bytes.decode('utf8'))
+    images=[root/'images'/sample['split']/(sample['id']+'.png') for sample in manifest['samples']]
+    outputs=[manifest_path, *images]
+    with generation_guard('meter.apply_glare:' + str(root.resolve()), images, outputs,
+                          {'seed': args.seed}, procedural_inputs=[manifest_path],
+                          inplace_paths=outputs, code_paths=[Path(__file__)]) as run:
+        if manifest_path.read_bytes() != manifest_bytes:
+            raise ValueError('dataset manifest changed during input enumeration')
+        if run.reused:
+            print('REUSED', root)
+            return
+        _produce(args, manifest)
+
+
+def _produce(args, manifest):
+    root=args.dataset
+    manifest_path=root/'manifest.json'
     if manifest.get('glare_applied'):
         raise RuntimeError('highlights already applied; refusing to apply twice')
     if len(manifest['samples']) != manifest['count'] or not manifest['endpoint_status'].startswith('image-specific'):

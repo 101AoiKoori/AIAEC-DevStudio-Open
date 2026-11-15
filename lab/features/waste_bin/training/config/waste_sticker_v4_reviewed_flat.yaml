@@ -1,0 +1,79 @@
+schema_version: 3
+task_id: waste_bin
+model_key: waste_sticker
+version: v4
+task: detect
+data: datasets/exports/waste_bin/waste_sticker_v4_reviewed_flat_20261113/data.yaml
+test_unavailable: true
+model: runs/waste_sticker/runs/waste_sticker/v3_20261111_151346_593593/training/weights/best.pt
+output_root: runs/waste_sticker
+description: 未完成的 24 类单板候选；缺桶面复杂正例及测试集，暂勿用于正式训练。
+imgsz: 640
+epochs: 24
+batch: 16
+workers: 0
+patience: 0
+seed: 42
+device: '0'
+optimizer: AdamW
+lr0: 0.0002
+lrf: 0.08
+momentum: 0.9
+weight_decay: 0.0005
+warmup_epochs: 1.5
+cos_lr: true
+close_mosaic: 0
+amp: false
+deterministic: true
+max_det: 160
+diagnostic_conf: 0.25
+match_iou: 0.5
+nms_iou: 0.7
+preview_limit: 48
+evaluate_after_training: true
+augment:
+  degrees: 3.0
+  translate: 0.05
+  scale: 0.12
+  shear: 0.0
+  perspective: 0.0
+  flipud: 0.0
+  fliplr: 0.0
+  mosaic: 0.0
+  mixup: 0.0
+  copy_paste: 0.0
+  hsv_h: 0.005
+  hsv_s: 0.1
+  hsv_v: 0.12
+source_notes:
+- 当前仅为平板数据候选，暂勿用于正式训练；数据与候选预算尚未冻结或执行。
+- 训练 1080 张含 480 张单贴正例及 600 张空板负例；开发 48 张单贴正例，无测试集。
+- 训练和开发共享 24 类图案母样；缺多桶、桶面干扰、真实场景与小目标覆盖。
+- 按来源、片段、主体及状态预选并审核数据；同源和物理素材复用分别报告。
+- 阶段参数按实际数据量、有效更新数与开发曲线复核；业务分层选模和最终测试另行执行。
+- 车载参考 640×480；制作数据不超过 720p。统计源图有效目标像素，放大不增加真实细节。
+class_names:
+- plastic_bottle
+- can
+- glass_bottle
+- newspaper
+- cardboard_box
+- clothes
+- leftover_food
+- vegetable_leaves
+- fruit_core
+- tea_leaves
+- bread
+- fish_bone
+- button_battery
+- fluorescent_lamp
+- mercury_thermometer
+- pill
+- paint
+- film
+- cigarette_butt
+- used_tissue
+- disposable_chopsticks
+- broken_ceramics
+- shell
+- discarded_glasses

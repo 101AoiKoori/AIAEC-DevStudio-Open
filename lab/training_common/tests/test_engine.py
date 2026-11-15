@@ -12,10 +12,11 @@ import yaml
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from engine.config import validate
-from engine.data import records, select_records, stage_dataset, relocate_staged_data
+from engine.data import records, select_records, stage_dataset, relocate_staged_data, inspect_dataset
+from engine.freeze_gate import freeze_selection
 from engine.reporting import match_detections, artifact_manifest
 from engine.runtime import new_run, run_context
-from engine.runner import train_run, assert_model_contract, compare_runs, resume_configuration
+from engine.runner import train_run, assert_model_contract, compare_runs, resume_configuration, _training_options
 from engine.bounded import BudgetExhausted, run_bounded
 
 
@@ -39,6 +40,11 @@ class EngineContracts(unittest.TestCase):
         spec = {'names': ['first', 'second'], **{s: 'images/' + s for s in ('train', 'val', 'test')}}
         (self.root / 'dataset/data.yaml').write_text(yaml.safe_dump(spec), encoding='utf-8')
 
+    def test_training_prefers_cuda_and_respects_explicit_cpu(self):
+        self.assertEqual(_training_options(self.config, 'data.yaml', self.root)['device'], '0')
+        cpu_config = {**self.config, 'device': 'cpu'}
+        self.assertEqual(_training_options(cpu_config, 'data.yaml', self.root)['device'], 'cpu')
+
     def test_staging_limits_only_train_and_preserves_source(self):
         source = self.root / 'dataset/labels/train/0.txt'
         before = source.read_bytes()
@@ -56,6 +62,32 @@ class EngineContracts(unittest.TestCase):
         first = select_records(items, 2, 42)
         self.assertEqual(first, select_records(items, 2, 42))
         self.assertEqual({cls for row in first for cls in row['classes']}, {0, 1})
+
+    def test_unavailable_test_is_explicit_and_cannot_be_frozen(self):
+        spec_path = self.root / 'dataset/data.yaml'
+        spec = yaml.safe_load(spec_path.read_text(encoding='utf-8'))
+        del spec['test']
+        spec_path.write_text(yaml.safe_dump(spec), encoding='utf-8')
+        config = {**self.config, 'version': 'v4', 'test_unavailable': True}
+        _, splits, report = inspect_dataset(self.root, config)
+        self.assertEqual(len(splits['train']), 4)
+        self.assertEqual(len(splits['val']), 4)
+        self.assertEqual(splits['test'], [])
+        self.assertEqual(report['test_status'], 'unavailable')
+        with self.assertRaisesRegex(ValueError, 'unavailable'):
+            freeze_selection(self.root, config, 'unused', 'unused', 'unused', 'unused')
+        with self.assertRaisesRegex(ValueError, 'no test path'):
+            inspect_dataset(self.root, {**config, 'data_overrides': {'test': []}})
+        spec['test'] = 'images/test'
+        spec_path.write_text(yaml.safe_dump(spec), encoding='utf-8')
+        with self.assertRaisesRegex(ValueError, 'no test path'):
+            inspect_dataset(self.root, config)
+
+    def test_unavailable_test_flag_is_typed_and_v4_only(self):
+        with self.assertRaisesRegex(ValueError, 'must be boolean'):
+            validate({**self.config, 'test_unavailable': 'true'})
+        with self.assertRaisesRegex(ValueError, 'only for V4'):
+            validate({**self.config, 'test_unavailable': True})
 
     def test_copied_package_retains_original_source_group(self):
         manifest = {'records': [{'image': 'dataset/images/train/0.jpg',

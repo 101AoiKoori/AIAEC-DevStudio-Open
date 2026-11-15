@@ -16,7 +16,7 @@
 | [e_bike](e_bike/README.md) | A/B 街违停有无、停车区车辆总数及倒伏数量 [17] | 10 | 后台处理（待接入调度） | 待开发 |
 <!-- TASKS:END -->
 
-各任务使用 `training/scripts/`、`training/config/`、`training/tests/` 放数据处理和训练相关工作，使用 `inference/config/`、`inference/tests/` 放独立推理配置和评估，共享推理源码位于 `ws/src/aec_vision/`。训练与推理的配置分开维护；详细结构与交接要求见 [识别开发与部署设计](../../docs/PERCEPTION_DEVELOPMENT.md)。共享原始素材统一放 `datasets/raw/<任务目录名>/`，标注和数据集导出分别放 `datasets/annotated/<任务目录名>/` 与 `datasets/exports/<任务目录名>/`；训练权重可放 `models/weights/<任务目录名>/`，部署所需模型放对应 ROS 包的 `models/`。这些数据与权重不进入 Git。各模块实现与验证范围见[识别开发设计](../../docs/PERCEPTION_DEVELOPMENT.md#共用推理脚本)。
+各任务使用 `training/scripts/`、`training/config/`、`training/tests/` 放数据处理和训练相关工作，使用 `inference/config/`、`inference/tests/` 放独立推理配置和评估，共享推理源码位于 `ws/src/aec_vision/`。训练与推理的配置分开维护；详细结构与交接要求见 [识别开发与部署设计](../../docs/PERCEPTION_DEVELOPMENT.md)。数据目录以 `config/workspace_layout.yaml` 为准；原始来源按各任务 `source.yaml`，标注根按任务声明，不能假定 `datasets/annotated/<任务>/`，详见[数据集工作目录](../../docs/DATASET_DESIGN.md#数据集工作目录)。训练权重可放 `models/weights/<任务目录名>/`，部署所需模型放对应 ROS 包的 `models/`。这些数据与权重不进入 Git。各模块实现与验证范围见[识别开发设计](../../docs/PERCEPTION_DEVELOPMENT.md#共用推理脚本)。
 
 建议各识别器区分 **成功、未找到、无法判定、运行错误**；明确携带任务位置、识别对象、结果、图像证据与耗时。确认无目标才输出零，视野不足或失败不能当成零。各任务的终端文案是规则示例，图片标注以各页明确要求为准；是否额外保存其他任务图片由联调决定。
 

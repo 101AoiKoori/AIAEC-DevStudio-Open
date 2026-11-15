@@ -1,0 +1,402 @@
+{
+  "schema_version": 1,
+  "model_key": "building_name_paper",
+  "target_split": "train",
+  "purpose": "单楼单纸实景背景合成候选；背景其他楼名目标及生成文字可读性均未确认，不能作为完整训练标签。",
+  "budget": 1,
+  "uncertainty_weight": 0,
+  "independence_basis": "单帧来自已登记父视频；该来源不代表独立采集场次或整个任务来源组成。",
+  "constraints": {
+    "route_context": "building_facade",
+    "traffic_signal_injection": "none",
+    "text_mirror": false,
+    "label_usage": "preserve_source_coverage_and_generated_truth"
+  },
+  "task_use_status": [
+    {
+      "image": "datasets/annotated/fire/real_review_candidates_20261110/images/0026.png",
+      "task": "building_name_paper",
+      "split": "train",
+      "role": "background",
+      "status": "candidate",
+      "evidence": {
+        "manifest": "datasets/annotated/fire/real_review_candidates_20261110/manifest.json",
+        "record_index": 25,
+        "index_basis": "zero_based",
+        "geometry_source": "datasets/scripts/building_name_paper/config/combination_plan.json#strata[0].target.quad_xy"
+      },
+      "parent_source": "Archive/Assets/场景/三楼与场地视频/三栋楼_垃圾桶与路口_003.mp4",
+      "image_size": [
+        1920,
+        1080
+      ],
+      "regions": [
+        {
+          "slot_id": "center",
+          "building_id": "screen_center",
+          "quad_xy": [
+            [
+              672,
+              122
+            ],
+            [
+              984,
+              124
+            ],
+            [
+              986,
+              188
+            ],
+            [
+              674,
+              188
+            ]
+          ],
+          "evidence": "旧入口 960×540 四角坐标乘二；位置约束按当前用户要求放宽。"
+        },
+        {
+          "slot_id": "right",
+          "building_id": "screen_right",
+          "quad_xy": [
+            [
+              1320,
+              25
+            ],
+            [
+              1510,
+              30
+            ],
+            [
+              1510,
+              65
+            ],
+            [
+              1320,
+              60
+            ]
+          ],
+          "evidence": "原图可见右侧楼体；像素坐标为多楼组合计划，贴面支撑和逼真度未验证。"
+        }
+      ],
+      "constraints": "背景其他名称纸条是否完整未知；仅输出部分标签候选。历史用途为 real_test_review_candidate，保留复用信息。"
+    },
+    {
+      "image": "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_002551.png",
+      "task": "building_name_paper",
+      "split": "train",
+      "role": "direct_sample",
+      "status": "candidate",
+      "parent_source": "datasets/raw/site_capture_20261112/videos/full_scene.mp4",
+      "evidence": {
+        "manifest": "datasets/annotated/site_capture_20261112/fire_name_v4_review/review_manifest.json",
+        "record_index": 1
+      },
+      "source_label": "datasets/annotated/site_capture_20261112/fire_name_v4_review/labels/building_name_paper/frame_002551.txt",
+      "source_state": "complete_negative",
+      "historical_usage": "development_review; source split unassigned; AI candidate not human accepted"
+    },
+    {
+      "image": "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_002701.png",
+      "task": "building_name_paper",
+      "split": "train",
+      "role": "direct_sample",
+      "status": "candidate",
+      "parent_source": "datasets/raw/site_capture_20261112/videos/full_scene.mp4",
+      "evidence": {
+        "manifest": "datasets/annotated/site_capture_20261112/fire_name_v4_review/review_manifest.json",
+        "record_index": 2
+      },
+      "source_label": "datasets/annotated/site_capture_20261112/fire_name_v4_review/labels/building_name_paper/frame_002701.txt",
+      "source_state": "complete_negative",
+      "historical_usage": "development_review; source split unassigned; AI candidate not human accepted"
+    },
+    {
+      "image": "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_003391.png",
+      "task": "building_name_paper",
+      "split": "train",
+      "role": "direct_sample",
+      "status": "candidate",
+      "parent_source": "datasets/raw/site_capture_20261112/videos/full_scene.mp4",
+      "evidence": {
+        "manifest": "datasets/annotated/site_capture_20261112/fire_name_v4_review/review_manifest.json",
+        "record_index": 4
+      },
+      "source_label": "datasets/annotated/site_capture_20261112/fire_name_v4_review/labels/building_name_paper/frame_003391.txt",
+      "source_state": "complete_positive",
+      "historical_usage": "development_review; source split unassigned; AI candidate not human accepted; OCR unknown"
+    },
+    {
+      "image": "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_004921.png",
+      "task": "building_name_paper",
+      "split": "train",
+      "role": "direct_sample",
+      "status": "candidate",
+      "parent_source": "datasets/raw/site_capture_20261112/videos/full_scene.mp4",
+      "evidence": {
+        "manifest": "datasets/annotated/site_capture_20261112/fire_name_v4_review/review_manifest.json",
+        "record_index": 5
+      },
+      "source_label": "datasets/annotated/site_capture_20261112/fire_name_v4_review/labels/building_name_paper/frame_004921.txt",
+      "source_state": "complete_negative",
+      "historical_usage": "development_review; source split unassigned; AI candidate not human accepted"
+    },
+    {
+      "image": "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_005101.png",
+      "task": "building_name_paper",
+      "split": "train",
+      "role": "direct_sample",
+      "status": "candidate",
+      "parent_source": "datasets/raw/site_capture_20261112/videos/full_scene.mp4",
+      "evidence": {
+        "manifest": "datasets/annotated/site_capture_20261112/fire_name_v4_review/review_manifest.json",
+        "record_index": 6
+      },
+      "source_label": "datasets/annotated/site_capture_20261112/fire_name_v4_review/labels/building_name_paper/frame_005101.txt",
+      "source_state": "complete_positive",
+      "historical_usage": "development_review; source split unassigned; AI candidate not human accepted; OCR unknown"
+    },
+    {
+      "image": "datasets/annotated/fire/real_review_candidates_20261110/images/0014.png",
+      "task": "building_name_paper",
+      "split": "train",
+      "role": "geometry_input",
+      "status": "ready",
+      "evidence": {
+        "manifest": "datasets/annotated/fire/real_review_candidates_20261110/manifest.json",
+        "record_index": 13,
+        "index_basis": "zero_based",
+        "plan_pointer": "$.strata[0].background.candidates[0].regions[0]"
+      },
+      "parent_source": "Archive/Assets/楼宇/锦绣大厦/视频/锦绣楼在室内地砖上的多面绕拍_001.mp4",
+      "ready_scope": "仅供单楼单纸部分候选入口使用的原图像素四角；不表示背景或生成图达到完整训练准入。",
+      "constraints": "四角为原图视觉近似，入口几何结构检查通过；未运行生产守卫，未生成或检查合成画面。"
+    },
+    {
+      "image": "datasets/annotated/fire/real_review_candidates_20261110/images/0014.png",
+      "task": "building_name_paper",
+      "split": "train",
+      "role": "background",
+      "status": "candidate",
+      "evidence": {
+        "manifest": "datasets/annotated/fire/real_review_candidates_20261110/manifest.json",
+        "record_index": 13,
+        "index_basis": "zero_based",
+        "plan_pointer": "$.strata[0].background.candidates[0]"
+      },
+      "parent_source": "Archive/Assets/楼宇/锦绣大厦/视频/锦绣楼在室内地砖上的多面绕拍_001.mp4",
+      "region": {
+        "coordinate_space": "1920x1080 original pixels",
+        "quad_xy": [
+          [
+            775,
+            275
+          ],
+          [
+            903,
+            254
+          ],
+          [
+            905,
+            286
+          ],
+          [
+            779,
+            306
+          ]
+        ],
+        "status": "visual_approximation"
+      },
+      "constraints": "背景已有纸条完整性未知；输出只允许部分候选。该来源的历史评价候选用途及同源复用须保留。"
+    },
+    {
+      "image": "datasets/annotated/fire/real_review_candidates_20261110/images/0014.png",
+      "task": "building_name_paper",
+      "split": "train",
+      "role": "direct_sample",
+      "status": "blocked",
+      "evidence": {
+        "manifest": "datasets/annotated/fire/real_review_candidates_20261110/manifest.json",
+        "record_index": 13,
+        "index_basis": "zero_based"
+      },
+      "parent_source": "Archive/Assets/楼宇/锦绣大厦/视频/锦绣楼在室内地砖上的多面绕拍_001.mp4",
+      "constraints": "原记录 labels=null、annotations_status=pending_review；全图检测真值未完成，不能直接训练或推断空负例。"
+    },
+    {
+      "image": "datasets/annotated/fire/real_review_candidates_20261110/images/0014.png",
+      "task": "building_name_paper",
+      "split": "unassigned",
+      "role": "historical_review",
+      "status": "candidate",
+      "evidence": {
+        "manifest": "datasets/annotated/fire/real_review_candidates_20261110/manifest.json",
+        "record_index": 13,
+        "index_basis": "zero_based",
+        "purpose_pointer": "$.purpose"
+      },
+      "parent_source": "Archive/Assets/楼宇/锦绣大厦/视频/锦绣楼在室内地砖上的多面绕拍_001.mp4",
+      "constraints": "原用途 real_test_review_candidate；没有在此分配 val/test，历史接触不能当独立评估。"
+    }
+  ],
+  "bounded_branch": {
+    "combination_id": "single_jinxiu_frame194",
+    "source_pool_pointer": "$.strata[0].background.candidates",
+    "source_group_shares": [
+      {
+        "parent_source": "Archive/Assets/楼宇/锦绣大厦/视频/锦绣楼在室内地砖上的多面绕拍_001.mp4",
+        "planned_count": 1,
+        "candidate_images": 1
+      }
+    ],
+    "compatible_combination": "一张 0014 原帧 × 一个近似楼顶四角 × 一个待生成名称；无额外遮挡。",
+    "sampling": "先按组均匀、再组内均匀；当前各只有一个选项，结果确定。名称固定为计划文本。",
+    "seed": 20261114,
+    "planned_count": 1,
+    "candidate_input_count": 1,
+    "structural_max_candidate_outputs": 1,
+    "confirmed_ready_training_images": 0,
+    "generated_images": 0,
+    "main_task_plan": {
+      "path": "datasets/scripts/building_name_paper/config/combination_plan.json",
+      "full_plan_pointer": "$.v4_task_combination_plan",
+      "parent_group_pointer": "$.v4_task_combination_plan.train_parent_groups[5]",
+      "single_paper_branch_pointer": "$.v4_task_combination_plan.combinations[3]",
+      "multi_paper_branch_pointer": "$.v4_task_combination_plan.combinations[4]",
+      "sampling_pointer": "$.v4_task_combination_plan.sampling_and_seed",
+      "parent_group_id": "train_jinxiu_indoor_001",
+      "parent_group_single_paper_target": 166,
+      "parent_group_multi_paper_target": 34,
+      "parent_group_direct_target": 150,
+      "main_single_paper_target": 1000,
+      "known_structural_candidate_capacity_in_this_plan": 1,
+      "parent_single_remaining_after_candidate_capacity": 165,
+      "parent_single_remaining_to_confirmed_training_ready": 166,
+      "parent_multi_known_structural_capacity_in_this_plan": 0,
+      "parent_multi_target_not_supported_here": 34,
+      "parent_direct_known_ready_capacity_in_this_scope": 0,
+      "parent_direct_target_not_confirmed_here": 150,
+      "limitation": "这里只核对这一张图和一个槽位；其他来源尚未在本轮范围逐项核对，不将它们推断为零或已就绪。主计划的 12 基底×14 名称是受条件约束的上界，不等于当前可用容量。"
+    },
+    "label_constraints": "背景纸条完整性 unknown；生成框为检测候选，生成文字和 OCR 真值分开，OCR unknown。",
+    "gap": "原图全图标签未完成、四角为视觉近似、生成后的可读性和训练准入未知；不能将这些条件当作完整训练图已就绪。",
+    "capacity_scope": "一项像素四角可作为指定部分候选入口的几何输入；结构上最多一张候选输出，已确认完整训练容量为零；不将本组外的 3000 张计划当作已支持。"
+  },
+  "relation_snapshot": {
+    "scope": "本计划 0014 与 0026 的用途关系、五条全场视频直接候选及楼名车载候选 manifest 六条共享预留关系；不代表全任务素材库存。",
+    "other_manifest": "datasets/annotated/fire/building_name_paper_v4_car_sequence_review_20261113/manifest.json",
+    "unit": "同一图片、任务、集合和角色构成一条关系；图片按实际路径去重；同一图可有多条关系。",
+    "unique_images": 13,
+    "relations": {
+      "ready": 1,
+      "candidate": 8,
+      "blocked": 1,
+      "reserved": 6,
+      "excluded": 0
+    },
+    "snapshot_date": "2026-11-14"
+  },
+  "selection_evidence": {
+    "source_manifest": "datasets/annotated/fire/real_review_candidates_20261110/manifest.json",
+    "source_record_index": 13,
+    "index_basis": "zero_based",
+    "source_frame": 194,
+    "source_seconds_approx": 6.4661,
+    "image_visual_observation": "1920×1080 原图可见一栋楼；拟贴位置位于正立面顶部的灰色实体横梁，四角为视觉近似。当前未发现可辨楼名纸条；未将全图目标完整性判为已确认。",
+    "region_coordinate_space": "原图像素坐标，原点左上，顺序左上、右上、右下、左下；未裁剪或缩放",
+    "original_labels": "原清单 annotations_status=pending_review，labels=null；不输入空负例。",
+    "text_truth": "清和大厦是拟生成文本，与原图真实文字无关；生成后的 OCR 可读性未知。",
+    "reservation": "父视频为锦绣室内绕拍001，不在本任务及火焰共享的预留父视频列表中；采集场次及与其他来源关系未知。",
+    "historical_usage": "原清单用途为 real_test_review_candidate，已有历史接触与复用；本次只记录 train 候选计划，不称独立评估。",
+    "entry": "datasets/scripts/building_name_paper/compose_rooftop_papers.py",
+    "planned_output": "datasets/samples/building_name_paper",
+    "scope": "仅原图视觉与入口结构检查；没有生成图片、标注、生产回执或运行训练。"
+  },
+  "strata": [
+    {
+      "id": "single_jinxiu_frame194",
+      "failure_event": "paper_or_background_label_uncertainty",
+      "conditions": [
+        "rooftop_paper",
+        "no_added_occlusion"
+      ],
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "observations": [],
+      "background": {
+        "sampling": "uniform_group_then_image",
+        "candidates": [
+          {
+            "image": "datasets/annotated/fire/real_review_candidates_20261110/images/0014.png",
+            "source_group": "Archive/Assets/楼宇/锦绣大厦/视频/锦绣楼在室内地砖上的多面绕拍_001.mp4",
+            "parent_source": "Archive/Assets/楼宇/锦绣大厦/视频/锦绣楼在室内地砖上的多面绕拍_001.mp4",
+            "generation_method": "provided_video_frame",
+            "image_size": [
+              1920,
+              1080
+            ],
+            "coverage": "unknown",
+            "coverage_evidence": "原清单 datasets/annotated/fire/real_review_candidates_20261110/manifest.json 的 record_index 13 为待核、无标签；本次原图观察未发现可辨楼名纸条，但未确认全图目标完整性。",
+            "existing_papers": [],
+            "regions": [
+              {
+                "slot_id": "B_rooftop_front",
+                "building_id": "B",
+                "quad_xy": [
+                  [
+                    775,
+                    275
+                  ],
+                  [
+                    903,
+                    254
+                  ],
+                  [
+                    905,
+                    286
+                  ],
+                  [
+                    779,
+                    306
+                  ]
+                ],
+                "evidence": "对 1920×1080 原图进行视觉选点：楼顶正立面灰色横梁上的近似纸条四角；未经现场标定或合成复核。"
+              }
+            ]
+          }
+        ]
+      },
+      "target": {
+        "kind": "building_name_paper",
+        "papers": [
+          {
+            "slot_id": "B_rooftop_front",
+            "text": "清和大厦"
+          }
+        ]
+      },
+      "labels": {
+        "task": "paper_detection",
+        "class_id": 0,
+        "format": "yolo_v8",
+        "status": "source_recorded_or_generated_detection",
+        "generated_ocr": "generated_string"
+      },
+      "augmentation": {
+        "mode": "none"
+      },
+      "sources": [
+        "real_scene_background",
+        "name_font_asset"
+      ],
+      "parameters": {
+        "seed": 20261114
+      }
+    }
+  ]
+}

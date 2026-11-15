@@ -1,4 +1,5 @@
 import importlib.util
+import copy
 import math
 import unittest
 from pathlib import Path
@@ -14,6 +15,18 @@ contract = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(contract)
 
 
+class MouthContrastTest(unittest.TestCase):
+    def test_dark_opening_passes_bright_or_missing_opening_fails(self):
+        body = np.ones((10, 10), dtype=bool)
+        mouth = np.zeros((10, 10), dtype=bool)
+        mouth[:5] = True
+        rgb = np.full((10, 10, 4), .8)
+        self.assertFalse(contract.mouth_pixel_contrast(rgb, mouth, body)['passed'])
+        rgb[:5, :, :3] = .1
+        self.assertTrue(contract.mouth_pixel_contrast(rgb, mouth, body)['passed'])
+        self.assertFalse(contract.mouth_pixel_contrast(rgb, np.zeros_like(mouth), body)['passed'])
+
+
 def mock_materials():
     result = {}
     for name in contract.BIN_NAMES:
@@ -26,6 +39,84 @@ def mock_materials():
 
 
 class BinRenderContractTest(unittest.TestCase):
+    def test_standalone_plan_rejects_unimplemented_and_duplicate_states(self):
+        state = {'id': 'a', 'conditions': [], 'planned_count': 1,
+                 'sources': ['bin.blend'], 'background': {'scene': 'bin.blend', 'floor_gray': .1, 'backdrop_gray': .3},
+                 'target': {'bins': {'blue': 'open'}, 'open_pose': 'hanging_back'},
+                 'labels': {'mode': 'candidate', 'open': 0, 'closed': 1}, 'augmentation': {'mode': 'none'},
+                 'parameters': {'camera_location': [0, -6, 3], 'camera_aim': [0, 0, 1],
+                                'yaw_degrees': 0, 'lens_mm': 35, 'key_energy': 800, 'fill_energy': 400,
+                                'color_factor': 1, 'roughness_delta': 0}}
+        other = copy.deepcopy(state)
+        other['id'] = 'b'
+        other['target']['bins']['blue'] = 'closed'
+        plan = {'model_key': 'waste_bin_state', 'budget': 2,
+                'constraints': {'resolution': [640, 480], 'label_mode': 'candidate',
+                                'min_visibility': .7, 'min_visible_pixels': 24},
+                'strata': [state, other]}
+        self.assertEqual(len(contract.standalone_planned_jobs(plan, 'bin.blend', 640, 480, .7, 24)), 2)
+        other['target']['bins']['blue'] = 'open'
+        other['parameters']['camera_location'][0] = 0.0
+        with self.assertRaises(ValueError):
+            contract.standalone_planned_jobs(plan, 'bin.blend', 640, 480, .7, 24)
+        other['target']['bins']['blue'] = 'closed'
+        state['planned_count'] = 2
+        with self.assertRaises(ValueError):
+            contract.standalone_planned_jobs(plan, 'bin.blend', 640, 480, .7, 24)
+        state['planned_count'] = 1
+        state['target']['bins'] = {}
+        other['target']['bins'] = {}
+        other['target']['open_pose'] = 'upright'
+        other['parameters']['color_factor'] = .9
+        with self.assertRaises(ValueError):
+            contract.standalone_planned_jobs(plan, 'bin.blend', 640, 480, .7, 24)
+        state['augmentation'] = {'mode': 'blur'}
+        with self.assertRaises(ValueError):
+            contract.standalone_planned_jobs(plan, 'bin.blend', 640, 480, .7, 24)
+
+    def test_arena_plan_drives_quotas_and_rejects_unsupported_states(self):
+        state = {'id': 'open', 'conditions': [], 'planned_count': 1,
+                 'background': {'scene': 'arena.blend'}, 'sources': ['arena.blend', 'bin.blend'],
+                 'target': {'bins': {'blue': 'open', 'red': 'closed'}, 'open_pose': 'upright'},
+                 'labels': {'mode': 'candidate', 'open': 0, 'closed': 1},
+                 'augmentation': {'exposure_ev': -.5, 'saturation': .8},
+                 'parameters': {'bin_location': [0, 1, 0], 'camera_location': [0, .64, .18],
+                                'camera_aim': [0, 1, .075]}}
+        second = copy.deepcopy(state)
+        second['id'] = 'closed'
+        second['target']['bins']['blue'] = 'closed'
+        plan = {'model_key': 'waste_bin_state', 'budget': 2,
+                'constraints': {'resolution': [640, 480], 'label_mode': 'candidate'}, 'strata': [state, second]}
+        self.assertEqual([x['id'] for x in contract.arena_planned_jobs(plan, 'arena.blend', 'bin.blend')],
+                         ['open', 'closed'])
+        second['target']['bins']['blue'] = 'open'
+        second['parameters']['bin_location'][0] = 0.0
+        with self.assertRaises(ValueError):
+            contract.arena_planned_jobs(plan, 'arena.blend', 'bin.blend')
+        second['target']['bins']['blue'] = 'closed'
+        state['planned_count'] = 2
+        with self.assertRaises(ValueError):
+            contract.arena_planned_jobs(plan, 'arena.blend', 'bin.blend')
+        state['planned_count'] = 1
+        state['target']['bins'] = {}
+        second['target']['bins'] = {}
+        second['parameters']['bin_location'][0] = 1
+        with self.assertRaises(ValueError):
+            contract.arena_planned_jobs(plan, 'arena.blend', 'bin.blend')
+        state['target']['bins'] = {'blue': 'open', 'red': 'closed'}
+        second['target']['bins'] = {'blue': 'closed', 'red': 'closed'}
+        state['augmentation']['blur'] = 1
+        with self.assertRaises(ValueError):
+            contract.arena_planned_jobs(plan, 'arena.blend', 'bin.blend')
+        del state['augmentation']['blur']
+        state['target']['open_pose'] = 'hanging_back'
+        with self.assertRaises(ValueError):
+            contract.arena_planned_jobs(plan, 'arena.blend', 'bin.blend')
+        state['target']['open_pose'] = 'upright'
+        plan['budget'] = 3
+        with self.assertRaises(ValueError):
+            contract.arena_planned_jobs(plan, 'arena.blend', 'bin.blend')
+
     def test_pbr_baseline_uses_shader_and_does_not_drift(self):
         materials = mock_materials()
         baseline = contract.capture_material_baseline(materials)

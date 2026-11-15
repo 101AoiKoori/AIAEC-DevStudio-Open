@@ -2,23 +2,17 @@
 import argparse
 import json
 import shutil
+import sys
 from pathlib import Path
 
 import cv2
 import numpy as np
 
 from compose_scene_fire import ROOT, EXPORTS, read_image
-from compose_scene_fire_eval import name_paper, paste
-
-CHARS = tuple('清和安乐明新宏瑞锦泽云景晨华康福泰阳祥雅宁兴嘉文远广德元中天湖海东南西北春夏秋冬江河山')
-CHARS = tuple(dict.fromkeys(CHARS))
-SUFFIX = ('大厦', '大楼', '中心', '公寓', '商厦')
-
-
-def make_name(index):
-    n = len(CHARS)
-    return CHARS[(index // n) % n] + CHARS[index % n] + SUFFIX[(index // (n*n)) % len(SUFFIX)]
-
+from compose_scene_fire_eval import FONT, name_paper, paste
+sys.path.insert(0, str(ROOT))
+from lab.training_common.production_guard import generation_guard
+from datasets.scripts.common.names import CHARS, SUFFIX, make_name
 
 def write_paper(image, box, text):
     x1, y1, x2, y2 = box
@@ -32,7 +26,7 @@ def write_paper(image, box, text):
     paste(image, patch, [[x1, y1], [x2-1, y1], [x2-1, y2-1], [x1, y2-1]])
 
 
-def generate(source, output, count):
+def _generate(source, output, count):
     if output.exists() or not output.resolve().is_relative_to(EXPORTS.resolve()):
         raise ValueError('output exists or outside fire exports')
     info=json.loads((source/'summary.json').read_text(encoding='utf-8'))
@@ -66,6 +60,30 @@ def generate(source, output, count):
         'source_groups':['scene_video_49s_shared','blender_v13_shared_model']}
     (output/'summary.json').write_text(json.dumps(summary,ensure_ascii=False,indent=2),encoding='utf-8')
     return summary
+
+
+def generate(source, output, count):
+    records = [json.loads(line) for line in (source / 'manifest.jsonl').read_text(encoding='utf-8').splitlines()]
+    if not 1 <= count <= len(records):
+        raise ValueError('invalid count')
+    chosen = records[:count]
+    images = [source / 'name/images/train' / (r['id'] + '.jpg') for r in chosen]
+    labels = [source / 'name/labels/train' / (r['id'] + '.txt') for r in chosen]
+    metadata = [source / 'summary.json', source / 'manifest.jsonl', FONT, *labels]
+    with generation_guard('fire.vary_name_papers:' + str(output.resolve().relative_to(ROOT)),
+                          [*metadata, *images], [output], {'count': count},
+                          code_paths=[Path(__file__), ROOT / 'lab/features/fire/training/scripts/compose_scene_fire.py',
+                                      ROOT / 'lab/features/fire/training/scripts/compose_scene_fire_eval.py',
+                                      ROOT / 'datasets/scripts/common/images.py', ROOT / 'datasets/scripts/common/annotations.py',
+                                      ROOT / 'datasets/scripts/common/names.py', ROOT / 'datasets/scripts/common/paper.py',
+                                      ROOT / 'datasets/scripts/common/perspective.py'],
+                          procedural_inputs=metadata, root=ROOT) as run:
+        if run.reused:
+            return json.loads((output / 'summary.json').read_text(encoding='utf-8'))
+        result = _generate(source, output, count)
+        result['batch_source_refs'] = run.source_refs
+        (output / 'summary.json').write_text(json.dumps(result, ensure_ascii=False, indent=2), encoding='utf-8')
+        return result
 
 
 if __name__=='__main__':

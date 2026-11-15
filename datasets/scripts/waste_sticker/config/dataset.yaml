@@ -1,0 +1,12 @@
+task: waste_sticker
+status: canonical_entry_sources_connected_production_paused
+allocation: {required: true, engine: datasets/scripts/common/bayesian.py, weights: per_plan_design_assumptions}
+goal: 识别24类物品贴纸并关联垃圾桶；投放正确性由后处理判断。
+states: [24类均衡, 四色桶, 桶位, 开闭, 单桶, 多桶, 偏航, 明暗, 饱和度, 反光, 遮挡]
+train_target_images: 7200
+source_mix_initial: {direct_real: 0.10, real_background_composite: 0.40, blender_background: 0.50}
+source_config: config/source.yaml
+placement: 按实拍参考桶面比例放置，避免遮挡桶身固有分类标志。
+sample_output: datasets/samples/waste_sticker
+dataset_output: datasets/exports/waste_sticker
+design_reference: docs/DATASET_DESIGN.md

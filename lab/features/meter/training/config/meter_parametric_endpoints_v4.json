@@ -1,0 +1,29 @@
+{
+  "source_blend": "datasets/assets/blender/meter/v4_parametric_station_v2_20261113/station.blend",
+  "source_face": "datasets/assets/blender/meter/v4_parametric_station_v2_20261113/face.png",
+  "image_size": [
+    1254,
+    1254
+  ],
+  "coordinate_system": "top-left pixels; generated outer tick endpoints",
+  "status": "parameterized synthetic tick geometry; physical meter correspondence and point visibility unknown",
+  "endpoints": {
+    "temperature_min": [
+      186.5474578142166,
+      929.4356124401093
+    ],
+    "temperature_max": [
+      1082.4947052598,
+      890.3176993131638
+    ],
+    "humidity_min": [
+      793.3693761527538,
+      791.2016815245152
+    ],
+    "humidity_max": [
+      458.0884419679642,
+      802.9099532067776
+    ]
+  },
+  "provenance": "Four endpoint values copied unchanged from the station v2 endpoints record; workspace paths are current after asset relocation."
+}

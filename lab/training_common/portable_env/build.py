@@ -34,8 +34,8 @@ def main():
     parser.add_argument('--output', default=None, help='New directory name under bundles/')
     parser.add_argument('--resolve', action='store_true', help='Intentionally update the pinned lock before building')
     args = parser.parse_args()
-    if sys.platform != 'win32' or sys.version_info.major != 3 or MINOR not in (12,13,14) or sysconfig.get_platform() != 'win-amd64':
-        parser.error('Build with standard Windows x64 CPython 3.12, 3.13 or 3.14')
+    if sys.platform != 'win32' or sys.implementation.name != 'cpython' or sys.version_info.major != 3 or MINOR not in (12, 14) or sysconfig.get_platform() != 'win-amd64' or sysconfig.get_config_var('Py_DEBUG') or sysconfig.get_config_var('Py_GIL_DISABLED'):
+        parser.error('Build with standard Windows x64 CPython 3.12 or 3.14; Python 3.13 is unsupported')
     args.output = args.output or 'win-cp3{}-cu128-v3'.format(MINOR)
     if len(Path(args.output).parts) != 1 or args.output in ('.', '..'):
         parser.error('--output must be one new directory name')

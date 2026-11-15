@@ -14,9 +14,10 @@ import numpy as np
 from PIL import Image
 
 ROOT = Path(__file__).resolve().parents[5]
-sys.path.insert(0, str(ROOT / 'lab/training_common'))
+sys.path[:0] = [str(ROOT), str(ROOT / 'lab/training_common')]
 
 from engine.data import records
+from lab.training_common.production_guard import generation_guard
 
 
 EXPORTS = ROOT / 'datasets/exports/plate'
@@ -182,7 +183,7 @@ def ocr_data(destination, training_rows, diagnostic_rows):
             'site_groups': sorted({row['physical_plate_group'] for row in site_annotations})}
 
 
-def prepare(batch):
+def _prepare(batch, source_refs):
     reviewed = read(batch / 'review/site_train_boxes.json')
     diagnosis = read(SITE / 'evaluation_candidates.json')
     holdout = {row['image'] for row in diagnosis}
@@ -231,7 +232,7 @@ def prepare(batch):
                          'negative': sum(not r['instances'] for r in items),
                          'boxes': sum(r['instances'] for r in items)}
     summary = {
-        'status': 'exported_visual_candidates', 'detector': counts, 'ocr': ocr_counts,
+        'status': 'exported_visual_candidates', 'detector': counts, 'ocr': ocr_counts, 'source_refs': source_refs,
         'holdout_images_screened': len(holdout),
         'adaptation': dict(Counter(row['review_status'] for row in reviewed)),
         'diagnostic': dict(Counter(row['review_status'] for row in diagnostics)),
@@ -246,6 +247,38 @@ def prepare(batch):
     }
     write(batch / 'summary.json', summary)
     print(json.dumps(summary, ensure_ascii=False))
+
+
+def prepare(batch):
+    reviewed_path = batch / 'review/site_train_boxes.json'
+    diagnosis_path = SITE / 'evaluation_candidates.json'
+    selection_path = SITE / 'photo_selection.csv'
+    reviewed = read(reviewed_path)
+    diagnosis = read(diagnosis_path)
+    legacy = legacy_records()
+    historical_ocr = HISTORICAL / 'synthetic_train/ocr'
+    ocr_manifests = [historical_ocr / f'{split}_annotations.json' for split in ('train', 'val')]
+    procedural = {reviewed_path, diagnosis_path, selection_path,
+                  ROOT / 'ws/src/aec_vision/config/plate/charset.json',
+                  HISTORICAL / 'round2_multi_car/dataset.yaml',
+                  HISTORICAL / 'synthetic_train/detector/dataset.yaml', *ocr_manifests}
+    media = {image_path(row['image']) for row in reviewed + diagnosis}
+    for _, _, row in legacy:
+        media.add(ROOT / row['image'])
+        procedural.add(ROOT / row['label'])
+    for path in ocr_manifests:
+        for row in read(path)['annotations']:
+            media.add(historical_ocr / row['image'])
+    detector, ocr = batch / 'detector', batch / 'ocr'
+    with generation_guard('plate_site_finetune_export', sorted(media | procedural),
+                          [detector, ocr, batch / 'summary.json'],
+                          {'batch': batch.relative_to(ROOT).as_posix()},
+                          code_paths=[Path(__file__), ROOT / 'lab/training_common/engine/data.py'],
+                          procedural_inputs=sorted(procedural), root=ROOT) as run:
+        if run.reused:
+            print('Reused indexed plate site finetune export')
+            return
+        return _prepare(batch, run.source_refs)
 
 
 def main():

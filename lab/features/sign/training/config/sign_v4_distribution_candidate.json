@@ -1,0 +1,1013 @@
+{
+  "schema_version": 1,
+  "dataset_version": "v4",
+  "status": "historical_snapshot_with_current_v4_combination_plan",
+  "model_key": "sign",
+  "config": "lab/features/sign/training/config/sign_v4.yaml",
+  "entry": "lab/features/sign/training/scripts/train_sign_v4.py",
+  "source_manifest": "datasets/exports/sign/v4_background_mix_v2_20261113/manifest.json",
+  "initialization": {
+    "path": "runs/sign/runs/sign/v3_20261111_150300_452905/training/weights/best.pt",
+    "source": "Returned sign V3 task weights; candidate V4 initialization.",
+    "license": "models/weights/yolo_v8/LICENSE.txt",
+    "evidence": "runs/sign/runs/sign/v3_20261111_150300_452905/metadata/status.json"
+  },
+  "additional_records": [
+    "datasets/exports/sign/v4_measured_multibackground_train_20261112/manifest.json",
+    "datasets/exports/sign/v4_mixed_background_batch_20261113/manifest.json",
+    "datasets/exports/sign/v4_second_background_60_20261113/manifest.jsonl"
+  ],
+  "scope": "历史候选批次声明；原导出已清空，此字段不代表当前训练集。原记录：Candidate only: 560 train, 160 validation, and 80 test composites. Each split is 40 percent Blender backgrounds from four views of arena_indoor_detailed.blend; other backgrounds come from two original videos. Sources and physical sign are shared across splits; test is not independent real-world evaluation. No training or evaluation has been run.",
+  "historical_status": "background_mix_source_gate_passed_package_pending",
+  "v4_combination_plan": {
+    "status": "planning_only_no_production",
+    "purpose": "按父来源及可行状态补齐禁行牌 train 组合，所有数量为设计预算",
+    "reserved_before_train": {
+      "purpose": "未来考察不同背景来源时的候选预留；不启动验证或测试",
+      "parent": "datasets/raw/site_capture_20261112/videos/full_scene.mp4",
+      "role": "背景及该父视频所有派生",
+      "record": "datasets/annotated/sign/v4_training_backgrounds_20261112/manifest.json",
+      "selection": "frames[0..12] 及同源其他派生；训练各角色均不使用该父视频",
+      "shared_roles": [
+        "可与其他任务共享父帧，各任务独立标签；本任务预留不限制其他任务",
+        "未来可共享已见牌具物料，但不得将结果称为未见牌具"
+      ],
+      "status": "planned_reservation"
+    },
+    "train_target_images": 2500,
+    "train_method_budgets": {
+      "direct": 750,
+      "real_composite": 1000,
+      "blender_composite": 750
+    },
+    "required_truncated_images": 500,
+    "pole_only_truncated_planned": {
+      "direct": 50,
+      "real_composite": 80,
+      "blender_composite": 40,
+      "total": 170,
+      "note": "为截断专项内部目标，不额外计图；可辨识线索不满足时未知"
+    },
+    "direct_source_groups": [
+      {
+        "id": "car_video",
+        "parent": "datasets/raw/car_real_capture_20261112/V_20261112_152304.mp4",
+        "planned": 550,
+        "status": "conditional",
+        "reason": "具体帧与完整牌具标签尚未分配"
+      },
+      {
+        "id": "site_photos",
+        "parent": "datasets/raw/site_capture_20261112/onboard_camera_images",
+        "planned": 148,
+        "status": "conditional",
+        "reason": "同批照片的确切独立关系、可辨目标与完整标签逐图确定",
+        "examples": [
+          {
+            "path": "datasets/raw/site_capture_20261112/onboard_camera_images/vehicle_0022.png",
+            "manifest": "datasets/annotated/site_capture_20261112/target_instances_manifest.jsonl",
+            "record_index": 21
+          },
+          {
+            "path": "datasets/raw/site_capture_20261112/onboard_camera_images/vehicle_0024.png",
+            "manifest": "datasets/annotated/site_capture_20261112/target_instances_manifest.jsonl",
+            "record_index": 23
+          }
+        ]
+      },
+      {
+        "id": "sign_video_direct",
+        "parent": "datasets/raw/sign/archive_assets_legacy/视频/禁止直行牌视频.mp4",
+        "planned": 50,
+        "status": "conditional",
+        "manifest": "datasets/annotated/sign/video_candidates_20261110/manifest.json",
+        "reason": "候选框未逐帧确认；新增帧仍需相应标签"
+      },
+      {
+        "id": "car_p05",
+        "parent": "datasets/raw/car_real_capture_20261112/P05_NOENTRY.png",
+        "planned": 1,
+        "status": "conditional",
+        "manifest": "datasets/annotated/sign/car_real_candidate_20261114/manifest.json",
+        "source_manifest": "datasets/annotated/car_real_capture_20261112/field_eval_v1/annotations_root.json",
+        "record_index": 6,
+        "reason": "标签 candidate_not_verified，原记录未改"
+      },
+      {
+        "id": "ebike_photo007",
+        "parent": "datasets/raw/e_bike/archive_assets_legacy/照片/小车摄像头实拍_近似平视_人物正反面和直立车_007.png",
+        "planned": 1,
+        "status": "conditional",
+        "manifest": "datasets/annotated/sign/sam2_fixture_candidates_20261110/manifest.json",
+        "record_index": 6,
+        "reason": "已有候选掩膜与历史 test 声明，不代表当前完整标签"
+      }
+    ],
+    "real_background_source_groups": [
+      {
+        "id": "junction_003",
+        "parent": "Archive/Assets/场景/三楼与场地视频/三栋楼_垃圾桶与路口_003.mp4",
+        "planned_images": 350,
+        "selected_bases": [
+          {
+            "path": "datasets/annotated/mixed_scene/v4_compositing_backgrounds_20261113/images/junction_003_001.jpg",
+            "manifest": "datasets/annotated/mixed_scene/v4_compositing_backgrounds_20261113/manifest.json",
+            "record_index": 0,
+            "pts_seconds": 1.0,
+            "source_group": "Archive/Assets/场景/三楼与场地视频/三栋楼_垃圾桶与路口_003.mp4",
+            "role": "实拍合成背景",
+            "coordinate_space": "640x360 原图像素；输出变换待定",
+            "direct_use": "conditional",
+            "synthetic_use": "conditional",
+            "limitation": "地面范围、已有牌具和遮挡层尚未完整确定"
+          },
+          {
+            "path": "datasets/annotated/mixed_scene/v4_compositing_backgrounds_20261113/images/junction_003_003.jpg",
+            "manifest": "datasets/annotated/mixed_scene/v4_compositing_backgrounds_20261113/manifest.json",
+            "record_index": 2,
+            "pts_seconds": 2.033233333,
+            "source_group": "Archive/Assets/场景/三楼与场地视频/三栋楼_垃圾桶与路口_003.mp4",
+            "role": "实拍合成背景",
+            "coordinate_space": "640x360 原图像素；输出变换待定",
+            "direct_use": "conditional",
+            "synthetic_use": "conditional",
+            "limitation": "地面范围、已有牌具和遮挡层尚未完整确定"
+          },
+          {
+            "path": "datasets/annotated/mixed_scene/v4_compositing_backgrounds_20261113/images/junction_003_005.jpg",
+            "manifest": "datasets/annotated/mixed_scene/v4_compositing_backgrounds_20261113/manifest.json",
+            "record_index": 4,
+            "pts_seconds": 3.766366667,
+            "source_group": "Archive/Assets/场景/三楼与场地视频/三栋楼_垃圾桶与路口_003.mp4",
+            "role": "实拍合成背景",
+            "coordinate_space": "640x360 原图像素；输出变换待定",
+            "direct_use": "conditional",
+            "synthetic_use": "conditional",
+            "limitation": "地面范围、已有牌具和遮挡层尚未完整确定"
+          },
+          {
+            "path": "datasets/annotated/mixed_scene/v4_compositing_backgrounds_20261113/images/junction_003_007.jpg",
+            "manifest": "datasets/annotated/mixed_scene/v4_compositing_backgrounds_20261113/manifest.json",
+            "record_index": 6,
+            "pts_seconds": 4.799511111,
+            "source_group": "Archive/Assets/场景/三楼与场地视频/三栋楼_垃圾桶与路口_003.mp4",
+            "role": "实拍合成背景",
+            "coordinate_space": "640x360 原图像素；输出变换待定",
+            "direct_use": "conditional",
+            "synthetic_use": "conditional",
+            "limitation": "地面范围、已有牌具和遮挡层尚未完整确定"
+          },
+          {
+            "path": "datasets/annotated/mixed_scene/v4_compositing_backgrounds_20261113/images/junction_003_009.jpg",
+            "manifest": "datasets/annotated/mixed_scene/v4_compositing_backgrounds_20261113/manifest.json",
+            "record_index": 8,
+            "pts_seconds": 5.799511111,
+            "source_group": "Archive/Assets/场景/三楼与场地视频/三栋楼_垃圾桶与路口_003.mp4",
+            "role": "实拍合成背景",
+            "coordinate_space": "640x360 原图像素；输出变换待定",
+            "direct_use": "conditional",
+            "synthetic_use": "conditional",
+            "limitation": "地面范围、已有牌具和遮挡层尚未完整确定"
+          },
+          {
+            "path": "datasets/annotated/mixed_scene/v4_compositing_backgrounds_20261113/images/junction_003_011.jpg",
+            "manifest": "datasets/annotated/mixed_scene/v4_compositing_backgrounds_20261113/manifest.json",
+            "record_index": 10,
+            "pts_seconds": 7.199255556,
+            "source_group": "Archive/Assets/场景/三楼与场地视频/三栋楼_垃圾桶与路口_003.mp4",
+            "role": "实拍合成背景",
+            "coordinate_space": "640x360 原图像素；输出变换待定",
+            "direct_use": "conditional",
+            "synthetic_use": "conditional",
+            "limitation": "地面范围、已有牌具和遮挡层尚未完整确定"
+          },
+          {
+            "path": "datasets/annotated/mixed_scene/v4_compositing_backgrounds_20261113/images/junction_003_013.jpg",
+            "manifest": "datasets/annotated/mixed_scene/v4_compositing_backgrounds_20261113/manifest.json",
+            "record_index": 12,
+            "pts_seconds": 8.199255556,
+            "source_group": "Archive/Assets/场景/三楼与场地视频/三栋楼_垃圾桶与路口_003.mp4",
+            "role": "实拍合成背景",
+            "coordinate_space": "640x360 原图像素；输出变换待定",
+            "direct_use": "conditional",
+            "synthetic_use": "conditional",
+            "limitation": "地面范围、已有牌具和遮挡层尚未完整确定"
+          },
+          {
+            "path": "datasets/annotated/mixed_scene/v4_compositing_backgrounds_20261113/images/junction_003_015.jpg",
+            "manifest": "datasets/annotated/mixed_scene/v4_compositing_backgrounds_20261113/manifest.json",
+            "record_index": 14,
+            "pts_seconds": 9.599066667,
+            "source_group": "Archive/Assets/场景/三楼与场地视频/三栋楼_垃圾桶与路口_003.mp4",
+            "role": "实拍合成背景",
+            "coordinate_space": "640x360 原图像素；输出变换待定",
+            "direct_use": "conditional",
+            "synthetic_use": "conditional",
+            "limitation": "地面范围、已有牌具和遮挡层尚未完整确定"
+          },
+          {
+            "path": "datasets/annotated/mixed_scene/v4_compositing_backgrounds_20261113/images/junction_003_017.jpg",
+            "manifest": "datasets/annotated/mixed_scene/v4_compositing_backgrounds_20261113/manifest.json",
+            "record_index": 16,
+            "pts_seconds": 10.6323,
+            "source_group": "Archive/Assets/场景/三楼与场地视频/三栋楼_垃圾桶与路口_003.mp4",
+            "role": "实拍合成背景",
+            "coordinate_space": "640x360 原图像素；输出变换待定",
+            "direct_use": "conditional",
+            "synthetic_use": "conditional",
+            "limitation": "地面范围、已有牌具和遮挡层尚未完整确定"
+          },
+          {
+            "path": "datasets/annotated/mixed_scene/v4_compositing_backgrounds_20261113/images/junction_003_019.jpg",
+            "manifest": "datasets/annotated/mixed_scene/v4_compositing_backgrounds_20261113/manifest.json",
+            "record_index": 18,
+            "pts_seconds": 11.998866667,
+            "source_group": "Archive/Assets/场景/三楼与场地视频/三栋楼_垃圾桶与路口_003.mp4",
+            "role": "实拍合成背景",
+            "coordinate_space": "640x360 原图像素；输出变换待定",
+            "direct_use": "conditional",
+            "synthetic_use": "conditional",
+            "limitation": "地面范围、已有牌具和遮挡层尚未完整确定"
+          }
+        ]
+      },
+      {
+        "id": "junction_005",
+        "parent": "Archive/Assets/场景/三楼与场地视频/三栋楼_路口及垃圾桶_005.mp4",
+        "planned_images": 350,
+        "selected_bases": [
+          {
+            "path": "datasets/annotated/mixed_scene/v4_compositing_backgrounds_20261113/images/junction_005_001.jpg",
+            "manifest": "datasets/annotated/mixed_scene/v4_compositing_backgrounds_20261113/manifest.json",
+            "record_index": 20,
+            "pts_seconds": 1.0,
+            "source_group": "Archive/Assets/场景/三楼与场地视频/三栋楼_路口及垃圾桶_005.mp4",
+            "role": "实拍合成背景",
+            "coordinate_space": "640x360 原图像素；输出变换待定",
+            "direct_use": "conditional",
+            "synthetic_use": "conditional",
+            "limitation": "地面范围、已有牌具和遮挡层尚未完整确定"
+          },
+          {
+            "path": "datasets/annotated/mixed_scene/v4_compositing_backgrounds_20261113/images/junction_005_003.jpg",
+            "manifest": "datasets/annotated/mixed_scene/v4_compositing_backgrounds_20261113/manifest.json",
+            "record_index": 22,
+            "pts_seconds": 2.2998,
+            "source_group": "Archive/Assets/场景/三楼与场地视频/三栋楼_路口及垃圾桶_005.mp4",
+            "role": "实拍合成背景",
+            "coordinate_space": "640x360 原图像素；输出变换待定",
+            "direct_use": "conditional",
+            "synthetic_use": "conditional",
+            "limitation": "地面范围、已有牌具和遮挡层尚未完整确定"
+          },
+          {
+            "path": "datasets/annotated/mixed_scene/v4_compositing_backgrounds_20261113/images/junction_005_005.jpg",
+            "manifest": "datasets/annotated/mixed_scene/v4_compositing_backgrounds_20261113/manifest.json",
+            "record_index": 24,
+            "pts_seconds": 4.033033333,
+            "source_group": "Archive/Assets/场景/三楼与场地视频/三栋楼_路口及垃圾桶_005.mp4",
+            "role": "实拍合成背景",
+            "coordinate_space": "640x360 原图像素；输出变换待定",
+            "direct_use": "conditional",
+            "synthetic_use": "conditional",
+            "limitation": "地面范围、已有牌具和遮挡层尚未完整确定"
+          },
+          {
+            "path": "datasets/annotated/mixed_scene/v4_compositing_backgrounds_20261113/images/junction_005_007.jpg",
+            "manifest": "datasets/annotated/mixed_scene/v4_compositing_backgrounds_20261113/manifest.json",
+            "record_index": 26,
+            "pts_seconds": 10.465811111,
+            "source_group": "Archive/Assets/场景/三楼与场地视频/三栋楼_路口及垃圾桶_005.mp4",
+            "role": "实拍合成背景",
+            "coordinate_space": "640x360 原图像素；输出变换待定",
+            "direct_use": "conditional",
+            "synthetic_use": "conditional",
+            "limitation": "地面范围、已有牌具和遮挡层尚未完整确定"
+          },
+          {
+            "path": "datasets/annotated/mixed_scene/v4_compositing_backgrounds_20261113/images/junction_005_009.jpg",
+            "manifest": "datasets/annotated/mixed_scene/v4_compositing_backgrounds_20261113/manifest.json",
+            "record_index": 28,
+            "pts_seconds": 12.632233333,
+            "source_group": "Archive/Assets/场景/三楼与场地视频/三栋楼_路口及垃圾桶_005.mp4",
+            "role": "实拍合成背景",
+            "coordinate_space": "640x360 原图像素；输出变换待定",
+            "direct_use": "conditional",
+            "synthetic_use": "conditional",
+            "limitation": "地面范围、已有牌具和遮挡层尚未完整确定"
+          },
+          {
+            "path": "datasets/annotated/mixed_scene/v4_compositing_backgrounds_20261113/images/junction_005_011.jpg",
+            "manifest": "datasets/annotated/mixed_scene/v4_compositing_backgrounds_20261113/manifest.json",
+            "record_index": 30,
+            "pts_seconds": 13.932133333,
+            "source_group": "Archive/Assets/场景/三楼与场地视频/三栋楼_路口及垃圾桶_005.mp4",
+            "role": "实拍合成背景",
+            "coordinate_space": "640x360 原图像素；输出变换待定",
+            "direct_use": "conditional",
+            "synthetic_use": "conditional",
+            "limitation": "地面范围、已有牌具和遮挡层尚未完整确定"
+          },
+          {
+            "path": "datasets/annotated/mixed_scene/v4_compositing_backgrounds_20261113/images/junction_005_013.jpg",
+            "manifest": "datasets/annotated/mixed_scene/v4_compositing_backgrounds_20261113/manifest.json",
+            "record_index": 32,
+            "pts_seconds": 15.665266667,
+            "source_group": "Archive/Assets/场景/三楼与场地视频/三栋楼_路口及垃圾桶_005.mp4",
+            "role": "实拍合成背景",
+            "coordinate_space": "640x360 原图像素；输出变换待定",
+            "direct_use": "conditional",
+            "synthetic_use": "conditional",
+            "limitation": "地面范围、已有牌具和遮挡层尚未完整确定"
+          },
+          {
+            "path": "datasets/annotated/mixed_scene/v4_compositing_backgrounds_20261113/images/junction_005_015.jpg",
+            "manifest": "datasets/annotated/mixed_scene/v4_compositing_backgrounds_20261113/manifest.json",
+            "record_index": 34,
+            "pts_seconds": 16.965166667,
+            "source_group": "Archive/Assets/场景/三楼与场地视频/三栋楼_路口及垃圾桶_005.mp4",
+            "role": "实拍合成背景",
+            "coordinate_space": "640x360 原图像素；输出变换待定",
+            "direct_use": "conditional",
+            "synthetic_use": "conditional",
+            "limitation": "地面范围、已有牌具和遮挡层尚未完整确定"
+          },
+          {
+            "path": "datasets/annotated/mixed_scene/v4_compositing_backgrounds_20261113/images/junction_005_017.jpg",
+            "manifest": "datasets/annotated/mixed_scene/v4_compositing_backgrounds_20261113/manifest.json",
+            "record_index": 36,
+            "pts_seconds": 19.131688889,
+            "source_group": "Archive/Assets/场景/三楼与场地视频/三栋楼_路口及垃圾桶_005.mp4",
+            "role": "实拍合成背景",
+            "coordinate_space": "640x360 原图像素；输出变换待定",
+            "direct_use": "conditional",
+            "synthetic_use": "conditional",
+            "limitation": "地面范围、已有牌具和遮挡层尚未完整确定"
+          },
+          {
+            "path": "datasets/annotated/mixed_scene/v4_compositing_backgrounds_20261113/images/junction_005_019.jpg",
+            "manifest": "datasets/annotated/mixed_scene/v4_compositing_backgrounds_20261113/manifest.json",
+            "record_index": 38,
+            "pts_seconds": 20.431488889,
+            "source_group": "Archive/Assets/场景/三楼与场地视频/三栋楼_路口及垃圾桶_005.mp4",
+            "role": "实拍合成背景",
+            "coordinate_space": "640x360 原图像素；输出变换待定",
+            "direct_use": "conditional",
+            "synthetic_use": "conditional",
+            "limitation": "地面范围、已有牌具和遮挡层尚未完整确定"
+          }
+        ]
+      },
+      {
+        "id": "parking_003",
+        "parent": "Archive/Assets/电动车与人物/视频/场地多辆电动车_直立与倒伏混合_较低视角_003.mp4",
+        "planned_images": 300,
+        "selected_bases": [
+          {
+            "path": "datasets/annotated/mixed_scene/v4_compositing_backgrounds_20261113/images/parking_003_001.jpg",
+            "manifest": "datasets/annotated/mixed_scene/v4_compositing_backgrounds_20261113/manifest.json",
+            "record_index": 80,
+            "pts_seconds": 1.333233333,
+            "source_group": "Archive/Assets/电动车与人物/视频/场地多辆电动车_直立与倒伏混合_较低视角_003.mp4",
+            "role": "实拍合成背景",
+            "coordinate_space": "640x360 原图像素；输出变换待定",
+            "direct_use": "conditional",
+            "synthetic_use": "conditional",
+            "limitation": "地面范围、已有牌具和遮挡层尚未完整确定"
+          },
+          {
+            "path": "datasets/annotated/mixed_scene/v4_compositing_backgrounds_20261113/images/parking_003_003.jpg",
+            "manifest": "datasets/annotated/mixed_scene/v4_compositing_backgrounds_20261113/manifest.json",
+            "record_index": 82,
+            "pts_seconds": 2.333233333,
+            "source_group": "Archive/Assets/电动车与人物/视频/场地多辆电动车_直立与倒伏混合_较低视角_003.mp4",
+            "role": "实拍合成背景",
+            "coordinate_space": "640x360 原图像素；输出变换待定",
+            "direct_use": "conditional",
+            "synthetic_use": "conditional",
+            "limitation": "地面范围、已有牌具和遮挡层尚未完整确定"
+          },
+          {
+            "path": "datasets/annotated/mixed_scene/v4_compositing_backgrounds_20261113/images/parking_003_005.jpg",
+            "manifest": "datasets/annotated/mixed_scene/v4_compositing_backgrounds_20261113/manifest.json",
+            "record_index": 84,
+            "pts_seconds": 3.333133333,
+            "source_group": "Archive/Assets/电动车与人物/视频/场地多辆电动车_直立与倒伏混合_较低视角_003.mp4",
+            "role": "实拍合成背景",
+            "coordinate_space": "640x360 原图像素；输出变换待定",
+            "direct_use": "conditional",
+            "synthetic_use": "conditional",
+            "limitation": "地面范围、已有牌具和遮挡层尚未完整确定"
+          },
+          {
+            "path": "datasets/annotated/mixed_scene/v4_compositing_backgrounds_20261113/images/parking_003_007.jpg",
+            "manifest": "datasets/annotated/mixed_scene/v4_compositing_backgrounds_20261113/manifest.json",
+            "record_index": 86,
+            "pts_seconds": 4.332988889,
+            "source_group": "Archive/Assets/电动车与人物/视频/场地多辆电动车_直立与倒伏混合_较低视角_003.mp4",
+            "role": "实拍合成背景",
+            "coordinate_space": "640x360 原图像素；输出变换待定",
+            "direct_use": "conditional",
+            "synthetic_use": "conditional",
+            "limitation": "地面范围、已有牌具和遮挡层尚未完整确定"
+          },
+          {
+            "path": "datasets/annotated/mixed_scene/v4_compositing_backgrounds_20261113/images/parking_003_009.jpg",
+            "manifest": "datasets/annotated/mixed_scene/v4_compositing_backgrounds_20261113/manifest.json",
+            "record_index": 88,
+            "pts_seconds": 5.666066667,
+            "source_group": "Archive/Assets/电动车与人物/视频/场地多辆电动车_直立与倒伏混合_较低视角_003.mp4",
+            "role": "实拍合成背景",
+            "coordinate_space": "640x360 原图像素；输出变换待定",
+            "direct_use": "conditional",
+            "synthetic_use": "conditional",
+            "limitation": "地面范围、已有牌具和遮挡层尚未完整确定"
+          },
+          {
+            "path": "datasets/annotated/mixed_scene/v4_compositing_backgrounds_20261113/images/parking_003_011.jpg",
+            "manifest": "datasets/annotated/mixed_scene/v4_compositing_backgrounds_20261113/manifest.json",
+            "record_index": 90,
+            "pts_seconds": 6.666166667,
+            "source_group": "Archive/Assets/电动车与人物/视频/场地多辆电动车_直立与倒伏混合_较低视角_003.mp4",
+            "role": "实拍合成背景",
+            "coordinate_space": "640x360 原图像素；输出变换待定",
+            "direct_use": "conditional",
+            "synthetic_use": "conditional",
+            "limitation": "地面范围、已有牌具和遮挡层尚未完整确定"
+          },
+          {
+            "path": "datasets/annotated/mixed_scene/v4_compositing_backgrounds_20261113/images/parking_003_013.jpg",
+            "manifest": "datasets/annotated/mixed_scene/v4_compositing_backgrounds_20261113/manifest.json",
+            "record_index": 92,
+            "pts_seconds": 7.666011111,
+            "source_group": "Archive/Assets/电动车与人物/视频/场地多辆电动车_直立与倒伏混合_较低视角_003.mp4",
+            "role": "实拍合成背景",
+            "coordinate_space": "640x360 原图像素；输出变换待定",
+            "direct_use": "conditional",
+            "synthetic_use": "conditional",
+            "limitation": "地面范围、已有牌具和遮挡层尚未完整确定"
+          },
+          {
+            "path": "datasets/annotated/mixed_scene/v4_compositing_backgrounds_20261113/images/parking_003_015.jpg",
+            "manifest": "datasets/annotated/mixed_scene/v4_compositing_backgrounds_20261113/manifest.json",
+            "record_index": 94,
+            "pts_seconds": 8.665888889,
+            "source_group": "Archive/Assets/电动车与人物/视频/场地多辆电动车_直立与倒伏混合_较低视角_003.mp4",
+            "role": "实拍合成背景",
+            "coordinate_space": "640x360 原图像素；输出变换待定",
+            "direct_use": "conditional",
+            "synthetic_use": "conditional",
+            "limitation": "地面范围、已有牌具和遮挡层尚未完整确定"
+          },
+          {
+            "path": "datasets/annotated/mixed_scene/v4_compositing_backgrounds_20261113/images/parking_003_017.jpg",
+            "manifest": "datasets/annotated/mixed_scene/v4_compositing_backgrounds_20261113/manifest.json",
+            "record_index": 96,
+            "pts_seconds": 9.999188889,
+            "source_group": "Archive/Assets/电动车与人物/视频/场地多辆电动车_直立与倒伏混合_较低视角_003.mp4",
+            "role": "实拍合成背景",
+            "coordinate_space": "640x360 原图像素；输出变换待定",
+            "direct_use": "conditional",
+            "synthetic_use": "conditional",
+            "limitation": "地面范围、已有牌具和遮挡层尚未完整确定"
+          },
+          {
+            "path": "datasets/annotated/mixed_scene/v4_compositing_backgrounds_20261113/images/parking_003_019.jpg",
+            "manifest": "datasets/annotated/mixed_scene/v4_compositing_backgrounds_20261113/manifest.json",
+            "record_index": 98,
+            "pts_seconds": 10.999033333,
+            "source_group": "Archive/Assets/电动车与人物/视频/场地多辆电动车_直立与倒伏混合_较低视角_003.mp4",
+            "role": "实拍合成背景",
+            "coordinate_space": "640x360 原图像素；输出变换待定",
+            "direct_use": "conditional",
+            "synthetic_use": "conditional",
+            "limitation": "地面范围、已有牌具和遮挡层尚未完整确定"
+          }
+        ]
+      }
+    ],
+    "blender_background_source_groups": [
+      {
+        "id": "arena_detailed",
+        "path": "datasets/assets/blender/shared/arena_4m2_pbr_20261112/arena_indoor_detailed.blend",
+        "role": "共享母场景背景",
+        "registry": "datasets/blender_source_registry.sqlite3",
+        "registry_state": "active_in_use",
+        "truth_level": "fit_from_photo",
+        "planned_views": 16,
+        "planned_images": 300,
+        "status": "conditional",
+        "reason": "视角及区域未生成；现有入口仅该场景4机位"
+      },
+      {
+        "id": "arena_master",
+        "path": "datasets/assets/blender/shared/arena_4m2_pbr_20261112/arena_master_user_20261113.blend",
+        "role": "共享母场景背景",
+        "registry": "datasets/blender_source_registry.sqlite3",
+        "registry_state": "active_candidate",
+        "truth_level": "approximate",
+        "planned_views": 24,
+        "planned_images": 450,
+        "status": "conditional",
+        "reason": "当前禁行牌背景入口不支持此母场景或扩展机位"
+      }
+    ],
+    "foreground_groups": [
+      {
+        "id": "rotation_video",
+        "parent": "datasets/raw/sign/archive_assets_legacy/视频/禁止直行牌视频.mp4",
+        "planned_real_positive_images": 600,
+        "planned_blender_positive_images": 470,
+        "assets": [
+          {
+            "path": "datasets/annotated/sign/sam2_fixture_candidates_20261110/train_0.png",
+            "parent_frame": "datasets/annotated/sign/video_candidates_20261110/images/sign_0000.png",
+            "parent_video": "datasets/raw/sign/archive_assets_legacy/视频/禁止直行牌视频.mp4",
+            "manifest": "datasets/annotated/sign/sam2_fixture_candidates_20261110/manifest.json",
+            "record_index": 0,
+            "view": "back",
+            "direct_use": "unavailable",
+            "synthetic_use": "conditional",
+            "reason": "SAM 掩膜尚待核对可见边界；单视频同牌具"
+          },
+          {
+            "path": "datasets/annotated/sign/sam2_fixture_candidates_20261110/train_8.png",
+            "parent_frame": "datasets/annotated/sign/video_candidates_20261110/images/sign_0120.png",
+            "parent_video": "datasets/raw/sign/archive_assets_legacy/视频/禁止直行牌视频.mp4",
+            "manifest": "datasets/annotated/sign/sam2_fixture_candidates_20261110/manifest.json",
+            "record_index": 1,
+            "view": "side",
+            "direct_use": "unavailable",
+            "synthetic_use": "conditional",
+            "reason": "SAM 掩膜尚待核对可见边界；单视频同牌具"
+          },
+          {
+            "path": "datasets/annotated/sign/sam2_fixture_candidates_20261110/train_14.png",
+            "parent_frame": "datasets/annotated/sign/video_candidates_20261110/images/sign_0210.png",
+            "parent_video": "datasets/raw/sign/archive_assets_legacy/视频/禁止直行牌视频.mp4",
+            "manifest": "datasets/annotated/sign/sam2_fixture_candidates_20261110/manifest.json",
+            "record_index": 2,
+            "view": "oblique",
+            "direct_use": "unavailable",
+            "synthetic_use": "conditional",
+            "reason": "SAM 掩膜尚待核对可见边界；单视频同牌具"
+          },
+          {
+            "path": "datasets/annotated/sign/sam2_fixture_candidates_20261110/train_20.png",
+            "parent_frame": "datasets/annotated/sign/video_candidates_20261110/images/sign_0299.png",
+            "parent_video": "datasets/raw/sign/archive_assets_legacy/视频/禁止直行牌视频.mp4",
+            "manifest": "datasets/annotated/sign/sam2_fixture_candidates_20261110/manifest.json",
+            "record_index": 3,
+            "view": "front",
+            "direct_use": "unavailable",
+            "synthetic_use": "conditional",
+            "reason": "SAM 掩膜尚待核对可见边界；单视频同牌具"
+          },
+          {
+            "path": "datasets/annotated/sign/sam2_fixture_candidates_20261110/train_26.png",
+            "parent_frame": "datasets/annotated/sign/video_candidates_20261110/images/sign_0389.png",
+            "parent_video": "datasets/raw/sign/archive_assets_legacy/视频/禁止直行牌视频.mp4",
+            "manifest": "datasets/annotated/sign/sam2_fixture_candidates_20261110/manifest.json",
+            "record_index": 4,
+            "view": "oblique",
+            "direct_use": "unavailable",
+            "synthetic_use": "conditional",
+            "reason": "SAM 掩膜尚待核对可见边界；单视频同牌具"
+          }
+        ],
+        "status": "conditional"
+      },
+      {
+        "id": "ebike_photo007",
+        "parent": "datasets/raw/e_bike/archive_assets_legacy/照片/小车摄像头实拍_近似平视_人物正反面和直立车_007.png",
+        "planned_real_positive_images": 300,
+        "planned_blender_positive_images": 230,
+        "assets": [
+          {
+            "path": "datasets/annotated/sign/sam2_fixture_candidates_20261110/test_photo007.png",
+            "parent_photo": "datasets/raw/e_bike/archive_assets_legacy/照片/小车摄像头实拍_近似平视_人物正反面和直立车_007.png",
+            "manifest": "datasets/annotated/sign/sam2_fixture_candidates_20261110/manifest.json",
+            "record_index": 6,
+            "historical_split": "test",
+            "role": "正面牌具前景候选",
+            "direct_use": "unavailable",
+            "synthetic_use": "conditional",
+            "reason": "未审核掩膜，旧 test 声明保留；需入口支持并判断与视频是否同一物理牌具"
+          }
+        ],
+        "status": "conditional",
+        "physical_identity_relation_to_rotation_video": "unknown"
+      }
+    ],
+    "occluder_sources": [
+      {
+        "role": "普通立杆负例及部分遮挡参考",
+        "path": "datasets/raw/car_real_capture_20261112/P01_TL1.png",
+        "manifest": "datasets/annotated/car_real_capture_20261112/background_source_manifest.jsonl",
+        "record_index": 0,
+        "status": "conditional",
+        "reason": "画面左边有可辨截断牌具；不得作为空标签；普通杆分离及层次未形成"
+      },
+      {
+        "role": "人物、电动车、楼宇等场景遮挡候选",
+        "references": [
+          "junction_003",
+          "junction_005",
+          "parking_003"
+        ],
+        "status": "conditional",
+        "reason": "各底图现有目标、前后顺序和遮挡区域尚未核定"
+      },
+      {
+        "id": "vehicle_flat_candidate",
+        "role": "无牌场景中跨任务电动车非目标前景或合理遮挡候选",
+        "path": "datasets/annotated/e_bike/multiview_masks_refined_20261110_v2/sam2_04_upright.png",
+        "parent_frame": "datasets/annotated/e_bike/video_review_20261110/images/source_002/frame_000003.jpg",
+        "parent_video": "datasets/raw/e_bike/archive_assets_legacy/视频/浅色背景单辆直立车_平视旋转_009.mp4",
+        "manifest": "datasets/annotated/e_bike/multiview_masks_refined_20261110_v2/selection.json",
+        "json_pointer": "vehicles[2]",
+        "planned_photo_empty": 25,
+        "status": "conditional",
+        "reason": "原清单两段平面视频保守归为一组，掩膜及适配当前牌具画面需核对"
+      },
+      {
+        "id": "vehicle_field_candidate",
+        "role": "无牌场景中跨任务电动车非目标前景或合理遮挡候选",
+        "path": "datasets/annotated/e_bike/field_eval_masks_20261110/upright_004.png",
+        "parent_frame": "datasets/annotated/e_bike/video_review_20261110/images/source_003/frame_000004.jpg",
+        "parent_video": "datasets/raw/e_bike/archive_assets_legacy/视频/单辆直立电动车_低视角环绕_005.mp4",
+        "manifest": "datasets/annotated/e_bike/field_eval_masks_20261110/selection_review_candidate.json",
+        "record_index": 3,
+        "planned_photo_empty": 25,
+        "status": "conditional",
+        "reason": "其他父视频，掩膜为 AI 视觉候选，实体及场次独立性未知；需核对接地与合成"
+      }
+    ],
+    "branches": [
+      {
+        "id": "DIRECT-FULL",
+        "method": "direct",
+        "state": "full",
+        "target_images": 550,
+        "background_group_shares": {
+          "car_video": 399,
+          "site_photos": 100,
+          "sign_video_direct": 49,
+          "car_p05": 1,
+          "ebike_photo007": 1
+        },
+        "foreground_role": "牌具对应视面；可辨牌杆只作为截断正例子集",
+        "regions": "逐底图有效地面、接地点及前后遮挡；裁边和输出分辨率映射需逐项确定",
+        "labels": "class 0 按最终可见掩膜框完整标注所有可辨牌具与可辨镜像",
+        "status": "conditional",
+        "entry_contract": "详见 entry_capabilities；素材/区域/监督尚未满足"
+      },
+      {
+        "id": "DIRECT-CLIP",
+        "method": "direct",
+        "state": "clipped",
+        "target_images": 150,
+        "background_group_shares": {
+          "car_video": 130,
+          "site_photos": 19,
+          "sign_video_direct": 1
+        },
+        "foreground_role": "牌具对应视面；可辨牌杆只作为截断正例子集",
+        "regions": "逐底图有效地面、接地点及前后遮挡；裁边和输出分辨率映射需逐项确定",
+        "labels": "class 0 按最终可见掩膜框完整标注所有可辨牌具与可辨镜像",
+        "status": "conditional",
+        "entry_contract": "详见 entry_capabilities；素材/区域/监督尚未满足",
+        "pole_only_target": 50
+      },
+      {
+        "id": "DIRECT-EMPTY",
+        "method": "direct",
+        "state": "empty",
+        "target_images": 30,
+        "background_group_shares": {
+          "car_video": 11,
+          "site_photos": 19
+        },
+        "foreground_role": "无牌具",
+        "regions": "原画面与可能新增的普通杆区域；全图需确认无牌",
+        "labels": "仅在全图确认无牌后输出空标签；未知不得作为负例",
+        "status": "conditional",
+        "entry_contract": "详见 entry_capabilities；素材/区域/监督尚未满足"
+      },
+      {
+        "id": "DIRECT-POLE-NEG",
+        "method": "direct",
+        "state": "ordinary_pole",
+        "target_images": 20,
+        "background_group_shares": {
+          "car_video": 10,
+          "site_photos": 10
+        },
+        "foreground_role": "无牌具；普通立杆仅作干扰",
+        "regions": "原画面与可能新增的普通杆区域；全图需确认无牌",
+        "labels": "仅在全图确认无牌后输出空标签；未知不得作为负例",
+        "status": "conditional",
+        "entry_contract": "详见 entry_capabilities；素材/区域/监督尚未满足"
+      },
+      {
+        "id": "PHOTO-FULL",
+        "method": "real_composite",
+        "state": "full",
+        "target_images": 700,
+        "background_group_shares": {
+          "junction_003": 250,
+          "junction_005": 250,
+          "parking_003": 200
+        },
+        "foreground_role": "牌具对应视面；可辨牌杆只作为截断正例子集",
+        "regions": "逐底图有效地面、接地点及前后遮挡；裁边和输出分辨率映射需逐项确定",
+        "labels": "class 0 按最终可见掩膜框完整标注所有可辨牌具与可辨镜像",
+        "status": "conditional",
+        "entry_contract": "详见 entry_capabilities；素材/区域/监督尚未满足",
+        "foreground_group_shares": {
+          "rotation_video": 470,
+          "ebike_photo007": 230
+        },
+        "background_foreground_shares": {
+          "junction_003": {
+            "rotation_video": 170,
+            "ebike_photo007": 80
+          },
+          "junction_005": {
+            "rotation_video": 170,
+            "ebike_photo007": 80
+          },
+          "parking_003": {
+            "rotation_video": 130,
+            "ebike_photo007": 70
+          }
+        }
+      },
+      {
+        "id": "PHOTO-CLIP",
+        "method": "real_composite",
+        "state": "clipped",
+        "target_images": 200,
+        "background_group_shares": {
+          "junction_003": 70,
+          "junction_005": 70,
+          "parking_003": 60
+        },
+        "foreground_role": "牌具对应视面；可辨牌杆只作为截断正例子集",
+        "regions": "逐底图有效地面、接地点及前后遮挡；裁边和输出分辨率映射需逐项确定",
+        "labels": "class 0 按最终可见掩膜框完整标注所有可辨牌具与可辨镜像",
+        "status": "conditional",
+        "entry_contract": "详见 entry_capabilities；素材/区域/监督尚未满足",
+        "foreground_group_shares": {
+          "rotation_video": 130,
+          "ebike_photo007": 70
+        },
+        "background_foreground_shares": {
+          "junction_003": {
+            "rotation_video": 45,
+            "ebike_photo007": 25
+          },
+          "junction_005": {
+            "rotation_video": 45,
+            "ebike_photo007": 25
+          },
+          "parking_003": {
+            "rotation_video": 40,
+            "ebike_photo007": 20
+          }
+        },
+        "pole_only_target": 80
+      },
+      {
+        "id": "PHOTO-EMPTY",
+        "method": "real_composite",
+        "state": "empty",
+        "target_images": 50,
+        "background_group_shares": {
+          "junction_003": 20,
+          "junction_005": 15,
+          "parking_003": 15
+        },
+        "foreground_role": "从两个已列电动车掩膜父组各规划25张非牌具前景合成；全图不得有可辨牌具或普通杆干扰",
+        "regions": "原画面与可能新增的普通杆区域；全图需确认无牌",
+        "labels": "仅在全图确认无牌后输出空标签；未知不得作为负例",
+        "status": "conditional",
+        "entry_contract": "当前禁行牌入口只支持已有背景空标签，不支持加入跨任务车辆前景；该分支条件受限，不能把只裁切或调色的原图记为合成",
+        "non_target_foreground_group_shares": {
+          "vehicle_flat_candidate": 25,
+          "vehicle_field_candidate": 25
+        }
+      },
+      {
+        "id": "PHOTO-POLE-NEG",
+        "method": "real_composite",
+        "state": "ordinary_pole",
+        "target_images": 50,
+        "background_group_shares": {
+          "junction_003": 10,
+          "junction_005": 15,
+          "parking_003": 25
+        },
+        "foreground_role": "普通立杆干扰作为跨来源合成前景；原背景须确认无牌，杆素材/掩膜尚未确定",
+        "regions": "原画面与可能新增的普通杆区域；全图需确认无牌",
+        "labels": "仅在全图确认无牌后输出空标签；未知不得作为负例",
+        "status": "conditional",
+        "entry_contract": "当前禁行牌入口无普通杆前景合成能力；无可用杆掩膜时本分支受限"
+      },
+      {
+        "id": "BLENDER-FULL",
+        "method": "blender_composite",
+        "state": "full",
+        "target_images": 550,
+        "background_group_shares": {
+          "arena_detailed": 220,
+          "arena_master": 330
+        },
+        "foreground_role": "牌具对应视面；可辨牌杆只作为截断正例子集",
+        "regions": "逐底图有效地面、接地点及前后遮挡；裁边和输出分辨率映射需逐项确定",
+        "labels": "class 0 按最终可见掩膜框完整标注所有可辨牌具与可辨镜像",
+        "status": "conditional",
+        "entry_contract": "详见 entry_capabilities；素材/区域/监督尚未满足",
+        "foreground_group_shares": {
+          "rotation_video": 370,
+          "ebike_photo007": 180
+        },
+        "background_foreground_shares": {
+          "arena_detailed": {
+            "rotation_video": 150,
+            "ebike_photo007": 70
+          },
+          "arena_master": {
+            "rotation_video": 220,
+            "ebike_photo007": 110
+          }
+        }
+      },
+      {
+        "id": "BLENDER-CLIP",
+        "method": "blender_composite",
+        "state": "clipped",
+        "target_images": 150,
+        "background_group_shares": {
+          "arena_detailed": 60,
+          "arena_master": 90
+        },
+        "foreground_role": "牌具对应视面；可辨牌杆只作为截断正例子集",
+        "regions": "逐底图有效地面、接地点及前后遮挡；裁边和输出分辨率映射需逐项确定",
+        "labels": "class 0 按最终可见掩膜框完整标注所有可辨牌具与可辨镜像",
+        "status": "conditional",
+        "entry_contract": "详见 entry_capabilities；素材/区域/监督尚未满足",
+        "foreground_group_shares": {
+          "rotation_video": 100,
+          "ebike_photo007": 50
+        },
+        "background_foreground_shares": {
+          "arena_detailed": {
+            "rotation_video": 40,
+            "ebike_photo007": 20
+          },
+          "arena_master": {
+            "rotation_video": 60,
+            "ebike_photo007": 30
+          }
+        },
+        "pole_only_target": 40
+      },
+      {
+        "id": "BLENDER-EMPTY",
+        "method": "blender_composite",
+        "state": "empty",
+        "target_images": 20,
+        "background_group_shares": {
+          "arena_detailed": 10,
+          "arena_master": 10
+        },
+        "foreground_role": "无牌具",
+        "regions": "原画面与可能新增的普通杆区域；全图需确认无牌",
+        "labels": "仅在全图确认无牌后输出空标签；未知不得作为负例",
+        "status": "conditional",
+        "entry_contract": "详见 entry_capabilities；素材/区域/监督尚未满足"
+      },
+      {
+        "id": "BLENDER-POLE-NEG",
+        "method": "blender_composite",
+        "state": "ordinary_pole",
+        "target_images": 30,
+        "background_group_shares": {
+          "arena_detailed": 10,
+          "arena_master": 20
+        },
+        "foreground_role": "无牌具；普通立杆仅作干扰",
+        "regions": "原画面与可能新增的普通杆区域；全图需确认无牌",
+        "labels": "仅在全图确认无牌后输出空标签；未知不得作为负例",
+        "status": "conditional",
+        "entry_contract": "详见 entry_capabilities；素材/区域/监督尚未满足"
+      }
+    ],
+    "orthogonal_design": {
+      "cross": "完整/可辨截断 × 两候选观察区 × 真实对应正/侧/斜/背视面 × 近/中/远 × 正常/偏暗；物理可行时交叉",
+      "negative": "无牌与普通杆两类背景在可行父组和成像条件间轮换；确认负例前禁止空标签",
+      "safety": "观察区到实际受限路线的映射仍需现场标定；识别不可靠时停车"
+    },
+    "capacity": {
+      "real_positive_target": 900,
+      "real_bases": 30,
+      "foreground_assets": 6,
+      "candidate_per_base_full": {
+        "video_views": 5,
+        "distinct_layouts_per_video_view": 4,
+        "photo_views": 1,
+        "distinct_layouts_per_photo_view": 8,
+        "sum": 28
+      },
+      "candidate_per_base_clipped": {
+        "video_views": 5,
+        "distinct_layouts_per_video_view": 2,
+        "photo_views": 1,
+        "distinct_layouts_per_photo_view": 3,
+        "sum": 13
+      },
+      "full_lower_bound": 25,
+      "clipped_lower_bound": 16,
+      "real_upper_bound_full": 840,
+      "real_upper_bound_clipped": 390,
+      "meaning": "每套指一张背景加一张前景，单目标 C(1,1)=1；站位和尺度/裁边构成明确区分的画面，不把微调色或种子计作独立基底。按全部搭配可行的上界，逐底图与视面受几何和标签限制时计算实际允许搭配之和；该数不是已核验产能。",
+      "negative_capacity": "50 张实景无牌分支规划两组不同父视频的电动车掩膜各25张；普通杆50张缺少可用杆掩膜。底图全图牌具真值、遮挡、摆位和入口均未确认，当前不能算作已实现容量。",
+      "blender_positive_target": 700,
+      "blender_candidate_views": 40,
+      "same_role_upper_bound_full": 1120,
+      "same_role_upper_bound_clipped": 520,
+      "blender_negative_capacity": "50 张空牌/普通杆分支须逐图确认；普通杆资源与入口尚缺"
+    },
+    "entry_capabilities": [
+      {
+        "path": "lab/features/sign/training/scripts/compose_sign_v4_measured.py",
+        "status": "conditional",
+        "can_read": "显式计划的 background、target、labels、augmentation、parameters、sources；单批固定原有背景清单及视面",
+        "gaps": [
+          "多父来源的共享 640x360 图尚不能直接传入",
+          "photo007 掩膜未接入",
+          "placed 需具体地面多边形、无牌确认和可辨线索",
+          "普通杆干扰与所有原有牌具标签未接通"
+        ]
+      },
+      {
+        "path": "lab/features/sign/training/scripts/compose_sign_arena_v4.py",
+        "status": "conditional",
+        "gaps": [
+          "当前背景须可用的导出清单；背面修复图缺失",
+          "不支持所列新母场景视角规划和普通杆负例"
+        ]
+      },
+      {
+        "path": "lab/features/sign/training/scripts/plan_sign_sampling.py",
+        "status": "conditional",
+        "gaps": [
+          "仅 measured/scene 单批计划，10–1000，未表达跨父源配额、placed 与负例"
+        ]
+      },
+      {
+        "path": "lab/features/sign/training/scripts/render_sign_arena_backgrounds.py",
+        "status": "conditional",
+        "gaps": [
+          "固定 detailed 场景和4机位；不能直接输出40个规划机位"
+        ]
+      },
+      {
+        "path": "lab/features/sign/training/scripts/train_sign_v4.py",
+        "status": "unavailable",
+        "gaps": [
+          "当前训练配置/引擎仍有验证相关要求，本轮只规划 train"
+        ]
+      },
+      {
+        "path": "lab/features/sign/training/config/sign_v4_distribution_candidate.json",
+        "status": "planning_not_generator_schema",
+        "gaps": [
+          "本对象供结构化选源交接，现有生产入口不能直接读取；未声称已完成入口兼容"
+        ]
+      }
+    ],
+    "actual_status": {
+      "this_stage_generated_samples": 0,
+      "this_stage_extracted_frames": 0,
+      "this_stage_rendered_images": 0,
+      "this_stage_trained_models": 0,
+      "note": "本阶段只补齐计划；配额和容量为设计值"
+    },
+    "key_gaps": [
+      "跨多个真实背景父组的源、区域及标签需接入入口；保留其他独立任务继续",
+      "第二牌具前景掩膜与原视频牌具是否同一实体未知；候选视面/掩膜需确认",
+      "无法确认背景无牌和普通杆为独立干扰时，该负例分支不得标为空",
+      "直接实拍750张是预算，当前未确认550车载视频帧和148照片的完整逐图标签",
+      "预留视频及所有派生不得进入本任务 train 的任何角色",
+      "实景空牌合成需跨任务电动车前景，普通杆负例需普通杆前景；当前禁行牌入口不支持这两类插入。"
+    ]
+  },
+  "historical_pending": [
+    "Coordinate index refresh and package construction with the coordinator."
+  ],
+  "pending": [
+    "跨父源背景、候选前景、负例与区域状态按 v4_combination_plan 落实；当前入口不可直接读取本计划。"
+  ]
+}

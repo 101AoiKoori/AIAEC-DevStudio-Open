@@ -1,3 +1,6 @@
+# Legacy V1/V2 environment; these versions do not support RTX 50 GPUs.
+# For the current Windows RTX 50 environment use portable_env/requirements-win-cp312-cu128.lock;
+# see portable_env/README.md. Do not install this file into that environment.
 # Python 3.9-3.12. Install the matching PyTorch wheel first; examples:
 # NVIDIA CUDA 12.1: python -m pip install torch==2.2.2 torchvision==0.17.2 --index-url https://download.pytorch.org/whl/cu121
 # NVIDIA CUDA 11.8: python -m pip install torch==2.2.2 torchvision==0.17.2 --index-url https://download.pytorch.org/whl/cu118

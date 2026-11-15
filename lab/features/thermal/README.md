@@ -1,4 +1,4 @@
-> 自动生成：请修改 `config/perception_tasks.json`，然后运行 `python tools/sync_docs.py`。
+> 自动生成：请修改 `config/perception_tasks.json`，然后运行 `python lab/scripts/contracts/sync_docs.py`。
 
 **识别摘要：** D 楼热异常位置及楼层 [14]
 
@@ -11,6 +11,8 @@
 # D 楼热异常楼层识别
 
 规则第 14、23、25 页，输出异常楼层及对应框图。用户已确认：有一个红外设备；D 楼为三列、四层模型，中间一根竖直发热电阻，两侧列不发热；赛方只要求报告第几楼异常。
+
+九项识别均按 RViz 雷达地图与 TF 坐标导航至任务点，车体转 90° 或 180°，使摄像头完全正对目标后拍照。任务结果可在行驶途中异步处理；每项仅启用该任务所需的模型及 OCR、OpenCV 等附属处理。
 
 状态含义见 [需求状态约定](../../../docs/PERCEPTION_DEVELOPMENT.md#需求状态与提醒)。标签描述本条当前工作状态；已明确的规则不等于实现完成。
 

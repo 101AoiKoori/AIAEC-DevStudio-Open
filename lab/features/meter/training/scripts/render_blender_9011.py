@@ -3,6 +3,10 @@
 The texture and calibration are derived from the user's PDF. Geometry and
 visibility are approximate and require review against the physical meter.
 """
+
+if __name__ == "__main__":
+    raise SystemExit("Legacy dataset CLI is retired; use datasets/scripts/meter/. Production remains paused.")
+
 import argparse
 import json
 import math
@@ -172,135 +176,151 @@ def load_render_pixels(path):
 
 
 def main():
+    raise RuntimeError("Retired production entry; use datasets/scripts/meter/ and its source.yaml")
+
+
+def _legacy_main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--output', required=True)
+    parser.add_argument('--model-output', required=True)
     parser.add_argument('--ticks', required=True)
     parser.add_argument('--count', type=int, required=True)
     parser.add_argument('--seed', type=int, required=True)
     args = parser.parse_args(sys.argv[sys.argv.index('--') + 1:])
-    out = Path(args.output)
-    ticks = json.loads(Path(args.ticks).read_text(encoding='utf-8-sig'))
-    bpy.ops.object.select_all(action='SELECT')
-    bpy.ops.object.delete(use_global=False)
-    scene = bpy.context.scene
-    scene.render.engine = 'CYCLES'
-    scene.cycles.samples = 32
-    scene.cycles.use_denoising = True
-    scene.render.resolution_x = scene.render.resolution_y = 512
-    scene.render.resolution_percentage = 100
-    scene.render.image_settings.file_format = 'PNG'
-    scene.world.color = (.35, .35, .35)
-    bpy.ops.mesh.primitive_cylinder_add(vertices=128, radius=1.04, depth=.12, location=(0, 0, 0))
-    shell = bpy.context.object
-    shell.name = 'metal_shell'
-    shell.data.materials.append(material('metal', (.55, .56, .58), metallic=.85, roughness=.24))
-    bevel = shell.modifiers.new('editable_shell_bevel', 'BEVEL')
-    bevel.width = .022
-    bevel.segments = 3
-    disk_texture(out / 'face_texture.png')
-    bpy.ops.curve.primitive_bezier_circle_add(radius=1.015, location=(0, 0, .09))
-    bezel = bpy.context.object
-    bezel.name = 'metal_bezel_bezier'
-    bezel.data.bevel_depth = .025
-    bezel.data.bevel_resolution = 4
-    bezel.data.resolution_u = 32
-    bezel.data.materials.append(material('bezel', (.65, .65, .65), metallic=.9, roughness=.2))
-    temp_center, humid_center = xy(ticks['temperature_center']), xy(ticks['humidity_center'])
-    temp = hand('temperature', temp_center, .76, .105, (.01, .01, .01))
-    humid = hand('humidity', humid_center, .31, .12, (.01, .01, .01))
-    glass = make_glass()
-    bpy.ops.object.camera_add(location=(0, 0, 4.2))
-    camera = bpy.context.object
-    camera.name = 'training_camera'
-    camera.data.lens = 48
-    scene.camera = camera
-    look_at(camera, (0, 0, 0))
-    key = area_light('moving_softbox', (1, 1, 3), 400, 1.8)
-    area_light('fill', (-2, -1, 3), 220, 3)
-    # Save a self-contained, editable model with packed derived PDF texture.
-    bpy.ops.wm.save_as_mainfile(filepath=str(out / 'meter_9011_approx.blend'))
-    image_dir, label_dir = out / 'images' / 'train', out / 'labels' / 'train'
-    image_dir.mkdir(parents=True)
-    label_dir.mkdir(parents=True)
-    temperature_angles = angles_from_ticks(ticks['temperature'], temp_center)
-    humidity_angles = angles_from_ticks(ticks['humidity'], humid_center)
-    randomizer = random.Random(args.seed)
-    manifest = {'purpose': 'PDF-inspired Blender smoke test; not a validated dataset',
-                'source': 'AI-generated face, based on PDF and commercial reference; rights and fidelity unverified',
-                'geometry': 'approximate generated image geometry, not measured dimensions',
-                'calibration_status': 'illustrative equally spaced endpoints; generated markings and physical meter not verified',
-                'keypoint_order': KEYPOINTS, 'seed': args.seed, 'samples': []}
-    for index in range(args.count):
-        tf, hf = randomizer.uniform(.05, .95), randomizer.uniform(.05, .95)
-        temp.rotation_euler.z = angle_at(temperature_angles, tf)
-        humid.rotation_euler.z = angle_at(humidity_angles, hf)
-        camera.location = (randomizer.uniform(-.9, .9), randomizer.uniform(-.8, .8),
-                           randomizer.uniform(3.8, 4.8))
-        camera.data.lens = randomizer.uniform(44, 52)
+    from meter_production_guard import guarded
+    model_out = Path(args.model_output).resolve()
+    model_root = (Path.cwd() / 'datasets/assets/blender/meter/legacy_generated').resolve()
+    if not model_out.is_relative_to(model_root) or model_out == model_root:
+        parser.error('model output must be under datasets/assets/blender/meter/legacy_generated')
+    with guarded('render_blender_9011', args, __file__, Path(args.output) / 'face_texture.png',
+                 extra_inputs=[args.ticks], inplace=True, extra_outputs=[model_out]) as run:
+        if run.reused:
+            return
+        out = Path(args.output)
+        ticks = json.loads(Path(args.ticks).read_text(encoding='utf-8-sig'))
+        bpy.ops.object.select_all(action='SELECT')
+        bpy.ops.object.delete(use_global=False)
+        scene = bpy.context.scene
+        scene.render.engine = 'CYCLES'
+        scene.cycles.samples = 32
+        scene.cycles.use_denoising = True
+        scene.render.resolution_x = scene.render.resolution_y = 512
+        scene.render.resolution_percentage = 100
+        scene.render.image_settings.file_format = 'PNG'
+        scene.world.color = (.35, .35, .35)
+        bpy.ops.mesh.primitive_cylinder_add(vertices=128, radius=1.04, depth=.12, location=(0, 0, 0))
+        shell = bpy.context.object
+        shell.name = 'metal_shell'
+        shell.data.materials.append(material('metal', (.55, .56, .58), metallic=.85, roughness=.24))
+        bevel = shell.modifiers.new('editable_shell_bevel', 'BEVEL')
+        bevel.width = .022
+        bevel.segments = 3
+        disk_texture(out / 'face_texture.png')
+        bpy.ops.curve.primitive_bezier_circle_add(radius=1.015, location=(0, 0, .09))
+        bezel = bpy.context.object
+        bezel.name = 'metal_bezel_bezier'
+        bezel.data.bevel_depth = .025
+        bezel.data.bevel_resolution = 4
+        bezel.data.resolution_u = 32
+        bezel.data.materials.append(material('bezel', (.65, .65, .65), metallic=.9, roughness=.2))
+        temp_center, humid_center = xy(ticks['temperature_center']), xy(ticks['humidity_center'])
+        temp = hand('temperature', temp_center, .76, .105, (.01, .01, .01))
+        humid = hand('humidity', humid_center, .31, .12, (.01, .01, .01))
+        glass = make_glass()
+        bpy.ops.object.camera_add(location=(0, 0, 4.2))
+        camera = bpy.context.object
+        camera.name = 'training_camera'
+        camera.data.lens = 48
+        scene.camera = camera
         look_at(camera, (0, 0, 0))
-        key.location = (randomizer.uniform(-1.8, 1.8), randomizer.uniform(-1.8, 1.8),
-                        randomizer.uniform(2.0, 3.5))
-        key.data.energy = randomizer.uniform(250, 650)
-        key.data.size = randomizer.uniform(.5, 2.3)
-        look_at(key, (0, 0, 0))
-        scene.cycles.seed = index
-        bpy.context.view_layer.update()
-        # A clean comparison render estimates whether glass highlights obscure a point.
-        glass.hide_render = True
-        clean_path = out / 'render_work_clean.png'
-        scene.render.filepath = str(clean_path)
-        bpy.ops.render.render(write_still=True)
-        clean = load_render_pixels(clean_path)
-        clean_path.unlink()
-        glass.hide_render = False
-        name = 'meter_{:05d}'.format(index)
-        scene.render.filepath = str(image_dir / (name + '.png'))
-        bpy.ops.render.render(write_still=True)
-        reflected = load_render_pixels(image_dir / (name + '.png'))
-        tip_t = temp.matrix_world @ Vector((.76, 0, 0))
-        tip_h = humid.matrix_world @ Vector((.31, 0, 0))
-        points3 = [Vector(temp.location), tip_t, Vector(humid.location), tip_h,
-                   xy(ticks['temperature'][0]['end'], .065), xy(ticks['temperature'][-1]['end'], .065),
-                   xy(ticks['humidity'][0]['end'], .065), xy(ticks['humidity'][-1]['end'], .065)]
-        points = [camera_point(scene, camera, p) for p in points3]
-        outline = [camera_point(scene, camera, (1.04 * math.cos(i * math.tau / 128),
-                                               1.04 * math.sin(i * math.tau / 128), .1))
-                   for i in range(128)]
-        x0, x1 = max(0., min(p[0] for p in outline)), min(1., max(p[0] for p in outline))
-        y0, y1 = max(0., min(p[1] for p in outline)), min(1., max(p[1] for p in outline))
-        if x1 <= x0 or y1 <= y0:
-            raise RuntimeError('generated meter outside frame')
-        tpoly, hpoly = screen_polygon(scene, camera, temp), screen_polygon(scene, camera, humid)
-        keypoints, states, visibility_evidence = [], [], []
-        for k, (x, y, depth) in enumerate(points):
-            if not (depth > 0 and 0 <= x < 1 and 0 <= y < 1):
-                keypoints.extend((0.0, 0.0, 0)); states.append(0)
-                visibility_evidence.append({'reason': 'outside image'})
-                continue
-            px = min(511, max(0, int(x * 512)))
-            py = min(511, max(0, int((1 - y) * 512)))
-            delta = float(np.max(reflected[py, px, :3] - clean[py, px, :3]))
-            neighborhood = reflected[max(0, py - 2):min(512, py + 3),
-                                     max(0, px - 2):min(512, px + 3), :3]
-            brightness = float(np.mean(neighborhood))
-            # Humidity hand is above temperature hand. Both can cover scale marks.
-            obscured = ((k in (0, 1) and point_in_polygon((x, y), hpoly)) or
-                        (k >= 4 and (point_in_polygon((x, y), tpoly) or point_in_polygon((x, y), hpoly))) or
-                        delta > .18 or brightness > .95)
-            visible = 1 if obscured else 2
-            keypoints.extend((x, y, visible)); states.append(visible)
-            visibility_evidence.append({'glass_difference': delta, 'local_brightness': brightness,
-                                        'reason': 'possibly obscured' if obscured else 'candidate visible'})
-        label = [0, (x0 + x1) / 2, (y0 + y1) / 2, x1 - x0, y1 - y0] + keypoints
-        (label_dir / (name + '.txt')).write_text(' '.join(str(v) if isinstance(v, int) else '{:.6f}'.format(v) for v in label) + '\n', encoding='utf-8')
-        manifest['samples'].append({'id': name, 'temperature_fraction': tf, 'humidity_fraction': hf,
-                                    'camera': list(camera.location), 'lens_mm': camera.data.lens,
-                                    'light': list(key.location), 'light_energy': key.data.energy,
-                                    'light_size': key.data.size, 'keypoints': points, 'visibility': states,
-                                    'values': {'temperature': -30 + tf * 80, 'humidity': hf * 100},
-                                    'visibility_evidence': visibility_evidence,
-                                    'visibility_note': 'approximate polygon, brightness and render-difference heuristic'})
-    (out / 'manifest.json').write_text(json.dumps(manifest, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
+        key = area_light('moving_softbox', (1, 1, 3), 400, 1.8)
+        area_light('fill', (-2, -1, 3), 220, 3)
+        # Save a self-contained, editable model with packed derived PDF texture.
+        model_out.mkdir(parents=True, exist_ok=False)
+        bpy.ops.wm.save_as_mainfile(filepath=str(model_out / 'meter_9011_approx.blend'))
+        image_dir, label_dir = out / 'images' / 'train', out / 'labels' / 'train'
+        image_dir.mkdir(parents=True)
+        label_dir.mkdir(parents=True)
+        temperature_angles = angles_from_ticks(ticks['temperature'], temp_center)
+        humidity_angles = angles_from_ticks(ticks['humidity'], humid_center)
+        randomizer = random.Random(args.seed)
+        manifest = {'purpose': 'PDF-inspired Blender smoke test; not a validated dataset',
+                    'source': 'AI-generated face, based on PDF and commercial reference; rights and fidelity unverified',
+                    'model_blend': (model_out / 'meter_9011_approx.blend').relative_to(Path.cwd()).as_posix(),
+                    'geometry': 'approximate generated image geometry, not measured dimensions',
+                    'calibration_status': 'illustrative equally spaced endpoints; generated markings and physical meter not verified',
+                    'keypoint_order': KEYPOINTS, 'seed': args.seed, 'samples': []}
+        for index in range(args.count):
+            tf, hf = randomizer.uniform(.05, .95), randomizer.uniform(.05, .95)
+            temp.rotation_euler.z = angle_at(temperature_angles, tf)
+            humid.rotation_euler.z = angle_at(humidity_angles, hf)
+            camera.location = (randomizer.uniform(-.9, .9), randomizer.uniform(-.8, .8),
+                               randomizer.uniform(3.8, 4.8))
+            camera.data.lens = randomizer.uniform(44, 52)
+            look_at(camera, (0, 0, 0))
+            key.location = (randomizer.uniform(-1.8, 1.8), randomizer.uniform(-1.8, 1.8),
+                            randomizer.uniform(2.0, 3.5))
+            key.data.energy = randomizer.uniform(250, 650)
+            key.data.size = randomizer.uniform(.5, 2.3)
+            look_at(key, (0, 0, 0))
+            scene.cycles.seed = index
+            bpy.context.view_layer.update()
+            # A clean comparison render estimates whether glass highlights obscure a point.
+            glass.hide_render = True
+            clean_path = out / 'render_work_clean.png'
+            scene.render.filepath = str(clean_path)
+            bpy.ops.render.render(write_still=True)
+            clean = load_render_pixels(clean_path)
+            clean_path.unlink()
+            glass.hide_render = False
+            name = 'meter_{:05d}'.format(index)
+            scene.render.filepath = str(image_dir / (name + '.png'))
+            bpy.ops.render.render(write_still=True)
+            reflected = load_render_pixels(image_dir / (name + '.png'))
+            tip_t = temp.matrix_world @ Vector((.76, 0, 0))
+            tip_h = humid.matrix_world @ Vector((.31, 0, 0))
+            points3 = [Vector(temp.location), tip_t, Vector(humid.location), tip_h,
+                       xy(ticks['temperature'][0]['end'], .065), xy(ticks['temperature'][-1]['end'], .065),
+                       xy(ticks['humidity'][0]['end'], .065), xy(ticks['humidity'][-1]['end'], .065)]
+            points = [camera_point(scene, camera, p) for p in points3]
+            outline = [camera_point(scene, camera, (1.04 * math.cos(i * math.tau / 128),
+                                                   1.04 * math.sin(i * math.tau / 128), .1))
+                       for i in range(128)]
+            x0, x1 = max(0., min(p[0] for p in outline)), min(1., max(p[0] for p in outline))
+            y0, y1 = max(0., min(p[1] for p in outline)), min(1., max(p[1] for p in outline))
+            if x1 <= x0 or y1 <= y0:
+                raise RuntimeError('generated meter outside frame')
+            tpoly, hpoly = screen_polygon(scene, camera, temp), screen_polygon(scene, camera, humid)
+            keypoints, states, visibility_evidence = [], [], []
+            for k, (x, y, depth) in enumerate(points):
+                if not (depth > 0 and 0 <= x < 1 and 0 <= y < 1):
+                    keypoints.extend((0.0, 0.0, 0)); states.append(0)
+                    visibility_evidence.append({'reason': 'outside image'})
+                    continue
+                px = min(511, max(0, int(x * 512)))
+                py = min(511, max(0, int((1 - y) * 512)))
+                delta = float(np.max(reflected[py, px, :3] - clean[py, px, :3]))
+                neighborhood = reflected[max(0, py - 2):min(512, py + 3),
+                                         max(0, px - 2):min(512, px + 3), :3]
+                brightness = float(np.mean(neighborhood))
+                # Humidity hand is above temperature hand. Both can cover scale marks.
+                obscured = ((k in (0, 1) and point_in_polygon((x, y), hpoly)) or
+                            (k >= 4 and (point_in_polygon((x, y), tpoly) or point_in_polygon((x, y), hpoly))) or
+                            delta > .18 or brightness > .95)
+                visible = 1 if obscured else 2
+                keypoints.extend((x, y, visible)); states.append(visible)
+                visibility_evidence.append({'glass_difference': delta, 'local_brightness': brightness,
+                                            'reason': 'possibly obscured' if obscured else 'candidate visible'})
+            label = [0, (x0 + x1) / 2, (y0 + y1) / 2, x1 - x0, y1 - y0] + keypoints
+            (label_dir / (name + '.txt')).write_text(' '.join(str(v) if isinstance(v, int) else '{:.6f}'.format(v) for v in label) + '\n', encoding='utf-8')
+            manifest['samples'].append({'id': name, 'temperature_fraction': tf, 'humidity_fraction': hf,
+                                        'camera': list(camera.location), 'lens_mm': camera.data.lens,
+                                        'light': list(key.location), 'light_energy': key.data.energy,
+                                        'light_size': key.data.size, 'keypoints': points, 'visibility': states,
+                                        'values': {'temperature': -30 + tf * 80, 'humidity': hf * 100},
+                                        'visibility_evidence': visibility_evidence,
+                                        'visibility_note': 'approximate polygon, brightness and render-difference heuristic'})
+        (out / 'manifest.json').write_text(json.dumps(manifest, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
 
 
 if __name__ == '__main__':

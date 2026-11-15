@@ -3,28 +3,35 @@
 The source session and renderer-reference overlap are not established, so
 outputs are intentionally not declared independent val/test sets.
 """
+
+if __name__ == "__main__":
+    raise SystemExit("Legacy dataset CLI is retired; use datasets/scripts/fire/. Production remains paused.")
+
 import argparse
 import json
 import random
+import sys
 from pathlib import Path
 
 import cv2
 import numpy as np
-from PIL import Image, ImageDraw, ImageFont
 
 from fire_blender_labels import yolo_row
 from compose_scene_fire import ROOT, EXPORTS, read_image, distribute
+sys.path.insert(0, str(ROOT))
+from lab.training_common.production_guard import generation_guard
+from datasets.scripts.common.paper import name_paper as _name_paper, paste
 
 BACKGROUND = ROOT / 'datasets/annotated/fire/real_review_candidates_20261110/images'
-FONT = ROOT / 'datasets/annotated/fire/blender_buildings_v13/NotoSansSC.ttf'
+FONT = ROOT / 'datasets/assets/blender/fire/blender_buildings_v13/NotoSansSC.ttf'
 SOURCES = {
     'scene_track': {'image': '0026.png', 'source_group': 'three_buildings_road_003',
-                    'source_video': 'Archive/Assets/场景/三楼与场地视频/三栋楼_垃圾桶与路口_003.mp4',
+                    'source_video': 'datasets/raw/site_archive_legacy/场景/三楼与场地视频/三栋楼_垃圾桶与路口_003.mp4',
                     'name_quad': [[336, 61], [492, 62], [493, 94], [337, 94]],
                     'fire_centers': [[340, 175], [435, 220], [353, 290], [475, 340]],
                     'paper_size': [36, 50]},
     'scene_tile': {'image': '0014.png', 'source_group': 'jinxiu_indoor_tile_001',
-                   'source_video': 'Archive/Assets/楼宇/锦绣大厦/视频/锦绣楼在室内地砖上的多面绕拍_001.mp4',
+                   'source_video': 'datasets/raw/fire/archive_assets_legacy/楼宇/锦绣大厦/视频/锦绣楼在室内地砖上的多面绕拍_001.mp4',
                    'name_quad': [[373, 148], [524, 139], [527, 169], [377, 180]],
                    'fire_centers': [[382, 236], [513, 244], [391, 310], [514, 351]],
                    'paper_size': [34, 48]},
@@ -46,27 +53,10 @@ def flame_paper(rng):
 
 
 def name_paper(text):
-    image = Image.new('RGB', (600, 160), (229, 228, 223))
-    font = ImageFont.truetype(str(FONT), 98)
-    draw = ImageDraw.Draw(image)
-    bounds = draw.textbbox((0, 0), text, font=font)
-    draw.text(((600 - (bounds[2]-bounds[0]))/2, (160-(bounds[3]-bounds[1]))/2-bounds[1]), text, font=font, fill=(20, 20, 20))
-    return cv2.cvtColor(np.asarray(image), cv2.COLOR_RGB2BGR)
+    return _name_paper(text, FONT)
 
 
-def paste(image, patch, quad):
-    height, width = patch.shape[:2]
-    source = np.float32([[0, 0], [width-1, 0], [width-1, height-1], [0, height-1]])
-    quad = np.asarray(quad, np.float32)
-    matrix = cv2.getPerspectiveTransform(source, quad)
-    warped = cv2.warpPerspective(patch, matrix, (image.shape[1], image.shape[0]))
-    mask = cv2.warpPerspective(np.full((height, width), 255, np.uint8), matrix, (image.shape[1], image.shape[0]))
-    image[mask > 0] = warped[mask > 0]
-    ys, xs = np.where(mask > 0)
-    return [int(xs.min()), int(ys.min()), int(xs.max())+1, int(ys.max())+1]
-
-
-def generate(output, count, seed):
+def _generate(output, count, seed):
     if output.exists() or not output.resolve().is_relative_to(EXPORTS.resolve()):
         raise ValueError('output exists or is outside fire exports')
     if count < 10 or count > 1000:
@@ -112,6 +102,26 @@ def generate(output, count, seed):
     summary.update(status='complete_candidates', note='Two scene frames from distinct videos and different physical layouts; synthetic overlays are not independent camera captures. Their overlap with v13 model reference sources and capture sessions is unconfirmed. Do not use as final val/test until audit.', source_groups=list(SOURCES), split_candidate={'scene_track':'val_candidate','scene_tile':'test_candidate'})
     (output/'summary.json').write_text(json.dumps(summary,ensure_ascii=False,indent=2),encoding='utf-8')
     return summary
+
+
+def generate(output, count, seed):
+    backgrounds = [BACKGROUND / item['image'] for item in SOURCES.values()]
+    videos = [ROOT / item['source_video'] for item in SOURCES.values()]
+    with generation_guard('fire.compose_scene_eval:' + str(output.resolve().relative_to(ROOT)),
+                          [FONT, *backgrounds, *videos], [output], {'count': count, 'seed': seed, 'sources': SOURCES},
+                          code_paths=[Path(__file__), ROOT / 'lab/features/fire/training/scripts/compose_scene_fire.py',
+                                      ROOT / 'lab/features/fire/training/scripts/fire_blender_labels.py',
+                                      ROOT / 'datasets/scripts/common/images.py',
+                                      ROOT / 'datasets/scripts/common/annotations.py',
+                                      ROOT / 'datasets/scripts/common/paper.py',
+                                      ROOT / 'datasets/scripts/common/perspective.py'],
+                          procedural_inputs=[FONT], root=ROOT) as run:
+        if run.reused:
+            return json.loads((output / 'summary.json').read_text(encoding='utf-8'))
+        result = _generate(output, count, seed)
+        result['batch_source_refs'] = run.source_refs
+        (output / 'summary.json').write_text(json.dumps(result, ensure_ascii=False, indent=2), encoding='utf-8')
+        return result
 
 
 if __name__=='__main__':

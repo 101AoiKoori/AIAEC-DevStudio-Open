@@ -1,0 +1,6 @@
+interface:
+  display_name: "数据集制作闭环"
+  short_description: "按任务目标、逻辑设计与已知证据推进数据集制作"
+  default_prompt: "使用 $dataset-production-loop 按项目实际素材和约束推进数据集制作。"
+policy:
+  allow_implicit_invocation: true

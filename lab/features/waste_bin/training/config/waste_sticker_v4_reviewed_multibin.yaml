@@ -1,0 +1,89 @@
+schema_version: 3
+task_id: waste_bin
+model_key: waste_sticker
+version: v4
+task: detect
+data: datasets/exports/waste_bin/waste_sticker_v4_reviewed_flat_20261113/data.yaml
+test_unavailable: true
+model: runs/waste_sticker/runs/waste_sticker/v3_20261111_151346_593593/training/weights/best.pt
+output_root: runs/waste_sticker
+description: 未完成的 V4 候选：受控平板与已审两桶合成样本，缺小目标、独立实拍和测试集，暂勿正式训练。
+imgsz: 640
+epochs: 24
+batch: 16
+workers: 0
+patience: 0
+seed: 42
+device: '0'
+optimizer: AdamW
+lr0: 0.0002
+lrf: 0.08
+momentum: 0.9
+weight_decay: 0.0005
+warmup_epochs: 1.5
+cos_lr: true
+close_mosaic: 0
+amp: false
+deterministic: true
+max_det: 160
+diagnostic_conf: 0.25
+match_iou: 0.5
+nms_iou: 0.7
+preview_limit: 48
+evaluate_after_training: true
+augment:
+  degrees: 3.0
+  translate: 0.05
+  scale: 0.12
+  shear: 0.0
+  perspective: 0.0
+  flipud: 0.0
+  fliplr: 0.0
+  mosaic: 0.0
+  mixup: 0.0
+  copy_paste: 0.0
+  hsv_h: 0.005
+  hsv_s: 0.1
+  hsv_v: 0.12
+source_notes:
+- 未完成候选；训练 1134 张（平板 1080、两桶合成 54），开发 48 张，无测试集；暂勿正式训练。
+- 54 张与原多桶待审核批次中的对应图片相同，不能重复加入。
+- 24 类图案、程序化场景、桶 Blender 母场景与视频背景复用；非独立实拍评估。
+- 两桶贴图的透视和现场尺度为近似，缺多桶密集、小目标和经核实实拍覆盖。
+class_names:
+- plastic_bottle
+- can
+- glass_bottle
+- newspaper
+- cardboard_box
+- clothes
+- leftover_food
+- vegetable_leaves
+- fruit_core
+- tea_leaves
+- bread
+- fish_bone
+- button_battery
+- fluorescent_lamp
+- mercury_thermometer
+- pill
+- paint
+- film
+- cigarette_butt
+- used_tissue
+- disposable_chopsticks
+- broken_ceramics
+- shell
+- discarded_glasses
+data_overrides:
+  train:
+  - images: datasets/exports/waste_bin/waste_sticker_v4_reviewed_flat_20261113/images/train
+    labels: datasets/exports/waste_bin/waste_sticker_v4_reviewed_flat_20261113/labels/train
+    source_group: reviewed_flat_train
+  - images: datasets/exports/waste_bin/waste_sticker_v4_reviewed_two_bin_20261113/images/train
+    labels: datasets/exports/waste_bin/waste_sticker_v4_reviewed_two_bin_20261113/labels/train
+    source_group: reviewed_two_bin_train
+  val:
+  - images: datasets/exports/waste_bin/waste_sticker_v4_reviewed_flat_20261113/images/val
+    labels: datasets/exports/waste_bin/waste_sticker_v4_reviewed_flat_20261113/labels/val
+    source_group: reviewed_flat_val

@@ -1,0 +1,229 @@
+task: meter
+status: configured_inputs_consumed_by_canonical_entry
+databases: {media_query: datasets/annotated/media_index/query_cache.sqlite3, blender_registry: datasets/blender_source_registry.sqlite3}
+roots: [datasets/raw/meter, datasets/raw/car_real_capture_20261112, datasets/assets/blender/meter]
+records: [datasets/annotated/meter/real_meter_visual_manifest.jsonl]
+selection: 查询现有数据库和清单，按任务、集合、角色及父来源选取；跨任务背景允许复用。
+station_source: datasets/assets/blender/meter/v4_parametric_station_v2_20261113/station.blend
+endpoint_config: lab/features/meter/training/config/meter_parametric_endpoints_v4.json
+station_face: datasets/assets/blender/meter/v4_parametric_station_v2_20261113/face.png
+face_override: null
+arena_source: datasets/assets/blender/shared/arena_4m2_pbr_20261112/arena_master_user_20261113.blend
+render_plan: datasets/scripts/meter/config/render_plan.json
+production_plan: datasets/scripts/meter/config/production_plan.json
+direct_pose_scope: existing_complete_eight_point_labels_only
+excluded_direct_records: datasets/annotated/meter/real_meter_visual_manifest.jsonl
+excluded_direct_reason: current_records_have_unresolved_points_do_not_make_pose_positives
+real_composite:
+  foreground_batch: datasets/samples/meter
+  production_plan: datasets/scripts/meter/config/production_plan.json
+  count: 36
+  selected_background_records:
+    - {record_index: 4, id: frame_003601}
+    - {record_index: 5, id: frame_009901}
+    - {record_index: 6, id: frame_010501}
+  lineage_links: []
+  status: configured_inputs_render_plan_is_first_resume_step
+  background_usage: candidate_reuse_of_recorded_regression
+  background_review: datasets/annotated/meter/v4_real_partial_regression_20261112/review_manifest.json
+candidate_pool:
+  inventory: datasets/annotated/meter/real_review_candidates_20261110/manifest.json
+  samples: 12
+  validation_annotations: datasets/annotated/meter/real_video_validation_v1/annotations
+  annotation_states: registration_rejected, registration_failed, unreviewed
+  blocking_review: no frame carries a complete 8-point Pose record; three frames have tick data but remain unreviewed, so direct real stays excluded and rendering is the first step.
+pairing:
+  schema_version: 1
+  status: draft
+  composition_policy:
+    target_source: blender_primary
+    blender_priority: increased
+    blender_share_target: 0.50
+    target_components: [station_model, parametric_needle_pose]
+    background_components: [arena_scene, station_scene]
+    note: 用户 2026-11-15 确认采用 10/40/50；参数化站房可覆盖双针组合，实拍无完整 Pose
+  policy:
+    parent_classes: [task_real, background]
+    split_unit: parent_group
+    train_parent_cap: 0.8
+    val_test_mode: reserve_only
+    derived_inherits_parent_split: true
+    cross_task_duplicates: allowed_with_separate_labels
+    same_source_splits: record_and_report
+  task_real:
+    - id: tr_car_real_meter
+      class: task_real
+      kind: parent_video
+      paths: [datasets/raw/car_real_capture_20261112/V_20261112_152304.mp4]
+      evidence:
+        - {manifest: datasets/annotated/meter/real_meter_visual_manifest.jsonl}
+      capture_session: unknown
+      labels: {status: blocked, note: 45 帧；无完整 8 点 Pose，读数映射未确认}
+      roles: [direct_target, composite_target]
+      split: {primary: train, status: proposed}
+      plan: null
+    - id: tr_site_meter
+      class: task_real
+      kind: parent_photo_batch
+      paths: [datasets/raw/site_capture_20261112/onboard_camera_images]
+      evidence:
+        - {manifest: datasets/annotated/meter/real_meter_visual_manifest.jsonl}
+      capture_session: unknown
+      labels: {status: blocked, note: 7 帧；Pose 点待标}
+      roles: [direct_target, composite_target]
+      split: {primary: val, status: proposed}
+      plan: null
+    - id: tr_archive_meter
+      class: task_real
+      kind: parent_photo_batch
+      paths:
+        - datasets/raw/meter/archive_assets_legacy/照片/小车摄像头实拍_近似平视_仪表和支架_002.png
+        - datasets/raw/meter/archive_assets_legacy/照片/手持倾斜近景_表盘_双针_外壳与反光_001.jpg
+        - datasets/raw/car_real_capture_20261112/P18_GAUGE.png
+      evidence:
+        - {manifest: datasets/annotated/meter/real_meter_visual_manifest.jsonl}
+      capture_session: unknown
+      labels: {status: blocked, note: 3 帧；Pose 点待标}
+      roles: [direct_target, composite_target]
+      split: {primary: test, status: proposed}
+      plan: null
+    - id: tr_meter_capture_val
+      class: task_real
+      kind: field_session
+      paths: [datasets/raw/meter/capture_20261116_val]
+      evidence:
+        - {note: 待采；采后登记读数、针位与 8 点真值}
+      capture_session: planned
+      capture_id: cap_meter_val_20261116
+      labels: {status: unknown, note: 待采后标注 8 点、读数、可见性}
+      roles: [direct_target, composite_target]
+      split: {primary: val, status: proposed, action: to_capture}
+      plan: null
+    - id: tr_meter_capture_test
+      class: task_real
+      kind: field_session
+      paths: [datasets/raw/meter/capture_20261116_test]
+      evidence:
+        - {note: 待采；采后登记读数、针位与 8 点真值}
+      capture_session: planned
+      capture_id: cap_meter_test_20261116
+      labels: {status: unknown, note: 待采后标注 8 点、读数、可见性}
+      roles: [direct_target, composite_target]
+      split: {primary: test, status: proposed, action: to_capture}
+      plan: null
+  backgrounds:
+    - id: bg_full_scene
+      class: background
+      kind: parent_video
+      paths: [datasets/raw/site_capture_20261112/videos/full_scene.mp4]
+      evidence:
+        - {manifest: datasets/annotated/meter/v4_real_partial_regression_20261112/review_manifest.json, record_index: 4}
+      review: {state: candidate_empty, method: contact_sheet, accepted_by: null, note: 3 帧均为 regression 复用}
+      labels: {status: unknown}
+      roles: [composite_background]
+      split: {primary: train, status: proposed}
+      plan: null
+    - id: bg_blocked_11
+      class: background
+      kind: parent_photo_batch
+      paths: [datasets/annotated/meter/real_meter_visual_manifest.jsonl]
+      evidence:
+        - {manifest: datasets/annotated/meter/real_meter_visual_manifest.jsonl, note: 11 条 composite_background blocked}
+      review: {state: unknown, method: visual_review, accepted_by: null, note: 解除 blocked 后按来源分 val/test}
+      labels: {status: blocked}
+      roles: [composite_background]
+      split: {primary: unassigned, status: proposed}
+      plan: null
+    - id: bg_site_003
+      class: background
+      kind: parent_video
+      paths: [datasets/raw/site_archive_legacy/场景/三楼与场地视频/三栋楼_垃圾桶与路口_003.mp4]
+      evidence:
+        - {manifest: datasets/annotated/mixed_scene/v4_compositing_backgrounds_20261113/manifest.json}
+      review: {state: candidate_empty, method: contact_sheet, accepted_by: null}
+      labels: {status: unknown}
+      roles: [composite_background]
+      split: {primary: val, status: proposed}
+      plan: null
+    - id: bg_site_005
+      class: background
+      kind: parent_video
+      paths: [datasets/raw/site_archive_legacy/场景/三楼与场地视频/三栋楼_路口及垃圾桶_005.mp4]
+      evidence:
+        - {manifest: datasets/annotated/mixed_scene/v4_compositing_backgrounds_20261113/manifest.json}
+      review: {state: candidate_empty, method: contact_sheet, accepted_by: null}
+      labels: {status: unknown}
+      roles: [composite_background]
+      split: {primary: val, status: proposed}
+      plan: null
+    - id: bg_site_009
+      class: background
+      kind: parent_video
+      paths: [datasets/raw/site_archive_legacy/场景/三楼与场地视频/三栋楼侧向扫描_009.mp4]
+      evidence:
+        - {manifest: datasets/annotated/mixed_scene/v4_compositing_backgrounds_20261113/manifest.json}
+      review: {state: candidate_empty, method: contact_sheet, accepted_by: null}
+      labels: {status: unknown}
+      roles: [composite_background]
+      split: {primary: test, status: proposed}
+      plan: null
+    - id: bg_site_012
+      class: background
+      kind: parent_video
+      paths: [datasets/raw/e_bike/archive_assets_legacy/视频/人物立牌正背面_电动车直立_倒伏和遮挡_场地扫描_012.mp4]
+      evidence:
+        - {manifest: datasets/annotated/mixed_scene/v4_compositing_backgrounds_20261113/manifest.json}
+      review: {state: candidate_empty, method: contact_sheet, accepted_by: null}
+      labels: {status: unknown}
+      roles: [composite_background]
+      split: {primary: test, status: proposed}
+      plan: null
+  data_sources:
+    - id: ds_endpoints
+      kind: fixed_artwork
+      path: lab/features/meter/training/config/meter_parametric_endpoints_v4.json
+      parent_group: null
+      roles: [reference]
+      split: {primary: shared, status: confirmed}
+  blender:
+    - id: bl_station
+      kind: blender_scene
+      path: datasets/assets/blender/meter/v4_parametric_station_v2_20261113/station.blend
+      role: target_scene
+      priority: primary
+      split: {primary: shared, status: confirmed, same_source_note: 参数化站房；父源为 9011 PBR 模型}
+    - id: bl_arena_master
+      kind: blender_scene
+      path: datasets/assets/blender/shared/arena_4m2_pbr_20261112/arena_master_user_20261113.blend
+      role: background_scene
+      priority: primary
+      split: {primary: shared, status: confirmed, same_source_note: 多任务共享母场景}
+  captures:
+    - id: cap_meter_val_20261116
+      target_split: val
+      reason: no_complete_pose_parent
+      status: conditional
+      object: 实物温湿表/站房
+      scene: 与现有视频不同安装/读数
+      views: [frontal, oblique]
+      lighting: [normal, reflection]
+      amount: 2 段 1–2 分钟视频或 50–100 张照片
+      truth: [eight_points, readings, visibility]
+      save_to: datasets/raw/meter/capture_20261116_val/
+    - id: cap_meter_test_20261116
+      target_split: test
+      reason: no_complete_pose_parent
+      status: conditional
+      object: 实物温湿表/站房
+      scene: 第三种读数/反光
+      views: [frontal, oblique]
+      lighting: [normal, strong_reflection]
+      amount: 2 段 1–2 分钟视频或 50–100 张照片
+      truth: [eight_points, readings, visibility]
+      save_to: datasets/raw/meter/capture_20261116_test/
+  plan_bindings:
+    train:
+      - datasets/scripts/meter/config/render_plan.json
+      - datasets/scripts/meter/config/production_plan.json
+    val: []
+    test: []
