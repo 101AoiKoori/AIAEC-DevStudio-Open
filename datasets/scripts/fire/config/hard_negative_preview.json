@@ -1,0 +1,28 @@
+{
+  "schema_version": 1,
+  "task": "fire",
+  "scene_name": "Fire Hard Negatives",
+  "purpose": "Color and shape contrast development preview; not yet part of train/val/test exports",
+  "output": "datasets/samples/fire/hard_negative_preview",
+  "scene_snapshot": "datasets/annotated/fire/production_inputs/hard_negative_preview.blend",
+  "source_scene": "datasets/assets/blender/aiaec_dataset.blend",
+  "building_collection": "Fire Buildings | A - 开心大厦",
+  "bin_scene": "Waste Bins Photo",
+  "seed": 181143,
+  "image_size": [640, 480],
+  "samples": 16,
+  "variants": [
+    {"kind": "signal_lamp", "colors": ["red", "green"], "height_m": 0.22},
+    {"kind": "bin", "colors": ["red", "blue"], "height_m": 0.12},
+    {"kind": "cone", "colors": ["orange", "gray"], "height_m": 0.10}
+  ],
+  "target_counts": [0, 1],
+  "prop_placement": {"x_m": [0.16, 0.21], "y_m": [-0.13, -0.07], "yaw_deg": [-22, 22], "height_factor": [0.85, 1.15]},
+  "sticker_anchor": {"x_m": [-0.045, 0.045], "height_m": [0.13, 0.22, 0.31]},
+  "camera": {"azimuth_deg": [-22, 22], "distance_m": [0.79, 0.91], "height_m": [0.19, 0.28], "lens_mm": 42},
+  "sticker_height_fraction": [0.10, 0.14],
+  "appearance": {"exposure_ev": [-0.5, 0.2], "key_energy_w": [12, 24], "roughness": [0.32, 0.65], "color_value": [0.65, 1.0]},
+  "supervision": "Only the designated fire sticker is a detector target. Other colors are controls, not red/orange hard-negative coverage.",
+  "split": "train",
+  "split_basis": "All scene variants inherit the same Blender mother; none is an independent val/test parent."
+}

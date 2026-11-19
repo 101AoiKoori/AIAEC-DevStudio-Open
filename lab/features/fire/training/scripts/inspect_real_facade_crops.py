@@ -11,7 +11,7 @@ from lab.training_common.production_guard import generation_guard
 from generate_fire_dataset import _generate, read_image, write_image
 
 USE_MANIFEST = ROOT / 'datasets/annotated/fire/fire_sticker_v4_arena_handoff_20261113/fire_image_use_manifest_20261114.json'
-ARTWORK = ROOT / 'datasets/raw/fire/team_assets/image1.png'
+ARTWORK = ROOT / 'Archive/Assets/working_sources/digital/fire/team_assets/image1.png'
 OUTPUT = ROOT / 'runs/fire_sticker/real_facade_bounded_inspection_v3_20261114'
 CROP = (1354, 1452, 2430, 2259)
 # Coordinates are in the 600 x 450 visual inspection of each 1076 x 807 crop.
@@ -45,8 +45,9 @@ def main():
         raise ValueError('inspection output already exists')
     for path in sources.values():
         source = (ROOT / path).resolve()
-        if not source.is_relative_to(ROOT / 'datasets/raw/fire') or not source.is_file():
-            raise ValueError('source photo missing or outside fire raw assets')
+        if not source.is_file() or not any(source.is_relative_to(ROOT / base) for base in (
+                'datasets/raw/fire', 'Archive/Assets/working_sources/legacy/fire', 'Archive/Assets/captures/fire')):
+            raise ValueError('source photo missing or outside fire camera sources')
     inputs = [USE_MANIFEST, ARTWORK, *(ROOT / path for path in sources.values())]
     with generation_guard('fire.inspect_real_facade_crops:' + OUTPUT.relative_to(ROOT).as_posix(),
             inputs, [OUTPUT], {'crop_xyxy': list(CROP), 'source_ids': list(PATCHES), 'seed': 431},

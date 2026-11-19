@@ -14,6 +14,7 @@ from .schema import (
     VERDICT_EXCLUDED,
     VERDICT_READY,
     VERDICT_UNKNOWN,
+    EmptinessReport,
     FrameRef,
     MetricRecord,
     Verdict,
@@ -134,6 +135,9 @@ def decide(metric: MetricRecord, plan: dict[str, Any] | None = None, *, role: st
     extra_codes = _extra_codes(metric)
     if extra_codes:
         verdict.reason_codes = sorted(set(list(verdict.reason_codes) + extra_codes))
+    search = (metric.extra or {}).get("emptiness_search")
+    if search is not None:
+        verdict.evidence["emptiness_search"] = search
     return verdict
 
 
@@ -147,15 +151,64 @@ def _extra_codes(metric: MetricRecord) -> list[str]:
     return codes
 
 
+def _suspect_verdict(frame: FrameRef, role: str, emptiness: EmptinessReport) -> Verdict:
+    suspects = emptiness.suspects or []
+    return Verdict(
+        frame=frame,
+        role=role,
+        verdict=VERDICT_UNKNOWN,
+        reason_codes=["unlabelled_target_suspected"],
+        evidence={
+            "judge": "suspects",
+            "count": len(suspects),
+            "top_score": round(max((float(s.get("score", 0.0)) for s in suspects), default=0.0), 4),
+        },
+    )
+
+
 def _decide_core(metric: MetricRecord, plan: dict[str, Any] | None = None, *, role: str = "background") -> Verdict:
     """Apply the thresholds. Separated so the wrapper can attach qualifiers."""
 
     thresholds = resolve_thresholds(plan)
     frame = metric.frame
     reasons: list[str] = []
+    extra = metric.extra or {}
+    emptiness = metric.emptiness
+    if metric.task == "person" and role == "background":
+        existing_targets = extra.get("existing_targets") or []
+        if existing_targets:
+            return Verdict(
+                frame=frame,
+                role=role,
+                verdict=VERDICT_EXCLUDED,
+                reason_codes=["target_annotation_present"],
+                existing_targets=list(existing_targets),
+                evidence={"judge": "annotated_background_target", "count": len(existing_targets)},
+            )
+        if emptiness and emptiness.below_scale:
+            # Older metrics can say clean despite small matches. Decide this before
+            # the placement result, which can be used for provisional backgrounds.
+            return Verdict(
+                frame=frame,
+                role=role,
+                verdict=VERDICT_UNKNOWN,
+                reason_codes=["below_target_scale", "unlabelled_target_suspected"],
+                evidence={"judge": "below_scale_suspects", "below_scale_count": len(emptiness.below_scale)},
+            )
+        if (emptiness and emptiness.target_spec.get("below_min_scale") == "not_a_target" and
+                not (extra.get("emptiness_search") or {}).get("reference_frame_height")):
+            return Verdict(
+                frame=frame,
+                role=role,
+                verdict=VERDICT_UNKNOWN,
+                reason_codes=["emptiness_unproven"],
+                evidence={"judge": "stale_person_emptiness_scope"},
+            )
+        if emptiness and emptiness.suspects:
+            return _suspect_verdict(frame, role, emptiness)
 
     shape = None
-    raw_shape = (metric.extra or {}).get("image_shape")
+    raw_shape = extra.get("image_shape")
     if isinstance(raw_shape, (list, tuple)) and len(raw_shape) >= 2:
         shape = (int(raw_shape[0]), int(raw_shape[1]))
 
@@ -284,7 +337,6 @@ def _decide_core(metric: MetricRecord, plan: dict[str, Any] | None = None, *, ro
                     evidence=placement_evidence,
                 )
 
-    emptiness = metric.emptiness
     if thresholds.get("emptiness_required", True):
         if emptiness is None:
             return Verdict(
@@ -304,19 +356,7 @@ def _decide_core(metric: MetricRecord, plan: dict[str, Any] | None = None, *, ro
                 evidence={"judge": "emptiness_requires_templates"},
             )
         if not emptiness.clean:
-            return Verdict(
-                frame=frame,
-                role=role,
-                verdict=VERDICT_UNKNOWN,
-                reason_codes=["unlabelled_target_suspected"],
-                evidence={
-                    "judge": "suspects",
-                    "count": len(emptiness.suspects or []),
-                    "top_score": round(
-                        max((float(s.get("score", 0.0)) for s in emptiness.suspects or []), default=0.0), 4
-                    ),
-                },
-            )
+            return _suspect_verdict(frame, role, emptiness)
 
     if _is_near_duplicate(metric, thresholds):
         duplicate = metric.duplicates

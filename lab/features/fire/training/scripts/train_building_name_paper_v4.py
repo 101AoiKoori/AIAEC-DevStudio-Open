@@ -10,8 +10,10 @@ PACKAGE_ROOT = HERE.parents[2]
 PACKAGED = (PACKAGE_ROOT / 'scripts/common/engine').is_dir()
 ROOT = PACKAGE_ROOT if PACKAGED else HERE.parents[5]
 sys.path.insert(0, str(ROOT / 'scripts/common' if PACKAGED else ROOT / 'lab/training_common'))
+sys.path.insert(0, str(HERE.parent))
 from engine.cli import main as engine_main
 from engine.config import resolve
+from paper_report import write_paper_report
 
 DEFAULT_CONFIG = 'config/train.yaml' if PACKAGED else 'lab/features/fire/training/config/building_name_paper_v4.yaml'
 
@@ -55,6 +57,18 @@ def paper_size_report(rows, imgsz):
 
 def main(argv=None):
     argv = list(sys.argv[1:] if argv is None else argv)
+    if argv and argv[0]=='paper-report':
+        parser=argparse.ArgumentParser(description=write_paper_report.__doc__)
+        parser.add_argument('--root',type=Path,default=ROOT)
+        parser.add_argument('--evaluation',required=True)
+        parser.add_argument('--dataset-manifest',required=True)
+        args=parser.parse_args(argv[1:])
+        try:
+            root=args.root.resolve()
+            path=write_paper_report(resolve(root,args.evaluation),resolve(root,args.dataset_manifest),root=root)
+            print(path.name+' ready');return 0
+        except (OSError,ValueError,KeyError,IndexError,TypeError) as error:
+            print(f'ERROR: {type(error).__name__}: {error}',file=sys.stderr);return 1
     if argv and argv[0] == 'paper-sizes':
         parser = argparse.ArgumentParser(description=paper_size_report.__doc__)
         parser.add_argument('--root', type=Path, default=ROOT)

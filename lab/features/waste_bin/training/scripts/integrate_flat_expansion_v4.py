@@ -19,7 +19,7 @@ MANIFEST = BATCH + '/manifest.json'
 SOURCE = 'datasets/annotated/waste_sticker_v4_handoff_20261113/staged_master_with_test_source_gate.json'
 CONFIG = 'lab/features/waste_bin/training/config/waste_sticker_v4_reviewed_master.yaml'
 DISTRIBUTION = 'datasets/annotated/waste_sticker_v4_handoff_20261113/distribution_master_candidate.json'
-GEN_CONFIG = 'datasets/raw/waste_bin/toolkit/configs/gen_default.yaml'
+GEN_CONFIG = 'Archive/Assets/working_sources/digital/waste_sticker/toolkit/configs/gen_default.yaml'
 GENERATOR = 'lab/features/waste_bin/training/scripts/generate_flat_controlled_v4.py'
 
 

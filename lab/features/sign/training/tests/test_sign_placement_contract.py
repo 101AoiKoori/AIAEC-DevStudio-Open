@@ -24,6 +24,15 @@ class SignPlacementContractTests(unittest.TestCase):
     def compose(self, placement):
         return measured.compose(self.background, self.sprite, 'placed', 'normal', None, None, placement)
 
+    def test_native_high_resolution_ground_region_reaches_image_edge(self):
+        review = {'image_size': [1920, 1080], 'geometry': {
+            'coordinate_size': [1920, 1080],
+            'ground_polygon': [[0, 700], [1919, 700], [1919, 1079], [0, 1079]],
+        }}
+        rectangle, protected = measured.pool_ground_rectangle(review)
+        self.assertEqual(rectangle, [0, 293, 639, 419])
+        self.assertEqual(protected, [])
+
     def test_ground_placement_and_occlusion_update_pixels_and_visible_box(self):
         placement = {**self.placement, 'occlusion_polygons': [[[90, 290], [130, 290], [130, 349], [90, 349]]]}
         image, box, info = self.compose(placement)
@@ -111,6 +120,59 @@ class SignPlacementContractTests(unittest.TestCase):
                 self.assertEqual(actual['background_sign_absence_evidence'], 'review record')
                 self.assertEqual(len((output / label).read_text().split()), 5)
                 self.assertEqual(run.record_sample.call_count, 1)
+
+    def test_existing_sign_box_is_mapped_through_crop_and_retained(self):
+        review = {'image_size': [1280, 960], 'label': {'presence': 'present',
+                  'instances': [{'class_id': 0, 'xyxy': [400, 400, 500, 600], 'object_id': 'old-sign'}]}}
+        existing = measured.existing_sign_boxes(review, [320, 240, 960, 720])
+        self.assertEqual(existing[0]['output_box_xyxy'], [80, 160, 180, 360])
+        state = {'id': 'placed', 'planned_count': 1, 'background': {'image': 'bg.png'},
+                 'target': {'state': 'placed', 'mask': 'train_20.png'},
+                 'labels': {'class_id': 0, 'kind': 'visible_fixture_box'},
+                 'augmentation': {'tone': 'normal'}, 'parameters': {**self.placement, 'left': 240},
+                 'sources': ['bg.png']}
+        row = {'image': 'bg.png', 'parent_image': 'parent.png', 'pts_seconds': 1.0,
+               'sign_absence': 'existing_labelled', 'sign_absence_evidence': 'review record',
+               'existing_sign_boxes': existing}
+        with tempfile.TemporaryDirectory() as tmp, \
+                mock.patch.object(measured, 'OUTPUT_ROOT', Path(tmp) / 'out'), \
+                mock.patch.object(measured.base, 'read_image', return_value=self.background), \
+                mock.patch.object(measured.base, 'cutout', return_value=self.sprite):
+            output = Path(tmp) / 'out'
+            run = mock.Mock()
+            result = measured._generate(output, {'target_split': 'train', 'strata': [state]},
+                                        run, {'placed': (row, {'source': 'sign.png'})})
+            lines = (output / result['samples'][0]['label']).read_text().splitlines()
+            self.assertEqual(len(lines), 2)
+            self.assertEqual(lines[1], '0 0.20312500 0.54166667 0.15625000 0.41666667')
+            self.assertEqual(result['samples'][0]['actual']['retained_background_signs'], existing)
+
+    def test_high_resolution_sign_source_maps_to_letterboxed_output(self):
+        review = {'image_size': [1920, 1080], 'label': {'presence': 'present',
+                  'instances': [{'class_id': 0, 'xyxy': [960, 270, 1200, 810]}]}}
+        self.assertEqual(measured.output_content_rectangle(review['image_size']),
+                         [0, 60, 640, 420])
+        self.assertEqual(measured.existing_sign_boxes(review)[0]['output_box_xyxy'],
+                         [320, 150, 400, 330])
+
+    def test_existing_sign_overlap_is_rejected_before_output(self):
+        row = {'image': 'bg.png', 'sign_absence': 'existing_labelled',
+               'sign_absence_evidence': 'review record',
+               'existing_sign_boxes': [{'output_box_xyxy': [105, 350, 150, 410]}]}
+        state = {'id': 'placed', 'planned_count': 1, 'background': {'image': 'bg.png'},
+                 'target': {'state': 'placed', 'mask': 'train_20.png'},
+                 'labels': {'class_id': 0, 'kind': 'visible_fixture_box'},
+                 'augmentation': {'tone': 'normal'}, 'parameters': self.placement,
+                 'sources': ['bg.png']}
+        with tempfile.TemporaryDirectory() as tmp, \
+                mock.patch.object(measured, 'OUTPUT_ROOT', Path(tmp) / 'out'), \
+                mock.patch.object(measured.base, 'read_image', return_value=self.background), \
+                mock.patch.object(measured.base, 'cutout', return_value=self.sprite):
+            output = Path(tmp) / 'out'
+            with self.assertRaisesRegex(ValueError, 'overlaps a labelled background sign'):
+                measured._generate(output, {'target_split': 'train', 'strata': [state]},
+                                   mock.Mock(), {'placed': (row, {'source': 'sign.png'})})
+            self.assertFalse(output.exists())
 
 
 if __name__ == '__main__':

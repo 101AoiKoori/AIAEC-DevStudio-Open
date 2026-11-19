@@ -24,6 +24,8 @@ sys.path.insert(0, str(ROOT))
 from datasets.scripts.common.config import source_path
 from datasets.scripts.common.paths import sample_dir, split_dir
 
+from datasets.scripts.common.blender_workspace import STATION, WORKSPACE_BLEND, activate_scene
+
 STATION_SOURCE = source_path('meter', 'station_source')
 STATION_PIVOT = Vector((0, -1.04, .02))
 
@@ -278,7 +280,7 @@ def add_station_room_context(scene):
         cube('GEO-station-shelf-upright', (x, -.35, -9.08), (.075, 3.65, .18), steel)
     for y in (-2.05, -1.2, -.35, .5, 1.35):
         cube('GEO-station-shelf-level', (-4.15, y, -9.08), (3.6, .07, .18), steel)
-    return {'reference': 'datasets/raw/car_real_capture_20261112/P18_GAUGE.png',
+    return {'reference': 'Archive/Assets/captures/car_real_capture_20261112/P18_GAUGE.png',
             'method': 'manually fitted 3D cables and shelving; no photo composited',
             'cables': ['GEO-station-gray-foreground-cable', 'GEO-station-floor-cable-loop',
                        'GEO-station-rising-cable'], 'shelf': 'GEO-station-shelf-back',
@@ -290,14 +292,15 @@ def render_station_v4(args, out, config, endpoint_data, run=None):
     station_source = Path(args.station_source).resolve() if args.station_source else STATION_SOURCE.resolve()
     station_roots = ((ROOT / 'datasets/annotated/meter').resolve(),
                      (ROOT / 'datasets/assets/blender/meter').resolve())
-    if not any(station_source.is_relative_to(root) for root in station_roots) or not station_source.is_file():
+    if (station_source != WORKSPACE_BLEND and
+            not any(station_source.is_relative_to(root) for root in station_roots)) or not station_source.is_file():
         raise ValueError('station-v4 source must be an existing blend under meter assets or annotations')
     if not bpy.data.filepath or Path(bpy.data.filepath).resolve() != station_source:
         raise ValueError('station-v4 requires the specified 65-degree station blend')
     maximum_count = 10000 if args.station_batch_v4 else 8
     if not 1 <= args.count <= maximum_count or not 1 <= args.samples <= 32:
         raise ValueError(f'station-v4 requires 1..{maximum_count} images and 1..32 samples')
-    scene = bpy.data.scenes['Station prototype previews']
+    scene = bpy.data.scenes[STATION if station_source == WORKSPACE_BLEND else 'Station prototype previews']
     if bpy.context.scene != scene or scene.render.engine != 'CYCLES':
         raise ValueError('station-v4 requires the active Cycles station scene')
     pivot = scene.objects['Station dial tilt pivot']
@@ -318,7 +321,7 @@ def render_station_v4(args, out, config, endpoint_data, run=None):
     if args.face_override:
         derived = Path(args.face_override).resolve()
         permitted = source_path('meter', 'face_override')
-        if station_source != (ROOT / 'datasets/assets/blender/meter/v4_parametric_station_v2_20261113/station.blend').resolve() or derived != permitted:
+        if station_source != STATION_SOURCE or derived != permitted:
             raise ValueError('face override must be the traced v4 thick-tick face for the parametric station')
         image = bpy.data.images.load(str(derived), check_existing=False)
         if tuple(image.size) != (1254, 1254):
@@ -552,7 +555,7 @@ def render_station_v4(args, out, config, endpoint_data, run=None):
             scene.render.filepath = str(out / 'images' / (name + '.png'))
             bpy.ops.render.render(write_still=True)
             if args.station_room_v4 and index == 0:
-                preview_scene = ROOT / 'datasets/assets/blender/batch_scenes/meter' / out.name / 'preview_scene.blend'
+                preview_scene = ROOT / 'Archive/technical/datasets/meter' / out.name / 'preview_scene.blend'
                 preview_scene.parent.mkdir(parents=True, exist_ok=True)
                 bpy.ops.wm.save_as_mainfile(filepath=str(preview_scene), copy=True)
                 manifest['editable_preview_scene'] = preview_scene.relative_to(ROOT).as_posix()
@@ -664,6 +667,11 @@ def main():
     plan_path = None
     plan_bytes = None
     pending_face_binding = None
+    if args.station_v4 and Path(bpy.data.filepath).resolve() == WORKSPACE_BLEND:
+        from datasets.scripts.meter.meter_station_plan import restore_station_production_frame
+        restore_station_production_frame(bpy)
+        activate_scene(STATION)
+        pending_face_binding = source_path('meter', 'station_face')
     if not args.preflight:
         if not (args.station_v4 and args.station_batch_v4 and args.station_dial_masks and args.station_pose_v4):
             ap.error('production supports planned station pose batches only')
@@ -689,19 +697,19 @@ def main():
                 ap.error('station count differs from parent allocation')
         validate_station_declaration(declaration, count=args.count, source=source.relative_to(ROOT).as_posix(),
                                      allow_occlusion=args.station_occlusion_v41)
-        parametric_station = (ROOT / 'datasets/assets/blender/meter/v4_parametric_station_v2_20261113/station.blend').resolve()
+        parametric_station = STATION_SOURCE
         if source == parametric_station:
             endpoint_path = Path(args.endpoints).resolve()
             if not endpoint_path.is_relative_to(ROOT) or not endpoint_path.is_file():
                 ap.error('endpoint configuration must be an existing workspace file')
             endpoint_info = json.loads(endpoint_path.read_text(encoding='utf-8-sig'))
-            expected_face = (parametric_station.parent / 'face.png').resolve()
+            expected_face = source_path('meter', 'station_face')
             if (ROOT / endpoint_info.get('source_face', '')).resolve() != expected_face:
                 ap.error('parametric station endpoints must name its current face')
             pending_face_binding = expected_face
     elif args.production_plan:
         ap.error('preflight does not generate samples and does not accept a production plan')
-    extra_outputs = ([ROOT / 'datasets/assets/blender/batch_scenes/meter' / out_candidate.name / 'preview_scene.blend']
+    extra_outputs = ([ROOT / 'Archive/technical/datasets/meter' / out_candidate.name / 'preview_scene.blend']
                      if args.station_room_v4 else [])
     def reload_meter_media():
         if pending_face_binding is not None:
@@ -709,7 +717,7 @@ def main():
         reload_unpacked_media(bpy)
     with guarded('render_meter_candidates', args, __file__, bpy.data.filepath,
                  extra_inputs=[args.endpoints, ROOT/'datasets/scripts/meter/config/dataset.yaml', ROOT/'datasets/scripts/meter/config/source.yaml'] + ([args.station_source] if args.station_source else []) + ([args.face_override] if args.face_override else []) + ([args.parent_allocation] if args.parent_allocation else []) + ([plan_path] if plan_path else []),
-                 code_dependencies=[TASK_HELPERS/'render_meter_batch.py', TASK_HELPERS/'power_meter_room.py', TASK_HELPERS/'meter_station_plan.py', ROOT/'datasets/scripts/common/config.py', ROOT/'datasets/scripts/common/paths.py'],
+                 code_dependencies=[TASK_HELPERS/'render_meter_batch.py', TASK_HELPERS/'power_meter_room.py', TASK_HELPERS/'meter_station_plan.py', ROOT/'datasets/scripts/common/config.py', ROOT/'datasets/scripts/common/paths.py', ROOT/'datasets/scripts/common/blender_workspace.py'],
                  outputless=args.preflight, media_probe=lambda: blender_media(bpy, face_source=pending_face_binding),
                  media_reload=reload_meter_media, extra_outputs=extra_outputs,
                  production_plan=declaration,

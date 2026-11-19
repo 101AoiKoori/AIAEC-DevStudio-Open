@@ -1,0 +1,21 @@
+{
+  "purpose": "three_class_candidate_verifier_probe",
+  "seed": 42,
+  "training_inputs": "runs/e_bike/synthetic_short_inputs_20261118/manifest.json",
+  "focused_inputs": "runs/e_bike/focused_inputs_20261118/manifest.json",
+  "evaluation_inputs": "runs/e_bike/focused_inputs_20261118/evaluation_snapshot.json",
+  "detector": "runs/e_bike/keypoint_control_20261118/training/weights/best.pt",
+  "initial_classifier": "runs/e_bike/two_stage_20261118/classifier/weights/best.pt",
+  "positive_iou": 0.6,
+  "ambiguous_other_pose_iou": 0.3,
+  "predicted_positives_per_gt": 1,
+  "background_candidates_per_image": 4,
+  "classifier_imgsz": 160,
+  "epochs": 20,
+  "batch": 32,
+  "wall_seconds": 600,
+  "evaluation_detector_settings": [[0.25,0.3],[0.10,0.5],[0.03,0.7],[0.01,0.7]],
+  "proposal_iou": 0.95,
+  "proposal_max_det": 300,
+  "scope": "Candidate classifier only; original detector frozen. Internal classifier validation groups are drawn from original train families. Old26 and existing32 never generate training crops. Known-source development evaluation, not independent test."
+}

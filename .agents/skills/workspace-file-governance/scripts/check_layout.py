@@ -54,6 +54,8 @@ def classify(path, indexed):
     if not parts or '..' in parts or PurePosixPath(path).is_absolute() or PureWindowsPath(path).drive:
         return 'error', '路径必须位于工作区内'
     top, name = parts[0], parts[-1]
+    if re.fullmatch(r'datasets/(?:samples/[^/]+|exports/[^/]+/(?:train|val|test))/\.gitkeep', path):
+        return 'ok', ''
     if (top in {'.venv', 'tmp'} or '__pycache__' in parts or name.endswith('.pyc')
             or path.startswith(('datasets/raw/', 'datasets/annotated/', 'datasets/exports/', 'datasets/samples/',
                                 'models/weights/', 'Archive/Assets/', 'ws/build/', 'ws/devel/',

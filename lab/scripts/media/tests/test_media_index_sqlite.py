@@ -177,6 +177,59 @@ class CacheTests(unittest.TestCase):
         finally:
             db.close()
 
+    def test_direct_capture_filters_match_one_task_and_described_media(self):
+        partition = 'datasets/annotated/common'
+        manifest = self.root / partition / 'sources/target_sources_manifest.json'
+        manifest.parent.mkdir(parents=True)
+        parent = 'datasets/raw/camera/clip.mp4'
+        row = {
+            'id': 'archive:fixture:42', 'capture_identity': 'fixture:video:42',
+            'image': core.relative(self.image), 'parent_video': parent,
+            'source_blend': 'datasets/assets/blender/shared/test.blend',
+            'point': 'P02', 'segment': 'clip-1', 'frame_index': 42, 'timestamp_seconds': 1.4,
+            'evidence': {'basis': 'fixture'},
+            'tasks': {
+                'person': {'state': 'complete_positive', 'uses': ['direct_sample'],
+                           'class_names': ['person', 'unused_class'],
+                           'instances': [{'class_name': 'person', 'xyxy': [1, 2, 10, 20]}]},
+                'e_bike': {'state': 'partial', 'uses': ['context_only'], 'class_names': ['e_bike']},
+            },
+        }
+        manifest.write_text(json.dumps({'schema_version': 1, 'records': [row]}), encoding='utf8')
+        self.parts[partition] = core.build_partition(manifest.parent.parent, False, None, [])
+        self.write_catalog()
+        self.assertEqual(self.call(['sync'])[0], 0)
+        filters = ['--point', 'p02', '--parent-video', parent, '--annotation-task', 'person',
+                   '--capture-identity', row['capture_identity'], '--parent-scene', row['source_blend'],
+                   '--annotation-label', 'person', '--annotation-use', 'direct_sample',
+                   '--annotation-state', 'complete_positive']
+        code, out, err = self.call(['evidence', *filters])
+        self.assertEqual(code, 0, err)
+        result = json.loads(out)
+        self.assertEqual(result['claimed_path'], core.relative(self.image))
+        with redirect_stdout(json_out := io.StringIO()):
+            self.assertEqual(core.main(['evidence', *filters]), 0)
+        self.assertEqual(json.loads(json_out.getvalue()), result)
+        claims = result['evidence'][0]['claims']
+        self.assertEqual(claims['capture_id'], row['id'])
+        self.assertEqual(claims['capture_identity'], row['capture_identity'])
+        self.assertEqual(claims['frame_index'], 42)
+        self.assertEqual(claims['evidence'], row['evidence'])
+        self.assertEqual(claims['tasks'], row['tasks'])
+        code, out, err = self.call(['query', *filters])
+        self.assertEqual(code, 0, err)
+        self.assertEqual(json.loads(out)['path'], core.relative(self.image))
+        code, out, err = self.call(['evidence', '--annotation-task', 'e_bike',
+                                    '--annotation-label', 'e_bike', '--annotation-use', 'direct_sample'])
+        self.assertEqual(code, 0, err)
+        self.assertEqual(out, '')
+        code, out, err = self.call(['evidence', '--annotation-task', 'person', '--annotation-label', 'unused_class'])
+        self.assertEqual(code, 0, err)
+        self.assertEqual(out, '')
+        code, out, err = self.call(['evidence', parent])
+        self.assertEqual(code, 0, err)
+        self.assertEqual(json.loads(out)['evidence'][0]['relation'], 'referenced_as')
+
     def test_raw_visual_query_preserves_candidate_and_rejected_separately(self):
         evidence_path = self.root / self.parts['datasets/exports/derived']['evidence_shard']
         entries = [json.loads(line) for line in evidence_path.read_text(encoding='utf8').splitlines()]
@@ -496,8 +549,10 @@ class CacheTests(unittest.TestCase):
                           'size': p.stat().st_size, 'mtime_ns': p.stat().st_mtime_ns})
         files.append({'path': core.relative(folder / 'render_plan.json'), 'present': False})
         config = {'schema_version': 1, 'task': 'person', 'declared_files': files,
-                  'source_config': {'current_selection': {'excluded_records': [
-                      {'image': 'datasets/raw/camera/excluded.png', 'reason': 'missing_labels'}]}},
+                  'source_config': {
+                      'direct_capture_manifests': ['datasets/annotated/common/sources/archive_real_capture.json'],
+                      'current_selection': {'excluded_records': [
+                          {'image': 'datasets/raw/camera/excluded.png', 'reason': 'missing_labels'}]}},
                   'dataset_config': {'train_target_images': 3000},
                   'plans': [{'plan_key': 'production_plan', 'path': core.relative(folder/'production_plan.json'),
                              'present': True, 'budget': 1, 'target_split': 'train'},
@@ -547,6 +602,24 @@ class CacheTests(unittest.TestCase):
                                     '--path', 'datasets/raw/camera/excluded.png'])[1], '')
         code, out, _ = self.call(['task-inputs', '--task', 'person', '--kind', 'state'])
         self.assertEqual(json.loads(out)['stratum']['labels']['status'], 'candidate')
+
+    def test_task_query_reads_direct_capture_manifest_as_unassigned_input(self):
+        self.task_declaration_fixture()
+        manifest = 'datasets/annotated/common/sources/archive_real_capture.json'
+        args = ['task-inputs', '--task', 'person', '--kind', 'input', '--path', manifest,
+                '--role', 'annotation_reference']
+        code, out, err = self.call(args)
+        self.assertEqual(code, 0, err)
+        item = json.loads(out)
+        self.assertEqual(item['reference_fields'], ['/direct_capture_manifests/0'])
+        self.assertFalse(item['present'])
+        self.assertIsNone(item['split'])
+        self.assertIsNone(item['plan_key'])
+        self.assertEqual(self.call([*args, '--split', 'train'])[1], '')
+        file = self.root / manifest
+        file.parent.mkdir(parents=True)
+        file.write_text('{}', encoding='utf8')
+        self.assertTrue(json.loads(self.call(args)[1])['present'])
 
     def test_task_query_rejects_changed_declaration_without_rescanning_media(self):
         folder = self.task_declaration_fixture()

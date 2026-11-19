@@ -86,7 +86,7 @@
       "split": "train",
       "role": "direct_sample",
       "status": "candidate",
-      "parent_source": "datasets/raw/site_capture_20261112/videos/full_scene.mp4",
+      "parent_source": "Archive/Assets/captures/site_capture_20261112/videos/full_scene.mp4",
       "evidence": {
         "manifest": "datasets/annotated/site_capture_20261112/fire_name_v4_review/review_manifest.json",
         "record_index": 1
@@ -101,7 +101,7 @@
       "split": "train",
       "role": "direct_sample",
       "status": "candidate",
-      "parent_source": "datasets/raw/site_capture_20261112/videos/full_scene.mp4",
+      "parent_source": "Archive/Assets/captures/site_capture_20261112/videos/full_scene.mp4",
       "evidence": {
         "manifest": "datasets/annotated/site_capture_20261112/fire_name_v4_review/review_manifest.json",
         "record_index": 2
@@ -116,7 +116,7 @@
       "split": "train",
       "role": "direct_sample",
       "status": "candidate",
-      "parent_source": "datasets/raw/site_capture_20261112/videos/full_scene.mp4",
+      "parent_source": "Archive/Assets/captures/site_capture_20261112/videos/full_scene.mp4",
       "evidence": {
         "manifest": "datasets/annotated/site_capture_20261112/fire_name_v4_review/review_manifest.json",
         "record_index": 4
@@ -131,7 +131,7 @@
       "split": "train",
       "role": "direct_sample",
       "status": "candidate",
-      "parent_source": "datasets/raw/site_capture_20261112/videos/full_scene.mp4",
+      "parent_source": "Archive/Assets/captures/site_capture_20261112/videos/full_scene.mp4",
       "evidence": {
         "manifest": "datasets/annotated/site_capture_20261112/fire_name_v4_review/review_manifest.json",
         "record_index": 5
@@ -146,7 +146,7 @@
       "split": "train",
       "role": "direct_sample",
       "status": "candidate",
-      "parent_source": "datasets/raw/site_capture_20261112/videos/full_scene.mp4",
+      "parent_source": "Archive/Assets/captures/site_capture_20261112/videos/full_scene.mp4",
       "evidence": {
         "manifest": "datasets/annotated/site_capture_20261112/fire_name_v4_review/review_manifest.json",
         "record_index": 6

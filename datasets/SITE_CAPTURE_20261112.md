@@ -1,7 +1,5 @@
 # 2026-11-12 比赛场地补录批次
 
-> 本文提及的部分本地素材、数据和历史运行产物未随本仓库提供；相关名称保留用于说明来源和实验背景。
-
 本批次收录用户补充的两段比赛场地视频和 160 张小车摄像头原图，共 3,096,193,369 字节。`onboard_camera_images/` 指拍摄设备是小车摄像头，照片跨多个识别任务；文件名中的 `vehicle_` 是保留的批次资产 ID，不代表电动车或车牌类别。批次日期为整理日期。用户确认小车摄像头的实际分辨率为 640×480，160 张车载 PNG 全部解码通过且均为 640×480。两段视频的拍摄设备和相互场次关系待核对。文件修改时间、原名里的时间和观察点编号保留作来源线索。
 
 | 原件 | 批次内文件 | 尺寸与时长 | 抽帧结果 |
@@ -10,7 +8,7 @@
 | `人物立牌补拍.mp4` | `videos/person_standees.mp4` | 1280×720，50.062 秒 | 12 段，49 帧 |
 | `小车实拍照片/` | `onboard_camera_images/vehicle_0001.png` 至 `vehicle_0160.png` | 640×480，160 张 PNG | 160 张照片已逐张看缩略图 |
 
-原件归入 `raw/site_capture_20261112/`，改名后复核了文件数量、逐文件字节数和修改时间。照片 ID 按原名排序分配。原名含点位和时间时在来源清单中单列，实际采集次序和标注以核实记录为准。
+原件归入 `../Archive/Assets/captures/site_capture_20261112/`，改名后复核了文件数量、逐文件字节数和修改时间。照片 ID 按原名排序分配。原名含点位和时间时在来源清单中单列，实际采集次序和标注以核实记录为准。
 
 ## 处理记录
 
@@ -93,5 +91,5 @@
 从仓库根目录运行以下命令，PATH 须有 FFmpeg 和 FFprobe。修改分段时以原视频开始为零点，按秒填入起始、结束和间隔。区间含起点并排除终点。每个区段从第一张可用帧起按原始时间戳取样，导出目录须为新目录。保留较密区段时可以缩短该段间隔，每次运行上限为 2,500 张。
 
 ```powershell
-python -B lab/scripts/media/extract_capture_frames.py --raw-batch datasets/raw/site_capture_20261112 --segments datasets/annotated/site_capture_20261112/segments.csv --output datasets/annotated/site_capture_20261112/extract_v2
+python -B lab/scripts/media/extract_capture_frames.py --raw-batch Archive/Assets/captures/site_capture_20261112 --segments datasets/annotated/site_capture_20261112/segments.csv --output datasets/annotated/site_capture_20261112/extract_v2
 ```

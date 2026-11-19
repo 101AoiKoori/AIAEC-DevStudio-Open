@@ -12,7 +12,7 @@ ROOT = Path(__file__).resolve().parents[5]
 SCRIPT = ROOT / 'lab/features/meter/inference/scripts/read_meter.py'
 CONFIG = ROOT / 'lab/features/meter/inference/config/pdf_page15.json'
 TICKS = ROOT / 'lab/features/meter/inference/config/pdf_ticks.json'
-SAMPLE = ROOT / 'datasets/raw/meter/pdf/page15-005.jpg'
+SAMPLE = ROOT / 'Archive/Assets/working_sources/reference/meter/pdf/page15-005.jpg'
 sys.path.insert(0, str(ROOT / 'ws/src/aec_vision/src'))
 from aec_vision.meter import annotate_ticks, project_points
 

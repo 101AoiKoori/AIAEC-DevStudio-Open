@@ -96,10 +96,8 @@ class GroundObservation:
 class EmptinessReport:
     """Evidence about targets that may be missing from the annotation.
 
-    Only candidates at or above the task's minimum target scale count as
-    suspects. Smaller standees and back-side (white-back) instances are
-    recorded separately: they are not targets, and a frame containing them can
-    still serve as a background.
+    Unresolved candidates count as suspects. Cases resolved by the task's
+    size or back-side rule keep their evidence in separate lists.
     """
 
     clean: bool

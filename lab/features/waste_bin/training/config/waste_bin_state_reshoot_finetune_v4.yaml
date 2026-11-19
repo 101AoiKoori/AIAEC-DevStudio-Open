@@ -1,0 +1,57 @@
+schema_version: 3
+task_id: waste_bin
+model_key: waste_bin_state
+version: v4
+task: detect
+data: datasets/exports/waste_bin_state/data.yaml
+model: training_packages/waste_bin_state/waste_bin_state_best_Val_Test/best.pt
+output_root: runs/waste_bin_state
+description: 真实桶主导的四色开闭微调，统一640输入；从原始远程best初始化新优化器，效果待训练验证。
+imgsz: 640
+epochs: 10
+batch: 4
+workers: 0
+patience: 0
+seed: 42
+device: '0'
+optimizer: AdamW
+lr0: 0.0001
+lrf: 0.08
+momentum: 0.9
+weight_decay: 0.0005
+warmup_epochs: 1
+warmup_bias_lr: 0.0
+cos_lr: true
+close_mosaic: 0
+amp: false
+deterministic: true
+max_det: 100
+diagnostic_conf: 0.25
+match_iou: 0.5
+nms_iou: 0.7
+preview_limit: 48
+training_policy:
+  mode: fixed_validation
+  save_period: 5
+evaluate_after_training: true
+augment:
+  degrees: 2.0
+  translate: 0.02
+  scale: 0.05
+  shear: 0.0
+  perspective: 0.0
+  flipud: 0.0
+  fliplr: 0.0
+  mosaic: 0.0
+  mixup: 0.0
+  copy_paste: 0.0
+  hsv_h: 0.0
+  hsv_s: 0.08
+  hsv_v: 0.1
+source_notes:
+- 原始补拍与派生图来自同一拍摄session，全部为train；四色开闭按真实照片标整桶框。
+- 真实桶及其合成主导，保留原Train回放和空负；当前集合组成及父源以导出manifest为准。
+- 原Val/Test保留用于已知来源回归；Test已用于失败分析，不声称新独立泛化测试。
+- 本轮授权本地batch 4微调10轮；从原始远程best初始化新优化器，不续训上次微调结果。
+- 训练与回归评估统一640输入；显式将偏置预热学习率设为0.0，避免继承Ultralytics默认0.1。
+- 训练后与原始best按相同口径比较，并单列f002017.jpg红桶漏检和绿桶开闭重复框；数据与配置调整不代表效果已经改善。

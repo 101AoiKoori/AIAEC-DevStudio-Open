@@ -3,14 +3,14 @@ task_id: e_bike
 model_key: e_bike
 version: v4
 task: detect
-data: datasets/exports/e_bike/v4_reviewed_858_20261113/data.yaml
-test_unavailable: false
+data: datasets/exports/e_bike/data.yaml
+test_unavailable: true
 model: runs/e_bike/runs/e_bike/v3_20261111_142947_802052/training/weights/best.pt
 output_root: runs/e_bike
-description: 已核有限母样的候选微调；开发和测试为同源 Blender 场景与车辆前景合成。
+description: V4 电动车姿态训练。
 imgsz: 640
 epochs: 20
-batch: 16
+batch: 4
 workers: 0
 patience: 0
 seed: 42
@@ -30,6 +30,9 @@ diagnostic_conf: 0.25
 match_iou: 0.5
 nms_iou: 0.7
 preview_limit: 48
+training_policy:
+  mode: fixed_validation
+  save_period: 5
 evaluate_after_training: true
 augment:
   degrees: 3.0
@@ -46,20 +49,4 @@ augment:
   hsv_s: 0.1
   hsv_v: 0.12
 source_notes:
-- 训练 175 张、开发 40 张、测试 40 张；实拍训练图 15 张，其余为 Blender 场景背景合成。
-- 实拍来源含两个原始视频；Blender 背景来自同一母场景的多个视角，前景素材复用。
-- 标签经过记录的结构检查和代表性 AI 目视审核，未逐图人工验收；未知近重复与物料身份保留为未知。
-- 开发和测试同源，不代表独立采集、独立场次、部署表现或实车验收。
-- 车载参考 640×480；制作数据不超过 720p。放大不增加真实细节。
-data_overrides:
-  train:
-  - images: datasets/exports/e_bike/v4_view_filtered_20261113/images/train
-    labels: datasets/exports/e_bike/v4_view_filtered_20261113/labels/train
-  - images: datasets/exports/e_bike/v4_vehicle_view_arena_20261113/images/train
-    labels: datasets/exports/e_bike/v4_vehicle_view_arena_20261113/labels/train
-  val:
-  - images: datasets/exports/e_bike/v4_vehicle_view_arena_20261113/images/val
-    labels: datasets/exports/e_bike/v4_vehicle_view_arena_20261113/labels/val
-  test:
-  - images: datasets/exports/e_bike/v4_vehicle_view_arena_20261113/images/test
-    labels: datasets/exports/e_bike/v4_vehicle_view_arena_20261113/labels/test
+- 当前训练输入、实际覆盖和来源接触见数据入口同目录 workspace_sources.json 及分集清单。

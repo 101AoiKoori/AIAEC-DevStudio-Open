@@ -13,6 +13,13 @@ import cv2
 import numpy as np
 
 from datasets.scripts.common.review import geometry
+from datasets.scripts.common.review.ground_space import image_ground_scale_ratio
+from datasets.scripts.common.review.relative_depth import (
+    fit_relative_ground_depth,
+    ground_relative_depth_index,
+    ground_stripe_scale_cue,
+    ground_stripe_scale_ratio,
+)
 from datasets.scripts.common.review.schema import GroundObservation, GroundPlaneObservation
 
 
@@ -120,6 +127,67 @@ def quad_checks(patch) -> dict:
         "left_height": math.hypot(points[3][0] - points[0][0], points[3][1] - points[0][1]),
         "right_height": math.hypot(points[1][0] - points[2][0], points[1][1] - points[2][1]),
     }
+
+
+class GroundPerspectiveCueTest(unittest.TestCase):
+    def test_observed_diagonal_axis_does_not_assume_scale(self):
+        image = np.full((HEIGHT, WIDTH, 3), 80, dtype=np.uint8)
+        for offset in (0, 18):
+            cv2.line(image, (150 + offset, 220), (315 + offset, 350), (242, 242, 242), 4)
+        floor = np.zeros((HEIGHT, WIDTH), dtype=bool)
+        floor[175:] = True
+        cues = geometry.ground_perspective_cues(image, floor)
+        self.assertEqual(cues["direction"]["status"], "estimated")
+        self.assertAlmostEqual(cues["direction"]["image_heading_deg"], 38.2, delta=1.5)
+        self.assertEqual(cues["scale"]["status"], "unknown")
+        self.assertIsNone(image_ground_scale_ratio(cues, (250, 270), (250, 330)))
+
+    def test_supported_ground_horizon_supplies_relative_scale(self):
+        floor = np.zeros((HEIGHT, WIDTH), dtype=bool)
+        floor[175:] = True
+        cues = geometry.ground_perspective_cues(ground_scene(yaw_degrees=30, noise=0), floor)
+        self.assertEqual(cues["scale"]["status"], "estimated")
+        ratio = image_ground_scale_ratio(cues, (320, 240), (320, 330))
+        self.assertAlmostEqual(ratio, 0.5, delta=0.04)
+        self.assertIsNone(image_ground_scale_ratio(cues, (320, 130), (320, 330)))
+
+    def test_lines_outside_floor_support_supply_no_direction(self):
+        image = ground_scene()
+        cues = geometry.ground_perspective_cues(image, np.zeros((HEIGHT, WIDTH), dtype=bool))
+        self.assertEqual(cues["direction"]["status"], "unknown")
+        self.assertNotIn("image_heading_deg", cues["direction"])
+        self.assertEqual(cues["scale"]["status"], "unknown")
+
+
+class RelativeGroundDepthTest(unittest.TestCase):
+    def test_aligned_affine_predictions_rank_only_supported_points(self):
+        y, x = np.indices((HEIGHT, WIDTH), dtype=float)
+        observed = (y > 150) & (y < 345) & (x > 70) & (x < 580)
+        observed[240:260, 300:320] = False
+        inverse_depth = y / HEIGHT + 0.2 * x / WIDTH
+        prediction = np.stack([2 + 4 * inverse_depth, 3 + 8 * inverse_depth])
+        cue = fit_relative_ground_depth(prediction, observed)
+        self.assertEqual(cue["status"], "estimated")
+        farther = ground_relative_depth_index(cue, (270, 190), observed)
+        nearer = ground_relative_depth_index(cue, (270, 315), observed)
+        self.assertGreater(nearer, farther)
+        self.assertIsNone(ground_relative_depth_index(cue, (310, 250), observed))
+        mismatched = fit_relative_ground_depth(np.stack([inverse_depth, 2 - inverse_depth]), observed)
+        self.assertEqual(mismatched["basis"], "depth_predictions_disagree")
+
+    def test_stripe_ratio_matches_synthetic_projection_and_rejects_extrapolation(self):
+        image = np.full((HEIGHT, WIDTH, 3), 70, np.uint8)
+        floor = np.zeros((HEIGHT, WIDTH), dtype=bool)
+        floor[145:] = True
+        # Stripe side lines intersect at (280, 80); its width is proportional to y - 80.
+        cv2.fillConvexPoly(image, np.array([[301, 180], [311, 180], [363, 345], [336, 345]]), (241, 241, 241))
+        cue = ground_stripe_scale_cue(image, floor)
+        self.assertEqual(cue["status"], "estimated")
+        far, near = cue["center_anchors_px"]
+        expected = (near[1] - 80) / (far[1] - 80)
+        self.assertAlmostEqual(ground_stripe_scale_ratio(cue, near, far), expected, delta=0.13)
+        self.assertIsNone(ground_stripe_scale_ratio(cue, (near[0] + 15, near[1]), far))
+        self.assertIsNone(ground_stripe_scale_ratio(cue, (near[0], near[1] + 5), far))
 
 
 class VanishingPointTest(unittest.TestCase):

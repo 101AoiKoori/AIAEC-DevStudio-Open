@@ -23,6 +23,24 @@ class StickerClassReportTests(unittest.TestCase):
                'matches': [[0, 0, .9]], 'false_prediction_indices': []}
         with self.assertRaises(ValueError): sticker.sticker_class_report([row], [str(i) for i in range(24)])
 
+    def test_zero_through_four_counts_and_empty_false_positives(self):
+        rows = []
+        for count in range(5):
+            truths = [{'class_id': i} for i in range(count)]
+            predictions = list(truths)
+            if count == 0:
+                predictions = [{'class_id': 7}]
+            rows.append({'ground_truth': truths, 'predictions': predictions,
+                         'matches': [[i, i, .9] for i in range(count)],
+                         'false_prediction_indices': [0] if count == 0 else []})
+        report = sticker.sticker_class_report(rows, [str(i) for i in range(24)])
+        self.assertEqual(report['negative_images'], 1)
+        self.assertEqual(report['negative_false_positive_image_rate'], 1)
+        for count in range(1, 5):
+            self.assertEqual(report['by_sticker_count'][str(count)]['images'], 1)
+            self.assertEqual(report['by_sticker_count'][str(count)]['exactly_correct_rate'], 1)
+        self.assertEqual(report['by_sticker_count']['0']['exactly_correct_rate'], 0)
+
 
 if __name__ == '__main__':
     unittest.main()

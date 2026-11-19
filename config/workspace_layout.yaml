@@ -86,7 +86,7 @@ root_entries:
   required: true
 - path: datasets
   kind: dir
-  purpose: 原始采集、标注候选与任务生产；`raw/` 原始素材，`annotated/` 标注与审查候选，`exports/<任务>/` 当前集合，`samples/<任务>/` 当前小样，`scripts/<任务>/` 生产入口；数据不入
+  purpose: 来源工作副本、标注候选与任务生产。`raw/` 只放八任务目标和共享背景工作副本，`annotated/` 保存标注与审查候选，`exports/<任务>/` 保存当前集合，`samples/<任务>/` 保存当前小样，`scripts/<任务>/` 保存生产入口。数据不入
     Git
   required: true
 - path: datasets/blender_source_registry.sqlite3
@@ -96,7 +96,7 @@ root_entries:
   required: true
 - path: datasets/assets/blender
   kind: dir
-  purpose: 当前与试验 Blender 源模型、任务工作副本及导出批次可编辑场景快照；按 shared、任务及 batch_scenes 分类，二进制不入 Git，规则见 [`datasets/README.md`](datasets/README.md#blender-源资产与派生数据)
+  purpose: 只存放 `aiaec_dataset.blend`；Scene、Collection 与历史快照规则见 [`datasets/README.md`](datasets/README.md#blender-源资产与派生数据)
   required: true
   local: true
 - path: training_packages
@@ -156,9 +156,18 @@ datasets:
   materialized_if_any:
   - datasets/raw
   - datasets/annotated
+  task_target_subdirs: [digital, camera, rendered]
   shared:
   - path: datasets/raw
-    purpose: 原始采集与来源工作副本
+    purpose: 八任务目标和共享背景工作副本。采集批次及源包按来源放在 `Archive/Assets/captures/` 和 `Archive/Assets/working_sources/`
+    required: true
+    create: false
+  - path: datasets/raw/shared/backgrounds/camera
+    purpose: 按实拍父来源归组的共享背景工作图
+    required: true
+    create: false
+  - path: datasets/raw/shared/backgrounds/rendered
+    purpose: 按 Blender 母场景归组的共享背景工作图
     required: true
     create: false
   - path: datasets/scripts/common
@@ -174,7 +183,7 @@ datasets:
     purpose: 跨任务透视模板导出
     required: true
   - path: datasets/annotated/common/sources
-    purpose: 跨任务背景与来源总账报告 `ledger.json`；由 `datasets/scripts/common/source_ledger/` 从任务配对、清单、共享背景池和 Blender 登记库重算
+    purpose: 任务目标源工作清单、共享背景池清单及派生来源总账 `ledger.json`
     required: true
   - path: datasets/annotated/media_index
     purpose: 可重建媒体查询缓存 `query_cache.sqlite3` 与持久生产回执 `production_state.sqlite3`
@@ -315,7 +324,7 @@ datasets:
         - source.yaml
         conditional:
         - path: production_plan.json
-          reason: 渲染图与掩膜尚未生产；计划由 render_plan.json 编译后生成
+          reason: 正式合成计划按需从当前前景和底图资格编制，小样有单独的分配清单
       annotation_roots:
       - datasets/annotated/waste_bin_state
       annotation_note: ''

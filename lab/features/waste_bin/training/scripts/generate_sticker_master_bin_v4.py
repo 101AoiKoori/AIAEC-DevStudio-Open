@@ -1,7 +1,7 @@
 """Composite planned sticker candidates onto declared master-scene bin renders."""
 
 if __name__ == "__main__":
-    raise SystemExit("Legacy dataset CLI is retired; use datasets/scripts/waste_bin_state or waste_sticker/. Production remains paused.")
+    raise SystemExit("Legacy dataset CLI is retired; use datasets/scripts/waste_bin_state or waste_sticker/.")
 
 import argparse
 import json
@@ -92,7 +92,7 @@ def validate_plan(plan, names, manifests):
                 raise ValueError(key + ' must be finite and between 0 and 2')
         name = names[cls] if cls is not None else None
         target = {'kind': 'sticker', 'class_id': cls, 'name': name} if name else {'kind': 'candidate_negative'}
-        artwork = [f'datasets/raw/waste_bin/toolkit/SourcePic/{name}.png'] if name else []
+        artwork = [f'Archive/Assets/working_sources/digital/waste_sticker/toolkit/SourcePic/{name}.png'] if name else []
         if (state['background'] != {'kind': 'blender_render_pool', 'manifests': manifest_names} or
                 state['target'] != target or state['labels'] != {'format': 'yolo_detection', 'class_id': cls} or
                 state['augmentation'] != {'gain': params['gain'], 'saturation': params['saturation'],
@@ -163,7 +163,7 @@ def main():
             raise ValueError('no source render supports planned state: ' + state['id'])
     procedural.update({base.CLASSES, ROOT/'config/perception_tasks.json', plan_path})
     procedural.update(base.CACHE / (name + '.npz') for name in names)
-    media.update(ROOT / 'datasets/raw/waste_bin/toolkit/SourcePic' / (name + '.png') for name in names)
+    media.update(ROOT / 'Archive/Assets/working_sources/digital/waste_sticker/toolkit/SourcePic' / (name + '.png') for name in names)
     codes = [__file__, base.__file__, grouped.__file__, ROOT/'lab/training_common/camera_tone.py']
     with generation_guard('waste_sticker_master_bin_v4:' + out.relative_to(ROOT).as_posix(),
                           sorted(media | procedural), [out], vars(args), code_paths=codes,

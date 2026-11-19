@@ -1,8 +1,5 @@
 """Plan e-bike training states from task/split/role use relations; no images are generated."""
 
-if __name__ == "__main__":
-    raise SystemExit("Task helper is import-only; use the primary entry in datasets/scripts/e_bike/. Production remains paused.")
-
 import argparse
 import json
 import random
@@ -47,19 +44,14 @@ def header(states, constraints, purpose):
 
 
 def eligible_sources(usage, backgrounds, entries, queue):
-    # Only this task/split/role relationship confers readiness. A reviewed candidate
-    # background is admitted by its explicit full-frame negative review and the
-    # user's current authorization to use these already reviewed alternatives.
+    # Candidate backgrounds carry their full-frame negative result as a structured state.
     bg_by_path = {b['image']: b for b in backgrounds}
     selected_bg, selected_fg = [], {'upright': [], 'fallen': []}
     for record in usage['records']:
         bg_rel = relation(record, 'background', {'ready', 'candidate'})
         if bg_rel and record['image'] in bg_by_path:
             bg = bg_by_path[record['image']]
-            review = bg.get('v4_input_review_20261114', {})
-            if bg['task_state'] != 'candidate_complete_negative' or not review:
-                continue
-            if '整幅裁切图目视未见电动车' not in bg_rel[0].get('label_status', ''):
+            if bg['task_state'] != 'candidate_complete_negative':
                 continue
             if any(not (ROOT / bg[k]).is_file() for k in ('image', 'parent_image', 'source_video')):
                 continue

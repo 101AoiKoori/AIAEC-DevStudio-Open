@@ -7,7 +7,7 @@ are created. Python 3.8+, NumPy and OpenCV are required.
 """
 
 if __name__ == "__main__":
-    raise SystemExit("Legacy dataset CLI is retired; use datasets/scripts/meter/. Production remains paused.")
+    raise SystemExit("Legacy dataset CLI is retired; use datasets/scripts/meter/.")
 
 import argparse
 import json

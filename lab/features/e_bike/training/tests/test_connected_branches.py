@@ -22,11 +22,11 @@ class ConnectedBranchesTest(unittest.TestCase):
 
     def test_person_occluder_must_use_own_configured_root(self):
         spec = dict(foot_x=20,foot_y=30,size_px=20,yaw=0,pitch=0,roll=0,relative_exposure=1)
-        root = entry.ROOT/'datasets/raw/person/team_assets'
+        root = entry.ROOT/'Archive/Assets/working_sources/digital/person/team_assets'
         with mock.patch('datasets.scripts.common.config.source_path', return_value=root) as resolve, \
              mock.patch.object(Path,'is_file',return_value=True):
-            self.assertEqual(entry.validate_people([{'source':'datasets/raw/person/team_assets/a.png'}],[spec]),
-                             {'datasets/raw/person/team_assets/a.png'})
+            self.assertEqual(entry.validate_people([{'source':'Archive/Assets/working_sources/digital/person/team_assets/a.png'}],[spec]),
+                             {'Archive/Assets/working_sources/digital/person/team_assets/a.png'})
             resolve.assert_called_with('e_bike','person_occluder_artwork_root')
             with self.assertRaisesRegex(ValueError,'outside'):
                 entry.validate_people([{'source':'datasets/raw/fire/a.png'}],[spec])

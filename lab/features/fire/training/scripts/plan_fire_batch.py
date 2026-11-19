@@ -13,11 +13,13 @@ ROOT = Path(__file__).resolve().parents[5]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 from lab.training_common.production_guard import plan_production  # noqa: E402
+from datasets.scripts.common.blender_workspace import WORKSPACE_BLEND
 from fire_blender_labels import explicit_scenario  # noqa: E402
 
 BASE = Path('datasets/annotated/fire/fire_sticker_v4_arena_handoff_20261113')
-ARTWORK = 'datasets/raw/fire/team_assets/image1.png'
-SCENE = 'datasets/assets/blender/fire/blender_buildings_v13/three_buildings.blend'
+ARTWORK = 'Archive/Assets/working_sources/digital/fire/team_assets/image1.png'
+RECORDED_SCENE = 'datasets/assets/blender/fire/blender_buildings_v13/three_buildings.blend'
+SCENE = WORKSPACE_BLEND.relative_to(ROOT).as_posix()
 
 
 def matching_relations(records, task, split, role):
@@ -52,8 +54,8 @@ def registered_scene(scene, registry, root=ROOT):
     registry_file = workspace_file(registry, root)
     with closing(sqlite3.connect(registry_file.as_uri() + '?mode=ro', uri=True)) as db:
         row = db.execute('SELECT current_path,classification,lifecycle_state,truth_level '
-                         'FROM assets WHERE asset_id=?', ('blender:' + scene,)).fetchone()
-    if not row or row[:3] != (scene, 'task_model_source', 'active_in_use'):
+                         'FROM assets WHERE current_path=?', (scene,)).fetchone()
+    if not row or row[:3] != (scene, 'editable_blender_workspace', 'active_in_use'):
         raise ValueError('Blender scene registration is missing or not active')
     return {'path': file.relative_to(root).as_posix(), 'classification': row[1],
             'lifecycle_state': row[2], 'truth_level': row[3], 'registry': registry}
@@ -72,7 +74,7 @@ def build_batch(selection, uses, single_c, seed=431, root=ROOT):
     artwork = workspace_file(ready[0][0]['path'], root).relative_to(root).as_posix()
     assets = selection['current_source_selection_20261114']['background_candidates']['blender']
     libraries = [asset for asset in assets if asset.get('id') == 'building_library']
-    if len(libraries) != 1 or libraries[0].get('path') != SCENE:
+    if len(libraries) != 1 or libraries[0].get('path') not in (RECORDED_SCENE, SCENE):
         raise ValueError('the planned building model source is missing or ambiguous')
     scene = registered_scene(SCENE, 'datasets/blender_source_registry.sqlite3', root)
     original = selection['current_source_selection_20261114']['v4_combination_plan']

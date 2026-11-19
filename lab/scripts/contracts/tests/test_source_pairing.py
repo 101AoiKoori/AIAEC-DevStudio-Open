@@ -1,10 +1,12 @@
 import copy
+import subprocess
 import tempfile
 import unittest
 from pathlib import Path
 
 import sys
 from pathlib import Path
+import yaml
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 import source_pairing
 
@@ -102,6 +104,13 @@ class PairingTest(unittest.TestCase):
             self.root, 'sign', self.data, allocation=allocation)
         self.assertTrue(any('blender_share_target' in error for error in errors))
 
+    def test_historical_mix_does_not_constrain_current_pairing(self):
+        allocation = {'tasks': {'sign': {'source_mix': {'blender': 0.40},
+                                          'source_mix_status': 'historical_reference'}}}
+        errors = source_pairing.validate_pairing(
+            self.root, 'sign', self.data, allocation=allocation)
+        self.assertFalse(any('blender_share_target' in error for error in errors))
+
     def test_target_components_required(self):
         del self.data['pairing']['composition_policy']['target_components']
         errors = source_pairing.validate_pairing(self.root, 'sign', self.data)
@@ -118,8 +127,8 @@ class PairingTest(unittest.TestCase):
         errors = source_pairing.validate_pairing(self.root, 'sign', self.data)
         self.assertTrue(any('派生源也必须标记 to_capture' in error for error in errors))
 
-    def test_empty_negative_requires_confirmed_empty(self):
-        self.data['pairing']['backgrounds'].append({
+    def test_empty_negative_requires_an_empty_scene_declaration(self):
+        background = {
             'id': 'bg_candidate',
             'class': 'background',
             'kind': 'parent_video',
@@ -128,10 +137,22 @@ class PairingTest(unittest.TestCase):
             'review': {'state': 'candidate_empty'},
             'roles': ['composite_background', 'empty_negative'],
             'split': {'primary': 'train', 'status': 'proposed'},
-        })
-        errors = source_pairing.validate_pairing(
-            self.root, 'sign', self.data, check_paths=False)
-        self.assertTrue(any('只有 confirmed_empty' in error for error in errors))
+        }
+        self.data['pairing']['backgrounds'].append(background)
+        # This checks a parent-level declaration; actual frame eligibility and
+        # placement are determined separately, without requiring human review.
+        for state in ('confirmed_empty', 'candidate_empty', 'candidate_complete_negative'):
+            with self.subTest(state=state):
+                background['review']['state'] = state
+                errors = source_pairing.validate_pairing(
+                    self.root, 'sign', self.data, check_paths=False)
+                self.assertFalse(any('empty_negative 需记录空场判定' in error for error in errors))
+        for state in ('unknown', 'contains_target'):
+            with self.subTest(state=state):
+                background['review']['state'] = state
+                errors = source_pairing.validate_pairing(
+                    self.root, 'sign', self.data, check_paths=False)
+                self.assertTrue(any('empty_negative 需记录空场判定' in error for error in errors))
 
     def test_unknown_role_is_rejected(self):
         self.data['pairing']['data_sources'].append({
@@ -170,6 +191,29 @@ class PairingTest(unittest.TestCase):
     def test_real_workspace_pairing_passes(self):
         errors = source_pairing.validate_all(ROOT)
         self.assertEqual(errors, [])
+
+    def test_scoped_check_ignores_unrelated_task_errors(self):
+        for task, data in (('sign', self.data), ('meter', {})):
+            config = self.root / 'datasets/scripts' / task / 'config/source.yaml'
+            config.parent.mkdir(parents=True)
+            config.write_text(yaml.safe_dump(data), encoding='utf-8')
+        self.assertEqual(source_pairing.validate_all(self.root, check_paths=False, task='sign'), [])
+        self.assertTrue(source_pairing.validate_all(self.root, check_paths=False, task='meter'))
+        self.assertTrue(source_pairing.validate_all(self.root, check_paths=False))
+
+    def test_cli_scoped_task_and_unknown_task(self):
+        config = self.root / 'datasets/scripts/sign/config/source.yaml'
+        config.parent.mkdir(parents=True)
+        config.write_text(yaml.safe_dump(self.data), encoding='utf-8')
+        script = ROOT / 'lab/scripts/contracts/source_pairing.py'
+        scoped = subprocess.run([sys.executable, str(script), '--root', str(self.root),
+                                 '--check', '--task', 'sign'], capture_output=True, text=True,
+                                encoding='utf-8')
+        self.assertEqual(scoped.returncode, 0, scoped.stderr + scoped.stdout)
+        invalid = subprocess.run([sys.executable, str(script), '--root', str(self.root),
+                                  '--check', '--task', 'unknown'], capture_output=True, text=True,
+                                 encoding='utf-8')
+        self.assertEqual(invalid.returncode, 2)
 
 
 if __name__ == '__main__':

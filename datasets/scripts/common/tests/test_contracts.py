@@ -49,6 +49,12 @@ class CommonContractsTest(unittest.TestCase):
         with self.assertRaises(ValueError):
             paths.split_dir("person", "../train")
 
+    def test_glare_is_a_planned_state_only_for_meter(self):
+        for task in paths.TASKS:
+            with self.subTest(task=task):
+                design, _ = load_task_config(task)
+                self.assertEqual('反光' in design['states'], task == 'meter')
+
     def test_warp_returns_visible_mask_and_clipped_box(self):
         patch = np.full((4, 4, 3), 200, np.uint8)
         _, mask, box, _ = warp_patch(patch, [[-2, 1], [2, 1], [2, 4], [-2, 4]], (6, 6))
@@ -72,6 +78,13 @@ class CommonContractsTest(unittest.TestCase):
         configs = ['datasets/scripts/sign/config/dataset.yaml',
                    'datasets/scripts/sign/config/source.yaml']
         self.assertEqual(paths.validate_guarded_outputs(code, ['datasets/samples/sign'], configs), 'sign')
+        self.assertEqual(paths.validate_guarded_outputs(code, ['datasets/samples/sign/val'], configs), 'sign')
+        with self.assertRaises(ValueError):
+            paths.validate_guarded_outputs(code, ['datasets/samples/sign/arbitrary'], configs)
+        with self.assertRaises(ValueError):
+            paths.validate_guarded_outputs(['datasets/scripts/person/generator.py'],
+                ['datasets/samples/sign/val'], ['datasets/scripts/person/config/dataset.yaml',
+                                              'datasets/scripts/person/config/source.yaml'])
         self.assertEqual(paths.validate_guarded_outputs(code, ['datasets/exports/sign/train'], configs), 'sign')
         with self.assertRaises(ValueError):
             paths.validate_guarded_outputs(code, ['runs/sign/batch01'], configs)
@@ -80,6 +93,18 @@ class CommonContractsTest(unittest.TestCase):
         with self.assertRaises(ValueError):
             paths.validate_guarded_outputs(code + ['datasets/scripts/person/generator.py'],
                                            ['datasets/samples/sign'], configs)
+
+    def test_sticker_orbit_review_has_its_own_sample_directory(self):
+        code = ['datasets/scripts/waste_sticker/render_sticker_arena_v4.py']
+        configs = ['datasets/scripts/waste_sticker/config/dataset.yaml',
+                   'datasets/scripts/waste_sticker/config/source.yaml']
+        output = paths.sticker_orbit_sample_dir(5).relative_to(paths.WORKSPACE).as_posix()
+        self.assertEqual(paths.validate_guarded_outputs(code, [output], configs), 'waste_sticker')
+        with self.assertRaises(ValueError):
+            paths.validate_guarded_outputs(code, ['datasets/samples/waste_sticker/arbitrary'], configs)
+        with self.assertRaises(ValueError):
+            paths.validate_guarded_outputs(['datasets/scripts/waste_sticker/generate_stickers.py'],
+                                           [output], configs)
 
 
 if __name__ == "__main__":

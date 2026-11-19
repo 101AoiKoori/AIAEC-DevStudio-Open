@@ -10,7 +10,8 @@ ROOT = Path(__file__).resolve().parents[3]
 sys.path[:0] = [str(ROOT), str(ROOT / 'lab/training_common')]
 from camera_tone import apply_tone, read_image, source_role, write_image  # noqa: E402
 from lab.scripts.data.v4_source_gate import build_queue  # noqa: E402
-from datasets.scripts.common.config import source_path
+from datasets.scripts.common.config import load_task_config, source_path
+from datasets.scripts.common.frame_environment import image_digest, query_frames
 from datasets.scripts.common.paths import sample_dir, split_dir
 from lab.training_common.production_guard import generation_guard  # noqa: E402
 from datasets.scripts.e_bike.e_bike_queue_inputs import queue_input_report
@@ -119,6 +120,9 @@ def main():
     plan_path = (ROOT / args.plan).resolve()
     out = (ROOT / args.output).resolve()
     relative(plan_path)
+    _, source_config = load_task_config('e_bike')
+    if source_config.get('direct_real_plan_status') == 'retired_from_train':
+        raise ValueError('The low-angle direct-real train entry is retired: its parent video has prior e-bike train exposure')
     declaration = json.loads(plan_path.read_text(encoding='utf-8-sig'))
     validate_declaration(declaration)
     if out not in {sample_dir('e_bike').resolve(), split_dir('e_bike', declaration['target_split']).resolve()}:
@@ -127,9 +131,20 @@ def main():
     rows = json.loads(review_path.read_text(encoding='utf-8'))['rows']
     if len(rows) != 4:
         raise ValueError('expected the four reviewed camera frames')
+    current = query_frames(task='e_bike', role='direct_target', split='train', status='eligible',
+                           database=ROOT / source_config['databases']['frame_environment'])
+    by_path = {path: review for review in current for path in review['paths']}
+    for row in rows:
+        review = by_path.get(row['image'])
+        if (review is None or review['label'].get('completeness') != 'complete' or
+                review['label'].get('scope', {}).get('kind') != 'frame' or
+                image_digest(row['image']) != review['content_sha256']):
+            raise ValueError(f"Direct-real frame lacks current train eligibility: {row['id']}")
     checked = [ROOT / value for row in rows for value in (row['source_frame'], row['source_video'])]
     media = [ROOT / row['image'] for row in rows] + checked
-    procedural = [plan_path, review_path, ROOT/'datasets/scripts/e_bike/config/source.yaml', ROOT/'datasets/scripts/e_bike/config/dataset.yaml'] + [ROOT / row['label'] for row in rows]
+    procedural = [plan_path, review_path, ROOT/'datasets/scripts/e_bike/config/source.yaml',
+                  ROOT/'datasets/scripts/e_bike/config/dataset.yaml',
+                  ROOT / source_config['databases']['frame_environment']] + [ROOT / row['label'] for row in rows]
     queue = build_queue(ROOT)
     for state in declaration['strata']:
         check_state(state, rows, queue)
@@ -144,6 +159,7 @@ def main():
                'missing_exposure_paths': queue.get('missing_exposure_paths', []),
                'unavailable_exposure_paths': queue.get('unavailable_exposure_paths', [])}
     code = [__file__, ROOT / 'lab/training_common/camera_tone.py', ROOT / 'lab/scripts/data/v4_source_gate.py',
+            ROOT / 'datasets/scripts/common/frame_environment.py',
             ROOT / 'lab/training_common/train.py', ROOT / 'lab/training_common/engine/data.py',
             ROOT / 'lab/training_common/engine/config.py', Path(__file__).with_name('e_bike_queue_inputs.py')]
     with generation_guard('e_bike.low_angle_real:' + relative(out), media, [out],

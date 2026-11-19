@@ -21,7 +21,7 @@ class SelectionTest(unittest.TestCase):
     def test_source_reference_and_selection(self):
         image = mod.BATCH + '/images/train/c04_00.png'
         row = {'image': image, 'label': mod.BATCH + '/labels/train/c04_00.txt', 'class_id': 4,
-               'source_name': '纸箱', 'source_artwork': 'datasets/raw/waste_bin/toolkit/SourcePic/纸箱.png',
+               'source_name': '纸箱', 'source_artwork': 'Archive/Assets/working_sources/digital/waste_sticker/toolkit/SourcePic/纸箱.png',
                'normal_or_dark': 'dark'}
         reference = {'manifest': mod.MANIFEST, 'record_index': 0, 'relation': 'describes'}
         source = {'samples': []}

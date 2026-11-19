@@ -26,10 +26,10 @@ def workspace(value):
 
 
 def matching_relations(source, role):
-    """Filter all four fields on the same source relation, not across records."""
+    """Find declared task, split and role; the durable review decides eligibility."""
     return [r for r in source['task_use_status']
             if (r.get('task'), r.get('split'), r.get('role')) ==
-            ('building_name_paper', 'train', role) and r.get('status') in ('candidate', 'ready')]
+            ('building_name_paper', 'train', role)]
 
 
 def _reserved(main):
@@ -79,6 +79,8 @@ def _candidate(relation, template, reserved):
                   'regions': copy.deepcopy(relation['regions'])}
     if result['parent_source'] != relation['parent_source']:
         raise ValueError('candidate parent differs from selected relation')
+    result['source_review'] = rooftop.bind_source_review(
+        result, [{'slot_id': result['regions'][0]['slot_id'], 'text': '清和大厦'}], 'train')
     return result
 
 
@@ -89,6 +91,19 @@ def blender_plan(main):
     return build_plan({'single': quotas.get('B_SINGLE_NAME', 0),
                        'multiple': quotas.get('B_MULTI_NAME', 0),
                        'negative': quotas.get('B_NO_PAPER', 0)})
+
+
+def _parent_quotas(candidates, by_parent, field):
+    """Keep each source parent's declared budget when other parents are unavailable."""
+    quotas = [0] * len(candidates)
+    by_candidate_parent = {}
+    for index, candidate in enumerate(candidates):
+        by_candidate_parent.setdefault(candidate['parent_source'], []).append(index)
+    for parent, indices in by_candidate_parent.items():
+        count, remainder = divmod(by_parent[parent][field], len(indices))
+        for offset, index in enumerate(indices):
+            quotas[index] = count + (offset < remainder)
+    return quotas
 
 
 def build(source, main, seed=20261114):
@@ -102,8 +117,8 @@ def build(source, main, seed=20261114):
             candidate = _candidate(relation, template, reserved)
             if candidate['parent_source'] not in by_parent:
                 raise ValueError('background is outside the existing train parent plan')
-            if any(c['parent_source'] == candidate['parent_source'] for c in candidates):
-                raise ValueError('duplicate parent group in this plan')
+            if any(c['image'] == candidate['image'] for c in candidates):
+                raise ValueError('duplicate image in this plan')
             probe = copy.deepcopy(source)
             probe['strata'][0]['background']['candidates'] = [candidate]
             probe['strata'][0]['target']['papers'][0]['slot_id'] = candidate['regions'][0]['slot_id']
@@ -112,11 +127,6 @@ def build(source, main, seed=20261114):
         except (ValueError, OSError, KeyError, IndexError) as error:
             rejected.append({'image': relation.get('image'), 'role': 'background', 'reason': str(error)})
     candidates.sort(key=lambda c: c['parent_source'])
-    # Do not let a one-parent synthetic pool stand in for the whole dataset.
-    single_target = (next(x['quota'] for x in main['combinations'] if x['id'] == 'R_SINGLE_NAME')
-                     if len(candidates) >= 2 else 0)
-    multi_target = (next(x['quota'] for x in main['combinations'] if x['id'] == 'R_MULTI_NAME')
-                    if len(candidates) >= 2 else 0)
     multi = []
     for candidate in candidates:
         if len(candidate['regions']) < 2:
@@ -131,11 +141,11 @@ def build(source, main, seed=20261114):
         except (ValueError, OSError, KeyError, IndexError) as error:
             rejected.append({'image': candidate['image'], 'role': 'multi_background', 'reason': str(error)})
     rng = random.Random(seed)
-    single_quotas = ([single_target // len(candidates) + (i < single_target % len(candidates))
-                      for i in range(len(candidates))] if single_target else [])
-    multi_quotas = ([multi_target // len(multi) + (i < multi_target % len(multi))
-                     for i in range(len(multi))] if multi else [])
-    names_needed = single_target + 2 * sum(multi_quotas)
+    single_quotas = _parent_quotas(candidates, by_parent, 'single_paper_quota')
+    multi_quotas = _parent_quotas(multi, by_parent, 'multi_paper_quota')
+    single_target = sum(single_quotas)
+    multi_target = sum(multi_quotas)
+    names_needed = single_target + 2 * multi_target
     pool_size = len(CHARS) * len(CHARS) * len(SUFFIX)
     if names_needed > pool_size:
         raise ValueError('unique-name pool is too small for the requested plan')
@@ -144,11 +154,6 @@ def build(source, main, seed=20261114):
     for branch, pool, quotas in (('R_SINGLE_NAME', candidates, single_quotas),
                                   ('R_MULTI_NAME', multi, multi_quotas)):
         for candidate, quota in zip(pool, quotas):
-            source_group = by_parent[candidate['parent_source']]
-            original = source_group['single_paper_quota' if branch == 'R_SINGLE_NAME' else 'multi_paper_quota']
-            shares.append({'branch': branch, 'parent_source': candidate['parent_source'],
-                           'original_quota': original, 'reallocated_quota': quota,
-                           'difference': quota - original, 'source_image': candidate['image']})
             for _ in range(quota):
                 count = 1 if branch == 'R_SINGLE_NAME' else 2
                 papers = [{'slot_id': candidate['regions'][i]['slot_id'], 'text': make_name(next(name_indices))}
@@ -164,17 +169,19 @@ def build(source, main, seed=20261114):
                                'labels': copy.deepcopy(rooftop.LABELS), 'augmentation': {'mode': 'none'},
                                'sources': ['real_scene_background', 'name_font_asset'],
                                'parameters': {'seed': seed}})
-        used = {c['parent_source'] for c, quota in zip(pool, quotas) if quota}
+        field = 'single_paper_quota' if branch == 'R_SINGLE_NAME' else 'multi_paper_quota'
         for group in main['train_parent_groups']:
             parent = group.get('parent')
-            if parent not in used:
-                original = group['single_paper_quota' if branch == 'R_SINGLE_NAME' else 'multi_paper_quota']
-                shares.append({'branch': branch, 'parent_source': parent, 'original_quota': original,
-                               'reallocated_quota': 0, 'difference': -original,
-                               'source_image': None, 'reason': 'no selected usable relation for this branch'})
+            selected = [(candidate['image'], quota) for candidate, quota in zip(pool, quotas)
+                        if candidate['parent_source'] == parent and quota]
+            actual_quota = sum(quota for _, quota in selected)
+            shares.append({'branch': branch, 'parent_source': parent, 'original_quota': group[field],
+                           'reallocated_quota': actual_quota, 'difference': actual_quota - group[field],
+                           'source_images': [image for image, _ in selected],
+                           'reason': None if selected else 'no eligible task-role source for this branch'})
     rng.shuffle(states)
     plan = {'schema_version': 1, 'model_key': 'building_name_paper', 'target_split': 'train',
-            'purpose': 'Seeded name-paper partial candidates; background label coverage and OCR are unknown.',
+            'purpose': 'Seeded name-paper plan from stored detection-eligible sources; original OCR stays unknown.',
             'budget': len(states), 'uncertainty_weight': 0,
             'independence_basis': 'Sources grouped by parent; repeated variants are not independent captures.',
             'constraints': copy.deepcopy(rooftop.CONSTRAINTS), 'strata': states}
@@ -185,11 +192,10 @@ def build(source, main, seed=20261114):
         if result['planned_total'] != len(states):
             raise ValueError('allocation did not preserve selected source quotas')
     else:
-        plan = {'status': 'not_executable', 'reason': 'fewer than two eligible parent groups'}
+        plan = {'status': 'not_executable', 'reason': 'no eligible name-paper composite source'}
 
     direct = []
     for relation in matching_relations(source, 'direct_sample'):
-        # A blocked direct role is not selected by matching_relations.
         if 'source_label' not in relation:
             continue
         try:
@@ -203,7 +209,12 @@ def build(source, main, seed=20261114):
             lines = workspace(relation['source_label']).read_text(encoding='utf8').splitlines()
             if bool(lines) != (task['state'] == 'complete_positive'):
                 raise ValueError('direct candidate polarity and existing label disagree')
-            direct.append(copy.deepcopy(relation))
+            selected = copy.deepcopy(relation)
+            selected['role'] = ('direct_target' if task['state'] == 'complete_positive'
+                                else 'empty_negative')
+            from datasets.scripts.building_name_paper.package_real_candidates import bound_direct_review
+            selected['source_review'] = bound_direct_review(selected)
+            direct.append(selected)
         except (ValueError, OSError, KeyError, IndexError) as error:
             rejected.append({'image': relation.get('image'), 'role': 'direct_sample', 'reason': str(error)})
     rng.shuffle(direct)
@@ -231,21 +242,21 @@ def build(source, main, seed=20261114):
               'R_MULTI_NAME': sum(multi_quotas), 'B_SINGLE_NAME': blender_single,
               'B_MULTI_NAME': blender_multi, 'B_NO_PAPER': blender_negative}
     reason = {'D_READABLE': 'No selected source has confirmed full transcription.',
-              'D_TEXT_UNKNOWN': 'Existing positive labels are AI review candidates; OCR is unknown.',
-              'D_NO_PAPER': 'Existing negative labels are AI review candidates, not confirmed negatives.',
-              'R_SINGLE_NAME': 'Selected non-reserved parent quotas are in source_quota_reallocation; at least two required.',
-              'R_MULTI_NAME': 'Only parents with two declared building slots are used; remaining quotas redistributed.',
+              'D_TEXT_UNKNOWN': 'Stored detection source is eligible; original OCR remains unknown.',
+              'D_NO_PAPER': 'Stored full-frame task absence makes these negative sources eligible.',
+              'R_SINGLE_NAME': 'Only eligible sources use their own declared parent quotas; missing parents remain shortfall.',
+              'R_MULTI_NAME': 'Only eligible two-slot sources use their own parent quotas; missing parents remain shortfall.',
               'B_SINGLE_NAME': blender_error or 'Independent name renderer; one board and its generated transcription.',
               'B_MULTI_NAME': blender_error or 'Independent name renderer; two boards with separate text and visible masks.',
               'B_NO_PAPER': blender_error or 'Independent name renderer hides all name boards and text; empty detection labels.'}
     leaves = [{'id': c['id'], 'target': c['quota'], 'arranged_candidates': actual[c['id']],
-               'shortfall': c['quota'] - actual[c['id']], 'status': 'candidate_not_training_approved',
+               'shortfall': c['quota'] - actual[c['id']], 'status': 'planned_not_produced',
                'reason': reason[c['id']]} for c in main['combinations']]
     report = {'seed': seed, 'status': 'plans_only_not_produced', 'leaves': leaves,
               'source_quota_reallocation': shares, 'rejected_relations': rejected,
               'selection': 'Same relation task+split+role; reserved and known regression excluded; source history preserved.',
-              'randomness': f'Backgrounds reused with replacement under exact parent quotas; {names_needed} distinct generated name indices sampled without replacement.',
-              'label_scope': 'Generated pictures have partial candidate detection labels and unknown OCR. Direct labels retain original AI-review candidate status.'}
+              'randomness': f'Backgrounds reused within eligible parent quotas; {names_needed} distinct generated name indices sampled without replacement.',
+              'label_scope': 'Only DB eligible task-role records enter plans. Original OCR remains unknown unless separately labelled.'}
     report['blender_scope'] = 'Independent building-name declaration; shared scene asset, task-owned labels and generated text; rendering has not been run.'
     return plan, selection, report, blender
 

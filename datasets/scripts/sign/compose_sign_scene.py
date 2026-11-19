@@ -5,7 +5,7 @@ truncated at the top in its source; test has only one complete camera view.
 """
 
 if __name__ == "__main__":
-    raise SystemExit("Task helper is import-only; use the primary entry in datasets/scripts/sign/. Production remains paused.")
+    raise SystemExit("Task helper is import-only; use the primary entry in datasets/scripts/sign/.")
 
 import argparse
 import csv
@@ -20,12 +20,12 @@ import numpy as np
 ROOT = Path(__file__).resolve().parents[3]
 from datasets.scripts.common.config import source_path
 ANNOTATED = source_path('sign', 'foreground_root')
-BACKGROUNDS = ROOT / 'datasets/raw/person/teammate_submission_20261110/dataset'
+BACKGROUNDS = ROOT / 'datasets/assets/person/dataset'
 EXPORTS = ROOT / 'datasets/samples/sign'
-VAL_VIDEO = ROOT / 'datasets/raw/e_bike/archive_assets_legacy/视频/人物立牌正背面_电动车直立_倒伏和遮挡_场地扫描_012.mp4'
-TEST_BACKGROUND = ROOT / 'datasets/raw/traffic_light/archive_assets_legacy/照片/小车摄像头实拍_近似平视_信号灯正面与道路_001.png'
+VAL_VIDEO = ROOT / 'Archive/Assets/working_sources/legacy/e_bike/视频/人物立牌正背面_电动车直立_倒伏和遮挡_场地扫描_012.mp4'
+TEST_BACKGROUND = ROOT / 'Archive/Assets/working_sources/legacy/traffic_light/照片/小车摄像头实拍_近似平视_信号灯正面与道路_001.png'
 SIGN_VIDEO = source_path('sign', 'foreground_video').relative_to(ROOT).as_posix()
-TEST_SIGN = 'datasets/raw/e_bike/archive_assets_legacy/照片/小车摄像头实拍_近似平视_人物正反面和直立车_007.png'
+TEST_SIGN = 'Archive/Assets/working_sources/legacy/e_bike/照片/小车摄像头实拍_近似平视_人物正反面和直立车_007.png'
 
 
 def read_image(path, mode):
@@ -35,8 +35,10 @@ def read_image(path, mode):
     return image
 
 
-def cutout(name):
+def cutout(name, *, working=None):
     path = ANNOTATED / name
+    if working:
+        path = working.path(path)
     image = read_image(path, cv2.IMREAD_UNCHANGED)
     if image.ndim != 3 or image.shape[2] != 4:
         raise ValueError('RGBA sign candidate required')
@@ -161,7 +163,7 @@ def _prepare_plan(declaration, split, backgrounds, mask_data):
         origins = [r for r in mask_data['records'] if 'index' in r and f"train_{r['index']}.png" == mask]
         if len(origins) != 1:
             raise ValueError('Foreground mask source missing or ambiguous')
-        source_video = 'datasets/raw/site_archive_legacy/场景/综合视频/空场与场景物料_001.mp4'
+        source_video = 'Archive/Assets/working_sources/legacy/site/场景/综合视频/空场与场景物料_001.mp4'
         expected = list(dict.fromkeys([name, source_video, (ANNOTATED / mask).relative_to(ROOT).as_posix(),
                                        origins[0]['source'], SIGN_VIDEO]))
         if state.get('sources') != expected:

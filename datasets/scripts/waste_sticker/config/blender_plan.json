@@ -28,10 +28,10 @@
       "failure_cost": 1,
       "failure_event": "render_or_visible_label_incomplete",
       "background": {
-        "scene": "datasets/assets/blender/shared/arena_4m2_pbr_20261112/arena_master_user_20261113.blend"
+        "scene": "datasets/assets/blender/aiaec_dataset.blend"
       },
       "target": {
-        "asset": "datasets/assets/blender/waste_bin/waste_sticker_animated_v4.blend",
+        "asset": "datasets/assets/blender/aiaec_dataset.blend#AEC Waste Stickers",
         "frame": 1
       },
       "labels": {
@@ -66,8 +66,8 @@
         "paper_aspect": 0.9011
       },
       "sources": [
-        "datasets/assets/blender/shared/arena_4m2_pbr_20261112/arena_master_user_20261113.blend",
-        "datasets/assets/blender/waste_bin/waste_sticker_animated_v4.blend"
+        "datasets/assets/blender/aiaec_dataset.blend",
+        "datasets/assets/blender/aiaec_dataset.blend#AEC Waste Stickers"
       ],
       "conditions": [
         "design_group_front"
@@ -85,10 +85,10 @@
       "failure_cost": 1,
       "failure_event": "render_or_visible_label_incomplete",
       "background": {
-        "scene": "datasets/assets/blender/shared/arena_4m2_pbr_20261112/arena_master_user_20261113.blend"
+        "scene": "datasets/assets/blender/aiaec_dataset.blend"
       },
       "target": {
-        "asset": "datasets/assets/blender/waste_bin/waste_sticker_animated_v4.blend",
+        "asset": "datasets/assets/blender/aiaec_dataset.blend#AEC Waste Stickers",
         "frame": 2
       },
       "labels": {
@@ -123,8 +123,8 @@
         "paper_aspect": 1.0352
       },
       "sources": [
-        "datasets/assets/blender/shared/arena_4m2_pbr_20261112/arena_master_user_20261113.blend",
-        "datasets/assets/blender/waste_bin/waste_sticker_animated_v4.blend"
+        "datasets/assets/blender/aiaec_dataset.blend",
+        "datasets/assets/blender/aiaec_dataset.blend#AEC Waste Stickers"
       ],
       "conditions": [
         "design_group_front"
@@ -142,10 +142,10 @@
       "failure_cost": 1,
       "failure_event": "render_or_visible_label_incomplete",
       "background": {
-        "scene": "datasets/assets/blender/shared/arena_4m2_pbr_20261112/arena_master_user_20261113.blend"
+        "scene": "datasets/assets/blender/aiaec_dataset.blend"
       },
       "target": {
-        "asset": "datasets/assets/blender/waste_bin/waste_sticker_animated_v4.blend",
+        "asset": "datasets/assets/blender/aiaec_dataset.blend#AEC Waste Stickers",
         "frame": 3
       },
       "labels": {
@@ -180,8 +180,8 @@
         "paper_aspect": 0.9738
       },
       "sources": [
-        "datasets/assets/blender/shared/arena_4m2_pbr_20261112/arena_master_user_20261113.blend",
-        "datasets/assets/blender/waste_bin/waste_sticker_animated_v4.blend"
+        "datasets/assets/blender/aiaec_dataset.blend",
+        "datasets/assets/blender/aiaec_dataset.blend#AEC Waste Stickers"
       ],
       "conditions": [
         "design_group_front"
@@ -199,10 +199,10 @@
       "failure_cost": 1,
       "failure_event": "render_or_visible_label_incomplete",
       "background": {
-        "scene": "datasets/assets/blender/shared/arena_4m2_pbr_20261112/arena_master_user_20261113.blend"
+        "scene": "datasets/assets/blender/aiaec_dataset.blend"
       },
       "target": {
-        "asset": "datasets/assets/blender/waste_bin/waste_sticker_animated_v4.blend",
+        "asset": "datasets/assets/blender/aiaec_dataset.blend#AEC Waste Stickers",
         "frame": 4
       },
       "labels": {
@@ -237,8 +237,8 @@
         "paper_aspect": 0.9213
       },
       "sources": [
-        "datasets/assets/blender/shared/arena_4m2_pbr_20261112/arena_master_user_20261113.blend",
-        "datasets/assets/blender/waste_bin/waste_sticker_animated_v4.blend"
+        "datasets/assets/blender/aiaec_dataset.blend",
+        "datasets/assets/blender/aiaec_dataset.blend#AEC Waste Stickers"
       ],
       "conditions": [
         "design_group_front"
@@ -256,10 +256,10 @@
       "failure_cost": 1,
       "failure_event": "render_or_visible_label_incomplete",
       "background": {
-        "scene": "datasets/assets/blender/shared/arena_4m2_pbr_20261112/arena_master_user_20261113.blend"
+        "scene": "datasets/assets/blender/aiaec_dataset.blend"
       },
       "target": {
-        "asset": "datasets/assets/blender/waste_bin/waste_sticker_animated_v4.blend",
+        "asset": "datasets/assets/blender/aiaec_dataset.blend#AEC Waste Stickers",
         "frame": 5
       },
       "labels": {
@@ -294,8 +294,8 @@
         "paper_aspect": 0.9958
       },
       "sources": [
-        "datasets/assets/blender/shared/arena_4m2_pbr_20261112/arena_master_user_20261113.blend",
-        "datasets/assets/blender/waste_bin/waste_sticker_animated_v4.blend"
+        "datasets/assets/blender/aiaec_dataset.blend",
+        "datasets/assets/blender/aiaec_dataset.blend#AEC Waste Stickers"
       ],
       "conditions": [
         "design_group_front"
@@ -313,10 +313,10 @@
       "failure_cost": 1,
       "failure_event": "render_or_visible_label_incomplete",
       "background": {
-        "scene": "datasets/assets/blender/shared/arena_4m2_pbr_20261112/arena_master_user_20261113.blend"
+        "scene": "datasets/assets/blender/aiaec_dataset.blend"
       },
       "target": {
-        "asset": "datasets/assets/blender/waste_bin/waste_sticker_animated_v4.blend",
+        "asset": "datasets/assets/blender/aiaec_dataset.blend#AEC Waste Stickers",
         "frame": 6
       },
       "labels": {
@@ -351,8 +351,8 @@
         "paper_aspect": 0.935
       },
       "sources": [
-        "datasets/assets/blender/shared/arena_4m2_pbr_20261112/arena_master_user_20261113.blend",
-        "datasets/assets/blender/waste_bin/waste_sticker_animated_v4.blend"
+        "datasets/assets/blender/aiaec_dataset.blend",
+        "datasets/assets/blender/aiaec_dataset.blend#AEC Waste Stickers"
       ],
       "conditions": [
         "design_group_front"
@@ -370,10 +370,10 @@
       "failure_cost": 1,
       "failure_event": "render_or_visible_label_incomplete",
       "background": {
-        "scene": "datasets/assets/blender/shared/arena_4m2_pbr_20261112/arena_master_user_20261113.blend"
+        "scene": "datasets/assets/blender/aiaec_dataset.blend"
       },
       "target": {
-        "asset": "datasets/assets/blender/waste_bin/waste_sticker_animated_v4.blend",
+        "asset": "datasets/assets/blender/aiaec_dataset.blend#AEC Waste Stickers",
         "frame": 7
       },
       "labels": {
@@ -408,8 +408,8 @@
         "paper_aspect": 0.9011
       },
       "sources": [
-        "datasets/assets/blender/shared/arena_4m2_pbr_20261112/arena_master_user_20261113.blend",
-        "datasets/assets/blender/waste_bin/waste_sticker_animated_v4.blend"
+        "datasets/assets/blender/aiaec_dataset.blend",
+        "datasets/assets/blender/aiaec_dataset.blend#AEC Waste Stickers"
       ],
       "conditions": [
         "design_group_front"
@@ -427,10 +427,10 @@
       "failure_cost": 1,
       "failure_event": "render_or_visible_label_incomplete",
       "background": {
-        "scene": "datasets/assets/blender/shared/arena_4m2_pbr_20261112/arena_master_user_20261113.blend"
+        "scene": "datasets/assets/blender/aiaec_dataset.blend"
       },
       "target": {
-        "asset": "datasets/assets/blender/waste_bin/waste_sticker_animated_v4.blend",
+        "asset": "datasets/assets/blender/aiaec_dataset.blend#AEC Waste Stickers",
         "frame": 8
       },
       "labels": {
@@ -465,8 +465,8 @@
         "paper_aspect": 1.0352
       },
       "sources": [
-        "datasets/assets/blender/shared/arena_4m2_pbr_20261112/arena_master_user_20261113.blend",
-        "datasets/assets/blender/waste_bin/waste_sticker_animated_v4.blend"
+        "datasets/assets/blender/aiaec_dataset.blend",
+        "datasets/assets/blender/aiaec_dataset.blend#AEC Waste Stickers"
       ],
       "conditions": [
         "design_group_front"
@@ -484,10 +484,10 @@
       "failure_cost": 1,
       "failure_event": "render_or_visible_label_incomplete",
       "background": {
-        "scene": "datasets/assets/blender/shared/arena_4m2_pbr_20261112/arena_master_user_20261113.blend"
+        "scene": "datasets/assets/blender/aiaec_dataset.blend"
       },
       "target": {
-        "asset": "datasets/assets/blender/waste_bin/waste_sticker_animated_v4.blend",
+        "asset": "datasets/assets/blender/aiaec_dataset.blend#AEC Waste Stickers",
         "frame": 9
       },
       "labels": {
@@ -522,8 +522,8 @@
         "paper_aspect": 0.9738
       },
       "sources": [
-        "datasets/assets/blender/shared/arena_4m2_pbr_20261112/arena_master_user_20261113.blend",
-        "datasets/assets/blender/waste_bin/waste_sticker_animated_v4.blend"
+        "datasets/assets/blender/aiaec_dataset.blend",
+        "datasets/assets/blender/aiaec_dataset.blend#AEC Waste Stickers"
       ],
       "conditions": [
         "design_group_front"
@@ -541,10 +541,10 @@
       "failure_cost": 1,
       "failure_event": "render_or_visible_label_incomplete",
       "background": {
-        "scene": "datasets/assets/blender/shared/arena_4m2_pbr_20261112/arena_master_user_20261113.blend"
+        "scene": "datasets/assets/blender/aiaec_dataset.blend"
       },
       "target": {
-        "asset": "datasets/assets/blender/waste_bin/waste_sticker_animated_v4.blend",
+        "asset": "datasets/assets/blender/aiaec_dataset.blend#AEC Waste Stickers",
         "frame": 10
       },
       "labels": {
@@ -579,8 +579,8 @@
         "paper_aspect": 0.9213
       },
       "sources": [
-        "datasets/assets/blender/shared/arena_4m2_pbr_20261112/arena_master_user_20261113.blend",
-        "datasets/assets/blender/waste_bin/waste_sticker_animated_v4.blend"
+        "datasets/assets/blender/aiaec_dataset.blend",
+        "datasets/assets/blender/aiaec_dataset.blend#AEC Waste Stickers"
       ],
       "conditions": [
         "design_group_front"
@@ -598,10 +598,10 @@
       "failure_cost": 1,
       "failure_event": "render_or_visible_label_incomplete",
       "background": {
-        "scene": "datasets/assets/blender/shared/arena_4m2_pbr_20261112/arena_master_user_20261113.blend"
+        "scene": "datasets/assets/blender/aiaec_dataset.blend"
       },
       "target": {
-        "asset": "datasets/assets/blender/waste_bin/waste_sticker_animated_v4.blend",
+        "asset": "datasets/assets/blender/aiaec_dataset.blend#AEC Waste Stickers",
         "frame": 12
       },
       "labels": {
@@ -636,8 +636,8 @@
         "paper_aspect": 0.9958
       },
       "sources": [
-        "datasets/assets/blender/shared/arena_4m2_pbr_20261112/arena_master_user_20261113.blend",
-        "datasets/assets/blender/waste_bin/waste_sticker_animated_v4.blend"
+        "datasets/assets/blender/aiaec_dataset.blend",
+        "datasets/assets/blender/aiaec_dataset.blend#AEC Waste Stickers"
       ],
       "conditions": [
         "design_group_front"
@@ -655,10 +655,10 @@
       "failure_cost": 1,
       "failure_event": "render_or_visible_label_incomplete",
       "background": {
-        "scene": "datasets/assets/blender/shared/arena_4m2_pbr_20261112/arena_master_user_20261113.blend"
+        "scene": "datasets/assets/blender/aiaec_dataset.blend"
       },
       "target": {
-        "asset": "datasets/assets/blender/waste_bin/waste_sticker_animated_v4.blend",
+        "asset": "datasets/assets/blender/aiaec_dataset.blend#AEC Waste Stickers",
         "frame": 16
       },
       "labels": {
@@ -693,8 +693,8 @@
         "paper_aspect": 0.935
       },
       "sources": [
-        "datasets/assets/blender/shared/arena_4m2_pbr_20261112/arena_master_user_20261113.blend",
-        "datasets/assets/blender/waste_bin/waste_sticker_animated_v4.blend"
+        "datasets/assets/blender/aiaec_dataset.blend",
+        "datasets/assets/blender/aiaec_dataset.blend#AEC Waste Stickers"
       ],
       "conditions": [
         "design_group_front"
@@ -712,10 +712,10 @@
       "failure_cost": 1,
       "failure_event": "render_or_visible_label_incomplete",
       "background": {
-        "scene": "datasets/assets/blender/shared/arena_4m2_pbr_20261112/arena_master_user_20261113.blend"
+        "scene": "datasets/assets/blender/aiaec_dataset.blend"
       },
       "target": {
-        "asset": "datasets/assets/blender/waste_bin/waste_sticker_animated_v4.blend",
+        "asset": "datasets/assets/blender/aiaec_dataset.blend#AEC Waste Stickers",
         "frame": 17
       },
       "labels": {
@@ -750,8 +750,8 @@
         "paper_aspect": 0.9011
       },
       "sources": [
-        "datasets/assets/blender/shared/arena_4m2_pbr_20261112/arena_master_user_20261113.blend",
-        "datasets/assets/blender/waste_bin/waste_sticker_animated_v4.blend"
+        "datasets/assets/blender/aiaec_dataset.blend",
+        "datasets/assets/blender/aiaec_dataset.blend#AEC Waste Stickers"
       ],
       "conditions": [
         "design_group_front"
@@ -769,10 +769,10 @@
       "failure_cost": 1,
       "failure_event": "render_or_visible_label_incomplete",
       "background": {
-        "scene": "datasets/assets/blender/shared/arena_4m2_pbr_20261112/arena_master_user_20261113.blend"
+        "scene": "datasets/assets/blender/aiaec_dataset.blend"
       },
       "target": {
-        "asset": "datasets/assets/blender/waste_bin/waste_sticker_animated_v4.blend",
+        "asset": "datasets/assets/blender/aiaec_dataset.blend#AEC Waste Stickers",
         "frame": 1
       },
       "labels": {
@@ -807,8 +807,8 @@
         "paper_aspect": 1.0234
       },
       "sources": [
-        "datasets/assets/blender/shared/arena_4m2_pbr_20261112/arena_master_user_20261113.blend",
-        "datasets/assets/blender/waste_bin/waste_sticker_animated_v4.blend"
+        "datasets/assets/blender/aiaec_dataset.blend",
+        "datasets/assets/blender/aiaec_dataset.blend#AEC Waste Stickers"
       ],
       "conditions": [
         "design_group_oblique"
@@ -826,10 +826,10 @@
       "failure_cost": 1,
       "failure_event": "render_or_visible_label_incomplete",
       "background": {
-        "scene": "datasets/assets/blender/shared/arena_4m2_pbr_20261112/arena_master_user_20261113.blend"
+        "scene": "datasets/assets/blender/aiaec_dataset.blend"
       },
       "target": {
-        "asset": "datasets/assets/blender/waste_bin/waste_sticker_animated_v4.blend",
+        "asset": "datasets/assets/blender/aiaec_dataset.blend#AEC Waste Stickers",
         "frame": 2
       },
       "labels": {
@@ -864,8 +864,8 @@
         "paper_aspect": 0.9162
       },
       "sources": [
-        "datasets/assets/blender/shared/arena_4m2_pbr_20261112/arena_master_user_20261113.blend",
-        "datasets/assets/blender/waste_bin/waste_sticker_animated_v4.blend"
+        "datasets/assets/blender/aiaec_dataset.blend",
+        "datasets/assets/blender/aiaec_dataset.blend#AEC Waste Stickers"
       ],
       "conditions": [
         "design_group_oblique"
@@ -883,10 +883,10 @@
       "failure_cost": 1,
       "failure_event": "render_or_visible_label_incomplete",
       "background": {
-        "scene": "datasets/assets/blender/shared/arena_4m2_pbr_20261112/arena_master_user_20261113.blend"
+        "scene": "datasets/assets/blender/aiaec_dataset.blend"
       },
       "target": {
-        "asset": "datasets/assets/blender/waste_bin/waste_sticker_animated_v4.blend",
+        "asset": "datasets/assets/blender/aiaec_dataset.blend#AEC Waste Stickers",
         "frame": 3
       },
       "labels": {
@@ -921,8 +921,8 @@
         "paper_aspect": 0.9574
       },
       "sources": [
-        "datasets/assets/blender/shared/arena_4m2_pbr_20261112/arena_master_user_20261113.blend",
-        "datasets/assets/blender/waste_bin/waste_sticker_animated_v4.blend"
+        "datasets/assets/blender/aiaec_dataset.blend",
+        "datasets/assets/blender/aiaec_dataset.blend#AEC Waste Stickers"
       ],
       "conditions": [
         "design_group_oblique"
@@ -940,10 +940,10 @@
       "failure_cost": 1,
       "failure_event": "render_or_visible_label_incomplete",
       "background": {
-        "scene": "datasets/assets/blender/shared/arena_4m2_pbr_20261112/arena_master_user_20261113.blend"
+        "scene": "datasets/assets/blender/aiaec_dataset.blend"
       },
       "target": {
-        "asset": "datasets/assets/blender/waste_bin/waste_sticker_animated_v4.blend",
+        "asset": "datasets/assets/blender/aiaec_dataset.blend#AEC Waste Stickers",
         "frame": 4
       },
       "labels": {
@@ -978,8 +978,8 @@
         "paper_aspect": 1.025
       },
       "sources": [
-        "datasets/assets/blender/shared/arena_4m2_pbr_20261112/arena_master_user_20261113.blend",
-        "datasets/assets/blender/waste_bin/waste_sticker_animated_v4.blend"
+        "datasets/assets/blender/aiaec_dataset.blend",
+        "datasets/assets/blender/aiaec_dataset.blend#AEC Waste Stickers"
       ],
       "conditions": [
         "design_group_oblique"
@@ -997,10 +997,10 @@
       "failure_cost": 1,
       "failure_event": "render_or_visible_label_incomplete",
       "background": {
-        "scene": "datasets/assets/blender/shared/arena_4m2_pbr_20261112/arena_master_user_20261113.blend"
+        "scene": "datasets/assets/blender/aiaec_dataset.blend"
       },
       "target": {
-        "asset": "datasets/assets/blender/waste_bin/waste_sticker_animated_v4.blend",
+        "asset": "datasets/assets/blender/aiaec_dataset.blend#AEC Waste Stickers",
         "frame": 5
       },
       "labels": {
@@ -1035,8 +1035,8 @@
         "paper_aspect": 1.0393
       },
       "sources": [
-        "datasets/assets/blender/shared/arena_4m2_pbr_20261112/arena_master_user_20261113.blend",
-        "datasets/assets/blender/waste_bin/waste_sticker_animated_v4.blend"
+        "datasets/assets/blender/aiaec_dataset.blend",
+        "datasets/assets/blender/aiaec_dataset.blend#AEC Waste Stickers"
       ],
       "conditions": [
         "design_group_oblique"
@@ -1054,10 +1054,10 @@
       "failure_cost": 1,
       "failure_event": "render_or_visible_label_incomplete",
       "background": {
-        "scene": "datasets/assets/blender/shared/arena_4m2_pbr_20261112/arena_master_user_20261113.blend"
+        "scene": "datasets/assets/blender/aiaec_dataset.blend"
       },
       "target": {
-        "asset": "datasets/assets/blender/waste_bin/waste_sticker_animated_v4.blend",
+        "asset": "datasets/assets/blender/aiaec_dataset.blend#AEC Waste Stickers",
         "frame": 6
       },
       "labels": {
@@ -1092,8 +1092,8 @@
         "paper_aspect": 1.0371
       },
       "sources": [
-        "datasets/assets/blender/shared/arena_4m2_pbr_20261112/arena_master_user_20261113.blend",
-        "datasets/assets/blender/waste_bin/waste_sticker_animated_v4.blend"
+        "datasets/assets/blender/aiaec_dataset.blend",
+        "datasets/assets/blender/aiaec_dataset.blend#AEC Waste Stickers"
       ],
       "conditions": [
         "design_group_oblique"
@@ -1111,10 +1111,10 @@
       "failure_cost": 1,
       "failure_event": "render_or_visible_label_incomplete",
       "background": {
-        "scene": "datasets/assets/blender/shared/arena_4m2_pbr_20261112/arena_master_user_20261113.blend"
+        "scene": "datasets/assets/blender/aiaec_dataset.blend"
       },
       "target": {
-        "asset": "datasets/assets/blender/waste_bin/waste_sticker_animated_v4.blend",
+        "asset": "datasets/assets/blender/aiaec_dataset.blend#AEC Waste Stickers",
         "frame": 7
       },
       "labels": {
@@ -1149,8 +1149,8 @@
         "paper_aspect": 1.0234
       },
       "sources": [
-        "datasets/assets/blender/shared/arena_4m2_pbr_20261112/arena_master_user_20261113.blend",
-        "datasets/assets/blender/waste_bin/waste_sticker_animated_v4.blend"
+        "datasets/assets/blender/aiaec_dataset.blend",
+        "datasets/assets/blender/aiaec_dataset.blend#AEC Waste Stickers"
       ],
       "conditions": [
         "design_group_oblique"
@@ -1168,10 +1168,10 @@
       "failure_cost": 1,
       "failure_event": "render_or_visible_label_incomplete",
       "background": {
-        "scene": "datasets/assets/blender/shared/arena_4m2_pbr_20261112/arena_master_user_20261113.blend"
+        "scene": "datasets/assets/blender/aiaec_dataset.blend"
       },
       "target": {
-        "asset": "datasets/assets/blender/waste_bin/waste_sticker_animated_v4.blend",
+        "asset": "datasets/assets/blender/aiaec_dataset.blend#AEC Waste Stickers",
         "frame": 8
       },
       "labels": {
@@ -1206,8 +1206,8 @@
         "paper_aspect": 0.9162
       },
       "sources": [
-        "datasets/assets/blender/shared/arena_4m2_pbr_20261112/arena_master_user_20261113.blend",
-        "datasets/assets/blender/waste_bin/waste_sticker_animated_v4.blend"
+        "datasets/assets/blender/aiaec_dataset.blend",
+        "datasets/assets/blender/aiaec_dataset.blend#AEC Waste Stickers"
       ],
       "conditions": [
         "design_group_oblique"
@@ -1225,10 +1225,10 @@
       "failure_cost": 1,
       "failure_event": "render_or_visible_label_incomplete",
       "background": {
-        "scene": "datasets/assets/blender/shared/arena_4m2_pbr_20261112/arena_master_user_20261113.blend"
+        "scene": "datasets/assets/blender/aiaec_dataset.blend"
       },
       "target": {
-        "asset": "datasets/assets/blender/waste_bin/waste_sticker_animated_v4.blend",
+        "asset": "datasets/assets/blender/aiaec_dataset.blend#AEC Waste Stickers",
         "frame": 9
       },
       "labels": {
@@ -1263,8 +1263,8 @@
         "paper_aspect": 0.9574
       },
       "sources": [
-        "datasets/assets/blender/shared/arena_4m2_pbr_20261112/arena_master_user_20261113.blend",
-        "datasets/assets/blender/waste_bin/waste_sticker_animated_v4.blend"
+        "datasets/assets/blender/aiaec_dataset.blend",
+        "datasets/assets/blender/aiaec_dataset.blend#AEC Waste Stickers"
       ],
       "conditions": [
         "design_group_oblique"
@@ -1282,10 +1282,10 @@
       "failure_cost": 1,
       "failure_event": "render_or_visible_label_incomplete",
       "background": {
-        "scene": "datasets/assets/blender/shared/arena_4m2_pbr_20261112/arena_master_user_20261113.blend"
+        "scene": "datasets/assets/blender/aiaec_dataset.blend"
       },
       "target": {
-        "asset": "datasets/assets/blender/waste_bin/waste_sticker_animated_v4.blend",
+        "asset": "datasets/assets/blender/aiaec_dataset.blend#AEC Waste Stickers",
         "frame": 10
       },
       "labels": {
@@ -1320,8 +1320,8 @@
         "paper_aspect": 1.025
       },
       "sources": [
-        "datasets/assets/blender/shared/arena_4m2_pbr_20261112/arena_master_user_20261113.blend",
-        "datasets/assets/blender/waste_bin/waste_sticker_animated_v4.blend"
+        "datasets/assets/blender/aiaec_dataset.blend",
+        "datasets/assets/blender/aiaec_dataset.blend#AEC Waste Stickers"
       ],
       "conditions": [
         "design_group_oblique"
@@ -1339,10 +1339,10 @@
       "failure_cost": 1,
       "failure_event": "render_or_visible_label_incomplete",
       "background": {
-        "scene": "datasets/assets/blender/shared/arena_4m2_pbr_20261112/arena_master_user_20261113.blend"
+        "scene": "datasets/assets/blender/aiaec_dataset.blend"
       },
       "target": {
-        "asset": "datasets/assets/blender/waste_bin/waste_sticker_animated_v4.blend",
+        "asset": "datasets/assets/blender/aiaec_dataset.blend#AEC Waste Stickers",
         "frame": 12
       },
       "labels": {
@@ -1377,8 +1377,8 @@
         "paper_aspect": 1.0393
       },
       "sources": [
-        "datasets/assets/blender/shared/arena_4m2_pbr_20261112/arena_master_user_20261113.blend",
-        "datasets/assets/blender/waste_bin/waste_sticker_animated_v4.blend"
+        "datasets/assets/blender/aiaec_dataset.blend",
+        "datasets/assets/blender/aiaec_dataset.blend#AEC Waste Stickers"
       ],
       "conditions": [
         "design_group_oblique"
@@ -1396,10 +1396,10 @@
       "failure_cost": 1,
       "failure_event": "render_or_visible_label_incomplete",
       "background": {
-        "scene": "datasets/assets/blender/shared/arena_4m2_pbr_20261112/arena_master_user_20261113.blend"
+        "scene": "datasets/assets/blender/aiaec_dataset.blend"
       },
       "target": {
-        "asset": "datasets/assets/blender/waste_bin/waste_sticker_animated_v4.blend",
+        "asset": "datasets/assets/blender/aiaec_dataset.blend#AEC Waste Stickers",
         "frame": 16
       },
       "labels": {
@@ -1434,8 +1434,8 @@
         "paper_aspect": 1.0371
       },
       "sources": [
-        "datasets/assets/blender/shared/arena_4m2_pbr_20261112/arena_master_user_20261113.blend",
-        "datasets/assets/blender/waste_bin/waste_sticker_animated_v4.blend"
+        "datasets/assets/blender/aiaec_dataset.blend",
+        "datasets/assets/blender/aiaec_dataset.blend#AEC Waste Stickers"
       ],
       "conditions": [
         "design_group_oblique"
@@ -1453,10 +1453,10 @@
       "failure_cost": 1,
       "failure_event": "render_or_visible_label_incomplete",
       "background": {
-        "scene": "datasets/assets/blender/shared/arena_4m2_pbr_20261112/arena_master_user_20261113.blend"
+        "scene": "datasets/assets/blender/aiaec_dataset.blend"
       },
       "target": {
-        "asset": "datasets/assets/blender/waste_bin/waste_sticker_animated_v4.blend",
+        "asset": "datasets/assets/blender/aiaec_dataset.blend#AEC Waste Stickers",
         "frame": 17
       },
       "labels": {
@@ -1491,8 +1491,8 @@
         "paper_aspect": 1.0234
       },
       "sources": [
-        "datasets/assets/blender/shared/arena_4m2_pbr_20261112/arena_master_user_20261113.blend",
-        "datasets/assets/blender/waste_bin/waste_sticker_animated_v4.blend"
+        "datasets/assets/blender/aiaec_dataset.blend",
+        "datasets/assets/blender/aiaec_dataset.blend#AEC Waste Stickers"
       ],
       "conditions": [
         "design_group_oblique"
@@ -1542,7 +1542,6 @@
       23
     ],
     "views": 2,
-    "source_scene": "datasets/assets/blender/shared/arena_4m2_pbr_20261112/arena_master_user_20261113.blend",
-    "production_paused": true
+    "source_scene": "datasets/assets/blender/aiaec_dataset.blend"
   }
 }

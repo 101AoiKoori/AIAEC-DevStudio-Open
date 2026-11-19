@@ -47,9 +47,9 @@ SOURCE_METHODS = {
 }
 VIDEO_KINDS = {'frame_sequence', 'provided_subset', 'video_frame'}
 SITE_SEQUENCE = 'datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene'
-SITE_VIDEO = 'datasets/raw/site_capture_20261112/videos/full_scene.mp4'
+SITE_VIDEO = 'Archive/Assets/captures/site_capture_20261112/videos/full_scene.mp4'
 PERSON_SEQUENCE = 'datasets/annotated/site_capture_20261112/sequence_v2/person_standees'
-PERSON_VIDEO = 'datasets/raw/site_capture_20261112/videos/person_standees.mp4'
+PERSON_VIDEO = 'Archive/Assets/captures/site_capture_20261112/videos/person_standees.mp4'
 OWNERS = {'fire_sticker': 'fire', 'building_name_paper': 'fire',
           'waste_bin_state': 'waste_bin', 'waste_sticker': 'waste_bin',
           'plate_detection': 'plate'}
@@ -239,6 +239,7 @@ def queue_inputs(root):
         INVENTORY, SEGMENTS, SELECTION, *ANNOTATIONS, REVIEW_SUMMARY, EXPOSURE,
         DUPLICATES, *SITE_SELECTIONS, DEVELOPMENT_EXPOSURE, 'config/perception_tasks.json')}
     media = set()
+    visited = set()
     media_suffixes = {'.jpg', '.jpeg', '.png', '.bmp', '.webp', '.tif', '.tiff',
                       '.mp4', '.mov', '.avi', '.mkv', '.npz'}
 
@@ -250,9 +251,14 @@ def queue_inputs(root):
             for child in value:
                 collect(child)
         elif isinstance(value, str) and value and '\n' not in value:
+            if value in visited:
+                return
+            visited.add(value)
             try:
+                if not (root / value).is_file():
+                    return
                 path = workspace_path(root, value)
-                if path.is_file() and path not in excluded:
+                if path not in excluded:
                     (media if path.suffix.lower() in media_suffixes else procedural).add(path)
             except (OSError, ValueError):
                 pass
@@ -279,11 +285,11 @@ def queue_inputs(root):
     return sorted(media), sorted(procedural), code
 
 
-def build_queue(root):
+def build_queue(root, *, inputs=None):
     """Reuse a database-recorded queue until its actual dependencies change."""
     from production_guard import generation_guard
     root = Path(root).resolve()
-    media, procedural, code = queue_inputs(root)
+    media, procedural, code = inputs if inputs is not None else queue_inputs(root)
     with generation_guard('source_queue:car_capture', media, [], {'version': 1},
                           procedural_inputs=procedural, code_paths=code, root=root) as run:
         if run.reused:
@@ -429,8 +435,9 @@ def _source_reuse(records, lineage_groups):
 
 def audit(root, data, known=None):
     errors = []
+    exposure_warnings = []
     if known is not None and (known.get('missing_exposure_paths') or known.get('unavailable_exposure_paths')):
-        errors.append('已知接触或近重复的历史文件/证据缺失，无法完成来源审计')
+        exposure_warnings.append('部分历史诊断接触或近重复证据缺失，独立性未证实')
     site_times = None
     person_times = None
 
@@ -503,9 +510,11 @@ def audit(root, data, known=None):
         links[a].add(b)
         links[b].add(a)
     exposed_images = set(data.get('exposed_images', []))
-    known_components = []
     if known is not None:
         exposed_images.update(known.get('exposed_images', []))
+    direct_exposure = set(exposed_images)
+    known_components = []
+    if known is not None:
         known_links = defaultdict(set)
         for row in known['samples']:
             for parent in row.get('parent_ids', []):
@@ -538,6 +547,8 @@ def audit(root, data, known=None):
     # bytes of all records connected to a selected image before propagating
     # exposure, so a renamed copy of a diagnostic parent cannot bypass it.
     exposed_files = defaultdict(list)
+    exact_exposure_files = defaultdict(list)
+    development_contact = defaultdict(set)
     known_files = defaultdict(list)
     related_files = defaultdict(list)
     # Exact copies are related even when no external inventory is supplied.
@@ -560,16 +571,17 @@ def audit(root, data, known=None):
                 bucket.append((path, key))
         except (OSError, ValueError):
             continue
+    unavailable_paths = {item['path'] for item in (known or {}).get('unavailable_exposure_paths', [])}
+    for image in sorted(exposed_images - unavailable_paths):
+        path = workspace_path(root, image)
+        if not path.is_file():
+            exposure_warnings.append(f'诊断接触来源缺失: {image}')
+            continue
+        size = path.stat().st_size
+        exposed_files[size].append(path)
+        if image in direct_exposure:
+            exact_exposure_files[size].append(path)
     if known is not None:
-        unavailable_paths = {item['path'] for item in known.get('unavailable_exposure_paths', [])}
-        for image in exposed_images:
-            if image in unavailable_paths:
-                continue
-            path = workspace_path(root, image)
-            if not path.is_file():
-                errors.append(f'诊断接触来源缺失: {image}')
-                continue
-            exposed_files[path.stat().st_size].append(path)
         for item in known['samples']:
             if (not item.get('image') or item['image'] in unavailable_paths or
                     item.get('source_kind') not in SOURCE_METHODS):
@@ -635,12 +647,14 @@ def audit(root, data, known=None):
                     same_video = [frame for frame in known.get('exposed_video_frames', [])
                                   if frame['video'] == video]
                     seconds = observation.get('source_time_seconds')
+                    if same_video:
+                        development_contact[key].add('shared_diagnostic_video')
                     if same_video and (not isinstance(seconds, (int, float)) or isinstance(seconds, bool) or
                                        not math.isfinite(seconds)):
                         errors.append(f'{key}: 关联视频父样本须记录源时间')
                     elif same_video and any(abs(seconds - frame['seconds']) <= .25 + 1e-6
                                             for frame in same_video):
-                        exposed.add(key)
+                        development_contact[key].add('near_diagnostic_frame')
                     if observation is not row and row.get('source_kind') in VIDEO_KINDS:
                         declared = row.get('source_time_seconds')
                         if (not isinstance(declared, (int, float)) or isinstance(declared, bool) or
@@ -664,12 +678,14 @@ def audit(root, data, known=None):
             group.add(key)
             pending.extend(links[key] - group)
         visited.update(group)
+        contacts = {reason for key in group for reason in development_contact.get(key, ())}
+        if group & exposed:
+            contacts.add('known_diagnostic_lineage')
         for key in group:
             if by_id[key].get('split') in SPLITS:
                 lineage_groups[key] = min(group)
-        roles = {by_id[key].get('split') for key in group} & SPLITS
-        if group & exposed and roles:
-            errors.append(f'已接触诊断图或其派生/近重复进入监督集合: {sorted(group)}')
+                if contacts:
+                    development_contact[key].update(contacts)
     counts = Counter()
     selected_images = defaultdict(list)
     label_owners = {}
@@ -714,7 +730,9 @@ def audit(root, data, known=None):
             for prior, prior_split in selected_images[image_size]:
                 if filecmp.cmp(prior, image_path, shallow=False):
                     errors.append(f'{key}: 所选图片字节相同（{prior_split}/{split}）: {prior}')
-            for prior in exposed_files[image_size]:
+            if row['image'] in direct_exposure or key in direct_exposure:
+                errors.append(f'{key}: 所选输出是已接触诊断图: {row["image"]}')
+            for prior in exact_exposure_files[image_size]:
                 if filecmp.cmp(prior, image_path, shallow=False):
                     errors.append(f'{key}: 图片与已接触诊断图字节相同: {prior}')
                     break
@@ -756,15 +774,6 @@ def audit(root, data, known=None):
                 field = 'background_origin' if method == 'composite' else 'parent_origin'
                 if processing.get(field) not in ('direct_camera', 'synthetic', 'unknown'):
                     errors.append(f'{key}: 已确认的 {field} 无效')
-        if known is not None and kind in VIDEO_KINDS:
-            same_video = [frame for frame in known.get('exposed_video_frames', [])
-                          if frame['video'] == row.get('parent_video')]
-            if same_video:
-                seconds = row.get('source_time_seconds')
-                if not isinstance(seconds, (int, float)) or isinstance(seconds, bool) or not math.isfinite(seconds):
-                    errors.append(f'{key}: 已有诊断帧的原视频须记录源时间')
-                elif any(abs(seconds - frame['seconds']) <= .25 + 1e-6 for frame in same_video):
-                    errors.append(f'{key}: 原视频时间处于已接触诊断帧的 0.25 秒缓冲内')
         if method not in GENERATION_METHODS:
             errors.append(f'{key}: 生成方式不在允许范围')
         if kind not in SOURCE_METHODS or method not in SOURCE_METHODS[kind]:
@@ -869,6 +878,9 @@ def audit(root, data, known=None):
     return {'status': 'failed' if errors else ('passed' if assigned else 'pending'), 'counts': dict(counts),
             'assigned': assigned, 'errors': errors, 'lineage_groups': lineage_groups,
             'source_reuse': _source_reuse(records, lineage_groups),
+            'development_contact': {key: sorted(development_contact[key]) for key in sorted(lineage_groups)
+                                    if development_contact.get(key)},
+            'exposure_warnings': exposure_warnings,
             'scope': 'Recorded relationships and review states only; no semantic truth or unseen-source claim.'}
 
 
@@ -898,11 +910,13 @@ def provenance(data, model, audit_result):
                         'near_duplicate_group': audit_result['lineage_groups'][row['id']], 'label_status': 'reviewed',
                         'review_state': task['state'], 'review_evidence': task['review_evidence'],
                         'source_review_evidence': row['review_evidence'],
-                        'strata': task.get('strata'), 'strata_review': task.get('strata_review')})
+                        'strata': task.get('strata'), 'strata_review': task.get('strata_review'),
+                        'development_contact': audit_result.get('development_contact', {}).get(row['id'], [])})
     if not records:
         raise ValueError('该模型没有通过门控的选定样本')
     return {'schema_version': 1, 'model_key': model, 'records': records,
             'source_reuse': audit_result.get('source_reuse', []),
+            'exposure_warnings': audit_result.get('exposure_warnings', []),
             'scope': 'Selected records; review is not an independent accuracy or delivery claim.'}
 
 

@@ -20,7 +20,7 @@ from aec_vision.meter import (annotate, annotate_ticks, detect_needle, match_tem
 
 CONFIG = ROOT / 'lab/features/meter/inference/config/pdf_page15.json'
 TICKS = ROOT / 'lab/features/meter/inference/config/pdf_ticks.json'
-PDF_EXAMPLE = ROOT / 'datasets/raw/meter/pdf/page15-005.jpg'
+PDF_EXAMPLE = ROOT / 'Archive/Assets/working_sources/reference/meter/pdf/page15-005.jpg'
 
 
 def main():

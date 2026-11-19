@@ -495,7 +495,7 @@ def render_doc(policy, actual, counts, rows):
             item['id'], _cell(item['definition']), _cell(item['authority'])))
     lines.extend([
         '',
-        '`pending` 不是第七个成果层，而是六层计数旁必须同时展示的未完成或未确认数量。',
+        '全流程盘点中的 `pending` 计量尚未完成或尚未确认的记录，可与已有标签或候选计数重叠。',
         '',
         policy['annotation_layers']['pending']['definition'],
         '',
@@ -525,7 +525,7 @@ def render_doc(policy, actual, counts, rows):
         '',
         '### 摘要契约',
         '',
-        '所有摘要必须同时列出计数单位、六层计数（{}）、`{}` 数，以及适用的人工语义、框和掩膜确认计数。{}'.format(
+        '盘点全流程标注状态时，列出计数单位、六层计数（{}）、`{}` 数，以及适用的人工语义、框和掩膜确认计数。{}'.format(
             '、'.join('`{}`'.format(name) for name in REQUIRED_LAYERS),
             policy['annotation_layers']['summary_contract']['pending_counter'],
             policy['annotation_layers']['summary_contract']['rule']),

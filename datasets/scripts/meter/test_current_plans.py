@@ -3,6 +3,7 @@ import copy
 import json
 import unittest
 
+from datasets.scripts.common import blender_workspace
 from datasets.scripts.common.config import load_task_config, source_path
 from datasets.scripts.common.bayesian import plan_production
 from datasets.scripts.meter import meter_station_plan as render
@@ -12,12 +13,13 @@ from datasets.scripts.meter import compose_meter_real_background_v4 as composite
 class CurrentMeterPlans(unittest.TestCase):
     def setUp(self):
         self.source = load_task_config('meter')[1]
-        self.render = json.loads(source_path('meter', 'render_plan').read_text(encoding='utf8'))
-        self.composite = json.loads(source_path('meter', 'production_plan').read_text(encoding='utf8'))
+        self.render = json.loads(source_path('meter', 'legacy_render_plan').read_text(encoding='utf8'))
+        self.composite = json.loads(source_path('meter', 'legacy_production_plan').read_text(encoding='utf8'))
 
     def test_render_plan_matches_arena_contract_and_twelve_unique_states(self):
         render.validate_arena_declaration(self.render, count=12,
-            sources=[self.source['arena_source'], self.source['station_source']], foreground=True)
+            sources=[self.source['arena_source'], blender_workspace.source_ref(
+                source_path('meter', 'station_source'), blender_workspace.STATION)], foreground=True)
         allocated = render.allocated_arena_states(plan_production(self.render), count=12)
         self.assertEqual(len(allocated), 12)
         self.assertEqual(self.render['execution']['device'], 'OPTIX')

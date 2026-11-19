@@ -11,6 +11,7 @@ if str(ROOT) not in sys.path:
 from datasets.scripts.common.config import load_task_config
 from datasets.scripts.common.paths import sample_dir, split_dir
 from datasets.scripts.common import images
+from datasets.scripts.common.package_direct_real import prepare as prepare_complete_direct
 from datasets.scripts.waste_sticker.source_inputs import real_source_catalog, select_direct_source
 from lab.training_common.camera_tone import apply_tone
 from lab.training_common.production_guard import generation_guard
@@ -23,9 +24,19 @@ def prepare_inputs(plan, catalog, formal=False):
         raise ValueError('unsupported direct sticker constraints')
     result = {}
     identities = set()
+    reviewed = {}
+    if formal:
+        complete, _ = prepare_complete_direct('waste_sticker', split=plan['target_split'])
+        for _, row, truth, *_ in complete:
+            for path in (row['image'], row.get('source_image')):
+                if path:
+                    previous = reviewed.get(path)
+                    if previous and previous[0]['record_id'] != row['frame_environment']['record_id']:
+                        raise ValueError('direct sticker frame has conflicting complete task decisions: ' + path)
+                    reviewed[path] = (row['frame_environment'], truth)
     for state in plan['strata']:
         image = state.get('background', {}).get('image')
-        row = select_direct_source(catalog, image, plan['target_split'], formal=formal)
+        row = select_direct_source(catalog, image, plan['target_split'], formal=formal, reviewed=reviewed)
         if state['background'] != {'image': image} or state['target'] != {'kind': 'existing_stickers'}:
             raise ValueError('direct sticker plan must retain the existing image targets')
         expected = list(dict.fromkeys([image, row['parent']]))
@@ -78,11 +89,13 @@ def _write(output, run, selected, formal):
                   'annotation_manifest': row['annotation_manifest'], 'record_index': row['record_index'],
                   'label_status': annotation['annotation_level'], 'source_role': annotation.get('source_role'),
                   'augmentation': state['augmentation']}
+        if formal:
+            actual['frame_environment'] = row['frame_environment']
         run.record_sample(state['id'], output=image_out, sources=state['sources'],
                           parameters=state['parameters'], actual=actual)
         records.append({'image': image_out.relative_to(output).as_posix(),
                         'label': label_out.relative_to(output).as_posix(), 'actual': actual})
-    (output/'manifest.json').write_text(json.dumps({'status': 'complete_candidates',
+    (output/'manifest.json').write_text(json.dumps({'status': 'complete_direct_candidates' if formal else 'complete_candidates',
         'split': run.plan['target_split'], 'records': records}, ensure_ascii=False, indent=2)+'\n', encoding='utf8')
 
 
@@ -109,14 +122,22 @@ def main():
     selected = prepare_inputs(plan, catalog, formal)
     media = sorted({ROOT / p for state in plan['strata'] for p in state['sources']})
     configs = [ROOT/'datasets/scripts/waste_sticker/config'/name for name in ('source.yaml', 'dataset.yaml')]
+    parameters = {'formal': formal, 'frame_environment_record_ids':
+                  [row['frame_environment']['record_id'] for row in selected.values()] if formal else []}
     with generation_guard('waste_sticker.direct_real:' + output.relative_to(ROOT).as_posix(), media, [output],
-                          {'formal': formal}, code_paths=[Path(__file__),
+                          parameters, code_paths=[Path(__file__),
                           ROOT/'datasets/scripts/waste_sticker/source_inputs.py',
+                          ROOT/'datasets/scripts/common/package_direct_real.py',
+                          ROOT/'datasets/scripts/common/frame_environment.py',
                           ROOT/'datasets/scripts/common/images.py', ROOT/'lab/training_common/camera_tone.py'],
-                          procedural_inputs=[plan_path, ROOT/config['real_annotations'], *configs], root=ROOT,
+                          procedural_inputs=[plan_path, ROOT/config['real_annotations'], *configs,
+                              *([ROOT/config['databases']['frame_environment']] if formal else [])], root=ROOT,
                           production_plan=plan, sample_output_paths=[output/'images']) as run:
         if not run.reused:
-            prepare_inputs(run.plan, catalog, formal)
+            current = prepare_inputs(run.plan, catalog, formal)
+            if (formal and [row['frame_environment']['record_id'] for row in current.values()] !=
+                    parameters['frame_environment_record_ids']):
+                raise ValueError('stored direct sticker qualification changed while entering production')
             _write(output, run, selected, formal)
 
 

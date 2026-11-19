@@ -8,9 +8,11 @@ import unittest
 from unittest.mock import patch
 
 import yaml
+from PIL import Image
 
 ROOT = Path(__file__).resolve().parents[3]
 sys.path.insert(0, str(ROOT / 'lab/training_common'))
+from engine.data import stage_dataset
 from engine.freeze_gate import freeze_selection
 from engine.runner import evaluate_run
 from engine.runtime import new_run
@@ -29,13 +31,22 @@ class V4EvaluationFlowTests(unittest.TestCase):
         self.weights = self.root / 'weights/model.pt'; self.weights.parent.mkdir()
         self.weights.write_bytes(b'fixture checkpoint')
         data = self.root / 'dataset'
-        for split in ('train', 'val', 'test'):
+        for split, color in (('train', 'red'), ('val', 'green'), ('test', 'blue')):
             for kind in ('images', 'labels'):
                 (data / kind / split).mkdir(parents=True)
-            (data / 'images' / split / 'a.png').write_bytes(('fixture ' + split).encode())
-            (data / 'labels' / split / 'a.txt').write_text('', encoding='utf-8')
+            Image.new('RGB', (20, 16), color=color).save(data / 'images' / split / 'a.png')
+            label = '0 0.5 0.5 0.5 0.5\n' if split == 'val' else ''
+            (data / 'labels' / split / 'a.txt').write_text(label, encoding='utf-8')
         (data / 'data.yaml').write_text(yaml.safe_dump({'names': ['person'],
             **{split: 'images/' + split for split in ('train', 'val', 'test')}}), encoding='utf-8')
+        (data / 'workspace_sources.json').write_text(json.dumps({'model_key': 'person', 'records': [
+            {'image': f'dataset/images/{split}/a.png', 'label': f'dataset/labels/{split}/a.txt',
+             'split': split, 'label_status': 'reviewed',
+             'review_state': 'complete_positive' if split == 'val' else 'complete_negative',
+             'review_evidence': 'dataset/workspace_sources.json',
+             'source_review_evidence': 'dataset/workspace_sources.json'}
+            for split in ('train', 'val', 'test')
+        ]}), encoding='utf-8')
         self.run = new_run(self.root, self.config, 'flow')
         self.used = []
 
@@ -62,7 +73,7 @@ class V4EvaluationFlowTests(unittest.TestCase):
         self.assertIn('evaluation_inputs', str(self.used[-1][0]))
         self.assertIn('evaluation_inputs', str(self.used[-1][1]))
         selected = freeze_selection(self.root, self.config, self.run, self.weights, 'selection_val', 'fixture only')
-        (self.run / 'data/images/test/test_000000_a.png').write_bytes(b'changed after validation')
+        (self.root / 'dataset/images/test/a.png').write_bytes(b'changed after freezing')
         self.evaluate('test', selected, 'test')
         self.assertIn('frozen_selection', str(self.used[-1][0]))
         self.assertIn('frozen_selection', str(self.used[-1][1]))
@@ -79,6 +90,23 @@ class V4EvaluationFlowTests(unittest.TestCase):
                 evaluate_run(self.root, self.config, selected, 'test', self.run, 'test')
         status = json.loads((self.run / 'metadata/final_test_status.json').read_text())
         self.assertEqual(status['status'], 'failed')
+
+    def test_training_snapshot_can_freeze_configured_holdout_in_same_run(self):
+        data = self.root / 'dataset'
+        input_test = data / 'images/test/a.png'
+        original = input_test.read_bytes()
+        self.config['training_policy'] = {'mode': 'fixed_validation', 'save_period': 1}
+        stage_dataset(self.root, self.config, self.run)
+        self.evaluate('val', self.weights, 'selection_val')
+        validation = self.run / 'metadata/evaluation_inputs/selection_val/data'
+        self.assertFalse((validation / 'images/test').exists())
+        selected = freeze_selection(self.root, self.config, self.run, self.weights, 'selection_val')
+        frozen = self.run / 'frozen_selection/data'
+        input_test.write_bytes(b'changed after freezing')
+        self.assertEqual((frozen / 'images/test/test_000000_a.png').read_bytes(), original)
+        self.assertFalse((self.run / 'data/images/test').exists())
+        self.evaluate('test', selected, 'test')
+        self.assertEqual(self.used[-1][1], frozen / 'data.yaml')
 
 
 if __name__ == '__main__':

@@ -1,638 +1,275 @@
-# V4 数据集制作细则
-
-九项识别任务由 RViz 雷达地图与 TF 坐标引导至各自任务点，小车转向 90° 或 180°，摄像头完全正对目标后拍摄。V4 数据生产仅覆盖经数据设计确认需要自建数据的任务。车牌沿用省赛模型，本轮不整理、生成或打包车牌数据集。其余八项任务的类别、train 规模及状态组合见[数据集设计](DATASET_DESIGN.md#八任务训练计划)；训练以合成数据为主，同时纳入直接实拍，实拍应占相当比例；缺少标签的当前实拍按任务重建标注，本轮已有标签按实际状态使用；合成包括实拍或数字图片的图像处理合成、Blender 渲染及渲染图与实拍混合。各任务以直接实拍、实拍背景合成、Blender 母场景背景的 30%／40%／30% 为初始计划；2026-11-15 用户要求 fire、building_name_paper、waste_bin_state 采用 20/40/40，waste_sticker、meter 采用 10/40/50，person、e_bike、sign 保持 30/40/30，具体组成按素材及标签状态调整，比例不是硬门槛。小车彩色图像以原生 640×480 为主要构图参考，热数据以实际设备输出为准。任何后续生产按生成方式、来源谱系和已知复用关系记录，测试不参与调参或选模。[数据区索引](../datasets/README.md#当前素材与来源候选) · [补录素材和模糊估计](../datasets/SITE_CAPTURE_20261112.md)
-
-批次、样本、复用关系及评估范围使用可查询的结构化记录；字段、原清单权威和 Python 查询入口见[媒体记录与查询设计](DATASET_DESIGN.md#媒体记录与查询设计)。缺失来源或结果保持缺失，不能由生成方式或目录名补造。
-
-## 标注与准入状态层
-
-本节的六个层是标注、审查和训练准入的当前统一口径。每项摘要必须写明计数单位，例如图片、图像—任务记录、候选框、实例或父组；不同单位不能直接相加或互相替代。
-
-| 层 | 记录的事实 | 不能证明 |
-| --- | --- | --- |
-| `source_available` | 来源路径、媒体或批次记录当前可访问；可以同时没有标签。 | 标签存在、画面内容正确、split 或训练资格。 |
-| `annotated` | 已存在标注记录或标签文件，包括 `partial`、`unknown`、负例和候选状态。 | 标注已被程序化验证、经人工确认或可训练。 |
-| `candidate` | 已提出框、掩膜、关键点、类别、空场判断或其他待核标签。 | 候选完整、人工接受或已通过自动验证。 |
-| `auto_validated` | 已通过明确记录的程序化检查，例如格式、路径、坐标范围、几何一致性或自动审查规则。 | 人工语义确认、人工框／掩膜确认或训练准入；程序化生成器接受也只进入本层。 |
-| `human_confirmed` | 由人工明确确认。语义、框／空场、掩膜分开记录：人工确认目标类别、可见性和遮挡，不等于确认框坐标；确认框或整帧无目标，也不等于确认掩膜。 | 未被人工检查的其他层、其他任务或其他帧。 |
-| `training_admitted` | 已按当前训练计划明确准入指定 split，并记录任务、角色、父来源和限制。 | 模型效果、独立场次或没有限制；目录存在、候选生成、自动通过和人工语义接受都不能单独产生本层。 |
-
-`pending` 是各层内部的待决状态，不是 `rejected` 的同义词。缺少 `accepted_by`、`human_accepted: false`、尚未走人工复核、自动判据为 `unknown` 或尚未准入，只能保留为 pending，不得自动改写成 `rejected`／`excluded`，也不得清空既有标注、框、掩膜或候选记录。只有存在明确失败证据并记录原因时，才可使用 `rejected`／`excluded`；该结论只作用于有证据的任务、角色、帧或实例范围。
-
-审查和手工记录的重跑必须 merge-preserve：默认校验只读；任何写回都不得覆盖未变化的人工字段、此前决定或非空人工内容。模板或整份手工记录的重建必须是显式请求，写入前检测非空人工内容并先备份。具体命令是否已实现该行为以对应脚本和测试为准，不能由本文档推定。
-
-### 当前可见标注层
-
-下表按现有结构化记录核对；`unknown` 表示当前没有可引用的该层记录，不等同于 0，也不表示被排除。计数日期为 2026-11-15。
-
-| 范围与单位 | `source_available` | `annotated` | `candidate` | `auto_validated` | `human_confirmed` | `training_admitted` | pending |
-| --- | --- | --- | --- | --- | --- | --- | --- |
-| 人物直接审查记录 | 34 条记录 | 23 条有完整标签记录 | 34 条记录、72 个候选框 | 23 条记录：16 正例、7 负例、46 个正例框 | 语义 3；框／空场 0；掩膜 0 | 0 | partial 11 条、26 个候选框；语义 31 条；标签确认 34 条；框／空场确认 34 条记录、46 个正例框；训练准入 34 条 |
-| CarRealPicture 当前标签范围 | 31 张图 | 126 条图像—任务记录 | 126 条记录、94 个候选框 | unknown | 完整记录语义 0；框／空场 0；掩膜 0 | 0 | 人工复核 126 条；`partial` 2 条、`unknown` 1 条继续 pending |
-| SiteCapture 五个小样清单 | 41 张图 | 66 条有标签文件的图像—任务记录 | 82 条记录、64 个候选框 | unknown | 语义 0；框／空场 0；掩膜 0 | 0 | 人工复核 82 条；`partial` 14 条、`candidate_partial` 2 条 |
-
-人物分层以 `datasets/scripts/person/config/direct_annotation_layers_20261115.json` 为准；CarRealPicture 标签由 `evaluate_field_capture.py audit-labels` 从两个标签文件读取；SiteCapture 小样由五个 `review_manifest.json` 读取。自动审查判定、生产回执和模型评分均不自动改写这些层。
+# V4 数据制作
 
 ## 当前生产进度
 
-记录日期：2026-11-15。人物任务已实跑三批：`exports/person/train` 3000 张、`val` 300 张、`test` 300 张，各含图片、YOLO 标签和 manifest，生产守卫已落三份回执（`planned_samples` 3000／300／300）。`samples/person` 另有 36 张最小链路试验批。其余七任务当前产量仍为 0，渲染、抽帧、打包和训练继续暂停。当前阶段已完成来源选择、可用标注用途、人物身份区域及遮挡次序、仪表和桶状态渲染计划；缺标注或用途未确认的素材保留 pending，只有具有明确失败证据的任务角色用途才排除，原件和原始记录保留。
+**2026-11-19 汇总核对。** 仪表、火焰、楼名纸条、禁行牌、垃圾桶开闭和垃圾贴纸均已有完整训练及Val/Test回传。仪表最终完成120轮（第97轮Pose最优），禁行牌完成115轮（第95轮最优）；垃圾桶开闭当前Train已切换为804张真实桶主导微调输入，完整基线的3500张Train保留于历史清单和训练包。数据规模、训练指标及各次微调得失见[数据集与模型训练阶段报告](research/DATASET_MODEL_REPORT_20261119.md)与[聚合证据](research/DATASET_MODEL_REPORT_20261119.json)。早期构建、审计和试跑记录保留其发生时状态。
 
-人物三批由 `datasets/scripts/person/build_full_person_plan.py` 编译，计划为 `config/full_train_plan_3000.json`、`val_plan_300.json`、`test_plan_300.json`，出图入口为 `compose_planned_ground_person.py`。train 组成：1650 无遮挡单人、375 直立电动车遮挡、375 倒伏电动车遮挡、600 双人；val/test 各 40 无遮挡单人、100 直立遮挡、100 倒伏遮挡、60 双人。三批共用 18 张身份纹理、4 张遮挡片（来自 2 段电动车视频）和 3 种色调；train 用 4 个 legacy 空场背景，val 留第 5 个，test 用 site_capture 来源组。已知缺口：三批都没有 zero-person 空场负样本，`config/task_targets.yaml` 中 person 的 counts 含 `empty` 但本批未覆盖；val 与 train 的背景来自同一条视频 `空场与场景物料_001.mp4`，只有 test 更换来源组，因此 val/test 只能作换帧、换布局的泛化证据，不能作跨场景或跨身份泛化证据。3600 条记录的 `source_role` 均为 `unknown`（`historical_exposure_incomplete`），manifest 状态为 `candidate_not_semantically_verified`，只能记 candidate 层，未经人工确认，也未准入训练。
+**全局推进原则。** 直接用已合格的共享底图、Blender 和实拍来源编排可行组合，生成完整图签并推进基线训练。按当批容量调整来源份额，缺少某种实拍或待补判的帧只影响对应分支。入库端复用已有机器证据，补齐目标标签和本次用途所需的空间，资格齐备即可消费。产量、父来源、split 和评价范围按实际清单记录，再按漏检、误检、类间混淆、关联及计数失败定向补合成或补拍实拍并微调。[训练与微调](TRAINING_WORKFLOW.md#训练与微调的失败驱动闭环)
 
-同日解除三处生产死锁：任务输出目录（`samples/<任务>`、`exports/<任务>/{train,val,test}`）尚未生成时 `workspace_layout.py check` 只报提示，由生产守卫在生成时创建，不再要求预先存在；`compile_background_dispatch.py` 不再要求 `accepted_by` 等于固定人名，改为要求非空人工接受；计划型生产仍禁止 adoption，无回执的中途产物通过删除该输出目录恢复，删除后重新生成由入口负责。
+**人物 V4 已收官。** 数据计划已执行，train、val、test 均已正式导出，图片与 YOLO 标签逐项配对。场景底图与直接实拍的父来源按集合隔离，未发现跨集同字节图片。各集合共享固定立牌图案和部分车辆裁片。模型已完成 150 轮正式训练和白侧板窄亮边专项微调，留用 10 轮微调运行的最佳推理权重。[人物生产命令](../datasets/scripts/README.md#人物最小生产路径) · [数据入口](../datasets/exports/person/data.yaml) · [来源索引](../datasets/exports/person/workspace_sources.json) · [训练交接](TRAINING_WORKFLOW.md#人物-v4-工作空间入口)
 
-当前任务配置位于 `datasets/scripts/<任务>/config/`：`dataset.yaml` 记录总目标，`source.yaml` 记录选定输入、父来源、原清单定位和排除项，各计划 JSON 记录入口能执行的状态及配额。任务路径、必需配置和标注根以 `config/workspace_layout.yaml` 为准，结构检查用 `python lab/scripts/contracts/workspace_layout.py check`。具体命令、参数、输出路径和工序顺序集中在[恢复生产入口](../datasets/scripts/README.md#恢复生产入口)。本文件维护阶段与数量预期；旧批次和文档修订从 Git 历史查询，不作为当前产量或恢复入口。
+| 集合 | 总张数 | 合成 | 直接实拍 | 社区框 | 非社区框 | 空标签图 |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| [train](../datasets/exports/person/train/manifest.json) | 3,000 | 2,992 | 8 | 7,217 | 1,770 | 257 |
+| [val](../datasets/exports/person/val/manifest.json) | 300 | 298 | 2 | 825 | 188 | 19 |
+| [test](../datasets/exports/person/test/manifest.json) | 300 | 247 | 53 | 792 | 141 | 43 |
 
-来源用途与首批计划已接入现有媒体查询库：8 条任务配置声明、13 份现存计划共 1,725 个状态及其路径反查引用，桶状态另有 1 份待编译计划。2026-11-15 重建声明分区并全量同步后，查询库为 `ready`、223 个分区，快照 2026-11-15T12:13:34Z，`missing_sources` 25。`datasets/assets/person` 分区记录 1,316 张图，只有媒体条目，没有清单或标签证据，也没有任务配置引用它；它与已不存在的 `datasets/person/` 按显式迁移关系登记，新旧路径在 `path_history` 中关联。生产回执库和 Blender 登记库未修改。配置及计划可按任务、集合、字段角色或输入路径查询，命令见[数据库输入查询](../datasets/scripts/README.md#从现有数据库取得当前输入)。用途声明、待生成前景和实际媒体分别记录，生产继续暂停。
+`train` 的合成包括实拍底图 2,092 张和 Blender 底图 900 张，覆盖单人、仅白背、正背同框、多人及电动车遮挡。60 张[人物小样](../datasets/samples/person/manifest.json)中有 52 张合成布局进入该批训练计划。`test` 的 53 张实拍与 83 张合成底图来自已接触的车载路线，其余 164 张合成使用另一个旧停车视频。该集合用于已知路线回归和合成评估。
 
-人物候选审查已完成三批：`v4_review_20261115`（8 帧，2 ready／6 unknown／0 excluded，提交于 `5b5fac8`）、`v4_review_20261115_b2`（18 帧，3／15／0，提交于 `03b35f4`）和 `v4_review_20261115_b3`（16 帧，6 ready／10 unknown／0，2026-11-15 07:15 提交）。b2 的 `metrics.jsonl` 已在 07:09 用同一代码重算，按当前判据是 4 ready／14 unknown，与提交时的 3／15 不同；度量目录里的结果可由代码和原图重算。b3 的 10 个 unknown 均为 `geometry_rejected`，其中 mixed_scene 桶背景 5 张全部落在该类；11 条记录带 `source_unresolved`，表示旧实拍的父视频关系未核实。`review_selection.json` 在 b1–b3 阶段只保留最近一批，旧批可从 Git 历史核对；当时 `accepted_by` 为空。当前 B6 状态见下文；旧 `min_patch_free_ratio`、`max_patch_obstacle_components` 仍作为默认关闭的兼容预筛。三批观测已从 `annotated/person/` 迁到 `annotated/common/review/person/`，透视模板在 `annotated/common/perspective/person/`；审查判据、产物和父源筛查属于跨任务 common，人物只是第一个使用者。
+以下为当前有界批次。2026-11-18 按用户要求先跑五任务小样，逐张解码并核对标签数量、格式和框范围，抽看带框及关键点的拼图。电动车和禁行牌用现有编制器按当前逐图库重编本次小样，电动车当前计划维护于 `datasets/scripts/e_bike/config/production_plan.json`，`datasets/annotated/e_bike/current_sample_plan.json` 保留此前 40 张批次的生成输入；禁行牌当批输入保存在 `tmp/sign_sample_recheck_plan.json`。火焰随后重编当前数据库三分支计划，实际记录见下表。其中禁行牌随后完成440张配对小样和3100张三集数据，当前配额以 `source.yaml#full_dataset` 为维护源，执行计划为该键指向的 Train／Val 计划，全局统计登记于 `config/task_targets.yaml#tasks.sign.plans`；其余任务进展见各自当前清单。生产回执保留输入与实际输出。楼名当前小样中的 5 张 train 实拍也出现在同一任务的 3000 张 train 批次中，来源复用按清单计量。
 
-2026-11-15 人物跨分支小样另有独立验收记录：当前 6 项候选覆盖直接实拍 3、实拍合成 1、Blender 2。5 项已由用户完成图片级目标与遮挡语义接受，并固化到 `datasets/scripts/person/config/toolchain_review_acceptance.json`；另有 1 项 Blender 原始预览按场景图和实例 ID 掩膜确定性生成，以 `programmatic_blender_generator` 接受，不计作人工验收。当前 6 项均为 `pass_candidate`。独立标签审计为 5 条，即 4 条完整正例和 1 条确认负例、10 个候选可见实例；负例帧已通过全帧检查，3 条实拍正例框仍标作 `Codex visual review` 候选，Blender 预览的 3 个框来自程序化生成证据。该层确认不自动等于通用人工逐框真值或训练准入；单帧预览也不是数据集批次。自动背景审查三批中的 `accepted_by` 空值只约束那三批审查，不覆盖本次任务配置的人工接受记录或程序化渲染验收。
+| 任务与分支 | 实际输出 | 当前边界 |
+| --- | ---: | --- |
+| [楼名四分支小样](../datasets/samples/building_name_paper/manifest.json) | 80 张、114 个纸条框、6 张空负 | 实拍 9 张／6 框，实拍底图替字 12 张／12 框，纯 Blender 31 张／48 框，楼体＋实拍底图 28 张／48 框。新分支覆盖两张车载底图 × 七种楼数组合 × 低机位左前／平视正前，地面投影和实际 Cycles 阴影随掩膜保留；来源分集及既往评估接触按清单记录。[合成拼图](../datasets/samples/building_name_paper/hybrid_contact_sheet.jpg) |
+| [仪表共享底板与光色小样](../datasets/samples/meter/manifest.json) | 433 张：54 实拍 Pose、1 部分点实拍、126 Blender 预览、8 实拍底图合成、244 Blender 底图合成；432 份 Pose 标签，126 张透明 RGBA | 共用池按 3 灯光场景×8 路线分层选取 96 张渲染底板，加 3 张已审查接地区的实拍底板，共 99 张。白盘／彩盘同几何配对，饱和度、曝光、前景相对亮度三轴独立轮换。修正实拍底板楼体重叠落点；保留 0055 八点纠偏。当前 unassigned，图签及配对检查通过。[单张预览](../datasets/samples/meter/contact_sheet.jpg) · [三集合配额草案](FULL_TRAIN_PLAN_DESIGN.md#meter)。 |
+| [火焰四种生成方式小样](../datasets/samples/fire/manifest.json) | 194 张、205 个火焰框 | 直接实拍含空负 55 张／15 框，实拍墙面合成 90 张／120 框，完整 Blender 31 张／46 框，楼体＋实拍场景 18 张／24 框。15 张实拍底图已配准墙面；混合分支使用楼角 PnP 相机近似拟合、逐帧视锥与地面足迹检查、Cycles 物理阴影及线性光合成。[独立复验](../datasets/annotated/fire/current_sample_review/audit.json)重解码 49 张 ID 图并核对 70 个渲染贴纸框，37 个父来源跨分集重叠为零。整楼未完整观察时保持 null。[混合拼图](../datasets/annotated/fire/current_sample_review/hybrid_contact_sheet.jpg)。 |
+| [电动车合成迭代小样](../datasets/samples/e_bike/manifest.json) | 当前 182 张：完整实拍／镜像 42、实拍底图合成 70、Blender 底图合成 70；直立 336、倒伏 322 框 | 现有素材新增 64 张一／三／五／七车与姿态数量交换、车体镜像对照，各 32 张实拍／Blender底图；[带框预览](../datasets/annotated/e_bike/current_queue_review/index.html) · [拼图](../datasets/annotated/e_bike/current_queue_review/examples.jpg)。上一轮 118 张导出与基线保留；新增48张已做10轮短微调，计数未改善。 |
+| [禁行牌全量数据](../datasets/exports/sign/data.yaml) | Train 2,500 张／2,000 框／500 空负；Val 300 张／275 框／75 空负；Test 300 张／225 框／75 空负 | 完整、截断或遮挡、可辨杆底座、空场和普通杆配额已兑现。三集背景父来源分开，前景共享；Test有既往诊断接触；全量图签和训练入口预检通过。440 张已接受小样保留作对照。  [完整训练包](../training_packages/sign/README.md)已构建：120轮上限、90轮保护、20轮早停耐心、36000秒（10小时）；随后完成115轮及Val/Test回传，Val最优第95轮。 |
+| [垃圾贴纸完整数据集](../datasets/exports/waste_sticker/data.yaml) | Train 1,800、Val 240、Test 240，共 5,130 个框 | 每图 1–4 桶，各集覆盖 24 类。Train 180 张无贴负例、单至四贴各 405；Val、Test 各 24 张负例、单至四贴各 54。逐图来源和实际范围见导出清单。 |
+| [楼名全量检测集](../datasets/exports/building_name_paper/manifest.json) | train 3000／val 300／test 300 | 4152 个纸条框、756 张空负；四分支分配及逐集审计见当前清单，只有 paper 检测监督。 |
 
-2026-11-15 放置区域杂物门禁由 `datasets/scripts/common/review/placement.py` 实现并在 b4 测验中启用。b4 从 `query_cache.sqlite3` 的 281 条 person 背景候选路径中按排序等距选 8 张，加入 b3 的 11 张非桶回归帧，共 19 帧；结果为 4 ready、3 excluded、12 unknown。`bg_00232`（对象占用 0.179、最大组件 0.167、垂直 0.0125、自由矩形 0.200）、`frame_007001`（0.341、0.249、0.0097、0.250）和数据库选出的 `bg_00240`（0.248、0.205、0.0265、0.117）判 `excluded`（`placement_patch_cluttered`）；`bg_00086` 对象占用 0.0991 接近 0.10 阈值，按临界带判 `unknown`（`placement_patch_unsure`）；其余 11 帧为 `geometry_rejected`。薄长地面标线单独记录 `marking_ratio`，与本任务已有目标框重叠的组件记为 `task_target`，均不计杂物。b4 计划与选择写在 `annotated/common/review/person/v4_review_20261115_b4/`，`review_selection.json` 仍为 b3；b4 是判定测验，不是训练选择。阈值是设计假设，尚未用独立标定集验证，其他任务未启用该门禁。
+**仪表当前全量已完成。** Train 6480、Val 1080、Test 1080，共 8640 张；7776 张正例、864 张无表图、62208 个关键点。2448 张独立透明前景、579 张 train 底板及 val/test 各 72 张专用底板参与制作；54 张原生实拍按 45／7／2 入三集并保留像素。随机位置尺度、约 70% 连续双针采样、轻微模糊／压缩／噪声已接入；逐图框、八点与显示区四角共用变换。每 250 张合成块独立审计并保存回执；三集图签审计、跨集 RGB 重复检查及 V4 训练数据入口预检通过。当前工作集未创建发布标签或正式版本目录。[数据入口](../datasets/exports/meter/data.yaml) · [全量清单](../datasets/exports/meter/manifest.json) · [Train 预览](../datasets/exports/meter/train/contact_sheet.jpg) · [生产入口](../datasets/scripts/meter/README.md#当前全量制作入口) · [数据预检](../datasets/annotated/meter/full_production/production_inputs/training_data_preflight.json)。
 
-2026-11-15 地面几何增加回退并在 b5 测验中复测同一 19 帧。主路径 VP patch 失败时依次尝试水平相机 patch（`placement_patch_level_camera`）和 Gabor/FFT 纹理地面顶边（`horizon_texture_fallback`、`placement_patch_texture_fallback`），纹理回退要求最小 patch 深度且地平线不超过 0.85H。b5 结果为 5 ready、5 excluded、9 unknown，`geometry_rejected` 由 11 降至 7。`bg_00040` 由几何失败恢复为 ready（水平相机 patch）；`frame_006001`、`bg_00280` 恢复 patch 后被杂物门禁判 `excluded`；`bg_00200` 恢复 patch 后对象占用 0.1306 仍判 `unknown`；`bg_00122`、`bg_00120` 的纹理回退因地平线过低被几何阶段拒绝，仍为 `geometry_rejected`。b5 计划与选择写在 `annotated/common/review/person/v4_review_20261115_b5/`；该批当时未更新当前选择，属于几何回退测验。回退 patch 的 reason code 保留在 metrics 中；阈值仍是设计假设，尚未用独立标定集验证。
-b5 之后对剩余 5 张 `geometry_rejected` 做目视归类：`bg_00165`、`bg_00160` 为办公室场景，画面含桌面、立牌和电动车；`frame_003001` 为立牌与电动车近景；`frame_005001` 为垃圾桶近景；`bg_00080` 为黑色反光墙与窄地面。它们不是干净的任务背景，不再继续几何调优。另做一次只读标线线检测试验：`bg_00086` 的放置区内未检出白线，对象占用主要来自地面纹理/颜色离群，标线修正无贡献；`bg_00232`、`bg_00240` 的对象占用仅分别下降约 0.02、0.01，判定不变。因此不加入标线硬门禁，保留 `marking_ratio` 报告。b4/b5 是测验批次；当前采用的 B6 判定和阈值见下文。
 
-2026-11-15 背景审查 B6 已采用用户接受的 24 帧 clean／clutter／geometry_failed 分类拟合放置阈值；24/24 为该标定集合内的拟合一致数，不是独立泛化测量。B6 对 19 帧给出 6 ready、8 unknown、5 excluded；用户接受 11 条确定判定和全部父视频关系，8 条 unknown 保持 pending。当前 `review_plan.json` 和 `review_selection.json` 指向 B6，公共审查能力仍在 `datasets/scripts/common/review/`。6 条 ready 已写入 `datasets/scripts/person/config/background_dispatch.json`，现有 54 状态、预算 36 的人物 train 计划按 JSON 分发背景；生成入口已通过 54 状态的内存合成检查。36 张实际批次首次因预建空目录被生产守卫拒绝；移除空目录后运行到第 4 张时因旧暗化函数不接受计划的 1.1 亮度增益而停止，留下 3 张图片和 3 个标签、无完成清单。人物入口现已增加有界亮度处理；自动批准审查拒绝了对该中途目录的递归删除命令，故未重跑，不计完成批次。两组父视频在候选状态中为 43／11；11 个 site 状态中至少 8 个必须选用，以使预算 36 的执行结果满足单父组不超过 80%。本阶段已在 `datasets/samples/person/` 实际生成 36 张图片和 36 个标签，清单状态为 `candidate_not_semantically_verified`；父组为 28／8，最大占比 77.8%，生产守卫完成回执已写入。此前 `datasets/exports/person/train/` 的 3 张图片和 3 个标签仍是中途产物，无完成清单。3000 张全量计划和 val/test 尚未执行。
+2026-11-18 电动车进入首轮基线：用户确认七车长队为直立 4／倒伏 3、四车近景为两态各二；另一长队帧按时序对应补齐，证据区分人工与机器复核。首轮 118 对图签核验后完成训练，以下指标仅指该轮冻结导出。全局登记仍为 `config/sample_plan.json`、用途 sample，不将拷贝后的基线重复计入全量 train 草案。`prepare_baseline_data.py` 消费当前完整小样和 `source.yaml#baseline_data`，导出 108 张 train／10 张 val，父路径分离。以既有 V3 权重初始化，batch 4、640 像素、20 轮，约 165 秒完成；[best.pt](../runs/e_bike/v4_baseline_20261118/training/weights/best.pt)的 mAP50 为 0.740，同图两态数量全对从 0/10 提高到 1/10，仍有同车重复框和漏检。验证含镜像与邻帧、已知场景物料，不能代表独立实场泛化。二维裁片的视面、倒伏多点接地与照明仍有近似。[逐图证据](../datasets/annotated/e_bike/queue_video_review.jsonl) · [首轮结果](../datasets/annotated/e_bike/baseline_result.json) · [计数对比](../runs/e_bike/v4_baseline_20261118/evaluation/val_final/pose_count_comparison.json)。
 
-2026-11-15 用户指定 V4 数据制作**先推进人物**；其他任务在人物链路（生成、审查、回执、测试骨架）跑通后按同一入口复用。
+2026-11-18 随后按用户要求只用现有素材继续合成，新增 64 张数量／姿态对照，维护于 `sample_recipe.json#queue_variants` 与 `paired_layouts`。在现有实拍底图与 Blender 理想空场沿各自长队地面槽位取一／三／五／七车，三／五／七车各交换两态数量，原向和车体镜像成对；既有八车、四种车车遮挡、单车和空场继续保留。当前小样 182 对图签、552 个可见掩膜框、68 对合成镜像及 42 张实拍／镜像像素检查通过；未新增实拍、未改动上一轮训练导出和模型；随后短微调见下方记录。全局仍登记原 `config/sample_plan.json`，用途 sample。审计与预览通过 `datasets/scripts/e_bike/audit_current_sample.py` 重建；阴影、视面与接地是二维近似，当前成图不证明模型效果。
 
-2026-11-14 21:43:51–21:51:43 之间 `datasets/exports/` 被重建为空骨架：8 个任务目录和 24 个 `train/val/test` 目录均为该窗口新建，旧批次树不再存在，执行者与命令在工作空间内无记录。这些空目录是代码约定的正式集合输出根（`datasets/scripts/common/paths.py` 的 `split_dir()` 与入口白名单），不是待清理残留。人物候选池 124 条声明输入中 77 条因此失效（person 21、waste_bin 20、fire 12、meter 9、mixed_scene 7、e_bike 3、sign 3、plate 2、annotated/meter 1）；`原根目录工具区的 build_training_packages.py` 使用的 9 个 `data.yaml` 均不存在，该入口已于 2026-11-15 删除，当前没有打包入口。人物 8 个 2026-11-14 候选批次位于 `runs/person/migrated_exports_20261114/`（1,367 个文件），未随该窗口消失。
+2026-11-18 电动车新增64张数量对照小测：沿用 `v4_baseline_20261118/training/weights/best.pt`，640输入、conf 0.25、NMS IoU 0.7、匹配IoU 0.5，不训练、不调参。两态数量同时全对28/64，逐实例无漏检且无额外误检27/64；单车16/16、三车10/16、五车2/16、七车0/16。实拍底图16/32、Blender底图12/32，镜像数量一致16/32对。该批共享既有前景和场景素材，仅作合成诊断，不能与上一轮10张实拍验证直接比较。[结果](../runs/e_bike/v4_baseline_20261118/evaluation/synthetic_count_smoke_20261118/summary.json) · [逐图数量](../runs/e_bike/v4_baseline_20261118/evaluation/synthetic_count_smoke_20261118/pose_counts.json)。
 
-### 首批计划
+2026-11-18 电动车短微调对照已完成：以首轮 best.pt 初始化，旧 train108 加新增合成48，共 train156；旧实拍 val10 加成对留出的新增合成16，共 val26。640输入、batch4、lr0=0.0001，10轮约66.61秒（硬上限600秒）。同图固定阈值下，合成留出两态数量全对6/16→6/16，原实拍1/10→1/10；26图平均两态数量绝对误差合计1.81→2.65，误检40→69、漏检17→10。mAP50 0.808→0.825，mAP50-95 0.518→0.558，检测指标改善但计数未改善。保留原基线，不采用本轮候选作部署。输入与配置为本次研究快照，当前 samples 与上一轮 exports 保持原位；同源合成留出含共享素材和底图，仅作诊断。[结果与候选模型](../datasets/annotated/e_bike/short_finetune_result.json)。
 
-下表为已经落盘的当前计划。候选状态数、分配预算、实际产量分开记录；预算是执行上限或目标，不是完成数。`samples` 中的小样不自动计入正式 train；渲染前景和掩膜属于后续合成输入，不能与最终合成图相加统计训练图数。
+2026-11-18 电动车继续完成两轮模型×四种NMS的完整推理对照，固定conf0.25、输入640、逐张rect推理，共26张、102个GT实例。两轮模型两态数量全对依次为：原同类IoU0.7均7/26；同类0.5为基线11/26、短微调8/26；跨类0.5为12/26、9/26；跨类0.3均13/26，逐车无漏检无多报均12/26。基线误检40→7、漏检17→21，短微调误检69→16、漏检10→18；基线实拍最好3/10。去重改善重复计数，同时会损失真实框覆盖；GT几何覆盖损失不等同物理车辆被删，部分是较差的大框压掉较准的框。参数仍仅作同源探索，未修改现行推理配置。逐张原设置复现既有TP/FP/FN；早期混合尺寸batch4探索与旧框过滤估计保留追溯，以本次完整逐张推理为准。[结果](../datasets/annotated/e_bike/nms_comparison_result.json) · [逐图八组预览](../runs/e_bike/nms_comparison_single_20261118/review.html)。
 
-| 任务 | 已选输入和首批组合 | 首批预算 | 恢复后的首步及后续工序 |
-| --- | --- | ---: | --- |
-| 人物 | 3 张完整标注背景、2 张身份纹理、直立/倒伏各 1 张车前景；头部/上身身份区域与先人后车遮挡已填写，身份区域至少 0.9 可见 | 54 个候选分配 36 张 | `person/compose_planned_ground_person.py` 写当前小样；18 条 partial/regression 记录保留原状态，不计入本批训练准入 |
-| 电动车 | 4 背景、4 车辆前景，空场、直立、倒伏及色调/角度 | 60 个候选分配 40 张 | `e_bike/compose_v4_grounded_train.py` 写当前小样；另有 4 张完整标注实拍的 8 张增强替代计划，不连续写同一非空目录 |
-| 火焰贴纸 | 3 张原照片的已定裁剪与支撑区域，唯一图案来自 `raw/fire/team_assets/` | 18 张：每照片零贴 2、单贴 4 | `fire/compose_real_facades.py` 写当前小样；全图监督和多贴不属于本首批 |
-| 楼名纸条 | 2 个完整检测正例、3 个完整负例；两个已有纸框各 20 个替字变体 | 45 张 | `building_name_paper/compose_rooftop_papers.py` 写 train；原字串未知不监督原字串，替字保留程序字符串 |
-| 禁行牌 | 10 背景、2 牌具视面；包含 32 个只保留下半部立杆/底座的设计裁切 | 400 张 | `sign/compose_sign_v4_measured.py` 写小样 → 局部索引 → `package_sign_candidate.py` 写 train |
-| 垃圾贴纸 | 两个不同视频的桶面 × 24 图案 × 4 种变化 | 192 张，每类 8 张 | `waste_sticker/generate_sticker_real_photo_v4.py` 写 train；002016 的 4 类候选另有 1 张直接小样计划 |
-| 垃圾桶开闭 | 16 个单桶颜色×开闭×明暗状态、2 个四桶组合、1 个空场；选定 10 背景 | 渲染 19 状态；合成最多 360 张 | `waste_bin_state/render_blender_waste_bin.py` → 局部索引 → `plan_current_sources.py` 以实际掩膜编译计划 → `generate_waste_v4_grouped.py` 写 train |
-| 温湿度表 | 场景、站房模型、表面范围和端点配置已接入；12 个前景状态配 3 个实拍背景 | 渲染 12 个前景；合成 36 张 | `meter/render_meter_arena_v4.py` → 局部索引 → `compose_meter_real_background_v4.py` 写 train；缺完整 8 点的直接实拍保持 pending，不冒充 Pose 标签 |
+2026-11-18 电动车两阶段微小训练已完成：保留156/26原图分集，研究快照将检测标签映射为单类别e_bike，裁出训练556／验证102个带8%上下文、保比例补方的姿态样本。单类别检测器与姿态分类器各10轮，分别约67.73秒和33.47秒，各有600秒硬上限。分类器由本地原检测器迁移兼容骨干参数、重建分类头，未下载额外权重。正确GT框上98/102辆姿态正确、23/26图两态数量全对（仅作分类上界诊断）；旧检测框重新判姿态最好12/26，新单类别检测接分类最好10/26（实拍2/10、合成8/16，NMS0.3），均未超过上一轮去重基线13/26。新单类别检测器在此预算内分车不足，未替换原基线或正式配置。两份.pt、输入快照、分类顺序、分组与逐框匹配结果在[两阶段结果](../datasets/annotated/e_bike/two_stage_result.json)，成图见[四组对照](../runs/e_bike/two_stage_20261118/evaluation/review.html)。
 
-人物 3 背景为同一视频 40.0、265.213、285.213 秒；仪表 3 背景和桶状态 10 背景也各自来自同一父视频不同时间。禁行牌背景为 3 个视频的 8 帧及同批 2 张照片。所有派生保留父来源，不以帧数或增强数冒充独立采集数。人物的 3 张背景在审查清单中均为 `human_accepted: false`，只能记为人工确认 pending；其中 `frame_001201` 与 `frame_007951` 在 2026-11-15 的自动几何判据下记 unknown（`geometry_rejected`），计划使用的是 `source.yaml` 中人工给出的 `ground_polygon` 与 `foot_xy`，不是自动审查通过结果。垃圾贴纸直接实拍现有 40 个无标注记录、P22 的 train 角色不满足项和 002044 的部分未知记录，保持 pending 或原角色失败状态，不填为空标签，也不删除候选。
+2026-11-18 电动车完成框中心／座椅双点辅助实验与同轮数普通检测对照，各追加10轮、每轮运行硬上限600秒，沿用156/26分集和同一姿态分类器。24个源裁片视面经AI视觉核对，15个可确认可见座椅表面中心，9个不标；实拍座椅未专门标注。框中心由可见框派生，不是新增语义监督。投影严格复现裁片裁边、平面变换、缩放、镜像和摆放，并用重建的完整／可见掩膜检查552个合成框；训练座椅可见300、已知遮挡2，验证可见42，其余为未标。双点模型配合框NMS0.3达到15/26两态数量全对（实拍3/10、合成12/16），直接中心／座椅点去重只有1～6/26，重复点抑制不足。同起点、同lr0.0003、同10轮的普通单类别检测器对照达到17/26（实拍4/10、合成13/16），因此不能把15/26归因为关键点净收益。保留现行推理与原基线。[源座椅点](../datasets/annotated/e_bike/seat_anchor_sources.jpg) · [完整结果与两份.pt](../datasets/annotated/e_bike/keypoint_result.json) · [五组点／框去重预览](../runs/e_bike/keypoint_inputs_20261118/evaluation/review.html)。后续四部件点训练记录见下段。
 
-桶状态的 `production_plan.json` 将在实际掩膜生成后由固定规划入口写出，目前没有该文件。360 是 18 个非空渲染状态 × 10 背景 × 2 色调的组合上限；实际渲染或放置失败会降低数量并记录原因。仪表 12 个 RGBA 前景同样尚未生成。这两项的下一步是已明确的渲染工序，不再等待重新选源。
+2026-11-18 四部件点加整体框实验已完成：24个既有裁片视面，前轮／后轮／座椅／车篮有可确认AI近似源点的视面数分别15／14／15／21；未知源点和实拍部件点不标。沿原156/26划分投影，训练已知部件点1298、验证146，框与原图保持不变。由与普通检测对照相同的单类别权重初始化，lr0.0003、10轮约72.16秒、600秒上限；共用同一姿态分类器。固定第10轮权重、同框NMS0.3时，四点和普通检测器均14/26两态数量全对，逐车全匹配分别13/26与14/26，四点实拍3/10、合成11/16。四点自动选优best也14/26，未超过此前普通检测器best17/26；后者选优口径不同，作为次要历史结果。用至少两个可靠对应部件区分重叠框的实验抑制仅2/26或6/26，大量重复预测，未采用。前后轮身份在镜像时保持，全部10组推理读回同一26图及GT。保留原模型、现行推理及118张导出。[源点预览](../datasets/annotated/e_bike/four_part_anchor_sources.jpg) · [四点结果与权重](../datasets/annotated/e_bike/four_part_result.json) · [逐图对照](../runs/e_bike/four_part_inputs_20261118/evaluation/review.html)。
 
-### 后续计划预计
+2026-11-18 已实际试跑RT-DETR-L：使用现有Ultralytics原生实现与官方v8.3.0预训练资产，下载来源、66,511,432字节及SHA256随实验记录，未引入外部源码。沿用156/26图与同一姿态分类器，640输入、batch2、AdamW lr0.0001、AMP关闭、deterministic关闭，每次10轮及900秒上限。首轮继承偏置预热lr0.1，10轮约254.64秒；排查后第二轮仅改warmup_bias_lr=0，10轮约303.13秒。修正后末轮mAP50为0.4651；原生无NMS推理在预定conf0.1／0.25／0.5下两态数量全对分别0/26、0/26、2/26，conf0.25误检285／漏检49，conf0.5误检26／漏检56。第一轮三档均0/26，保留其配置排查证据。六组推理验证同一26图、102个GT，未替换原模型及118张导出。该模型从通用COCO权重起步，与已有多轮小车微调YOLO的17/26参照初始化不同，只说明本轮配置和短预算尚未得到可用计数，不能否定RT-DETR架构。[结果与权重](../datasets/annotated/e_bike/rtdetr_result.json) · [修正预热后的三档逐图预览](../runs/e_bike/rtdetr_biasfix_20261118/evaluation/review.html)。
 
-最终 train 规模沿用各任务 `config/dataset.yaml`，合计 **29,700 张**。当前正式产量为 0，因此这些数仍全部是待生产目标。首批执行后，按实际进入 train 的图像扣减余量；小样、替代分支、重复打包和中间渲染不重复扣减。下表为后续实施安排，尚未编译的组合不冒称已有可执行批量 JSON。父源组数量、已用与剩余、80% 父组上限和需要补标注/补渲染/补采的组见[八任务父源容量与分配可行性](PARENT_SOURCE_CAPACITY.md)；父子源配对、split 预留与 `source.yaml` 结构见[数据集父子源配对与分集预留](DATASET_SOURCE_PAIRING.md)。
+2026-11-18 已完成P2PNet思路独立点计数小训练：使用156/26图，冻结既有小车YOLO骨干，仅训练新点位置与姿态头，匈牙利一对一匹配、推理无NMS；未复制上游源码，不是官方VGG16复现。10轮共390次更新，训练约13.55秒；同一26图在固定conf0.25／0.5／0.75下两态数量全对分别0/26、0/26、2/26，未超过既有YOLO参照17/26。conf0.5时训练集也仅9/156图数量全对，存在大量重复点，说明本轮轻量点头尚未拟合，不能据此否定独立点计数路线。点距离匹配与旧框IoU指标分别解释；完整权重重载后骨干特征与缓存最大误差0，5项坐标、匹配和损失测试通过。原模型及118张导出保留；评估仍为已接触来源的研究对照。用户提出的多部件凸包及厚度约束尚未测试，凸包相交本身不构成多车计数依据。[结果与权重](../datasets/annotated/e_bike/point_counter_result.json) · [三档逐图点预览](../runs/e_bike/point_counter_micro_20261118/evaluation/review.html)。
 
-| 任务 | 最终 train 目标 | 首批之后的扩量安排 | 已准备的额外计划或具体边界 |
-| --- | ---: | --- | --- |
-| 人物 | 3,000 | 复用已选身份区域和遮挡布局，扩展单人/多人、街景位置及明暗；总目标含 750 张电动车遮挡，直立/倒伏约各半 | 当前只落实 36 张首批；后续按已记录用途选背景及人物工作场景，侧背面不作为两类身份正例 |
-| 电动车 | 4,000 | 扩展零/一/多车、直立/倒伏、人车及车车遮挡、视面与截断；直接实拍和 Blender 按各自父来源补充 | 8 张直接实拍增强方案已写；其余全量配额需在本任务固定计划中展开 |
-| 火焰贴纸 | 3,000 | 保留唯一图案，扩展楼面、尺度、位置和成像组合；多贴走具有明确贴放区域的分支 | 18 张首批限裁剪零/单贴；完整原图缺标注分支保持 pending，不阻塞现有裁剪与场景合成 |
-| 楼名纸条 | 3,000 | 同楼面换字、同字换楼面，组合单楼/多楼/无纸；检测和 OCR 分别记录监督 | 独立 Blender 计划已写 900（单名 600、多名 150、无纸 150），当前输出为小样，未生产、未自动纳入 train |
-| 禁行牌 | 2,500 | 多背景、距离、视面、有/无及截断组合；总目标含 500 张截断，首批 32 个杆子状态包含其中 | 当前 400 张计划已写；缺完整标签的直接实拍分支保持 pending，不进入本批准入 |
-| 垃圾桶开闭 | 3,500 | 用实际掩膜扩展四色、开闭、桶位、数量、邻桶遮挡和低视点；按实际失败记录排除不可用组合 | 19 状态渲染及最多 360 合成路线已实现；其余配额在同一任务计划扩展，不重新建版本目录 |
-| 垃圾贴纸 | 7,200 | 保持 24 类均衡，每类至少 300 个已标注实例；与桶色、位置、开闭和遮挡交叉，保持桶面比例 | 另有 26 状态 Blender 计划写 test，为共享图案合成集合；不抵扣 train，不是全局 test 总规模 |
-| 温湿度表 | 3,500 | 扩展针位、安装位置、距离、角度与成像组合；总目标约 875 张含反光 | 12 前景→36 合成计划已写；缺完整 Pose 的直接实拍保持 pending，反光下可见点按实际标注 |
+2026-11-18 已完成多部件归属加凸包固定参数小实验：复用四部件best模型及既有姿态分类器，不重训；同一26图以conf0.25、宽松NMS IoU0.95获取候选，按同类预测点的固定原型归属、两个共享部件或一个共享部件加尺度加厚凸包证据去重，不用GT参与处理。宽松候选／仅归属／归属加凸包的重复预测分别320／271／223，凸包方案相对候选减少30.3%，两态数量全对仍仅1/26；同模型框NMS0.3为14/26、重复0，已有另一YOLO模型参照17/26。相对宽松候选，归属加凸包删101个预测并损失1个GT覆盖，框NMS删345个并损失5个GT覆盖；保守删除未带来计数净收益。重复按最大IoU≥0.5归属同GT的多余预测统计，另报车辆漏检，不能把误删当改善。模型候选的部件点不一致、背景伪部件仍是限制；这不是独立部件检测或可学习归属模型。已生成104张带点、加厚凸包、删除候选的四组预览与实拍/合成拼图，10项相关测试通过；原权重哈希及118张导出保持。[结果](../datasets/annotated/e_bike/part_hull_result.json) · [逐图对照](../runs/e_bike/part_hull_probe_20261118/review.html) · [拼图](../runs/e_bike/part_hull_probe_20261118/comparison_contact.jpg)。
 
-来源初始配比仍按[八任务训练计划](DATASET_DESIGN.md#八任务训练计划)，依据可用标签与来源调整，缺少直接实拍不能伪装为实拍达标。沿用跨任务素材用途、父来源份额和视频跨时间取样；先使用当前已记录可用来源，不重新全库逐张筛查。具体组合不足时才处理该分支，达到入口可读、配额可行、来源与标签用途明确就结束规划。状态目标与组合轴覆盖、全量容量缺口见[训练目标与组合轴覆盖](DATASET_DESIGN.md#训练目标与组合轴覆盖生成)；容量缺口不为零时不能只放大预算，必须新增可行组合或状态。
+2026-11-18 已按视觉研发、实验治理及历史/文件治理Skill完成电动车计数全景梳理与实验文件分类，未新增训练。当前17/26参照为单类别检测、姿态分类及NMS0.3组合；同一26图逐车审计为车辆FP5／FN7，9张数量失败中7张涉及定位、2张仅姿态错误，重复指标已为0。后续建议优先输入尺度/候选诊断、定向合成与现有组合微调，再做有训练集拟合证据的独立计数头。已建立[研究维护页](research/E_BIKE_COUNTING.md)和由source.yaml引用的experiment_inventory，分类26个runs目录中的50份模型检查点、2份Pose初始化、1份骨干状态及182份特征缓存，核对9份结果引用均存在、11项结构化路径/哈希对一致。原路径和历史记录保留，无文件迁移、删除或正式版本创建；盘点入口只读现有实验并刷新证据索引。
 
-val/test 的整体图片总数尚未确定；保留已记录父来源用途和独立分支，不按 train 比例自动扩充。本轮不执行模型验证、测试或训练，也不据结果安排重训或选模。后续训练初始化方式仍未决定。未实际执行首批渲染，当前没有可靠耗时测量，不承诺完成日期。
+2026-11-18 已围绕17/26组合完成固定权重输入尺度与原生NMS前候选诊断，未重训。26图、102GT，conf0.25、NMS0.3、逐张矩形推理；640精确复现17/26且逐框坐标最大差0，960为12/26、1280为10/26、640全图加两块固定远端裁区为16/26；车辆FP/FN分别5/7、10/23、16/33、5/8。640的7个漏检中5个位置吻合候选分数低于0.25，2个有高分候选被NMS删除，已验证重叠保留框并出专图。固定裁区不读GT，原图比例、2px边界过滤和跨视图去重均留证；该窗口不是物理远端标定，其他裁区与尺度训练仍未验证。已保存原生NMS前全部解码框/分数、保留索引、四组104张预览及2张NMS图；8项坐标/归因测试通过。结果及实验索引已接入source.yaml，保持640及原权重、118张导出。[结果](../datasets/annotated/e_bike/input_scale_result.json) · [逐图预览与候选追溯](../runs/e_bike/input_scale_probe_20261118/review.html)。
 
-### 执行时序与停止点
+2026-11-18 已完成640下置信度/NMS与有界微调对照：同一原生NMS前解码张量比较5档conf×5档硬NMS及3组Gaussian Soft-NMS，原17/26逐框逐姿态复现，28组均未超越。conf0.20/IoU0.3为14/26、车辆FP8/FN7；0.25/0.5为15/26、FP15/FN6、重复3；0.20/0.5找回原7例中的3个，但数量12/26、FP19/FN4。0.01/0.7可按IoU匹配找回全部7例，却FP421、重复174、数量1/26。随后同156/26、640、batch4，从17/26检测器继续最多40轮、lr0.0001、warmup_bias_lr0、min15/patience10、墙钟900秒，实际40轮约204.56秒未早停，分类器不变；末轮原参数15/26（实拍1/10、合成14/16），mAP自动选优权重14/26，二者找回原7例中3个且姿态正确，但新增4个GT漏检。保留原640/conf0.25/IoU0.3组合及原权重、118张导出；未新增训练数据或正式发布。已生成936张参数与训练预览、原7例定位/姿态矩阵、误检raw_id与跨模型GT变化审计，12项相关测试通过。[结果](../datasets/annotated/e_bike/threshold_nms_result.json) · [综合对照](../runs/e_bike/threshold_nms_probe_20261118/review.html)。
 
-1. **当前已完成：**来源配置、可用标注选择、身份区域、首批计划及恢复命令；代码阶段通过 15 项审计自测（`lab/scripts/audit/test_production_entry_coverage.py --self-test`），静态覆盖 227 文件、402 入口记录。人物候选审查判据与三批审查已跑，审查方法与父源地面净空阈值未定，结论不作为父源选定依据。检查范围是配置、代码及内存几何，不是渲染或模型效果。
-2. **用户恢复生产后：**八项从[当前入口](../datasets/scripts/README.md#恢复生产入口)执行各自首批；仪表和桶状态先渲染，再局部刷新新产物分区。GPU 可用的渲染入口使用 OPTIX。只处理实际执行错误，不把首批变成无限验证循环。
-3. **后续扩量：**按已定状态和 train 目标，在各任务固定 JSON 中展开剩余配额，消费已有用途记录和父来源份额。缺标注或未准入素材保持 pending；只有具备明确失败证据的角色才记录排除。共享写入与 Git 由协调方串行处理。没有可执行计划的分支不能靠改 `count` 或复制近似状态冒充覆盖。
-4. **阶段交接：**记录各集合实际图数、实例数、来源组成、失败及排除项；正式输出仅进入 `exports/<任务>/{train,test,val}`。完成数据交接即停止，不自动进入训练，也不以规划数量宣称数据完成。
+2026-11-18 已完成定向数据与一轮有界训练：研究配方focused_recipe复用4个实拍/Blender底图及24个车体视面，生成128张训练合成、32张整布局族留出（8族）、54张完整实拍放大裁片、48张训练来源GT框外硬负例；训练386图、早停val仍为旧26，新32在训练结束后才评估。研究可见率下限显式0.55，46个实例低于0.7，原制作默认0.7保持；四种车车遮挡、掩膜框、无目标裁区、原val字节、分组及跨split像素去重均已机器核对，无新增人工确认。初始化原17/26检测器，640/conf0.25/IoU0.3及原姿态分类器保持，40轮约419.30秒。原模型／末轮／mAP选优在旧26为17／16／18，新32为21／22／23；选优实拍3/10低于原4/10，旧合成15/16高于13/16，旧26车辆FP/FN为3/7（原5/7）、实拍FN7（原4）。合成有小幅收益，实拍退步，保留原17/26参照，未发布新正式版本。15项相关测试通过，数据与58图三模型对照均已输出，当前182张sample及118张exports保留；研究输入单独由source.yaml登记，不切换现行生产计划。[结果](../datasets/annotated/e_bike/focused_result.json) · [262张新增数据小样](../runs/e_bike/focused_inputs_20261118/review.html) · [前后对照](../runs/e_bike/focused_comparison_20261118/review.html)。
 
-## 八任务接入与未受管路径
+2026-11-18 电动车本轮有界研究完成交接：P2/P3共享骨干、重建检测头，8图45辆在增加相同更新预算后均可完整拟合；完整156训练40轮，各1560更新且LR/累积轨迹一致，旧26主参数数量P3=14、P2=12，有限置信度复核仍未超保留20/26。姿态分组NMS三seed均退为18/26，未采用。保留17→20、框姿态匹配16→18的三seed稳定开发集增益，实际权重SHA固定，单图研究入口重新加载后58图逐框逐姿态复现。资料核对补充BPJDet/JointDet部件归属、CrowdDet集合实例、DDQ方向，尚未迁移到小车。正式数据182小样/118导出、部署和原权重未替换。[研究交接](../datasets/annotated/e_bike/goal_research_result.json) · [P2/P3对照](../runs/e_bike/p2_detector_densefit_20261118/review.html)。
 
-任务实现及助手位于 `datasets/scripts/<任务>/`，各自读取自身 `source.yaml`；公共能力位于 `datasets/scripts/common/`。任务代码不导入其他任务生成器，允许按父来源复用素材。旧入口兼容转发或明确停用，不能从退休 CLI 恢复生产。生产守卫要求声明输入、两个 YAML、计划、代码、输出及实际回执；具体支持分支见[脚本入口说明](../datasets/scripts/README.md)。
+2026-11-18 电动车连续质量排序实验完成：仅原156训练来源挖2224候选（train1842/内部val382），冻结语义特征，几何/图像+几何两头各50轮回归IoU并训练无歧义同车排序。主混合排序旧26均20/18，图像头布局32退为20/20；事后纯质量也无全面净收益，未采用。GT辅助模式只诊断。候选层排序比例提高未转成整图收益，关键同车框仍排序错误；原控制58图逐框逐姿态复现。后续转向P2/P3细粒度检测头的小子集受控拟合，不继续穷举旧开发集混合系数；当前数据与部署不变。[预览](../runs/e_bike/quality_rank_20261118/review.html) · [回执](../datasets/annotated/e_bike/quality_rank_result.json)。
 
-`lab/scripts/audit/test_production_entry_coverage.py` 区分停用、兼容转发、纯计划、受管写入及实际未受管路径；公开生产函数单独检查。静态审计不执行生成器，不证明动态调用、像素语义或标签真值。现有 V3 模型及内层 `runs/` 保持原位；历史候选、删除输出和旧回执不计入当前产量，不能按迁移后的路径直接复用旧回执。
+2026-11-18 电动车三种子与候选池复核完成：同1262裁片、固定split/起点、20轮，seed42/43/44均旧26数量20、框姿态匹配18，实拍6/5、布局32为21/21，成功图集合一致；只能支持已知开发集训练稳定性。NMS前原阈值语义候选最多匹配97/102、最终95/102；两处损失分别是同车较完整框被较差框抑制、相邻合框的多GT匹配歧义，不都等价于车辆消失。新增框匹配歧义诊断和反例测试，现有原17/16及新20/18不变；下一步固定语义筛选研究连续框质量排序，goal继续，正式数据与部署不变。[三种子预览](../runs/e_bike/verifier_seed_study_20261118/review.html) · [候选池复核](../datasets/annotated/e_bike/candidate_pool_result.json)。
 
-## 状态计划的输入与入口契约参考
+2026-11-18 电动车持续研究补齐来源接触与完整性小训练对照：当前58图与直接156训练无像素/镜像重复，继承V3训练4000图与5张实拍原帧也无精确重复；48张合成评估均共享训练背景与车体来源，不能称来源隔离。局部候选拒绝组与等量纯背景重复对照均1233 train／252内部val、20轮，旧26数量/严格分别16/16与20/18，实拍3/3与6/5；硬拒绝少2FP却新增6个漏GT，未采用。固定原语义筛选再用质量组判姿态也未改善，严格降至17/26。原方案与语义验证器离线计算中位18.51/33.64ms，4方案58图两遍预测均与冻结结果一致；不代表Ubuntu/ROS耗时。下一步多种子复核20/18及设计明确来源分组，当前数据/部署保持。[对照预览](../runs/e_bike/completeness_comparison_20261118/review.html) · [实验回执](../datasets/annotated/e_bike/completeness_result.json)。
 
-当前可执行计划位于各任务 `config/`，字段以入口代码和对应契约测试为准。通用计划包含任务、集合、预算、用途、约束及 `strata`；每个状态明确背景、目标、标签、增强、参数、来源和配额上下限。贝叶斯为已决定的可行状态分配预算，不选择任务目标，也不自动找素材。先验和权重记录为设计假设；不提供模型验证反馈。
+2026-11-18 已建立电动车持续研究goal，并完成首轮评价复核：20组冻结预测在IoU0.3/0.5/0.7回放，IoU0.5下原参照数量17/26但严格逐车框/姿态全对16/26，新验证器数量20/26但严格18/26，实拍严格4→5/10；计数仍有错漏抵消。实拍10图实际5原帧及镜像、3已声明父组，两方向均数量正确的原帧族1/5→2/5，不能当10个独立场景；来源别名、近邻及初始化接触矩阵仍待继续核查。原参数下贪心和最大有效匹配数一致，其他条件存在5条逐图敏感记录，历史结果保持。4项新测试通过；后续依次研究来源相关性、运行成本、候选完整性/同车去重及召回，正式数据与部署未切换。[复核结果](../datasets/annotated/e_bike/evaluation_audit_result.json) · [持续研究与阶段断点](research/E_BIKE_COUNTING.md#持续研究goal与评价复核)。
 
-计划状态必须与实际入口支持的字段和参数一致。固定配额的状态不宣称由先验改变数量；可调整配额也不证明模型效果。计划和未来渲染文件是不同对象，不能将占位路径登记为现存素材。详细算法与设计约束见[贝叶斯状态组合](DATASET_DESIGN.md#贝叶斯状态组合与生成契约)，完整执行命令只在[脚本入口说明](../datasets/scripts/README.md#恢复生产入口)维护。
+2026-11-18 已完成电动车三类候选验证器实验：冻结原17/26检测器，仅原156训练来源生成1046 train／216内部val裁片，完整160输入训练20轮约75.97秒。640/conf0.25/NMS0.3下，原参照及无过滤池控制17/26，仅非车过滤18/26，联合姿态20/26；实拍4→6/10，既有布局32保持21/32。逐车FP5→3、FN仍7，修正3个匹配姿态，58图无新增GT丢失；低阈值仍有大量局部/重复预测。原26及布局32是反复使用的开发诊断，内部val受初始化接触影响。原参照与新末轮权重均保留，仅研究候选；当前182小样、118导出与部署不变。[条件与带框预览](../runs/e_bike/candidate_verifier_20261118/review.html) · [持久回执](../datasets/annotated/e_bike/candidate_verifier_result.json)。
+
+2026-11-18 已完成等训练量数据消融及同来源整帧采样补充：四组均保留旧156 train，补48旧图重采样控制／硬负例／完整实拍裁片／12族合成，各204槽位、固定20轮、seed42、batch4、lr0.0001，从同一17/26权重开始，分类器不变。实测每组76次更新且逐更新LR/epoch/梯度累积轨迹完全一致；末轮主比较旧26为17/17/17/16，实拍3/3/2/3，既有布局32为21/20/20/22。裁片组实拍FP/FN7/10，对照5/6；据此追加与48裁片父帧逐一对应的整帧重采样组，同样76次更新及相同轨迹，实拍4/10、FP/FN3/7，但旧26仅16/26、新32为21/32。原参照旧17/26、实拍4/10、FP/FN4/4，保留原组合。五组GT实例数762/556/648/680/664，单种子配比干预不作普遍数据类型排名；整帧组是事后设计的补充，原四组回执保留。GT框姿态诊断98/102及95/96，仅用于区分定位与裁片分类，不当检测成绩。已输出六组58图错误标色及权重/训练量回执，5项新测试通过，当前sample/exports及原权重保持。[综合结果](../datasets/annotated/e_bike/data_ablation_result.json) · [原四组](../runs/e_bike/data_ablation_20261118/review.html) · [含整帧补充的逐车对照](../runs/e_bike/real_sampling_followup_20261118/review.html)。
+
+**禁行牌全量制作与核对。** 已按接受的小样扩为 Train 2500、Val 300、Test 300。Train 的完整／截断或遮挡／可辨杆底座／空场／普通杆为 1300／500／200／300／200；Val 为 140／60／25／45／30。实际使用 Train 344、Val 67 张底图或原帧，父组 15／4；Train 相机来源 1700（直接实拍 9）、Blender 底图 800，Val 相机来源 300（直接实拍 11）。两集均覆盖四视面与远近／截断／杆底座16格，分别有80／16张实景灯体遮挡，目标短边小于32像素的合成图为318／28张；70个原有框的输出出现随图保留。普通杆硬负200／30张为各集一张原图的裁区与色调派生。逐图解码、标签范围、独立可见掩膜框、遮挡与继承框、完整色调组的亮度／饱和度检查通过，集内及跨集相同RGB重复为零，背景父组跨集重叠为零。Val 曾缺少侧视小目标，已在固定300张内补齐并重核。当前计划登记、实际统计及训练来源索引均已切到全量；Test已生成并作受控回归；完整训练及Val/Test回传已完成，未创建正式数据版本。多数场地同源且共享牌具视频，评价范围为受控诊断。Windows数据预检通过。[当前制作入口](../datasets/scripts/sign/README.md#当前全量数据) · [全量审计](../datasets/annotated/sign/full_dataset_audit.json) · [带框总览](../datasets/annotated/sign/full_dataset_contact.jpg) · [训练预检](../datasets/annotated/sign/full_training_preflight.json) Test使用20张停车视频帧、1个父组，完整140／边缘截断60／杆底座25／空负75，无已确认普通信号灯杆和直接牌具正例。19条旧待验证资格的源像素接触检查通过并写回；初次新增的8张车体遮挡造成牌面内部背景窗口，已全部换成边缘截断，原照片及原掩膜完整。最终三集均覆盖16格，封闭遮挡背景窗口提示为零；三对集合的父组及相同RGB交叉均为零。训练仍仅用Train／Val选择，Test入口已启用。[三集预检](../datasets/annotated/sign/full_three_split_preflight.json) · [修订回执](../datasets/annotated/sign/test_occlusion_repair.json)。
+
+**禁行牌共享底图扩源预检。** 2026-11-18 逐帧访问当前 585 张 train 合格底图（Blender 564、同视频实拍 19、照片 2）。582 张在本轮近地条带及底座跨度条件下找到布局，已编成独立的 [1,164 张扩源候选计划](../datasets/scripts/sign/config/background_expansion_plan.json)，该扩源计划尚未渲染。另 3 帧保留原资格并记录本轮搜索失败；三个物理父来源不能等同于 582 个独立场景。原 `background_source_inventory.json` 的 155 条未分配背景已完成逐图复核，现行状态见下方补证结果。[操作入口](../datasets/scripts/sign/README.md#共享底图扩源)
+
+**禁行牌底图补证与分集。** 2026-11-18 原 inventory 的 155 条 `sign/unassigned/unknown` 已逐图写回。147 条为 `eligible`（139 张实拍、8 张旧 Blender），其中 10 张保留已有牌具完整框；147 条已全部分配为 Train 70、Val 77、Test 0。另 4 条主体牌具帧为 `blocked`，4 条落点不明的合成用途为 `unknown`，其完整无牌证据可用于负例。原有 585 张 Train 合格底图继续可用。新增覆盖的是 14 个此前未在禁行牌合格池出现的实拍父路径，多数拍于同一室内模型场地。按实际父视频、照片及场次记录覆盖，原 inventory 保留为历史快照。`bins004` 父视频跨任务已有 Val 接触，禁行牌本批已归 Val。上一轮分集小样为 Train 162 张（79 框、83 空负）、Val 31 张（18 框、14 空负）；使用 99 张底图、19 个不交叉父来源引用，保留 3 个旧牌框。历史 Val 照片与 Train 同父，该轮已排除。前景共享同一牌具视频，Val 为受控场景诊断。图签解码、可见掩膜框及继承框核验通过，跨集无相同 RGB 图。旧根目录 188 张已按清单清理，当前根清单为分集汇总。[审计](../datasets/annotated/sign/current_sample_audit.json) · [Train 小样](../datasets/samples/sign/train/manifest.json) · [Val 小样](../datasets/samples/sign/val/manifest.json) · [155 帧复核回执](../datasets/annotated/common/review/sign_background_155_20261118/recheck_receipt.json)
+
+**禁行牌已接受的440张困难组合小样。** 本轮Train305张、236框、69空负；Val135张、140框、23空负，保留36个原有牌具框的输出出现。使用Train66／Val25张底图、15／4个父来源；每集合均覆盖四视面×小目标／中景／部分截断／杆底座截断16格。85组同布局四色调经亮度与饱和度实测核对；40张目标框短边小于32像素。各集合8张实景灯体遮挡和4张普通信号灯支杆硬负；这些硬负为两张不同分集原帧的色调派生。跨集无背景父来源交叉或相同RGB图像。上一轮193张生成图签已清理；以识别任务与有效监督为目标，不把接地及阴影真实感作为普遍生产门槛。真实识别效果尚未评估，未启动训练。[本轮审计](../datasets/annotated/sign/current_sample_audit.json) · [带框总览](../datasets/annotated/sign/current_sample_contact.jpg)
+
+
+**楼名全量检测数据。** 已完成 train 3000 张／3495 框／601 空负、val 300 张／323 框／82 空负、test 300 张／334 框／73 空负。13 张实拍底图来自 4 个父视频，按父来源分集，选用 182 个 Blender 有纸／无纸物理模板。全量分支为实拍 41、原纸框替字 195、楼体＋实拍底图 2164、纯渲染 1200。三集分别覆盖全部 26 种楼体／纸条开关状态，train 的多楼部分有纸 1016 张、有楼无纸 598 张；低机位 0.14／0.20 m，左前单楼 70°、多楼 50°，透视与接地阴影沿用物理层。逐图解码、图签、最后可见纸面掩膜及框核对通过，3600 张无相同 RGB 重复，选中实拍底图父组无跨集重叠。当前计划登记、训练数据入口及实际清单已同步；val/test 保留既往开发接触并共享楼体资产，用于受控诊断；原远程训练和新视频微调情况见下方，未创建正式发布版本。[数据入口](../datasets/exports/building_name_paper/data.yaml) · [审计](../datasets/exports/building_name_paper/audit.json) · [Train 拼图](../datasets/exports/building_name_paper/train_contact_sheet.jpg) · [Val 拼图](../datasets/exports/building_name_paper/val_contact_sheet.jpg) · [Test 拼图](../datasets/exports/building_name_paper/test_contact_sheet.jpg) · [复跑入口](../datasets/scripts/building_name_paper/README.md#当前全量检测数据)
+
+**楼名训练打包。** 当前 [训练包](../training_packages/building_name_paper/README.md)已包含三集 3600 张图签、同类 V3 初始权重、共享引擎及楼名专项诊断；150 轮上限，120 轮后允许 15 轮耐心早停，单次硬时限 10 小时。3600 条最终纸框与已知生成控制已绑定来源索引，显式声明两类 Blender 分支共享楼体资产。共享便携环境下的包内预检、代码指纹、权重加载和单图 CPU 有限前向通过；原远程训练已完成 135 轮，第 108 轮为 best；回传模型已核对，新增视频微调见下方。Test 不参与当前微调选模。[检查回执](../training_packages/building_name_paper/package_checks.json) · [配置与启动](TRAINING_WORKFLOW.md#楼名纸条训练包)
+
+**楼名新视频独立微调。** 按用户指定，已在训练包内新增 [finetune_dataset](../training_packages/building_name_paper/finetune_dataset/manifest.json)，只消费三段新拍视频及其派生图，原训练图参与数为 0。Train 231 张／177 框／90 空负，Val 21 张／13 框／8 空负；原始抽帧共 72 张，其余为 Train 裁剪及 24 张双／三纸条人工多视图拼图。纸面四角视觉核对后用光流与单应性传播，逐框检查；不采用弱模型的预测框充当真值。Train 使用 buildingname1/2，Val 使用 buildingname，视频文件隔离但共享现场与拍摄 session，属于同场景诊断。已在包内从回传 best.pt 以低学习率完成 43 轮微调，第 33 轮为 best，保留完整 last 和精简权重；新 Val 的 TP／FP／FN 为 4／2／9→10／0／3。原 Test 的重叠额外框减少，但背景误检仍有回归，候选独立保留；数据和运行均与原全量 Train 分开。[数据制作](../datasets/scripts/building_name_paper/README.md#新视频独立微调) · [微调配置与进度](TRAINING_WORKFLOW.md#楼名新视频独立微调)
+
+**楼名 Blender 光照与低机位。** 2026-11-18 已将 `Buildings` 保存为四相机场景，A/B/C 单楼和 ABC 全景各有一条 275 帧轨迹。相机离地 0.14–0.23 m，单楼覆盖左前 70°，三楼覆盖左前 50°，参考车载帧构图作近似，实际相机标定仍未知。A、B、C Collection 分别控制楼体显示及渲染，支持全部七种非空组合；纸条与文字可随楼体或单独开关。照明改为 World 环境光和 Cycles 漫反射反弹，纸面为粗糙漫反射。已认可的低机位 Blender 分支覆盖七种楼数组合及左前、正前、右前对照，当前小样直接复用这些图签，计划和掩膜保存在本任务已有的 annotated/fire 归属下。实拍、实拍底图替字与楼体＋实拍底图通过 build_current_sample.py 接到同一小样入口。新增楼体合成由道路标线消失点拟合地平线、按射线反投影接地，并用带楼／空场漫反射接收面比值产生阴影；焦距和机高保持近似声明。前景、地面光照层和纸条掩膜保存在 annotated/fire/building_name_paper_sample/hybrid，实际产量由 source.yaml#sample_manifest 定位。四条轨迹的 1,100 个整数帧均检查纸框在画面内，每条抽查 92 帧纸面遮挡。火焰独立使用同工程的 `Fire Buildings` 场景和 241 帧轨迹，共享楼宇几何。[Blender 分支证据](../datasets/annotated/fire/building_name_paper_sample/blender/manifest.json) · [轨迹、开关与入口](../datasets/scripts/building_name_paper/README.md#blender-光照轨迹和楼体开关)
+
+本次替换前的生成小样已归档于 `Archive/technical/datasets/e_bike/sample_before_recheck_20261118/`、`Archive/technical/datasets/sign/sample_before_recheck_20261118/`、`Archive/technical/datasets/meter/sample_before_recheck_20261118/`、`Archive/technical/datasets/fire/sample_before_recheck_20261118/`，分别保留旧 36、40、3、18 张及原清单，供本次对照。以上为相应小样运行的记录；垃圾贴纸随后已完成本页所列三个 split 的完整导出，其他任务的实际进度按各自当前清单核对。
+
+电动车全量 train 草案为 4,000 张，禁行牌 2,500 张 Train、300 张 Val 与 300 张 Test 已执行。早期逐图库快照另有尚未分配 split 的完整直接实拍正例：电动车 16、火焰 5、楼名 4、禁行牌 6、桶状态 17、人物 3 个帧版本。同一照片可属于多个任务。推进中的任务按父来源、既往接触和 `source.yaml` 的拟议用途确定 split，再用当前资格打包。桶状态与仪表的合成入口使用对应的 Blender 前景。[各任务入口](../datasets/scripts/README.md#恢复生产入口) · [组合轴覆盖](DATASET_DESIGN.md#训练目标与组合轴覆盖生成) · [全量预算依据](FULL_TRAIN_PLAN_DESIGN.md)
+
+**2026-11-17 垃圾桶优先批次。** 逐图库按原帧记录 `bins004` 的 20 张 val 四桶图，共 80 个开闭框；这 20 帧的四桶开闭状态组合相同，只是视角有所变化，组合数与父视频组数各为 1，不能将帧数或实例框数当作组合多样性。另将已完整审查的 2 张 1920×1080 四桶图按 `source.yaml` 对应父视频分到 train。当时的[train 直接实拍清单](../datasets/annotated/waste_bin_state/full_export_history/20261117T095913236346Z/train/manifest.json)导出 12 张（2 张正例、10 张整帧无桶负例，8 个桶框），[当时的 val 清单](../datasets/annotated/waste_bin_state/full_export_history/20261117T095913236346Z/val/manifest.json)导出 20 张正例（80 个桶框）。图签逐项存在、导出图片哈希与入库原图一致，train 与 val 无同帧或同背景父组。数据库另有 2 张与 train 同属 `full_scene` 父视频的 val 空负资格，本次 val 导出未选它们；此前 22 张 val 的生成副本保留在 `tmp/waste_bin_state_val_22_before_parent_filter_20261117/` 供追溯。旧选源中的 10 张 train 空背景已通过实际合成入口的标签、父图和接触掩膜检查；Blender 前景、掩膜与标签已按下方批次补齐。两张有桶但红桶盖不可判的旧帧仍为部分标签，不计完整正例。
+
+**桶状态实拍底图补录。** 轨道帧入库前，逐图库有 108 个合格帧身份（train 22、val 27、test 59），合成选源入口已读取三个 split 的全部合格底图。机器先用已有完整标签和源图像素脚点为 41 张写入资格，再参照底图中已有的桶框估算相对尺寸，放大试放偏小的前景，补入 14 张（val 6、test 8）。本轮剩余 13 张中，5 张已有脚点但标签或格式未齐，5 张首次试放未找到完整脚点，3 张放大后未找到完整脚点。机器证据满足用途即可生效。借用 train 前景试放所得的空间证据可用于 val 和 test 底图入库，正式生成时核对前景、底图与输出的 split 配对。`pool_159.png` 等 22 张以桶为画面主体的帧，桶任务常规合成用途为 `blocked`，桶开闭直接正例资格仍为 `eligible`。[首批机器写入回执](../datasets/annotated/common/review/bin_probe_machine_qualification_20261117/receipt.json) · [调整尺度写入回执](../datasets/annotated/common/review/bin_probe_scaled_qualification_20261117/receipt.json) · [剩余试放清单](../datasets/annotated/waste_bin_state/pool_batch_probe_remaining_20261117/manifest.json) · [主体修订回执](../datasets/annotated/common/review/bin_primary_subject_exclusion_20261117/receipt.json)
+
+**Arena 八路相机通用底图。** 从统一工程 `datasets/assets/blender/aiaec_dataset.blend` 的 `Arena`、`Arena Indoor Soft Light` 和 `Arena Detailed` 各沿八条轨道渲染，每路 24 帧，每种场景 192 张，共 576 张，保存在 `datasets/raw/shared/backgrounds/rendered/aiaec_eight_routes*_20261117/`。每张均按场景物件记录写入八任务的 train 整帧 `empty_negative` 资格。三种场景共用同一 Blender 父来源。利用保存的相机矩阵和约 4.2 米见方的地面投影，564 张形成可用接地候选，分别取得人物、电动车、禁行牌和桶状态的 train `composite_background` 资格。其余 12 张在这四项任务中仅有空负资格。楼名纸条和仪表均复用整帧空场证据，各有 576 张取得 train `composite_background` 资格。任务计划按实际构图核对放置。这批通用空场对火焰和垃圾贴纸当前用于空负例。表面贴放分别使用下方的可贴立面及可贴桶面批次。[Arena 帧清单](../datasets/annotated/common/sources/aiaec_eight_routes_20261117/manifest.json) · [Indoor Soft Light 帧清单](../datasets/annotated/common/sources/aiaec_eight_routes_indoor_20261117/manifest.json) · [Detailed 帧清单](../datasets/annotated/common/sources/aiaec_eight_routes_detailed_20261117/manifest.json) · [入库入口](../datasets/scripts/common/ingest_shared_route_backgrounds.py)
+
+**火焰当前接线。** 当前 train 3,000、val 300、test 300，共 3,600 对图签、5,704 个指定贴纸框。已将 train 450、val/test 各 30 张普通空负替换为硬负例，本阶段随后补齐600张同框干扰正例，并将Val/Test各90张既有合成正例改为小目标，未涉及的文件保持原字节。train 红灯、红橙桶、红橙锥桶各 150 张；val/test 各复核 15 帧真实红桶图，每帧两档温和亮度派生，来自两个不同父视频。当前四种生成方式为实拍及亮度派生 115、实拍墙面合成 2,057、完整 Blender 1,218、楼体＋实拍场景 210 张，覆盖 39 个父来源，跨分集父来源和相同图片重叠为零。退出的 510 组旧图签及失效预览、掩膜、混合图层已按清单清理，保留原件、原生成计划和持久回执；当前完整配额、逐图记录、空标签、统计与训练入口已同步。原墙面配准、楼角 PnP 近似相机、Cycles 接地阴影及线性光合成继续沿用，整楼未完整观察时保持 null。首轮方案已落地，保持3600图和5704框；Val/Test各补45个8–16像素和135个16–32像素目标，保留较大目标与实拍。基础包制作阶段仅做生成及打包一致性处理；其后远程基线已完成135轮，下载的best与Val/Test结果保留在原训练包内，当前按下述专项接续。[当前集合](../datasets/exports/fire/manifest.json) · [空负替换阶段核对](../datasets/annotated/fire/current_full_review/audit.json) · [替换入口](../datasets/scripts/fire/README.md#空负例批量替换)。
+
+**火焰10轮微调及对比已完成。** 使用1224张精简Train、batch 4，在包内完成固定10轮，约572秒，Val选出第6轮best；[结果入口](../training_packages/fire_sticker/finetune_result.json)关联权重、哈希与[对比报告](../training_packages/fire_sticker/runs/fire_sticker/v4_compact_finetune_10ep_batch4_20261118_2045_r1/comparison/comparison.md)。同一640输入、conf=0.25、NMS IoU=0.7、匹配IoU=0.5下，Test红桶误检框8→3、贴纸475/480→480/480、总误检9→4；Val贴纸474/480→480/480但误检0→2（窗内橙色干扰）。未参与本轮微调的2400张旧Train图，两版均3760/3760检出且零误检；该回归覆盖三种合成方式，原直接实拍Train已全部回放。原候选池和Val/Test图签保留，父源划分不变，现有集合是开发已接触的诊断，非独立实车泛化证据。已有预测按0.5过滤可令本轮Val/Test红桶误检归零，但Test会漏2个真小贴纸，且Val/Test各留1个其他误检；未重跑推理或修改默认阈值。启动时补齐包内来源证据引用，评估时修复Windows字体缓存重复写入；失败回执均保留，未额外训练。
+
+**火焰硬负例开发小样。** 独立 `Fire Hard Negatives` 场景已生成 12 张颜色及有无贴纸对照：6 张正例、3 张红橙硬负例、3 张其他颜色控制负例；红／绿灯、红／蓝桶、橙／灰锥桶均保持成对机位和光照。颜色继续作为有效线索，目标保留指定图案，干扰物只记上下文。已重解码 ID 核对图签与逐楼归属，并视觉核对贴墙、比例和接地。另视觉复核两张实拍，确认其中一张红桶帧为 `fire/hard_negative` 的 val 素材，另一张保留普通负例身份。该开发小样保留；当前集合的空负批量替换已完成，未训练或评估误报率。[小样与参数](../datasets/scripts/fire/config/hard_negative_preview.json) · [独立核对](../datasets/annotated/fire/hard_negative_review/audit.json) · [颜色拼图](../datasets/annotated/fire/hard_negative_review/contact_sheet.jpg)。
+
+**垃圾贴纸 Blender 桶面底图。** `Arena Waste Sticker Preview` 沿八条轨道各取 3 帧，得到 24 张无物品贴纸的四色桶面图。逐图库已写入 96 个可贴正面及 24 张 train `composite_background` 资格。现用选源和合成入口已逐帧试贴，持久生产回执登记实际产出 24 张图和 24 份配对 YOLO 标签。该批为试跑，当前可从回执核对产量。[桶面源清单](../datasets/annotated/waste_bin/waste_sticker_arena_surfaces_20261117/manifest.json) · [试跑回执库](../datasets/annotated/media_index/production_state.sqlite3) · [合成入口](../datasets/scripts/waste_sticker/generate_sticker_real_photo_v4.py)
+
+**共享池索引。** 共享池清单的 `records` 保留 200 条基批次记录，`extensions` 纳入三份 Arena 渲染清单、C 楼立面清单和垃圾贴纸桶面清单。合并这五批后，候选发现器读到 824 条共享池图像路径、823 个帧身份，并核对 `raw/` 的 2,543 条图像路径全部已注册。机器审查关联表沿用原四份 JSONL 重建，`check` 已通过。各任务的用途资格以逐图库为准。[共享池清单](../datasets/annotated/common/sources/background_pool_manifest.json) · [候选发现器](../datasets/scripts/common/discover_raw_background_candidates.py) · [机器审查关联表](../datasets/annotated/common/sources/background_pool_machine_review_index.json)
+
+桶状态当前共有 672 张合格底图（train 586、val 27、test 59）。实际合成入口通过 `qualified_backgrounds` 和 `eligible_ground_backgrounds` 读取了新增的全部 564 张，并用其中一张产出 train 合成试点及配对标签，清单状态为 `complete_candidates`。人物 V4 已收官，本批登记来源与用途资格。[轨道底图合成试点](../datasets/annotated/waste_bin_state/sample_history_20261117/route_background_composite_probe/manifest.json)
+
+桶状态代表缩影共 42 张，含直接实拍正例 5、实拍空负 5、实拍底图合成 16、Blender 轨道底图合成 16。合成前景统一使用 `Waste Bins Photo` 的后垂开盖。198 个可行帧组成 96 个互补候选对，贝叶斯按底图类型和新增桶数分层选 16 对。两类底图中新增 1、2、3、4 桶各 4 张，80 个新增框中开、闭各 40 个。实拍底图另保留一个黑桶开盖框。32 张合成均为 train 来源，正视 31 张、斜侧 1 张，邻桶有重叠 15 张。直接实拍保留原 split，成套小样共有 37 张 train、2 张 val、3 张 test。小样根只保存 `images/`、`labels/`、`manifest.json`。[小样清单](../datasets/samples/waste_bin_state/manifest.json) · [分配审计](../datasets/annotated/waste_bin_state/sample_composite_allocation.json) · [图签总览](../datasets/annotated/waste_bin_state/sample_overview.png) · [旧小样迁移和清理](../datasets/annotated/waste_bin_state/sample_history_20261117/current_sample_predecessors.json)
+
+**垃圾桶开闭当前阶段：真实桶主导的 10 轮微调及前后对比完成，指定红桶漏检尚未解决。** [本次运行](../runs/waste_bin_state/v4_real_priority_finetune_10ep_batch4_20261118/metadata/status.json)从原始远程 best 初始化，batch 4，实际参数为 640 输入、偏置预热学习率 0，已完成全部 10 轮，Val 选优为第 1 轮。[同条件比较](../runs/waste_bin_state/v4_real_priority_comparison640_batch4_20261118/bin_state_comparison.json)包含原始、best 和第 10 轮 last；[指定图诊断](../runs/waste_bin_state/v4_real_priority_finetune_10ep_batch4_20261118/diagnostics/f002017/comparison.json)显示 640 下红桶仍漏，960 下 last 检红却把绿、蓝开盖误判闭盖。当前图签由真实四色桶补拍、单／双／四桶真实前景合成与旧 Train 正负回放构成，规模、来源和逐色开闭配额读取[当前导出](../datasets/exports/waste_bin_state/manifest.json)、[微调计划](../datasets/scripts/waste_bin_state/config/reshoot_finetune_plan.json)与[核对回执](../datasets/annotated/waste_bin_state/reshoot_finetune/verification.json)。原 Val/Test 图像及标签字节保持一致；补拍同一 session 全部归 Train。单桶仅放大同色开闭均有证据的机位，多桶使用已观察的兼容正面／背面组；全部按完整可见桶及附属盖板标框。邻桶布局按实际 mask 交集另记遮挡，不能把要求交叠的布局数当成有效遮挡数。现有真实低机位仅灰桶闭盖，没有成对低机位开盖和高俯视，侧面裁边照片仍只作原图训练，不补造新视角。[视角观察](../datasets/annotated/waste_bin_state/reshoot/view_observations.json)与[代表图](../datasets/annotated/waste_bin_state/reshoot_finetune/overview.jpg)记录这一范围；贴图接地感及真实视角覆盖仍有限。
+
+[当前微调配置](../lab/features/waste_bin/training/config/waste_bin_state_reshoot_finetune_v4.yaml)统一 640 输入，显式修正偏置预热学习率为 0，本次 batch 4、10 轮，从原始远程 best 初始化新优化器；运行状态、保存权重与实际参数均已核对。上一轮 [960 输入运行](../runs/waste_bin_state/v4_reshoot_finetune_10ep_batch4_20261118/metadata/status.json)已完成 10 轮，[统一 640 的比较](../runs/waste_bin_state/v4_reshoot_comparison640_batch4_20261118/bin_state_comparison.json)未改善整体回归表现；本次没有续训上一轮候选，也没有覆盖原始模型。旧微调图签已完整保存至[替换备份](../datasets/annotated/waste_bin_state/full_export_history/20261118T115303522390Z/publication_backup.json)，旧配方及源回执见[生成输入快照](../datasets/annotated/waste_bin_state/full_export_history/20261118T114233064429Z/finetune_inputs.json)。原完整基线及已执行输入保留在原训练包与[基线导出历史](../datasets/annotated/waste_bin_state/full_export_history/20261118T095958167975Z/manifest.json)。
+
+**垃圾桶开闭初始全量交付（微调前基线）。** 正式导出共 3,939 张，train 3,500、val 186、test 253。Train 含实拍正例 4、实拍空负 24、Blender 轨道空负 276、实拍底图合成 800、Blender 轨道底图合成 2,396。成图 0／1／2／3／4 桶分别为 300／1,600／526／542／532 张，四色各自开闭等量，保留 10 个实拍黑桶开盖框。贝叶斯按底图类型与新增桶数在可行互补对内分配，1,598 个互补对的合成底图和外观参数分别固定。实际前景保持完全后折开盖，图签覆盖可见整桶。全图解码、图签配对、开闭框和 SHA-256 去重均通过。[基线训练包数据入口](../training_packages/waste_bin_state/dataset/data.yaml) · [基线全量清单](../datasets/annotated/waste_bin_state/full_export_history/20261118T095958167975Z/manifest.json) · [Train 分配回执](../datasets/annotated/waste_bin_state/full_plans/train_composite_allocation.json)
+
+Val 含 33 张直接实拍正例、25 张实拍空负、128 张实拍底图合成。Val 开盖 107、闭盖 349，保留底图原桶标签且存在闭盖偏多。Test 含 9 张直接实拍正例、52 张实拍空负、192 张实拍底图合成，开盖 213、闭盖 202。两个评估集合各剔除 2 张与 train 同父的 `full_scene` 空负。实拍父源分属各 split，两套合成评估前景共用 `Waste Bins Photo` 桶资产，各自独立渲染。22 张 train 实拍底图来自两个父视频，564 张轨道候选共享一个 Blender 母场景。[分集与归档](../datasets/exports/waste_bin_state/manifest.json)
+
+桶开闭便携包已在 `training_packages/waste_bin_state` 完成构建与离线检查，含全部三集图签、通用 COCO YOLOv8n 初始权重、120 轮配置、Test 与专项评估入口。代码和权重摘要、3939 张逐桶元数据绑定、便携环境预检均通过；本次未启动训练或模型推理。颜色用于后续分组诊断，不参与训练损失或选模。[训练包说明](TRAINING_WORKFLOW.md#垃圾桶开闭训练包)
+
+组合轴参考表登记了 19 个源渲染状态，显示的差额限于该表登记的计划。桶开闭 train 的 3,500 张目标已由正式导出清单核实。[参考计划覆盖](DATASET_DESIGN.md#训练目标与组合轴覆盖生成)
+
+桶状态后续批次读取现行逐图用途资格。缺少某个底图类型或桶数组合时，优先把该组未用配额转给同桶数的可行互补对，并登记实际配比与剩余缺额。正式打包按本批图签与实际来源核算总数。尺度有实测证据时用于细化落点，其余使用并记录有依据的近似。`eligible + unassigned` 按父来源和已有接触安排本批 split，已分集且可用的组合照常生成。[全量编制入口](../datasets/scripts/waste_bin_state/plan_full_train.py)
+
+逐图库当前有 654 张已审无桶且具备接地资格的桶状态底图。584 张为 train（含 564 张 Blender 轨道帧），val 19 张，test 51 张。共享候选清单按 `frame_id`、资格记录 ID、父组和 split 提供来源；接收任务按本任务标签与实际落点使用。这 564 张轨道帧与按任务核对的 Blender 底图快照逐图一致。[跨任务接地候选](../datasets/annotated/waste_bin_state/ground_reuse_manifest.json)
+
+本轮合成流程简化聚焦垃圾桶底图入库、计划和生产。车牌沿用省赛模型，垃圾分类贴纸的批次进度见下方。
+
+**垃圾分类贴纸实拍补录。** 车载视频 `V_20261112_152304.mp4` 的 002011–002052 共 42 帧已按 `waste_sticker` 逐图审查：31 帧为完整的当帧贴纸标签、11 帧因边缘截断或模糊保留部分标签，0 帧确认无贴。四张实物贴纸始终是油漆、果核、剩饭、纽扣电池这一套；入画数量变化只是可见子集和视角变化，**物理图案组合与父视频各只有 1 个**。`002016` 的四框经原图及参考图案复核后获得 train `direct_target` 资格，已通过逐图库正式打包到 `datasets/samples/waste_sticker/`；其余 30 张完整视频帧和 `P22_TRASH.png` 完整回归图列为 `unassigned`，11 张部分标签帧不计直接正例配额。`P22_TRASH.png` 与 002027 的全帧 SSIM 约 0.990，现有捕获身份也关联二者，因此这些帧不能当作独立采集或新图案组合。[旧贴纸 train 生产回执](../datasets/annotated/media_index/production_state.sqlite3)的 192 张均为实拍桶面合成图；另按[打包声明](../datasets/scripts/waste_sticker/config/train_193_package_spec.json)组成 193 张训练候选 ZIP，含 196 个标签框（192 个合成、4 个直接实拍）。ZIP 完整性和全部图片解码通过；合成图 8 张总览图逐图查看，贴纸落在红桶面且框在贴纸区域，未见明显错位。类别与图案按生成清单对应，尚无独立模型识别验证；两张底图及红桶单一载体不能视为场景多样性。
+
+**垃圾桶与贴纸的 Blender 出图复核。** 桶盖开闭从 `Waste Bins Photo` 重渲 19 张，其中 18 张含桶、1 张为空场。开盖统一采用盖板垂在桶后，12 个开盖框、12 个闭盖框及 19 份图签均通过掩膜审计。旧竖盖渲染与其派生合成已退役，旧清单、回执和失效预览清单收在历史记录。贴纸旧合成诊断批次完成了 26 个状态，104 个贴纸框与掩膜及图案编号逐项一致，覆盖 24 类。抽看时有小尺寸、低对比度的图案，识别效果按后续实际推理记录。[桶开闭前景清单](../datasets/annotated/waste_bin_state/foreground/manifest.json) · [旧前景回执](../datasets/annotated/waste_bin_state/v4_upright_render_superseded_20261117.json) · [贴纸合成诊断回执库](../datasets/annotated/media_index/production_state.sqlite3)
+
+### 垃圾贴纸完整数据交付
+
+当前 20 张小样按 `datasets/scripts/waste_sticker/config/source.yaml#sample_manifest` 查询，覆盖 24 类、36 个框；旧 26 状态 Blender 与 1 帧实拍计划保留为历史参考配方，退出现行覆盖统计。正式分集由三个 `full_<split>_plan.json` 和对应导出清单维护，小样不追加到正式产量。
+
+<a id="垃圾贴纸生产计划"></a>
+
+2026-11-18 已按[垃圾贴纸数据设计](DATASET_DESIGN.md#垃圾贴纸数据设计)生成 2,280 张，每图 1–4 个可见桶、每桶至多一贴。Train 1,800 张、4,050 框，含 180 张无贴负例和单至四贴各 405 张；Val、Test 各 240 张、540 框，分别含 24 张无贴负例和每档 54 张正例。训练各类 163–179 个实例，验证各类 22–24 个，测试各类 21–24 个。
+
+| 来源 | Train | Val | Test |
+| --- | ---: | ---: | ---: |
+| `Waste Stickers` 原生场景 | 990 | 160 | 200 |
+| Blender 桶面透视叠贴 | 270 | 0 | 0 |
+| Blender 整桶叠实拍场地 | 450 | 0 | 40 |
+| 实拍桶面透视叠贴 | 90 | 80 | 0 |
+
+2,280 对图片与 YOLO 标签均已解码并核对实例框及计数，未发现相同 RGB 图像。训练入口按 `fixed_validation` 实读 Train／Val，通过完整监督和类别覆盖预检；Test 另行全量检查。三个 split 的实际产量已写入生产守卫回执。[数据入口](../datasets/exports/waste_sticker/data.yaml) · [来源索引](../datasets/exports/waste_sticker/workspace_sources.json) · [验收结果](../datasets/exports/waste_sticker/audit.json) · [执行命令](../datasets/scripts/README.md#垃圾贴纸完整数据集)
+
+远程完整训练已完成 150 轮，Val 在第 94 轮选出最佳权重，用户回传了 [best 与评估结果](../training_packages/waste_sticker/waste_sticker_best_Val_Test/audit.json)。原 Test 的实拍场地混合分支出现白色道路标线误检，已按[专项微调计划](../datasets/scripts/waste_sticker/config/hard_negative_finetune_plan.json)制作正负对照、白卡和原 Train 正例回放。实际图签数量、类别与父来源隔离见[专项审计](../datasets/annotated/waste_bin/waste_sticker_hard_negative/audit.json)，当前输入见[专项数据入口](../datasets/annotated/waste_bin/waste_sticker_hard_negative/data.yaml)。原 Test 保留为已知回归，新增挑战仍共享留出实拍父组及固定资产。本次微调已按用户要求在完整第 10 轮检查点保存后停止，原 20 轮配置快照保留，详见[停止及精简回执](../runs/waste_sticker/v4_white_stripe_finetune_20261118/metadata/user_epoch_stop.json)。[Test 对比](../runs/waste_sticker/v4_white_stripe_finetune_20261118/comparison/test.json)显示总体误检下降，但仍有白色部件误检及原回归集新增漏检；[指定失败图](../runs/waste_sticker/v4_white_stripe_finetune_20261118/comparison/user_selected_failures.json)已核对，数据仍缺真实白色杂物与同尺度小药片对照。上一轮权重停止沿用。用户随后授权重新从远程原始 best 微调，当前[保召回计划](../datasets/scripts/waste_sticker/config/recall_preserving_finetune_plan.json)与[数据审计](../datasets/annotated/waste_bin/waste_sticker_recall_preserving/recall_preservation_audit.json)保留完整旧 Train，补真实白色干扰和全类小尺寸纸片对照；[新运行](../runs/waste_sticker/v4_recall_preserving_from_remote_20261118/metadata/train_status.json)已完成 10 轮并选出第 7 轮权重；[结果回执](../runs/waste_sticker/v4_recall_preserving_from_remote_20261118/comparison/workflow_status.json)记录误报减少但 Test 漏检增加，未采用为原始 best 的替代。详见[训练交接](TRAINING_WORKFLOW.md#垃圾贴纸白色背景硬负例微调)。
+
+原生渲染使用已存车载相机，Train 中 18 张使用 Cycles 8 采样，其余原生图使用经对照核验的 EEVEE 128 采样，逐图记录引擎。整桶混合复用 32 个训练物理模板和 24 个测试物理模板的 RGBA、阴影与掩膜，按已审地面进行缩放、平移和轻微调色。实拍父视频按 split 留出，固定图案及基础 Blender 工程共享，评价范围为当前来源与共享资产的受控诊断。
+
+Val 的 20 张桶面已修正原先部分下沿落到地面的几何，并保留原决策及新观察回执。旧 192 张合成导出、193 张候选包和过期小样已按授权清理，历史事实从原生产回执追溯。P22 同源实拍仍作为单独回归来源，不计入这 2,280 张。[桶面修正回执](../datasets/annotated/waste_bin/waste_sticker_current_surface_review/intake_receipt.json)
+
+逐图库的 61 个合格合成底图帧身份为 Train 28、Val 20、Test 13，`surface` 角色共 46 个帧身份，整帧无贴负例资格共 644 个。此批实际使用 24 张 Blender 桶面、2 张 Train 实拍桶面、20 张 Val 实拍桶面、1 张 Train 低机位场地和 3 张 Test 宽地面场地。Test 的其他 10 张同父候选保留，当前模板没有使用。图签和来源按用途分别计数。[逐图库](../datasets/annotated/common/sources/frame_environment.sqlite3) · [分配回执](../datasets/annotated/waste_bin/whole_bin_ground_reuse_20261117/production_split_assignment_receipt.json)
 
 ## 任务分工与阶段边界
 
-先按任务目标确定应学特征和需要排除的干扰，直接设计保持语义和标签正确的状态组合，再从现有数据库及 JSON 选源；不要求逐个合成组合找到实拍对应证据。来源、区域、参数、标签及产出如实记录。当前仅文档、配置和已授权代码契约工作可以继续，全部生产保持暂停。
+数据制作的全局、任务和批次职责见[视觉研发架构](VISION_ARCHITECTURE.md#数据制作的全局与局部)。
 
-各任务独占 `datasets/scripts/<任务>/` 和各自输出。火焰与楼名、桶状态与贴纸分别维护任务脚本，共享能力归公共目录；任务需要共用清单或场景时按[协作协议](../datasets/DATASET_COORDINATION.md#窗口通信与共享写入)明确写者。一个任务只有一套当前小样和数据集，不因运行、调参或错误新建并列版本目录。
+## 从原始采集到导出
 
-跨任务背景与来源的父组、split 预留、共享背景池和 Blender 场景用量由[背景与来源总账](BACKGROUND_SOURCE_LEDGER.md)汇总和校验。总账是派生视图，任务 `source.yaml`、批次清单和 Blender 登记库仍是权威记录；未提供 `pairing` 的任务只按 legacy 观察记录，不据此推断父组或 split。
+按[数据集制作 Skill](../.agents/skills/dataset-production-loop/SKILL.md#执行当前批次)推进。具体命令查[逐图入库](../datasets/scripts/README.md#逐图入库与资格查询)、[任务脚本入口](../datasets/scripts/README.md#恢复生产入口)和[训练入口](TRAINING_WORKFLOW.md#v4-任务包构建与启动)。[项目执行约定](../AGENTS.md#数据设计与实现)维护正式版本发布权。
 
-### 基底、区域与脚本规划时序
+### 查询和分配候选
 
-顺序为：任务状态 → 已有用途记录选源 → 背景/前景/区域/标签 → 任务入口与公共库 → 可执行 JSON → 实际生产回执。已完成记录直接复用；只在输入变化或具体分支失败时处理受影响项，不重做全部调查。区域坐标随裁剪、缩放和投影同步转换，最终框、掩膜及关键点使用最终图像坐标。
+候选查询、显式分配及返回记录的用法统一见[逐图入库与资格查询](../datasets/scripts/README.md#逐图入库与资格查询)。
 
-### 八项任务规划交接
+## 标注与准入状态层
 
-当前规划交接由[首批计划](#首批计划)、[后续计划预计](#后续计划预计)及[恢复生产入口](../datasets/scripts/README.md#恢复生产入口)组成。任务 `source.yaml` 指向已选素材及原清单，计划 JSON 指定状态和预算；数据查询库、Blender 登记库及生产回执库按各自职责使用，不建立第二来源台账。
+字段定义和计数见[标注状态层](ID_AND_COUNT_POLICY.md#标注状态层)，各任务的用途判定见[标签、空间与用途资格](DATASET_DESIGN.md#标签空间与用途资格)。
 
-### 语义查询与结构化选源交接
+### 机器判定与写回
 
-每个选定组合保存状态、角色、素材路径、父来源、原清单及 `record_index`/JSON pointer、区域、标签状态、配额和实际入口。用途已明确的素材直接复用；未索引嵌套字段直接读取原 JSON。当前选源的停止点是来源存在、用途与标签条件满足、区域可表达、入口可读、配额可行。达到后进入已授权的下一工序，不等其他缺口分支。
+首次录入读取并解码一次，复用既有观测和标签，判定主体任务、各任务的标签范围及适用的大致放置区域，并在同次提交写出各用途资格。机器证据满足本用途即为 `eligible`，人工署名只记录实际人工确认。选源和计划读取当前资格。合成核对文件身份、标签与坐标配对，以及本次实际脚点、贴放和遮挡，复用入库视觉判断。[审查入口](../datasets/scripts/README.md#背景审查入口)
 
-#### 图片与任务用途的关系
+缺项按 `(frame_id, task, role, split)` 定位，在入库端用已有标签、同源帧、原图或模型定向补判并重算资格。只有引用已被替换的观测等受影响用途需要更新。查询的 `evidence_superseded` 指出需要换用的证据版本。其他合格用途继续出样和出包。[资格查询实现](../datasets/scripts/common/frame_environment.py#L281)
 
-以图片为行，八任务各有 `train`、`val`、`test` 三种潜在集合用途，共 24 个任务与集合位置；这只是查询视图，实际用途按原清单稀疏记录，未声明不等于不适用。同一图片可关联多个任务、集合和角色，例如背景、目标前景或遮挡物；每条关系保留任务、集合、角色、状态、适用范围及原清单证据。历史 `regression` 用途单独保留，不以 24 个位置覆盖历史记录。当前 `val`／`test` 仅记录已决定的预留，不新增数量配额、制作或模型评估。
+空间录入只要求有依据的大致可用区域及原图坐标，不以精确相机角度、透视标定或凸包作为统一准入门槛。`candidate` 表示可尝试布局，实际目标的尺寸、脚点、遮挡和标签变换仍由生成入口逐次核对；无法确认大致区域时才保留空间 `unknown`。空间 `unknown` 不抹去已证实的整帧空负监督。
 
-`ready` 仅表示该图片的特定任务、集合、角色及注明条件下已声明可作为输入，不等于图像标签完整、生成结果通过或获得训练准入。`candidate`、`blocked`、`reserved`、`excluded` 和历史 `regression` 按原记录和实际语义保留；缺少人工接受、未知或尚未准入保持 pending，不自动改成 `rejected`／`excluded`，而 `excluded` 必须有实际失败证据。未知历史曝光、父来源或标签不推断为已确认。用途关系由现有任务 JSON、原清单和索引引用承载，不新建第二来源数据库，也不把局部分区的声明当成全库用途矩阵。按主计划记录分支预算、父组份额、随机规则、候选图像池及路径；可支持容量只按已展开且相容的角色和状态计算，未展开的分支保留未知，不以计划值冒充已落盘样本或可执行能力。视频邻帧保留同一父视频关系；Blender 母场景可规划多个机位，但场景文件不等于已落盘渲染图，多帧或多机位不因此成为独立采集。
+`regression` 记录用于追踪来源接触。按当前用途、split 和配对关系选源。组外评估按实际留出的父组或场次计数。逐字节相同的图片遵守同任务跨 split 的去重规则。 [来源配对与复用](DATASET_SOURCE_PAIRING.md#7-跨任务复用与相同图片规则)
 
-**索引兼容的局部示例。** [电动车图片用途清单](../datasets/annotated/e_bike/v4_complex_backgrounds_20261112/image_task_use_manifest_20261114.json)以顶层 `records` 中每张图片的 `task_use_status` 数组声明多条用途。`background_007045.png` 的 `e_bike/train/background/ready` 仅适用于该清单指定的单车直立和倒伏两种状态，历史曝光为未知；这不证明其他组合或标签已就绪。`sam2_01_fallen.png` 与 `sam2_06_upright.png` 分别有 `e_bike/train/target_foreground/ready` 声明，亦记录边缘限制与历史曝光未知。用途与条件以原清单和其引用的原始记录为准。
+## 八任务接入与未受管路径
 
-现有 SQLite 查询接口可按图片路径正查已索引证据，例如：
+按[任务脚本入口](../datasets/scripts/README.md#恢复生产入口)运行，批次回执记录实际输入、调用和产物。
 
-```bash
-python lab/scripts/media/media_index_sqlite.py query --path datasets/annotated/e_bike/v4_complex_backgrounds_20261112/background_007045.png --with-evidence --limit 1
-```
+## 现行入口限制与处理
 
-CLI 的 `--observed-task` 筛选观察内容，`--region-role`／`--region-task` 筛选区域声明，均不等于 `task_use_status` 用途筛选。新 `task-inputs` 子命令按任务、集合和字段角色查询当前配置及计划声明，不将旧清单的全部用途自动转换为当前选择。`referenced_as` 是被清单引用的路径，不能当作图片自身的 `describes` 声明。对已索引的顶层 `records`，可用 Python 只读 SQLite，将 `evidence` 和 `manifest_rows` 连接后对同一数组元素筛选，以下示例限定上述电动车清单：
-
-```bash
-python - <<'PY'
-import sqlite3
-from pathlib import Path
-
-cache = Path('datasets/annotated/media_index/query_cache.sqlite3').resolve()
-with sqlite3.connect(cache.as_uri() + '?mode=ro', uri=True) as db:
-    sql = '''
-        SELECT DISTINCT e.path, r.manifest, r.record_index
-        FROM evidence AS e
-        JOIN manifest_rows AS r ON r.id = e.manifest_row_id
-        JOIN json_each(r.shared_json, '$.claims.task_use_status') AS use
-        WHERE json_extract(e.entry_json, '$.evidence[0].relation') = 'describes'
-          AND r.manifest = ?
-          AND json_extract(use.value, '$.task') = ?
-          AND json_extract(use.value, '$.split') = ?
-          AND json_extract(use.value, '$.role') = ?
-          AND json_extract(use.value, '$.status') = ?
-        ORDER BY e.path
-    '''
-    args = ('datasets/annotated/e_bike/v4_complex_backgrounds_20261112/'
-            'image_task_use_manifest_20261114.json',
-            'e_bike', 'train', 'target_foreground', 'ready')
-    for row in db.execute(sql, args):
-        print(*row, sep='\t')
-PY
-```
-
-该样例在对应分区同步后可查出上述两张前景；查询结果是清单声明，使用前仍按原记录核对范围及当前文件。索引不监控外部修改，以 `status` 和分区快照判断范围及新鲜度。未由索引展开的嵌套字段直接读取 `source.yaml` 指向的原 JSON；索引未命中不代表原计划没有声明。
-
-## 每个模型的标注范围
-
-每个模型仅标注其类别表定义的任务目标，并完整标注该任务范围内所有可辨认实例。一项任务可以有一个或多个类别，一张图可以有多个同类或异类实例。画面中的其他任务对象作为背景或干扰保留，不加入本模型类别表；人物任务中电动车遮人时，按最终可见证据调整人物标签。
-
-同一图片用于不同模型时，分别保存各模型的标签、类别表和审核状态。原始 RGB 可以共用；训练导出使用各自的图像与标签配对目录，同名文件在不同任务目录下对应各自标签。通过共同 `image_id` 和父来源关联，不能把所有任务的框合并到同一训练标签。某图对一个模型是负例，对另一个模型可以是正例。
-
-| 模型 | 该模型标什么 | 其他物体怎样处理 |
+| 实际触发位置 | 当前影响 | 最小处理 |
 | --- | --- | --- |
-| 火焰贴纸 | 单类 `fire_sticker`，目标图案按[火焰任务需求](../lab/features/fire/README.md#需要实现)使用；每张可辨火焰贴纸一个框。三张贴纸就有三个框。确认无贴纸的图保存空标签。 | 红桶、信号灯、人物和楼名纸均不标成火焰；这些物体可以成为硬负例。无火焰不新增为一个检测类别。 |
-| 桶开闭 | 每个可辨状态的桶一个框，类别为 `open` 或 `closed`。同图四桶分别标四个实例。 | 桶上物品贴纸不作为桶状态模型的独立目标。状态不可判按任务监督规则复核。 |
-| 垃圾贴纸 | 每张符合任务定义的物品贴纸一个框，类别取既有 24 类。 | 桶开闭不属于该模型标签，桶身固有类别图标作为干扰。 |
-| 人物 | 每个近距离、正面可辨人偶一个可见框，类别为社区或非社区；白背不标框，作为硬负例。 | 电动车作为背景或遮挡物；车辆框属于电动车模型的另一份标签。 |
-| 其余模型 | 电动车标每辆车的姿态框，楼名纸条标每张纸条，牌具标每件牌具，车牌标每块牌，仪表标每只表及其八点。 | 仅处理本模型契约内实例，文字、数值、区域及跨帧关联使用各自记录与后续模块。 |
+| [生产守卫](../lab/training_common/production_guard.py) | 生产以实际输入、输出占用和持久回执为准。查询缓存可附加来源索引，缺失或过期时仍可生成并记录回执。 | 修正实际缺失的输入或输出冲突；重跑使用入口已有的指定批次替换方式。 |
+| [配对 checker](../lab/scripts/contracts/source_pairing.py#L99)与[分配器](../lab/training_common/bayesian_allocation.py#L217) | checker 检查配对声明；结构有效的 `stale` 条目可通过，实际计划引用须按受影响的冲突核对。分配器拒绝违反本批预算、上下界或容量的计划。全量 train 草案的父组份额用于该草案。 | 修正冲突引用或显式登记同源用途，编译相关 split；分支容量不足时在本次可行组合内调配。 |
+| 电动车[合成](../datasets/scripts/e_bike/compose_v4_grounded_train.py#L451)与禁行牌[合成](../datasets/scripts/sign/compose_sign_v4_measured.py#L135) | 当前生成入口可继承范围内已有目标的完整框，并核对新增目标的遮挡。现行禁行牌分集小样有 193 张。旧 inventory 的 155 条背景已写回为 147 合格、4 主体牌具受阻、4 落点未知。 | 在入库端复用已有标签，按当前主体、放置及变换证据定向补判旧记录。合格底图中的非主体目标随合成更新标签，空场分支按负例证据独立选材。 |
+| [楼名全量生成](../datasets/scripts/building_name_paper/build_full_dataset.py)与[审计](../datasets/exports/building_name_paper/audit.json) | 当前三集计划覆盖完整实拍、原纸框替字、纯渲染和楼体实拍合成，预算读取 full_recipe.json。 | 按父组记录来源，按最后可见纸面掩膜核对框；变更资格或来源时重编受影响状态。 |
+| 桶状态[合成](../datasets/scripts/waste_bin_state/generate_waste_v4_grouped.py#L220)与仪表[合成](../datasets/scripts/meter/compose_meter_real_background_v4.py#L111) | 桶状态编制器读取逐图库当前合格底图，合成输入包含可匹配同 split 的 Blender 图像、掩膜与标签。仪表 36 状态限旧清单的三张候选及固定投影，需要 RGBA 前景与八点标注。 | 桶状态已导出完整直接实拍并用合格底图通过单桶和四桶小样生成，继续按当期前景和底图重编计划。仪表按本任务当前配方继续推进。 |
+| 垃圾贴纸[完整汇总入口](../datasets/scripts/waste_sticker/assemble_full_dataset.py)与[来源选取](../datasets/scripts/waste_sticker/source_inputs.py) | 四路输入已汇总为 Train 1,800、Val 240、Test 240 张，5,130 个框，审计通过。Val 使用 20 张实拍桶面，Test 整桶混合使用 3 张实拍场地。 | 训练读取现行 `data.yaml` 和逐图来源，评估按共享图案、Blender 基础资产及留出实拍父组说明范围。 |
+| [来源审计](../lab/scripts/data/v4_source_gate.py#L674)与[近似帧审查](../datasets/scripts/common/review/judge.py#L361) | 调用这些审计的入口按各自配置处理诊断接触、时间邻近和相似度。 | 逐图库按标签和用途证据计算资格，相似度用于抽样、去重及复用记录。 |
+| [公共直接实拍打包](../datasets/scripts/common/package_direct_real.py#L118) | 打包器从逐图库读 `eligible` 真实相机帧。当前可准备楼名 train 2 正、3 负，以及仪表 train 3 个整帧空负例。 | 随图保存捕获身份和标签范围。楼名检测用完整框，OCR 按实际转录。 |
+| [训练数据暂存](../lab/training_common/engine/data.py#L329)与[训练入口](../lab/training_common/engine/runner.py#L239) | V4 暂存核对任务、split、标签和来源证据。当前标准训练入口按运行配置指定的验证集选优，历史运行的权重及报告按运行时配置理解。 | 先用正式数据入口和来源索引组装训练输入，再按[训练工作流](TRAINING_WORKFLOW.md#人物-v4-工作空间入口)核对、启动或恢复。 |
 
-**镜像与实体身份。** 用户确认符合本模型目标条件的可辨镜像正常标检测框，并附 `reflection`、反射区域及可确认的实体关系；同图实体与镜像是两个图像目标，但人数、车辆数、逐楼火焰数及车位归属不能把镜像增加为新实体。人物镜像也须满足近距离、正面可辨条件；镜像中的真人、白背面和远处人偶不因此成为人物正例。反射来源或实体对应未核时保留关联未知，单图检测完整性与物理计数完整性分别记录。该要求用于数据标签和后续关联设计，不表示运行时反射识别与去重已实现。
+公共直接实拍打包器读取完整正例或完整空负例资格，优先使用任务工作副本，其次是共享相机副本。按捕获身份去重，保存 `frame_id`、资格修订、标签和来源出处。人物计划读取[背景分发快照](../datasets/scripts/person/config/background_dispatch_environment.json)。资格缺项在入库端补判，或按已具备资格的素材重编受影响的状态。 [直接实拍打包](../datasets/scripts/common/package_direct_real.py)
 
-**邻帧帮助复核的边界。** 来源图案与邻帧可用于确认任务内目标身份、连续轨迹、开闭变化和遗漏对象。记录所查看帧号、对应证据和当前帧可见性，不把邻帧框坐标直接复制到当前帧。类别经用户确认但画面证据弱时，分别保留确认来源、可见框和遮挡属性；当前图只剩不可定类碎片时，邻帧身份仅作序列记录。人物的白背、侧背、远处及无法判断者属于目标范围之外，不因邻帧能确认身份而补正例。当前帧只有检测可用而文字不可读时，框与文字状态分开。无法穷尽本模型目标时可规划仅含已核实例的裁剪，但裁剪必须重新检查边界、其他目标与父图用途，不能把部分标签的整图导出为普通完整 YOLO 监督。
+2026-11-16 电动车 train 首次回填得到 4 条 `empty_negative` 与 0 条 `composite_background`。随后用 `near_floor_local_support_v2` 定向补判，新增 12 条合成底图资格，其中人物 val 5、test 4，电动车 train 2，禁行牌 train 1。两张人物 test 图在原始 640×480 坐标中重算。人物 train 原 12 条继续读取原资格。电动车原 4 条负例仍可查询，这次补判只修订了选定帧的合成资格。[查询与补判入口](../datasets/scripts/README.md#背景审查入口)
 
-**人物白背的负监督。** 人物正例仅为近距离、正面可辨认的立牌。白背面是明确硬负例：保留在画面里但不输出人物框，不设成忽略区域，也不等待补身份。同图有合格正面人物时只标这些人物；仅在确认没有其他合格目标时使用空人物标签。无法判断是否存在合格目标时保留部分或未知状态，不将整图作为完整负例。白背上的预测按误报计，白背硬负回归集以零人物误报为通过条件；类别表仍只有社区与非社区两类。纯侧背、薄边、远处及无法判断的人物同样不作为正例。空人物标签表示没有本模型合格目标，不代表整条街物理上无人；计数需要覆盖各人的合格正面观察。当前候选实例用于规定范围。最小尺度已按 PERSON-MIN-SCALE 确定：参照 `frame_001201`（640×360）正面可辨立牌 117–122 px（0.325–0.339 画面高），目标最小高度比例取 0.28 画面高，合成放置缩放下限 0.30 画面高，推理侧置信度阈值需与该比例配套设定，当前尚未标定。[人物需求](../lab/features/person/README.md#需要实现)
+2026-11-17 对旧共享背景批次完成一次独立的批量空间观测写库：该批 200 个池记录对应 199 个帧身份（两条 `007045` 路径是同帧别名）。96 条按线和纹理求得地面四边形，104 条使用近处地面先验；全部帧有局部无米制 XYZ 投影及高度参考。186 个池记录找到了类似地面的接触像素，14 个只有空间模型。抽查发现部分楼模和人物表面被接触算法误认为地面，因此 186 是待确认的机器线索，不是新增合成配额。独立空间审计写库时，池中有 85 个不同帧身份具备至少一项任务的 `composite_background` 资格；后续扩额试点变化见下文。扩池编制须同时读取入库空间观测和本任务资格，结合已标注对象、目标占位及遮挡约束放置。[批量入口与坐标定义](DATASET_DESIGN.md#背景图入库与复用) · [审计汇总](../datasets/annotated/common/perspective/background_pool_space_v1/summary.json)
 
-完整、部分、负例和未知均按模型分别判定。火焰标签完整不要求同时完成楼名 OCR；但火焰图中尚有疑似火焰未核时，不能按完整负例或完整监督导出。场景制作可维护所有物体的掩膜和几何以计算遮挡，这些辅助记录按模型筛选后才进入训练标签。[任务需求源](../config/perception_tasks.json) · [YOLO 检测格式](https://docs.ultralytics.com/datasets/detect/)
+**共享池扩额试点与空间复核。** `parking_003` 同父视频的 20 帧已在一次逐图录入中写入垃圾桶状态和禁行牌的整帧视觉结论；垃圾桶状态 20 条 test `empty_negative` 已生效，禁行牌 19 条新空负与原有 1 条共同形成 20 条 test 空负。实际四桶落点探针通过池索引 165–179、182 的 16 帧，逐图库据探针回执把这 16 条垃圾桶状态 test `composite_background` 修订为 `eligible`；索引 164、180、181、183 在 300 次布局尝试后仍未找到四桶位置，保持 `unknown`。新补的 19 条禁行牌 `composite_background` 仍为 `unknown`，其原有索引 180 的 1 条 test 背景资格保留。20 帧属于 1 个物理父视频：任务 `source.yaml` 的旧视频路径与池清单的现路径 SHA256 同为 `38be0e149cc8…`；来源路径映射尚未自动合并，计数按同一物理视频。禁行牌同源已有旧检查接触，只能用于已接触场景回归，不能称为独立新场景测试。[试点逐图证据](../datasets/annotated/common/review/pool_quota_pilot_20261117/review.jsonl) · [四桶小样探针](../datasets/annotated/waste_bin_state/pool_quota_probe_20261117/probe.json) · [资格修订回执](../datasets/annotated/common/review/pool_quota_pilot_20261117/probe_promotion_receipt.json) · [来源配对](../datasets/scripts/waste_bin_state/config/source.yaml)
 
-**车载偏暗与低饱和。** 按现有画面和逻辑将偏暗、低饱和纳入训练覆盖，记录数量、正负状态、来源与生成方式。拟合的曝光、伽马、饱和度和压缩参数标为模拟，不当作实测标定；同一父图的明暗派生记录复用关系，不作为独立采集。变暗后无法确认目标、类别或状态的画面不强行沿用完整真值。已于 2026-11-15 删除的 V4 训练打包入口曾要求每个必需 split 都有同时具备两项条件的已审图，其中包括 val；该入口不适用于本轮不安排验证的路线，当前没有任务包生成入口，见[训练流程](TRAINING_WORKFLOW.md#v4-后续窗口的执行方向)。
+另从 `full_scene.mp4` 同一 train 父组新增池索引 38、41、42、43 四帧：完整空负与垃圾桶状态 `composite_background` 各 4 条 `eligible`，四桶探针记录尺寸上限 0.46；索引 46 的探针失败，未纳入本批。两组试点合计新增垃圾桶状态合成底图资格 20 条（parking test 16、full_scene train 4），完整空负 24 条（20、4），分别保留父组和 split；这是逐图库资格及小样接触结果，正式生成产量以实际入口回执为准。[full_scene 入库回执](../datasets/annotated/common/review/pool_quota_full_scene_train_20261117/ingest_receipt.json) · [试点资格修订](../datasets/annotated/common/review/pool_quota_pilot_20261117/height_limit_revision_receipt.json) · [来源别名核对](BACKGROUND_SOURCE_LEDGER.md#已核实的物理父源别名)
 
-亮度与饱和度同时观察整图和目标局部，避免大面积黑色背景掩盖目标过亮或过艳。四色桶等颜色相关目标在较暗样本中仍需核查颜色是否可辨；当颜色或状态无法确认时，按对应任务记未知。保留原始较暗画面与正常曝光画面，不对已经偏暗的实拍统一重复压暗。
+新四桶前景采用蓝绿开、红灰闭。在同一 `full_scene` 父视频的 3 张已有 train 资格底图 `train_000163`、`train_000091`、`train_002188` 上重算脚点，实际出图 6 张、24 个 YOLO 框，使用弱接地阴影。旧竖盖前景的 site009、site012 和共享池合成预览已移除，旧探针坐标和底图证据继续保留。选用旧探针覆盖的帧时按新前景重做放置检查。这 6 张作为合成外观与图签的历史参考，正式 train 导出另行编排。[合成候选清单](../datasets/annotated/waste_bin_state/sample_history_20261117/composites/manifest.json) · [生成计划](../datasets/scripts/waste_bin_state/config/pool_pilot_plan.json)
 
-`lab/training_common/camera_tone.py` 可从工作空间内的父图生成两档偏暗低饱和候选，保留尺寸、父图、模拟参数及版本，不复制标签；已接触父图和已知时间缓冲内的帧自动标为回归，其余仍未分配。制作正式集合时分别选择各自父样，审核任务真值及色彩后再按来源门控分配，不能将候选状态当作训练许可。
+抽查空间叠图发现：池索引 53–73 的部分线模型远边穿过楼模立面，74–115 的部分地面四边形仅剩窄前景条；索引 199 的空黑地面未检出接触像素，索引 11、36 的落脚候选包含楼体下部。199 个帧身份中，线／纹理模型为 96、近场先验为 103（按 200 个路径计为 96／104）。因此局部 XYZ、候选掩膜及覆盖率只用于选择与复核，不直接增加配额；生成入口使用具体目标的尺寸、脚点和图签验证候选。
 
-## 1. 从实拍建立场景模板
+**共享空间观测 v2 定向修订。** `shared_background_space_v2` 已对 27 个不同帧身份写入新版空间证据，旧 v1 证据保留：楼模序列索引 53–73 共 21 帧将宽泛的地面四边形缩到可见的近地接触片区；索引 36 的楼体误判接触像素从 17,064 降到 6,624。先前没有接触候选的索引 0、21、25、191、199 现在有机器候选，其中索引 199 的黑色渲染地面由 0 增至 100,336 像素。新版 27 条仍全部标为 `contact_candidate_unverified`，其中 22 条用局部地面支持、5 条用已有地面掩膜；图示改善了这些误判和漏判，但不证明任意任务目标都能放入。写库回执记录受影响的 current 任务决策前后均为 436 条，原有 1 条垃圾桶合成资格未变；本次空间证据导入本身没有提升用途资格。后续提升必须以对应任务的完整标签、实际目标尺寸与落点探针另行修订，不能把 27 帧计成新增配额。[v2 空间汇总](../datasets/annotated/common/perspective/background_pool_space_v2/summary.json) · [楼模序列 QA](../datasets/annotated/common/perspective/background_pool_space_v2/qa/facade_series_053_073.jpg) · [误判与漏判 QA](../datasets/annotated/common/perspective/background_pool_space_v2/qa/prompt_cases.jpg) · [写库回执](../datasets/annotated/common/review/pool_space_v2_import_20261117/import_receipt.json)
 
-1. 从已有的车载照片和视频分别选街道、停车区、楼面、岔口、四色桶和站房参考。每个观察区先找停稳正对目标的基准视角，再找用于增强和偏位容错的侧面或斜视互补视角。同一背景的近邻帧只留关键变化。用手机高分辨率近景核对物料、文字和遮罩边界，用车载参考决定最终构图和尺度。
-2. 在基准帧标道路边线、角点、楼面、桶位、车位、物料允许出现的区域、可用前景遮挡及两个不同深度的参照物。地面有四个可确认的同平面对应点时，可拟合地面投影来确定底座或车轮落点。路面投影只用于落点。立牌、侧倒车和桶的可见外形由真实视角裁片或三维模型确定。有一张背景图却缺少足够几何约束时，采用图像坐标和实拍近远尺寸的插值，并记录为近似构图。墙贴、楼名纸和车牌贴合各自所在平面的四角。
-3. 每张模板记录来源组、原尺寸、有效区域、空背景是否核对、可用视角、尺度参照、遮挡层和光向。先登记实际用途及已有来源角色，再派生样本；不强制建立开发或测试集合。不同任务可以使用同一底图和各自标注。冻结的 60 张及近重复、派生图保留作回归。物料、布置或原视频已知复用时在清单中登记，评估按实际来源报告。[已有素材与适配来源](../datasets/README.md#当前素材与来源候选)
+随后对 `full_scene` train 池索引 21 单独补录：全帧无桶已证实，垃圾桶状态 `empty_negative` 为 `eligible`；四桶脚点探针虽通过，当时预览中桶组透视与场景不符且阴影不足，`composite_background` 保持 `unknown`，原因码 `perspective_or_shadow_composite_unverified`。索引 36、45 的旧四桶探针各尝试 300 次仍无完整放置，未升合成资格。计入这张空负后，该轮试点新增垃圾桶状态空负共 25 条，合成底图仍为前述 20 条；`e_bike` 在索引 21 的既有资格不随垃圾桶状态改变。这是旧前景和旧探针的历史结果；后续按修正后的桶盖掩膜、实际可放组合、完整标签和遮挡重新判定。可靠的图像尺度比可改善缩放，但不是底图资格或制作的必填条件，缺失时记录所用的近似尺度。[索引 21 入库回执](../datasets/annotated/common/review/pool_quota_full_scene_21_20261117/ingest_receipt.json) · [当时的资格检查](../datasets/annotated/common/review/pool_quota_full_scene_21_20261117/post_ingest_check.json) · [旧四桶探针](../datasets/annotated/waste_bin_state/pool_quota_probe_20261117/full_scene_extra_probe.json)
 
-共享接地辅助 [`ground_placement.py`](../lab/training_common/ground_placement.py) 支持按已知 Blender 相机与地面平面投影车辆轮胎或倒伏接点。固定实拍机位且裁切一致时，可用四个已知地面控制点一次拟合 OpenCV 单应映射；机位或图像变换改变须重新标定。无标定的单张图可利用车道边、墙脚及画面底部线索估计候选地面多边形，线索不足返回 `None`；该估计不判断障碍是否清空，也不提供真实米制坐标。地面参数关联现有父素材和相机记录，同条件重复使用不必逐图重调坐标。合成控制及从 SQLite 选出的两张真实图已用于检查：一张返回候选区域，另一张含多车的画面返回 `None`。工作空间电动车原入口已独立使用 Blender 投影，共享辅助尚待接入；其他任务是否调用按各自实现记录。
+**共享空间观测 v3 方向字段。** 在 v2 的 8 个选定帧（池索引 0、21、25、36、53、73、191、199）上写入 `shared_background_space_v3`：接触掩膜与 v2 逐像素相同，方向与尺度状态单独记录。索引 21 从有地面支持的图像线段估出地面**图像轴向** 36.3°、置信度 `moderate`；36、53、73 也有轴向估计，其余 4 帧方向 `unknown`，8 帧尺度均 `unknown`。不再把旧版假定的 0°／90°／180°／270° 投影方向当作测量值，`projected_headings_deg` 置空。图像轴向不是桶组或相机的物体 yaw，也不是光照方向；它不能独自校正合成透视和阴影。写库回执中受影响 current 任务决策前后均为 80 条，索引 21 垃圾桶合成资格仍 `unknown`；合成 A/B 的视觉结果仍待验收。[v3 观测汇总](../datasets/annotated/common/perspective/background_pool_space_v3/summary.json) · [索引 21 轴向 QA](../datasets/annotated/common/perspective/background_pool_space_v3/qa/005751_ground_axis.png) · [八帧 QA](../datasets/annotated/common/perspective/background_pool_space_v3/qa/representative_axes.jpg) · [写库回执](../datasets/annotated/common/review/pool_space_v3_import_20261117/import_receipt.json)
 
-### 核心车载批次怎样进入 V4
+**共享空间观测 v5 批量写库。** 200 条共享池路径对应 199 个帧身份，全部已写入接地候选和局部无米制坐标；其中 8 张旧版漏检图经原图与 SAM 2 核对后补出接地范围，部分范围仍较窄。109 帧有地面图像方向，153 帧有通过质量检查的同帧远近排序，19 帧有地平线或局部等宽标线支持的相对尺度比。远近排序不能直接当尺寸比；标线尺度只适用于其锚点之间的中心轴。入库时保留旧观测和任务资格，垃圾桶合成底图资格仍为当时的 56 帧，后续可随完整标签、新前景脚点及遮挡证据动态修订。没有尺度比的底图可用记录了依据的近似尺寸合成，现有接地候选也不自动等于某任务的合成配额。[逐帧结果](../datasets/annotated/common/perspective/background_pool_space_v5_relative/full_pool/observations.jsonl) · [算法验收](../datasets/annotated/common/perspective/background_pool_space_v5_relative/verification_receipt.json) · [写库回执](../datasets/annotated/common/review/pool_space_v5_import_20261117/import_receipt.json)
 
-[CarRealPicture](../datasets/CAR_REAL_CAPTURE_20261112.md) 是当前最权威的车载 RGB 外观来源：任务点照片建立清晰参照，连续图片记录到达与转向过程，任务识别取目标正对画面，抽样目录用于快速审查。三种入口保留来源对应，不能按三个独立采集来源累计。用户确认它们来自同批导出。`train` 是原件的抽样目录名，不决定训练用途；实际抽样间隔和序列对应以批次核查为准。时间对应未核实的图可以审作静态候选，时序评价只用对应明确的片段。
+**修正桶盖后的底图资格扩额。** 后折桶盖的新前景完成图签和掩膜审计后，以其实际轮廓对 28 张实拍底图做脚点、原图目标标签及遮挡复核；18 张形成可复核的用途证据，分别为 train 8、val 3、test 7，其中 9 张支持当前四桶组合、9 张支持单桶。新增资格先覆盖这 18 张；实际生成入口进一步查出 train 池索引 45、46 属于已知回归曝光，随即把它们的 train 合成资格改为 `blocked`，保留空间与标签证据。对全部原有资格再运行实际生成入口的曝光规则，另发现 1 张旧 train 底图也被限定为回归用途；一并阻止后，当前 `waste_bin_state/composite_background` 有效帧身份为 71（train 21、val 25、test 25）。按同一生成规则计算，原有 56 条中实际可供生成的是 55 条，本轮净增 16 条。资格依据本任务完整标签、新前景放置和来源使用范围，图像测得的尺度比不设为准入条件；生成入口对 16 张新增资格及其接地掩膜已完成读取核对。[逐帧候选与预览](../datasets/annotated/waste_bin_state/v5_new_foreground_placement_20261117/manifest.json) · [初次写库回执](../datasets/annotated/common/review/bin_pool_v5_new_foreground_import_20261117/import_receipt.json) · [新增帧曝光修订](../datasets/annotated/common/review/bin_pool_v5_new_foreground_import_20261117/exposure_amendment_receipt.json) · [全量曝光核对](../datasets/annotated/common/review/bin_pool_v5_new_foreground_import_20261117/full_exposure_audit_receipt.json)。实际生成入口随后从新入库的 train 帧索引 20、185 各出 1 张单桶与四桶小样；清单回读的资格记录均为 current，YOLO 图签分别 1、4 框且坐标合法，脚点与新掩膜放置记录一致。两张均记录 `scale_basis=planned_approximation`，没有图像尺度比也正常完成合成。[新增资格生成小样](../datasets/annotated/waste_bin_state/sample_history_20261117/composites_qualified_pool/manifest.json)
 
-先在任务点正对图和相邻来源记录中建立正常可辨、困难可辨、确认无目标、不可判四类候选。保持原始清晰度，标注每个模型自己范围内的全部实例。四桶正面下方的物品贴纸是垃圾贴纸的真实正例来源，桶身固有分类图标是另一种对象，逐贴核对既定 24 类中的具体图案、框与所属桶；同图另存桶开闭标签。出现真实正例不等于实拍已覆盖全部 24 类，按既定 24 张图案补齐合成覆盖。
+沿索引 21 的 36.3° 地面轴向另制作斜视四桶与柔影 A/B，记录了 4 个候选脚点和图签。它使用 `photo_orbit` 的 **test 前景**，场景尺度仍 `unknown`，产物标为 `diagnostic_only`；该预览只用于比较构图与接地，不能跨 split 进入 train，也没有把索引 21 的垃圾桶合成资格升为 `eligible`。[斜视柔影诊断](../datasets/annotated/waste_bin_state/pool_quota_probe_20261117/index21_along_ground_axis_soft_shadow.json) · [阴影 A/B](../datasets/annotated/waste_bin_state/pool_quota_probe_20261117/index21_soft_shadow_ab.png) · [历史小样原路径与校验记录](../datasets/annotated/waste_bin_state/sample_history_20261117/migration.json)
 
-四桶在同一任务点正对画面出现；按四色与可辨开闭组合安排样本，每桶正面下方恰好一张既定图案。Blender 合成须使画面、状态与标签一致，实际组合数量按可用来源和关键状态决定。
+**首次录入的多任务事务验收。** 在临时逐图库中，`vehicle_0001.png` 只解码并提交一次，两个电动车实例以共享 `object_id` 同时供四个任务引用；同一事务保存 `e_bike`、`person`、`sign`、`meter` 的 val 完整标签及环境。提交后独立查询立即得到电动车 `direct_target eligible`，其余三任务 `empty_negative eligible`；仪表的 `composite_background` 仍为 `unknown`，空间不满足放置也没有挡住已证实的整帧空负资格。此为隔离临时库的入口验收，未把该样本写进正式库或计入上述试点配额。[一次录入回执](../datasets/annotated/common/review/first_intake_vehicle0001_20261117/temporary_intake_receipt.json) · [提交后查询](../datasets/annotated/common/review/first_intake_vehicle0001_20261117/temporary_intake_check.json)
 
-混合时先选任务和状态，再在可用来源中选片段、主体和背景。以新车载画面定构图、尺度、透视、曝光与清晰度基准；旧车载、手机近照和视频补可见面、纹理与几何，渲染补可控针位、开闭和摆位。组合保持真实接地及光向，并同步更新可见标签。楼面贴纸画面与灯具所在地点分开；灯具用独立无楼体负帧，红桶等按已有场景证据安排；贴纸跨桶色轮换，人物身份跨街景轮换，人物任务中电动车遮人单独轮换，防止颜色、背景或固定位置成为答案。下文各任务配方沿用这套核心来源，不因仪表建模工作较多而降低其他任务的覆盖。
+**共享池八任务待补状态写库。** 按 199 个帧身份 × 8 个任务核对当前合成用途；452 个原先连当前 `composite_background` 决策都没有的组合，现已依据已有共享空间、任务标签及任务几何证据写为 `unknown`，分别指出标签未审／不完整、作用域待核或任务放置未审／未合格。未修改任何既有资格，也没有把共享接地候选升为任务配额。重跑对账新增数为 0，库的 `quick_check=ok`，1592 个组合现在都有可查询的合成用途状态；在下述快速补证前，垃圾桶有效合成配额为 71 帧。旧机器审查关联表按当前证据重建后由 175 条当前关联变成 159 条，排除项由 3 变成 7 条；这些变化只清除已被后续对象观测替代的旧关联，不改变逐图库资格。[批量回执](../datasets/annotated/common/review/pool_task_pending_20261117/receipt.json) · [对账入口](../datasets/scripts/common/reconcile_pool_pending.py) · [当前机器关联](../datasets/annotated/common/sources/background_pool_machine_review_index.json)
 
-来源权威用于校准外观和判定合成是否可信，取样权重由各任务有效状态决定。不能按新序列帧数等比堆入训练；真实图、实拍增强、实景合成和渲染分别统计。新车载已审片段按本轮训练用途安排并保留同源声明；旧冻结 60 张的历史诊断用途如实记录。依据既有错误和资料确定组合，每模型只有一次训练机会，重训还是微调尚未确定。位于 `datasets/exports/` 的清单多数已随该目录清空而不可按原路径回查；人物 2026-11-14 的 8 个候选批次迁到 `runs/person/migrated_exports_20261114/` 后保留了原清单，但清单内的 image/label 仍写 `datasets/exports/authoritative/person/…`（1,351 行），需按新路径改写才能回查。目录外生产回执仍在；当前素材与各任务候选以实际路径和状态为准，不以追加采集数量作为整体前置门槛。
+**新前景快速补证。** 从垃圾桶任务“标签完整、split 已定、落点待核”的 77 帧中筛出尚未用新桶前景试放的 67 帧，按共享接地掩膜优先查看空间较大的候选。池索引 95、189、190 的单桶试放预览经原图视觉核对，三个支点均通过来源像素掩膜，新增目标框不覆盖已有已标桶；近似 90 像素桶高和轻柔接触阴影记录在诊断清单。索引 95 的 test 试放借用 train 桶渲染验证背景几何，**不是**可用于 test 的合成图。把这三帧的局部任务接地证据及完整原图标签关联入库后，`waste_bin_state/composite_background` 当前有效帧身份由 71 增至 **74**。其中 189、190 的底图各有一只已标注的黑色开盖桶：生成器现可读取 `state`／`bin_color` 字段，保留其原框并继续给新增蓝桶出图签。实际生成入口的 train 两条计划输入已通过身份、原图哈希、现行资格、已有桶标签、接地与来源规则检查；test 底图资格可查，但现有前景渲染清单属于 train，生成入口现会拒绝跨 split 组合，待同 split 前景素材准备好再生成。本批尚未运行正式生成，仅保留诊断预览。`source_role` 对这三张为 `unknown/historical_exposure_incomplete`，未命中已知回归限定，后续正式批次仍记录此来源边界。[预览与脚点](../datasets/annotated/waste_bin_state/pool_fast_probe_20261117/manifest.json) · [入库和入口核对](../datasets/annotated/common/review/bin_pool_fast_probe_import_20261117/receipt.json)
 
-### 多原件取样与场景混合
+实时库存按任务、用途、split 和父组查询 `state_coverage.py --source-status`。某条记录可分配还取决于计划所需的接地宽度、标签作用域及其他布局约束。[查询命令](../datasets/scripts/README.md#逐图入库与资格查询)
 
-当前方案采用完整视频图片序列、连续片段分配和跨素材合成。小样可先复用已有帧；不以所有视频完成全序列解码为单任务小样或设计的前置条件。实际纳入完整序列处理的视频，先估算资源并按下述规则分批执行。同一原视频的不同片段可按用户方案用于不同集合，记录已知同源关系；本轮不安排常规验证或最终测试，用户授权的有限检查按指定范围执行。原视频是来源记账单位，连续片段是分配单位，图像是单图模型的训练单位，完整事件窗是时序任务的评估单位。这些层次分别记录。CarRealPicture 已提供连续帧目录、抽样图和点位照片；帧与视频的对应范围见批次记录。新车载批次已整理 52 个内容片段和 63 张开发诊断候选；可用素材、标签及候选批次以当前路径和记录为准。
+### 背景入库仍需接通的代码
 
-旧版人物、电动车、火焰、楼名、禁行牌、桶开闭和垃圾贴纸共用约 49 秒综合视频的背景。现有人物重训候选的 3,276 张训练图中，3,268 张实景合成沿用该视频，另有 8 张车载裁剪。先前已核到 38 个归档视频、2 个补录视频和 160 张车载原图；新增 CarRealPicture 车载批次作为 V4 核心来源，与这些旧素材共同扩展观察角度与状态覆盖。现有待审核素材的数量不等于可训练数量。[素材索引](../Archive/technical/materials/ASSETS_INDEX.md#视频) · [V3 来源与规模](research/DATASET_COVERAGE_TRAINING.md#3-任务复杂度与数据规模)
-
-#### 完整序列、片段和集合
-
-1. **遍历完整时间轴。** 纳入处理的视频从首帧到末帧顺序解码，以原生帧节奏形成图片序列和逐帧索引。记录原视频 ID、解码帧序号、原始 PTS、时间基准、尺寸、成功或失败。可变帧率用 PTS 定位；不以帧号除以假定帧率替代。解码失败记录准确位置，不用复制上一帧补齐。处理覆盖全视频，包括目标、转场、空场及低质区段；这些区段随后各有用途。
-2. **母序列保留来源关系。** 原视频不改写，纳入制作的视频逐帧解码；高于 720p 的来源按比例降采样，不拉伸，记录输出尺寸、缩放算法、帧序号与时间戳。数据集图片长边不超过 1280 像素、短边不超过 720 像素；训练画面优先匹配 640×480 车载构图和目标实际像素。允许裁切与合成，记录父素材、尺度和变换，上采样不增加真实细节。保留原视频供细节核对，不把降采样序列称为原尺寸。先估算全序列空间和处理量，逐视频分批完成；若空间不足则记录尚未物化区间，不悄悄改为稀疏抽帧。全帧序列只保存一份，集合清单引用它，最终训练导出按需复制。用户已提供的 CarRealPicture JPEG 序列保留原编码和原路径，不转存 PNG 冒充无损原帧；核对对应范围后直接复用，必要补解码另记派生关系。全部帧已解码与全部帧已落盘分别记录。
-3. **按事件细分片段。** 旧补录批次的 35 个区段是粗索引；新车载序列须另建事件索引。两批均细分到视角连续、目标状态与动作可解释的片段。普通静态检测可先按 2–8 秒候选窗审查，再在转弯、明显视角改变、进出画、遮挡起止及开盖变化处调整。秒数是起点。开闭过渡、同车轨迹、灯色切换、一次完整计数观察和冷态到升温过程保留完整事件窗，避免切断任务真值。连续微片段仍共享同一原视频。
-4. **先去重复关系，再分配。** 连拍照片、近邻帧、重复转码及同一静止构图建立重复簇；同一帧的裁剪、亮度变体和合成派生保留父关系。父帧、重复簇及派生样本可按方案跨集合，按父样、近重复、事件和片段结构化记录已知复用。逐字节完全重复不得跨监督集合；已接触诊断图及其确认近重复和派生保留开发回归，不能冒称未见测试。按任务保留完整事件窗，不能将同源结果冒充独立采集或独立场次。
-5. **按实际用途分配片段。** 为每段记录可确认的任务、类别、姿态、尺度、遮挡、光照、清晰度、可读性和正负状态；未知保持未知。按用户确定的用途和来源关系分配片段，记录种子及实际片段、图像和实例数量，不按长视频帧数直接分配。本轮不安排常规验证或最终测试，用户授权的有限检查按指定范围执行；是否保留相应集合按用户方案确定；历史 train／val／test 保留其原有用途记录，不为凑集合而拆分相邻帧。
-6. **冻结已有诊断样本。** 60 张固定回归图、已知重复及其派生保留回归用途；母视频其余合格区段可参加新分配，记录与回归同源。旧 val/test 曾参与评估的素材保留历史用途，若新版本改作训练，登记该变化；旧指标只对应旧版本，旧评估样本不再作为新版未见测试。不同任务默认共享同一原片段的分配，以方便联合验收；确需不同用途时逐任务登记，联合评估说明各模型见过的范围。
-7. **切分后选训练帧。** 先轮转父视频，再在各视频内按任务相关的构图、视角、光影、目标位置、姿态和遮挡选择代表帧，保留稀有事件和有用硬负例。按[组合选源规则](DATASET_DESIGN.md#组合选源与基底数量)计入同视频的不同基底，记录帧号或时间戳及所覆盖的变化。相似帧控制曝光量。单图模型可以打乱选中帧的加载顺序，时序任务保持窗内原顺序。
-
-#### 让画面复杂且有可学习目标
-
-| 混合层次 | 制作与约束 | 训练和检查内容 |
+| 现有入口 | 已接通与当前缺口 | 最小接线 |
 | --- | --- | --- |
-| 真实序列与车载照片 | 按任务选完整标注的帧，跨视频、片段和照片组混合。照片按连拍或重复关系分组，缺时间信息保留未知。 | 核对当前模型任务范围内每个可辨认实例，不能仅标最显眼的一个。单帧真值与序列实例、区域身份分别保存。 |
-| 主体与背景 | 同一类主体跨多个合格背景，同一背景轮换类别、数量与姿态。背景已有的本任务目标须完整保留标注，无法处理其遮挡时改用已核空裁区。 | 独立统计背景原件、主体原件、物理实例及二者配对。原视频、背景帧或主体裁片及其派生可按用户方案跨集合使用，并记录已知复用；逐字节重复和诊断关联遵守实际入口门控。 |
-| 密度与遮挡 | 覆盖单体、多体、同类密集、异类同框、前后错列、局部截断与真实反射。先定透视和接地，再计算可见掩膜、框和点。 | 保留至少一个可监督目标或一个确认的硬负例事件。遮挡后仍可辨认的本任务其他实例也须标注；不能用简单复制旧框表示新遮挡。 |
-| 光学与多极端 | 将低照、反光、斜视、远小、拖影按真实可出现的条件组合，保留每组的清晰基准及逐项加难版本。 | 可定位但字不可读可用于检测；OCR 可读性、Pose 点可见性和状态未知分别标记。全部不可辨的图进入拒识或复核队列，不强迫训练正确类别。 |
-| 公共图案与渲染 | 24 类图案、人物身份素材、模型几何可按实际用途共享，记录共享资产及渲染参数。用于合成的帧、裁片与渲染母图按自身 split 取用。 | 共享图案测试衡量已知图案的新构图；未见文字、图案或物料的测试另列。多个母源组合时列齐父 ID，跨 split 父样本组合须重新配对或列为同源诊断，不进入未见片段测试。 |
+| [单图录入 `ingest_frame`](../datasets/scripts/common/ingest_frame_environment.py)与[历史回填](../datasets/scripts/common/backfill_frame_environment.py) | 单图接口用同一份原始字节计算哈希、解码并共享图像，统一提交多任务对象、观测和资格。任务事实由调用方或 `review` 回调提供。历史回填导入已有清单与标签，部分空间估计仍按任务读图。 | 新图用同一次录入写入判定结果。历史资料先复用已有证据，仅补齐受影响用途的缺项。 |
+| [Arena 轨道帧入库](../datasets/scripts/common/ingest_shared_route_backgrounds.py) | 已写入接地观测及楼名纸条、仪表的通用底图资格。现用楼名替字与仪表固定站位配方分别使用各自指定的来源。 | 核对楼名纸条和仪表的生成计划如何选用这些帧及布置前景。 |
+| [火焰三分支生成](../datasets/scripts/fire/compose_real_facades.py) | 当前数据库的 5 张完整实拍、3 张实拍底图及独立 Blender 场景已接通，形成 54 张图签。 | 现有 C 楼底图库存 24 张／240 区域可继续编制底图叠贴分支，独立评估和训练导出按后续目标安排。 |
+| [共享池接收观测](../datasets/scripts/common/background_pool.py#L120)与[地面估计](../datasets/scripts/common/background_pool.py#L319) | 按来源路径汇总逐图和任务记录。旧池分支重建时仍会估计地面，仅部分任务计算目标尺度下的放置范围。后续观测追加到 `additional_evidence`，首条判定仍被消费。 | 复用现有来源清单和机器观测，按图像身份、坐标基准、观测版本增量刷新。任务记录明确当前有效证据，保留旧证据、人工内容和原批次引用。电动车几何应从入库事实读取，解除[依赖旧生成计划](../datasets/scripts/common/background_pool.py#L182)的反向引用。 |
+| [媒体字段提取](../lab/scripts/media/media_index.py#L113)与[任务过滤](../lab/scripts/media/media_index_sqlite.py#L406) | 索引已识别亮度、饱和度和任务证据。部分池内成像属性仍在 `strata`，组合条件查询主要适配直接实拍记录；`task-inputs` 返回计划和配置声明。 | 库内按同一图像、任务、角色和 split 的记录查询 `eligible`，携带标签与空间证据。旧清单和索引提供回填与定位。 |
+| [共享池排序](../datasets/scripts/common/background_pool.py#L355)与[禁行牌编计划](../datasets/scripts/sign/plan_sign_sources.py#L102) | 共享池按已声明用途和 split 轮转父组，几何参考行尚未进入合成用途。禁行牌已将选中背景交给贝叶斯分配；其他任务仍依赖各自接口。禁行牌对所有候选组给最低配额，扩池后可能超出固定预算。 | 把满足当前用途的背景纳入各任务现有计划编译。对已选可行组合和必做覆盖分配最低配额，可选组由分配器择用。 |
+| 电动车[计划校验](../datasets/scripts/e_bike/compose_v4_grounded_train.py#L267)、禁行牌[共享池分支](../datasets/scripts/sign/compose_sign_v4_measured.py#L409) | 电动车与禁行牌配方现可继承完整旧目标框并拒绝新增目标遮住旧框。 | 按配方声明所需标签和可放区域。 |
+| 禁行牌[共享池执行校验](../datasets/scripts/sign/compose_sign_v4_measured.py#L610)及[父组配对](../datasets/scripts/sign/config/source.yaml) | 现用计划按本批所选底图核对当前资格。`parking_003_017` 对应的同字节父视频已从 train 移出，保留有既往接触的 test 诊断用途。 | 新批按明确的父组和 split 选源，核验所选资格及引用素材。独立评估按回执确认未接触的来源。 |
 
-训练复杂度首先增加有效状态与组合覆盖。正常清晰、困难可辨和确认硬负例按任务状态及可用素材依据逻辑一次安排，不套用统一比例，也不依靠开发集结果调整。未知与不可读样本单列，不并入有标签样本分母。各类别、尺度和关键姿态在可用背景中覆盖，避免困难强度、背景或某段视频成为类别线索；按图像和实例分别报告实际构成。
+### 受影响入口核对
 
-各任务按实际可用来源和评估目的安排来源组，不规定每个 split 的最低来源组数或单个来源的最高占比。报告实际使用的直接实拍图、实拍派生、实景合成、Blender 渲染背景及其父来源；父视频下切出的多个片段仍关联同一原件。来源集中或关键状态缺少可用来源时，按实际情况报告覆盖范围。
+入口改动按涉及的任务和样本核对。录入看一次提交后的用途资格和证据。选源及生成看是否读取当前资格，以及本次文件、标签和实际放置是否一致。旧帧按需要补录受影响的用途。
 
-#### 逐任务的片段与标签约束
+## 状态计划的输入与入口契约参考
 
-| 模型或环节 | 切片与混合重点 | 保留的监督 |
-| --- | --- | --- |
-| 人物 | 两街的近距正面、稀疏与密集、车辆遮挡过程交错取段；保留白背硬负例及完整计数窗。 | 仅标近距正面可辨的两类框；记录街区和跨帧实例，白背、薄边、远处与不可判人物不标正例。 |
-| 电动车 | 直立、倒伏分别来自尽可能多的原件，低机位和截断状态在多背景上重复覆盖。 | 姿态、可见框、区域及车辆 ID；实体可辨而姿态不明时单列可用分项。 |
-| 车牌检测 | 同一牌在任务点正对画面中的距离、反光和清晰度变化，空位及相似蓝牌单列。 | 框、四角、物理牌和车位；重复经过同一牌保留同物料关系。 |
-| 火焰贴纸 | 按任务点正对楼面、贴纸尺度和同楼多贴细分，加入灯具干扰片段。 | 每个可辨火焰贴纸及楼面归属；完整逐楼计数使用完整观察窗。 |
-| 楼名纸条 | 任务点正面纸条的尺度、清晰度和拖影片段交错，白纸、窗格和火焰底纸作硬负例。 | 纸框与全文可读性分开；同一全文的多帧不计作新文本。 |
-| 禁行牌具 | 任务点正面、白墙低反差和杆与底座完整可见性分别覆盖。 | 整件可见框；路线分支由观察位置和方向真值单列。 |
-| 桶开闭 | 各桶色的稳定开、稳定闭及过渡分段，保留完整开合事件，跨原件混合视点。 | 整桶框、可见盖证据、开闭或未知、桶 ID；过渡不自动归开或闭。 |
-| 垃圾贴纸 | 真实可核物品贴、桶类图标干扰与合成 24 类分开记来源，贴纸跨桶色和视点。 | 类、框、桶归属；新车载贴桶正例与已核固有桶图标负例分别标注，24 类覆盖逐类核对。 |
-| 温湿度表 | 任务点正对画面中的表盘尺度、安装后仰和反光扫针过程分段，实拍固定针位与合成变化针位分开。 | 表框、八点、可见性、两针读数；固定读数视频不扩充读数组合。 |
-| OCR、灯色与热异常 | OCR 裁剪记录父帧及各自 split，跨集合复用按方案登记；灯色切换、热响应和计数按完整事件窗分配与回放。 | 文字/数显可读真值、时间戳及完整事件标签；现有 RGB 不生成真实热真值。 |
+计划声明任务、split、预算、约束及 `strata`。生成器消费该任务已实现的字段。组合与分配见[贝叶斯状态组合与生成契约](DATASET_DESIGN.md#贝叶斯状态组合与生成契约)。
 
-#### 清单、检查与实施边界
+## 配方与历史
 
-在已有批次目录维护序列和片段清单，不另建一套文档索引。新解码母序列放 `datasets/annotated/<批次>/` 下职责明确的处理子目录；这是批次记录约定，不是任务标注根，也不由 `workspace_layout.py` 检查。CarRealPicture 原件保留在 `Archive/Assets/CarRealPicture/`，处理区读取 `datasets/raw/car_real_capture_20261112/` 工作副本，路径关系见[来源副本映射](../datasets/source_copy_map.json)。正式集合放在 `datasets/exports/<任务>/{train,test,val}/`；测试、预检、渲染试验和待定集合候选按既有目录职责放在 exports 外。来源门控已支持下列部分字段，已有 CSV／JSON 不视为已具备全部字段。
+人物批次记录见[全合成候选](../Archive/technical/datasets/person/v4_ground_person_3600_20261116/)、[首批 300 张快照](../Archive/technical/datasets/person/v4_train_300_20261116/)和[小样迭代记录](../datasets/scripts/person/config/sample_issues.yaml)。
 
-| 记录层 | 需要保存的字段 |
-| --- | --- |
-| 原件与帧 | `source_id`、原件路径、照片组/场次及确认状态、帧号、PTS、时间基准、源尺寸、序列文件、解码状态。 |
-| 片段与关系 | `segment_id`、原视频 ID、起止 PTS、事件/轨迹 ID、状态、重复簇、边界缓冲、冻结和排除原因。 |
-| 标签与父样本 | 任务、类别/框/点/全文、完整/部分/未知标注、复核依据、背景/前景/渲染父 ID、几何与成像参数、生成方式。 |
-| 分配与导出 | 任务与 split、分配种子、实际取样权重、父样本复用、原件角色占比、清单版本、成功/失败/跳过及原因。 |
+[数据制作参考](DATASET_RECIPES.md)保留任务配方、实拍依据和制作参数。
 
-导出前检查帧与标签配对、类别顺序、坐标和可见性、空标签依据；检查逐字节完全重复是否跨监督集合，记录同帧、已知重复簇与派生样本的跨集合复用，核对冻结诊断图及其确认近重复和派生是否混入监督集合，事件窗是否被拆开，背景已有的本任务目标是否漏标。按任务和 split 输出原件数、片段数、帧数、实例数、状态覆盖、最大来源份额、背景—类别及前景—背景交叉表。阈值、比例、去重判定和人工复核范围随清单记录。
+- <a id="每个模型的标注范围"></a>[每个模型的标注范围](DATASET_RECIPES.md#每个模型的标注范围)
+- <a id="多原件取样与场景混合"></a>[多原件取样与场景混合](DATASET_RECIPES.md#多原件取样与场景混合)
+- <a id="实拍实景合成与-blender-的接入顺序"></a>[实拍、实景合成与 Blender 的接入顺序](DATASET_RECIPES.md#实拍实景合成与-blender-的接入顺序)
 
-本轮不安排评估；既有同场地、同源视频结论须标明原视频共享率、物理实例共享及逐视频分母。若素材足够可另留整视频作补充对照，但不以此阻止主数据集制作。已查看并用于定位失效的 60 张属于固定诊断回归，不能称全新盲测；既有测试片段的历史用途保留，本轮不安排新测试。简单帧级随机切分、全帧数量和换随机种子均不能证明鲁棒性。现有 Beta 演示只在独立试验假设下成立，同视频多片段的相关性和有效来源数须单独解释。[概率与拟合分析](research/DATASET_COVERAGE_TRAINING.md)
-
-| 任务 | 先用的互补原件与已存在的候选 | 来源边界 |
-| --- | --- | --- |
-| 楼名纸条、楼名 OCR、火焰贴纸 | 已入库的楼宇审核候选 63 张含 17 段归档原视频的 51 帧，另有车载图及楼宇近照。交叉三楼扫描、单楼绕拍、车载低机位和 Blender 渲染，先核任务点正面、贴纸数量及相似灯具。 | 三楼 `003` 和锦绣地砖 `001` 的旧验证、测试用途保留历史记录；新版按片段重新分配时记录用途变化。不同楼面及楼名真值按实际记录。[楼宇审核清单](../datasets/annotated/fire/real_review_candidates_20261110/manifest.json) |
-| 人物、电动车 | 人物用车载原图、已知身份图案和从多种原件核对的空背景，补录人物视频用于选取合格正面及核对遮挡，白背用于硬负例。电动车已有 5 个归档原视频的 97 个审核帧，可用 `003` 的低视点多车、`005` 的低视点直立、`008/009` 的倒伏和直立转拍补几何，再与车载场景对照。 | 人物归档 `012` 已参与旧评估，新版按片段分配并记录复用，具体旧角色以导出清单为准。旧电动车合成的 7,000 个直立前景均来自 `009`，3,000 个倒伏前景均来自 `008`。下一版同时增加两姿态的主体来源。清单中保守归组的裁片继续同组。[人物与车辆原件](../Archive/technical/materials/ASSETS_INDEX.md#电动车人物及场景13-段) · [车辆审核清单](../datasets/annotated/e_bike/video_review_20261110/manifest.json) |
-| 禁行牌具 | 用专门旋转原件补正侧背，补录 `scene_03/08` 核对截断和白墙低反差背面，另选已有车载岔口及其它原件的已核背景。 | 同一牌具跨背景后仍共享物理物料，单列前景集中度。摆位及路线仍按已核映射。[牌具原件](../Archive/technical/materials/ASSETS_INDEX.md#禁止直行牌1-段) |
-| 桶开闭、桶色与投放、垃圾贴纸 | 已入库 23 个审核样本含 7 段归档桶视频的 21 帧。先取 `001/003` 互补开闭、`004` 低机位、`007` 浅地面及 `005/006` 单桶近景。桶盖动作原片用于核对开合过渡，手遮挡片段不纳入当前数据配额。交叉真实桶面、不同背景、24 类图案与四种桶色。 | 桶身固有类别图标用作已确认的物品贴干扰。新增车载批次已有贴桶物品图案正例，逐贴类别、可见框和桶归属待审核；24 类实拍覆盖和合成覆盖分别记录。[桶审核清单](../datasets/annotated/waste_bin/real_review_candidates_20261110/manifest.json) · [桶盖动作原片](../datasets/raw/waste_bin/运动方式.mp4) |
-| 车牌检测与 OCR | 国赛车牌正例视频已确认来自全场补录原件的 `scene_11/16/21`。同时核对旧车载近照、新车载路线和已有合成牌面。训练合成可以交叉不同车位背景、牌面角点及字符。 | 三个区段同属一段视频，照片中的相同物理牌保持关联。国赛车牌正例视频数量目前有限，省赛合成及外部道路实拍作为各自来源报告。[补录视频区段](../datasets/annotated/site_capture_20261112/segments.csv) · [车牌数据与适配](../datasets/README.md#当前素材与来源候选) |
-| 温湿度表与数显 OCR | 交叉固定读数原片、手持倾斜近照、两批车载构图、补录 `scene_05/17` 和新版站房渲染。按素材记录真实反光位置、近远变化和数显可读状态。 | 固定读数视频的多帧只提供同一针位的观测。旧版与新版站房模型共享 9011 表盘谱系，独立报告渲染母样和真值覆盖。[仪表实拍审核](../datasets/annotated/meter/real_review_candidates_20261110/manifest.json) · [站房构图](research/METER_VISION.md#按车载实拍重做合成数据) |
-| 红绿灯与热异常 | 红绿灯交叉归档综合视频可用区段、补录 `scene_01/10/14/19` 和车载灯图，按灯位留完整窗口。热异常可先做楼面配准和故障回放。 | 灯的三色切换须逐窗核真值。D 楼现有 RGB 用于楼层几何，真实热源状态仍缺红外观测和独立真值。[红绿灯与热异常细则](#红绿灯-hsv-与时序标定) |
-
-`data_overrides` 可拼接已配对标签目录，`workspace_sources.json` 登记逐图来源，`train_limit` 做类别优先随机取样。[抽帧工具](../lab/scripts/media/extract_capture_frames.py)仍按选定区段和间隔抽样并限制最多 2,500 帧；人物视频和全场视频另已建立完整序列，后者按 640×360 保存并保留源时间戳。楼宇、桶和仪表生成器及人物、牌具、车牌小样入口已按车载尺寸局部扩展；这些候选仍需语义、近重复和集合审核。V4 训练入口与来源门控已建立，但训练入口不适用于本轮无验证路线；八任务正式数据集尚未完成。[数据读取入口](../lab/training_common/engine/data.py)
-
-全场视频帧的实际 PTS 存在阶段性偏移，不能用固定帧率公式代替；使用 `sequence_640_v1/full_scene/ffmpeg.log` 中对应帧的 `pts_time` 核对来源时间和诊断时间缓冲。人物视频完整序列按其 `frames_probe.json` 的显示顺序对应探测时间。V4 来源门控对两组序列检查帧号、视频身份和实际时间，时间不符时拒绝选入正式集合。
-
-来源审核沿选定图像的父样本和已知近重复关系传播，并比较清单中已有文件的逐字节副本；未分配的父图也参与诊断接触和序列时间检查。自动发现的同源组写入审核结果和分发包来源记录。此检查不能发现未登记的视觉近重复、重新编码后的别名或未建立关系的素材，仍须结合画面、时间和实物记录复核。
-
-`datasets/annotated/site_capture_20261112/v4_development_exposure.json` 记录已明确用于开发回归的图片、直接背景和物料来源。门控将已接触的回归图、整图父样和车载／人物序列前景帧纳入来源及诊断时间检查；普通物料图案仅作为已复用前景记录，不因用于一次回归合成就全部禁用。正式集合仍须记录物料与父样复用，已知同帧、近重复及直接派生不得冒称独立。
-
-接触清单也记录有证据的新增近重复关系。火焰 Blender 两批小样的前两对是同一随机种子下的重复渲染，实例掩膜相同，门控按已确认近重复关联；字节不完全相同不能作为跨集合独立证据。
-
-需要区分原清晰度和重采样时，在来源记录的 `image_processing` 中审核并填写 `resolution_review`、`source_size`、`output_size`、`resampling` 与 `clarity`；门控检查输出尺寸与实际解码图一致。实景合成的背景来源或增强的父图来源另用已确认的 `background_origin` 或 `parent_origin` 记录。缺少证据时保持未知，不能仅凭视频帧来源推断未经缩放；源尺寸与清晰度本身仍需来源证据，门控不冒称已实测原视频元数据。
-
-### 用像素尺寸约束合成
-
-下表统计冻结诊断清单中车载照片里的原图候选框，包含部分标注。跨度用于确定审图量级。最终档位用可用于开发的来源复核。姿态、遮挡和裁切会改变框宽高，按对应姿态和可见程度选参照。相机内参和实际物距未测量时，记录像素档与视角即可。
-
-| 目标 | 已有 640×480 参考宽 × 高 | 制作起点 |
-| --- | --- | --- |
-| 人物立牌 | 21 个部分候选，52–75 × 118–184 px | 主样按完整立牌高度分 118–140、141–160、161–184 px 三档。遮挡后另记可见高度。 |
-| 电动车 | 12 个候选，82–206 × 52–170 px | 直立按车高、倒伏按车宽分别分档。近景的裁切车保留实际可见框，记录裁切前大小。 |
-| 车牌 | 9 个候选，30–104 × 10–42 px | 先覆盖远处约 30×10 px 与近处约 90–105×35–42 px，中间档用真实构图插值。按字符可见性决定 OCR 用途。 |
-| 火焰贴纸 | 11 个候选，14–35 × 25–40 px | 这些候选是旧画面中的像素观察，不是固定目标或覆盖范围；按已知物料、可用实拍或合理几何近似设计贴纸相对楼面、窗格的比例，未实测的比例注明假设；距离和视角变化时像素大小可不同。 |
-| 楼名纸条 | 3 个候选，51–114 × 32–38 px | 先做约 50、80、110 px 三档宽度，文字按投影后笔画保留情况复核。 |
-| 禁行牌具 | 6 个候选，54–149 × 179–295 px | 先做高约 180、235、290 px 三档，侧背面使用对应源视角。 |
-| 桶开闭 | 16 个候选，83–128 × 126–171 px | 先做高约 130、150、170 px 三档。同一机位桶盖变化后重算框。 |
-| 仪表盘 | 两个候选宽 120、133 px。六张构图参考约 87–133 × 75–104 px | 表盘宽先分 87–101、102–116、117–133 px。按中心、轮廓比例和针尖投影共同筛选。 |
-| 垃圾贴纸 | 旧冻结诊断仅有干扰负图；新车载 P22 四个正例宽 26–29、高 27–31 px | 以已测贴纸尺寸为近景参照，再依据板面资产补类别。按可辨尺寸上下试三档，分别看缩小后图案辨识与边框定位。 |
-
-新车载已标子集的[尺寸统计](../datasets/annotated/car_real_capture_20261112/field_eval_v1/candidate_scale_summary.json)与[V3诊断](../datasets/CAR_REAL_CAPTURE_20261112.md#候选标注与-v3-重新检查)补充上述旧参考；两批分开统计，不把候选极值直接当生成范围。
-
-[原图候选框](../datasets/annotated/site_capture_20261112/field_eval_v1/evaluation_candidates.json) · [仪表构图参考](research/METER_VISION.md#按车载实拍重做合成数据)
-
-## 2. 画面和标签一起制作
-
-| 顺序 | 操作 | 审图要求 |
-| --- | --- | --- |
-| 选底图与资产 | 复用经核对的实拍空背景、真实物料视角裁片、Blender 模型和已审标签。底图已有本模型任务目标时一起核对并标注，其他物体保留作背景或遮挡。平面文字和贴纸以四角透视投影。玻璃、倒伏车辆、侧背及桶盖变化使用真实对应视角或三维几何。 | 核对真实背景的剩余目标、印刷尺寸、比例与放置区域。源图上的商标、反射、白边或抠图缺口会改变真值时修复或剔除。 |
-| 排景与遮挡 | 地面物件按落点和相机深度排层，近处遮挡远处。保留真实前景层，例如前车、真人、围板、桶盖或柱子。可见比例用画内可见掩膜面积除以遮挡前的画内掩膜面积，画外截断另用画内面积除以完整投影面积登记。 | 相邻物体可重叠并应有合理深度关系。底座接地，影子方向与同一背景的已有阴影一致。核对当前模型任务目标的剩余可见轮廓与标注。 |
-| 匹配成像 | Blender 先改变顶灯、侧窗、环境光和物件位置，渲染投影与反光。实景合成先匹配局部亮度、白平衡、接触影和边缘，按构图等比例缩放或重渲染到 640×480。相机效应施加在整张已合成画面上。 | 在 100% 原始尺寸审查抠图边缘、接地、相机锐度和局部高光。边缘光晕、反光落点脱离玻璃、固定纹理暴露类别等情况回到场景修改。 |
-| 施加轻重变化 | 保留清晰母图。模糊轻档可从 σ 0.35–0.7 px 或方向拖影 2–3 px 起步，较强档只做少量对照。横移优先沿水平或斜向，转弯用相应方向候选。若用曝光扰动，可先取 −0.5、0、+0.5 EV 作为对照候选，之后按背景中性区域和目标可读性调整。真实原图保留本身软化。 | 统一审查原图、轻档及边界档。与目标相关的颜色语义、文字、刻度和针尖不得被错误标为可读。参数是制作起点，实拍观测和估算见[车载模糊记录](../datasets/SITE_CAPTURE_20261112.md#车载模糊与增强候选)。 |
-| 派生标注 | 裁切、透视、缩放等变换同步作用到掩膜、角点和标签。由最终可见像素算检测框，保留父素材、投影前后尺寸和坐标映射。OCR 裁剪从同一检测图派生，分别保留理想角点裁剪和实际检测裁剪的来源。 | 完整正例、确认为空、部分标注及无法判断分别登记。训练格式无法忽略待核目标时，整图留在该任务的复核记录中。 |
-
-同一组诊断对照可固定底图、布置、机位和种子，只变一个因素，以识别具体影响；生产数据同时主动组合多因素，覆盖真实失效和物理可行的困难场景。极端组合用于找到不可读、不可辨和拒识边界。
-
-### 面向失效场景的组合生产
-
-以车载画面的构图、尺度和成像为锚，复用可用的真实前景、背景、物料图案、现有生成器和经实拍拟合的渲染资产。按类别、状态、任务点正面构图、光照和相似干扰建立覆盖矩阵，人物另计电动车遮人，依据资料和逻辑一次安排多个因素；不以少数母场景的重复变体充当独立覆盖。常态、困难可辨和硬负例均进入设计，不可判画面保留未知。逐任务的素材、状态和负例以[组合表](#资产轨迹和多任务混合的执行边界)及[逐任务配方](#3-逐任务制作配方)为准。
-
-优先组合已观察的失效：人物正面与白背、人车遮挡；电动车低视点、直立倒伏和截断；火焰小贴及独立灯具负帧；楼名斜视软化与白色相似物；牌具背面低反差和近景裁切；四色桶与开闭状态交叉；24 类贴纸跨桶色及固有图标干扰；仪表双针读数、反光和车载构图；车牌远小斜视、车体背景与镜像。按实际场景安排目标和相似物负例；仅有共现证据时安排同屏；真实外观、渲染与增强的可用范围分别核实，不能用图像变换伪造未观测到的实物姿态或读数。
-
-确定母样用途及已知同源关系，维护父来源和变换参数，几何变换同步更新可见框、关键点或文字状态。本轮不安排开发集对照和按结果修改采样；同视频不同片段及派生按实际用途和既有规则记录，不把同源派生当作独立采集。
-
-### 实拍、实景合成与 Blender 的接入顺序
-
-既有车载诊断登记为已接触资料，不能改称未见测试。逐任务记录已看过、已预测、参与参数选择和保留用途；同一 RGB 可共用，标签、审核状态和模型接触范围分别保存。本轮依据现有资料确定覆盖，不开展训练对照。
-
-1. **先分配母样用途。** 按连续片段、近重复簇、点位照片与序列对应分配角色；同批、父帧及近重复可按方案跨集合并记录复用，逐字节完全重复及已接触诊断关联按门控约束处理。按实际用途分配训练背景、前景、材质裁片和渲染拟合参照；已用于诊断的照片记录原有用途及复用。本轮不安排最终测试。原始序列引用原路径，训练导出才按需复制。
-2. **直接实拍入训练。** 使用当前实拍并按任务重建缺失标签，保留原图、本轮已有标签及其实际状态；保留未增强原图。对训练片段按尺度、姿态、遮挡、模糊及正负例选代表帧，每段设曝光上限；静止长尾不因帧多占满一个 epoch。每任务审核完全部可辨目标才导出完整监督；未知类别或盖板不可判不写成空标签。实拍的重复采样次数另计，不称新增独立样本。
-3. **实拍增强。** 在训练母图上做有限曝光、轻拖影、裁切与透视，保留原图—变体关系。变换后重新判断小贴、字符和八点是否仍可监督。原图已有明显运动模糊时不再随机重复叠加强模糊。训练图增强后可按方案分配，须记录父图及跨集合复用；逐字节完全重复与诊断关联遵守门控约束。
-4. **实景合成。** 核查背景中的本任务目标，再标可放区和前景遮挡层。人物与车辆用匹配视面的真实裁片，纸贴和车牌沿所属平面四角投影；替换已有目标时须消除其残影并修标签。没有可信空背景时保留原目标并完整标注，不用粗糙擦除制造可学习边缘。新物体的接地影、亮度、锐度、尺度及景深匹配所在位置。多个父样本都来自同一用途池，记录全部父 ID。
-5. **Blender 接入。** 已有楼宇、垃圾桶、仪表模型按已知物料和逻辑设定可行几何，未实测的参数标明近似；完整场景渲染与透明前景合成分开记账。透明渲染保存 RGBA、遮挡掩膜和接触阴影，再与训练实拍背景合成；合成后的像素决定可见框，不能直接沿用未遮挡三维包围框。未具备匹配模型的任务继续用实拍裁片与平面投影，不为统一流程临时替换成不相似的三维资产。
-
-各模型按任务状态缺口确定来源和采样安排；按[批量生产规则](#任务分工与阶段边界)登记实际使用的 Blender 背景数量、视角组与父来源。以下为各模型重点：
-
-| 模型 | 主要用途 |
-| --- | --- |
-| 人物 | 两类近距正面立牌的遮挡与密度，白背硬负例，初始化待定 |
-| 电动车 | 真实直立／倒伏视面及人车叠挡，避免平面旋转冒充三维倒伏 |
-| 火焰贴纸 | 新楼面尺度、红色干扰、楼面不同位置的密集小贴；按 V3 错误修配额 |
-| 楼名纸条 | 真实纸条尺度与斜视，全文变化、窗格和火焰底纸负例 |
-| 禁行牌具 | 真实正侧背和近裁切整件框；路线摆位真值另存 |
-| 桶开闭 | 实际机位的盖板证据，四色开闭反转和邻桶同屏 |
-| 垃圾贴纸 | 已拍图案作为真实锚点，24 类跨桶色、缺贴、多贴及错投 |
-| 仪表 | 实拍比例与玻璃反射，双针读数组合、关键点可见性及无表负例 |
-| 车牌检测 | 真实车位构图、牌面替换、远小斜牌、空车位及车体图案干扰 |
-
-依据既有已审数据、任务风险与逻辑一次确定来源及样本构成，按母样限频并保留必要的稀有类与状态，不依赖开发集结果或训练对照调整。训练预算按任务设计；重训还是微调尚未确定。
-
-### Blender 与车载画面的校准
-
-本轮对照了现有仪表 `prototype_vehicle_front.png`、桶 `preview.png` 和楼宇 `A_front.png` 与新车载点位图：仪表原型已有上下装配与室内背景，但周围线缆、物料和窗光层次仍简化；桶预览为 1024×1024 的大目标、灰色布景和较亮塑料，车载 P22 为 640×480、目标更小且有物品贴纸及复杂背景；楼宇参考预览偏近景单楼，车载同时出现邻楼、远处车辆、斜面和室内环境。上述预览用于定位修改方向，不代表所有现有渲染的统计。
-
-根据任务逻辑确定近、中、远和正、斜视等场景参数，使用现有参照时保存参考 ID、场景版本和参数；不要求每个组合都有实拍对应；不安排校准试验或验证，不靠模糊或过曝掩盖已知几何不匹配。
-
-| 层次 | 具体怎样对齐 | 小样检查和记录 |
-| --- | --- | --- |
-| 相机与投影 | 输出母图为 640×480、4:3；用地面线、楼边、桶顶、表心及已知物料尺寸拟合透视、机位高度、俯仰、距离和主点。未知真实内参时只记有效投影估计，不声称由一张图恢复物理焦距。不要拉伸方形图到4:3。 | 对比目标中心、宽高、邻物间距、轮廓和地面消失方向。固定参考小样可先以中心差≤5px、框宽高差≤10%作为需复核的试制门槛，小目标另按标注误差调严；这是设计阈值，尚未测得通过。 |
-| 几何与纹理 | 楼孔、纸边、立牌底座、桶盖厚度与后垂姿态、表盘后仰和双针高度分别核对。印刷贴纸使用现有真实图案；颜色图按正确色空间加载，粗糙度等数据图按数据解释。 | 先核轮廓、透视和语义，再看纹理。文字不镜像，人物类别、桶图标与物品图案不混。保持表盘八点顺序和实物刻度对应。 |
-| 场地与光照 | 建立黑色路面/围板、浅墙、窗面、顶灯及邻物代理几何；顶灯、侧窗和环境光分别控制。World/HDRI 提供包围光与反射，背景图提供可见场景，二者不自动等价。室内参考优先于任意室外天空。 | 用同一中性区域的亮度分位数、阴影方向/软硬、高光位置及目标内对比度核对。真实视频有窗边亮暗差，不必把全图平均提亮。HDRI 没有实测依据时记录近似室内环境。 |
-| 材质与反射 | 桶色取实际桶区域，玻璃/金属保持角度相关反射；围板和地面保留真实镜面干扰。用光源和几何改变反射位置，避免把高光固定画在纹理中。 | 同色材质在不同光向下仍应保持类别；核对反射目标与真实实体关系，镜像不能在整段计数中新增实体。 |
-| 成像 | 先核清晰渲染，再按新序列中的静止、直行、转弯分别拟合软化与方向拖影。只在有对应证据时加入畸变、暗角、噪声、压缩和曝光变化；这些参数可有界扩展但须标作模拟。 | 在目标和背景分别测边缘过渡、亮度分布、过曝面积和局部对比；全图拉普拉斯值不能单独当模糊真值。颜色管理、曝光、去噪设置固定并记录，检查小字/细针是否被去噪抹除。 |
-| 标签 | 保存实例掩膜、前后遮挡、相机与物体变换；检测框取最终可见实例，关键点用投影加遮挡判断，OCR保存字符串与可读性。玻璃和反射另加语义复核。 | 像素掩膜通过不等于标签语义通过；完整、部分、不可读分开。标签通道保持无混色，不给标注图施加美化或去噪。 |
-
-Blender 的透视相机由视场角、焦距和传感器设置共同控制；透明背景、阴影及对象分离通道支持与实拍合成。具体以使用版本的 API 为准。[相机手册](https://docs.blender.org/manual/en/5.3/render/cameras.html) · [渲染通道](https://docs.blender.org/manual/en/5.0/render/layers/passes.html)
-
-楼宇 `render_blender_fire_dataset.py`、桶 `render_blender_waste_bin.py` 和仪表 `render_meter_candidates.py` 已能生成 640×480 候选小样，旧方形入口仍保留；实际构图、标签和场景差异须逐项复核，不能仅靠修改训练输入尺寸视为车载拟合完成。仪表小样及其未知点位状态见[站房仪表研究](research/METER_VISION.md#按车载实拍重做合成数据)。原有 Skill 的产品摄影、浅景深和美化预设不作为本项目的相机标定值。
-
-#### 资产、轨迹和多任务混合的执行边界
-
-已有可编辑资产包括 [三楼合景](../datasets/assets/blender/fire/blender_buildings_v13/three_buildings.blend)、[四色桶 PBR 场景](../datasets/assets/blender/waste_bin/blender_pbr_v2_20261110/waste_bin_pbr.blend)与[电表站房原型](../datasets/assets/blender/meter/blender_9011_power_meter_prototype_tilt_20261112/meter_9011_power_meter_station.blend)。从已有资产及其生成入口派生可编辑工作版本，不覆盖参考模型。楼孔和纸贴尺寸、桶盖姿态和图标、双针刻线与下方电表可按已知物料与逻辑设计合理变化；已知实拍用于参考，未经测量的几何标明近似，不要求每个组合先有实拍。生成式表盘贴图与实物刻线的一致性未确认，不能因点位可投影就视为实物读数真值。人物、车辆、牌具可利用已有裁片、透视投影与合成工具；三维建模按具体需要决定。
-
-轨迹以车载片段为运动参考，在模型坐标系中建立可复核的 **到达任务点、转向、停稳正对观察** 三类轨迹。先固定目标和灯光，对照真实任务点正对画面的目标中心、框宽高、透视和背景边线；再在可见范围内有界变化侧向偏移、俯仰和朝向。每条轨迹记录母场景、参考片段、相机内外参候选、关键帧、插值方式、帧率、画幅、场景状态与采样帧号。相机标定未取得时这些值为拟合参数，不当成实际测量。经审核后独立改变目标布置、读数、轨迹和光照，避免某一类别、针位或桶盖状态固定绑定某条路径。轨迹只提供关联的连续观察，邻帧不是独立母场景；单图训练按任务点正对画面的目标尺度和成像变化抽取代表帧，计数与时序评价保留完整事件窗。
-
-以下是需要制作和验收的完整组合；少量回归小样已生成，状态见[数据区说明](../datasets/README.md)。每项先在固定构图中排有目标、相似物无目标、两者共现三组，再跨不同训练母背景及尺寸、光线轮换，检查目标完整标注与负例证据。混合画面分别输出当前任务标签；画面中其他任务对象不能进入当前类别表。
-
-| 模型 | 主要素材与观察路径 | 需要优先覆盖的硬负例或同屏干扰 |
-| --- | --- | --- |
-| 人物 | 已知正面立牌素材与真实街面，接近和侧向经过，但正例须保持近距离正面可辨。 | 白背面为硬负例，真人与相似立牌为背景；白背误检单列，同框合格正面仍须标出。 |
-| 电动车 | 真实直立、倒伏视面和街区/停车区底图，以任务点正对构图为基线。 | 汽车轮廓、路面黑线、人物脚与车影；有车及相似物同屏时逐车标姿态。 |
-| 火焰 | 楼宇模型和实际楼面按近远、斜视变化，保留多贴与单贴的逐面归属。 | 灯具使用独立无楼体负帧；红桶、黄车及橙红标记按已有证据安排，不推定与火焰同框。 |
-| 楼名 | 楼面纸条素材或渲染随视角移动，文字及纸框分开登记。 | 白色火焰底纸、窗格、空白纸及其他牌面文字；逐纸标框，文字不可读不编造全文。 |
-| 禁行牌 | 牌具实拍和实景合成的接近、转向与经过；杆、牌、底座作为整件。 | 空路口、相似立杆、圆牌、浅墙高亮和裁切杆件；按识别任务区分目标与干扰。 |
-| 桶开闭 | 四桶 Blender 及真实背景，按任务点正对构图覆盖可判开闭状态；侧面视角仅供容错增强。 | 桶体贴纸、桶色变化、相邻桶与非桶物体；状态不可判不强行写开闭。 |
-| 垃圾贴纸 | 真实贴桶图案、24 类素材与桶面投影，覆盖低视角和可辨小贴。 | 桶身固有类别图标、无贴桶面、相似图案；真实四类已见不等于 24 类均有实拍。 |
-| 仪表 | 双针站房原型及车载参考，固定安装后仰，接近、轻偏视及移动反光。 | 只有数显电表、圆灯、圆牌与反光玻璃；八点按可见性标，数显 OCR 另存。 |
-| 车牌 | 真实牌面及车位背景、按四角投影的牌面，覆盖接近、转向和反射。 | 车身蓝块、无牌车位和相似文字；检测框与字符可读性分开，镜像不增加实体。 |
-
-每条生成记录至少关联背景原帧或渲染母场景、主体和贴图父样、轨迹、目标实例、相机及成像参数、遮挡与任务标签、集合用途和审核结果。依据已有证据与逻辑定义任务框、可见目标、硬负例、光影和投影的一致关系；无法确认的部分记录未知。不能由固定种子或更换帧号证明独立，失败原因及重试亦计入清单。训练、开发验证和测试可按方案复用父帧、近重复簇及派生，逐字节完全重复和诊断关联遵守门控约束；结构化报告视频与物理资产复用；已用于调参的片段不再称首次未见测试。
-
-### 未拍到的组合与极端状态
-
-由真实片段建立常态范围，再区分“已观察困难”“物理可行但未观察”“不可辨或故障”三层。各任务依据类别、场景和错误代价一次确定常态、可辨困难及确认硬负例的样本构成，记录分配及依据。不可辨或故障样本保留未知，不标成可靠正例或空负例。
-
-| 模型 | 超出现有视频的可控组合 | 不应强行给出的监督 |
-| --- | --- | --- |
-| 人物 | 非社区少数类＋多人密集＋车挡腿；同身份换街区、近边截断＋局部阴影 | 白背、侧背、远处或不可辨人物的正例标签；白背明确作硬负例 |
-| 电动车 | 倒伏＋多车叠挡＋低视点；同姿态在空停车区、人物附近轮换 | 只有碎片可见却无法判姿态时的确定姿态 |
-| 火焰 | 斜楼面＋远小密贴；灯具独立负帧，其他干扰按已有证据安排 | 消失在模糊和遮挡中的贴纸仍当作可见框 |
-| 楼名 | 未见全文＋极斜纸面＋窗反光；白纸/孔洞/火焰底纸同屏 | 不可读字符被当完整 OCR 真值 |
-| 禁行牌具 | 背面低反差＋截断底座＋路口亮暗差；空路口多相似杆 | 未确定摆位就给允许路线 |
-| 桶开闭 | 四桶状态组合反转＋后垂盖＋相邻桶同屏，固定桶色更换开闭 | 看不到盖/桶口证据就判开或闭 |
-| 垃圾贴纸 | 24类跨四色桶＋同屏多贴＋小尺寸斜视；错投与固有图标共存 | 物品类或所属桶不可核却判投放正确 |
-| 仪表 | 双针多读数组合＋后仰＋高光扫针；仅电表/圆灯等负例 | 针尖被挡仍标可见，或编造真实读数 |
-| 车牌 | 新字符串＋斜牌＋车体截断＋局部反光；远小牌旁有相似蓝块 | 不可读字符被强迫整牌识别 |
-
-按现有资料和逻辑一次安排关键双因素及多因素组合，记录可行依据、母样、类别及失败事件，用条件采样覆盖。严重模糊、极远小和完全遮挡叠加后若已没有监督信息，转入不可辨或拒识检查。域随机化为渲染变化提供研究依据；本轮收益未测，记录来源与适用范围。[域随机化原论文](https://arxiv.org/abs/1703.06907)
-
-### 组合覆盖规则
-
-- **各环节可参考历史 32 个状态槽位设计覆盖，不要求制作或验证小样。** 检测和 OCR 可以用单图、实例裁剪或关联片段。灯色用完整观察窗，热异常用轮次或合成回放槽位。默认排样 12 个基础正例、8 个困难正例、8 个确认负例、4 个不可判定或部分可见。下面各环节按其语义细化数量及分母。审图槽位可以包含评估和待核样本，实际训练只导出具备相应监督的数据。
-- **扩量按条件缺口计数。** 列出各任务需覆盖的组合，例如桶色 × 开闭、人物类 × 遮挡、火焰尺度 × 楼面角度。每个基础格尽量使用两种不同来源、机位或布置作为母样。同一个画面换模糊或亮度仍记为一个母样。某格只有一个来源就登记该限制。依据已有证据安排实际易错的双因素组合，避免从相同母图重复导出大量近似样本。
-- **用真实常见情况稳定分布。** 各任务分别确定基础正例、困难正例与硬负例的起始比例，另保留旧数据中经复核的正常场景和空图。无效或未知样本保留在诊断队列。按类别、场景组和实例数复核分布，避免少数背景、类别或同源母图主导一批数据。正式比例依据现有资料、逻辑与误报代价一次确定。
-
-## 3. 逐任务制作配方
-
-以下配方中的历史困难对照和模型评估口径供资料参考，本轮不执行；标签语义、来源和未知状态仍按实际证据记录。
-
-### 人物立牌
-
-**依据与制作。** 用 A/B 街真实帧标地面可站立区、前后排参照和可用前景遮挡。从 16 个社区、2 个非社区图案建立物料 ID，正例使用已核对的正面图案与底座，透视变化保持正面可辨。白背面只作为背景或硬负例，不从轮廓、站位或邻帧恢复其类别框。保留 640×480 车载近距正面构图，已整理的旧 8 个适配框高约 139–190 px，具体近距范围按当前可辨正面审核，不能仅按旧框高放行远处人物。按脚点深度缩放、落地并合成接触影，轮换两类立牌在同一背景的站位、光线及大小。现有 960×480 工具可复用深度排序和可见掩膜，较低可见率会重采，制作 640×480 的密集错列和重遮挡前需调整筛选。[人物需求](../lab/features/person/README.md#需要实现) · [人物首批合成](../datasets/scripts/person/compose_planned_ground_person.py) · [实景合成](../datasets/scripts/person/synthesize_real_ground.py)
-
-| 因素 | 候选档位及组合规则 |
-| --- | --- |
-| 画面布局 | A/B 街分开覆盖。单人、2–3 人、4–8 人错列。密集布局先按实际地面和底座大小排，允许两类人物同排或分排。相邻立牌遮挡要求至少两块立牌。 |
-| 目标尺寸与视面 | 仅在近距离正面可辨范围变化尺度、轻度正面斜视与画面位置。背面、薄侧与远景作为非目标背景；截断和遮挡分别登记。 |
-| 前景和光线 | 无挡、立牌互挡、电动车遮挡。遮挡要求前景在目标前方且掩膜相交。清晰、轻拖影、暗部低对比均需覆盖社区及非社区。 |
-| 可见与真值 | 合成可见比例先审 ≥85%、65%–<85%、45%–<65% 三档。当前图近距正面可辨时标可见框；丢失正面类别证据的目标不作正例。白背必须作为硬负例，不设忽略区域、不等待补身份。空街、真人、侧背和远处背景按相同目标范围审空标签。 |
-
-**32 个审图槽位。** 12 个基础正例按 A/B 街 × 三种密度 × 两种非社区立牌位置分配，可在多人格中安排纯社区对照。8 个困难正例按四组配对安排，依次覆盖同排与错列互挡、无遮挡与车遮人、近正与仍可辨的轻斜正面、清晰与低照拖影。8 个负例含 4 个白背硬负例与 4 个空街、真人或相似牌具场景；有合格正面同框时保留其标签。4 个边界槽位核对薄边、远处、画外截断及重遮挡是否已超出正例范围。对两种背景重复同一人车布局，检查背景、人物类别和遮挡是否意外绑定。
-
-**标注与验收。** 保留街区、来源组、物料 ID、跨帧实例 ID、可见掩膜及可见框。两类检测标签沿用现有顺序。小样逐图核对底座、遮挡顺序、相邻框和两类数量。真实连续观察按同一轨迹去重，分别评价近距正面两类检出及错分、白背误报、每街计数全对和非社区人员框选。任一街覆盖未完成时记汇总不完整。固定实拍回归按当前人物目标范围复核后评分；观察窗须覆盖各人的合格正面，不能用白背空标签宣称整街无人。按来源组和原始／合成类型分别报分母。[人物实拍诊断](research/FIELD_EVALUATION_V3_20261112.md#实拍失效)
-
-### 电动车
-
-**依据与制作。** 用 A/B 街人偶区域、停车区实拍和既有转拍候选建立三个区域的地面模板。停车区按已确认的车头朝外布置。直立按轮胎接地点，倒伏按车身接地轮廓，分别选真实视面，保留车头朝向、物料 ID 和掩膜。轮辐、车轮与背景边缘按可见证据记录。已有 12 个车载候选框约 82–206 × 52–170 px。V3 诊断低视点三车全漏，另有近景截断倒伏车漏检。沿车载近远尺寸重排同一物料，分别试低机位、姿态和边缘截断。现有 960×480 工具可复用分槽和可见掩膜，需补 640×480 构图及低可见率的审图入口。[电动车需求](../lab/features/e_bike/README.md#需要实现) · [车辆场景合成](../lab/features/e_bike/training/scripts/synthesize_vehicle_scene.py) · [V3 实拍诊断](research/FIELD_EVALUATION_V3_20261112.md#实拍失效)
-
-| 因素 | 候选档位及组合规则 |
-| --- | --- |
-| 区域与数量 | A 街、B 街、停车区。单辆、2–3 辆、4 辆及以上分排。街区保留直立和倒伏，任一可确认车辆均可构成违停存在。 |
-| 姿态与机位 | 直立、倒伏及混合。常规视角、低机位、偏侧和近边，直立按框高分档，倒伏按框宽分档。 |
-| 叠挡与成像 | 无挡、车车叠挡、人物遮车、边缘裁切。车车叠挡要求至少两辆车。低机位同时覆盖清晰、偏暗与低反差，独立记录可见与画外比例。 |
-| 负例与未知 | 经核对的空区、蓝汽车立牌和相似物进入负例。实体可确认而姿态不可辨时保留实体和区域，姿态记未知。规则归属未确认的其他非机动车进入复核。 |
-
-**32 个审图槽位。** 12 个基础正例按三区域 × 两姿态 × 两个尺寸档排，停车区另使两姿态同屏。8 个困难正例组成四对，覆盖常规／低机位、低机位／常规机位、分开／相邻双车、完整／边缘裁切。同车位换用直立与倒伏裁片进行姿态对照。8 个负例含 4 个确认空区与 4 个汽车立牌或相似轮廓场景。4 个边界槽位覆盖轮胎局部、倒伏姿态不明、区界待核与其他样式非机动车。
-
-**标注与验收。** 保留逐车物料和跨帧实例 ID、区域、可见框、姿态及证据。类别沿用直立 0、倒伏 1，姿态未知留在审核记录。小样核对低视点和截断目标框、不同姿态的落点与地面透视。本轮不安排开发集或连续观察模型评估，召回、错分、误报及计数效果保持未知。区域覆盖不足或姿态不明时保留未知或部分完成，报告漏计和重复计数及各自分母。
-
-### 车牌检测
-
-车牌沿用省赛模型，本轮不制作车牌数据；以下是既有研究配方及历史资料，不构成本轮生产或验证指令。
-
-用户提供的车牌实际尺寸为宽 36 cm、高 24 cm，制作牌面几何和投影时使用该尺寸。车体支架尺寸、牌面姿态和相机参数按各批次素材分别拟合并记录；拟合值不作为实测标定。
-
-**依据与制作。** 车牌训练可使用已审核的现场照片、视频帧、省赛合成及道路照片，按样本覆盖、生成方式与来源分别登记；各来源的适用范围由开发验证结果核对。已用于诊断的照片及已知接触画面只作开发回归；其余实拍按父视频、片段和物理牌关系审核后分配集合。同一图中所有可定位牌面及镜像分别标框，字符、车位和实体数单独核查。使用已审车载原图与三张车牌场景素材建车型和牌面模板。标车辆、牌面四角、停车区域及已核车位。按车辆原牌面单应变换把新牌贴回原处，处理旧边缘和字符，保持车体、牌面和接地影的共同透视，再整帧模拟降采样、曝光、反光和拖影。已有 9 个车载候选框约 30–104 × 10–42 px。25–40、45–75、85–110 px 宽为三档试制起点，结合姿态和牌面高一并审查。现有导出脚本整理旧合成和已审实拍，新车位透视和真实反光生成需补齐。[车牌候选导出](../lab/features/plate/training/scripts/prepare_plate_site_finetune.py) · [国赛素材与适配统计](../datasets/README.md#当前素材与来源候选)
-
-| 因素 | 候选档位及组合规则 |
-| --- | --- |
-| 布局与尺度 | 单车、相邻双车、三车同屏，各配不同尺度与偏移。已知摆位方可赋车位真值。邻车遮挡牌面要求实际存在邻车且在牌面前。 |
-| 牌面与边界 | 近正视、斜视，搭配完整、邻车遮牌和画外裁切。用四角和剩余牌面支撑检测框，框由最终可见部分得到。 |
-| 成像 | 清晰、轻拖影、局部强反光。保留车体而改变反光落点，可配远小、强反光且仍可定位的困难正例。 |
-| 存在和可读性 | 可定位牌面为正例，字符可读性独立登记。已确认没有可见车牌的空位、车体反光和相似矩形是负例。画面可能有牌且边界无法定位时进入复核。 |
-
-**32 个审图槽位。** 12 个基础正例先覆盖三档尺度 × 正斜两面 × 两种经核布置，单、双、三车在组间轮换。8 个困难正例按四对安排，比较斜视无反光与强反光、远小清晰与轻拖影、双车分开与互遮、近景完整与切边。8 个负例含 4 个确认空位与 4 个相似矩形或车体反光。4 个边界槽位包含远小不可读、强反光仍可定位、边界待核及车位待核。
-
-**标注与验收。** 检测标注为单类 `plate` 可见框。另存物理牌 ID、车位、角点、可读状态、相机原图和裁切来源。实车车位归属真值仍待核。先审同车牌面落点、远小目标框及多牌漏标，再报各档召回和确认负例误报。固定实拍回归和开发集使用相同匹配口径，分别标明车牌物料与来源是否重合。已定位牌面和未知车位的结果按各自分母汇报。[车牌需求](../lab/features/plate/README.md#需要实现) · [同场车牌诊断](research/FIELD_EVALUATION_V3_20261112.md#实拍失效)
-
-### 七位车牌 OCR
-
-以下为历史研究配方，不构成本轮训练或验证指令。
-
-**依据与制作。** 现有实拍适配中，约 29–30 px 宽的牌可定位而字符不可读，约 85–95 px 宽近景有可读示例。先在原图做成像退化，再从同一图派生真值框裁剪、四角校正裁剪和检测框裁剪，核对远小样本经过放大后的笔画仍来自原始像素。按项目七位字符表生成有效整串，在相应位置轮换合法形近字，避免某位置总出现同一字符。完整字符串和物理牌先分组再派生裁剪。三块现场物理牌的 11 张诊断裁剪按三组报告。[车牌 OCR 候选统计](../datasets/README.md#当前素材与来源候选) · [七位字符表](../ws/src/aec_vision/config/plate/charset.json) · [双 OCR 研究](research/PLATE_DUAL_OCR.md)
-
-| 因素 | 候选档位及组合规则 |
-| --- | --- |
-| 原图与裁剪 | 原图牌宽试用 25–40、45–75、85–110 px。近正视、斜视各保留紧框和带背景裁剪，记录校正及坐标转换。 |
-| 成像与字符 | 清晰、轻拖影、局部强反光。保持同串、同一透视和边界，逐次改变一种因素。增加形近字符与斜视反光组合。 |
-| 可读状态 | 无挡、单个字符完全遮住、多个字符完全遮住。完整转写可核的样本用于监督。字符完全遮住的样本用于拒识与误接纳评估，物理牌登记中的已知字符串仍可作关联真值。 |
-| 非牌与非法串 | 从确认无牌的误检框、相似文字块和格式不符的文字构造拒识对照，另记原因。 |
-
-**32 个审图槽位。** 12 个基础正例涵盖三档尺度 × 两种视面 × 两组合法字符串，以实际可读性筛进监督。远档若无可读证据，记该档监督缺口并将样本移到边界队列。8 个困难正例作四对，覆盖形近字符、斜视、轻拖影、裁剪偏移。8 个拒识对照由 4 个非牌检测框与 4 个近似牌面的格式不符文字构成。4 个边界槽位用来复核单字遮住、多字遮住、局部高光、远小不可读。
-
-**标注与验收。** 保留物理牌 ID、原图与裁剪坐标、七位转写、逐字符可读性、车位及未知原因。分别报告真值框、四角校正框和检测框上的整串准确率、逐位置混淆、拒识及误接纳。按现有双路仲裁检查一致、合法分歧和无效输出，分开保存 CNN 与第二 OCR 分数。按物理牌或观察片段核对跨帧整串，已确认车位才进入端到端归属分母。冻结实拍样本只做回归，正式配置选择在开发验证上完成。
-
-### 火焰贴纸与楼名纸条
-
-共用 A/B/C 楼景、相机和观察轨迹。分别标楼面四角、楼名纸位置和可见边界。全场视频 `scene_09` 约 106–117 秒用于比对楼面从正视到斜视，`scene_07`、`scene_12` 用于比对楼面与桶同框。两项各自导出标签，按楼号和观察区间关联。[视频区段表](../datasets/annotated/site_capture_20261112/segments.csv) · [楼面与素材依据](DATASET_DESIGN.md#场景证据与楼宇采集)
-
-#### 火焰贴纸检测
-
-1. **来源与摆放。** 按[火焰任务需求 FIRE-R02](../lab/features/fire/README.md#需要实现)使用唯一目标图案，沿用宽 2.5 cm、高 3.5 cm 的贴纸物料依据，在楼上不同位置安排落点。贴纸相对楼面和邻近窗格的大小与位置结合已知物料、可用实拍或合理几何近似设计，未实测的比例注明假设，并处理所在平面和视角的透视；距离、视角改变可使像素大小变化。等比例放大整图不能改变贴纸与楼面的相对比例；缩放、透视及裁切后同步更新框和可见状态。旧车载候选像素宽度只说明当时画面，不规定固定范围；单图达到相近量级不等于现场标定。V3 在固定实拍诊断中出现斜视小贴漏检、单贴重复框和红黄灯误报，记录原诊断范围。[尺度设计](DATASET_DESIGN.md#楼名文字与火焰数据集方案) · [V3 实拍失效](research/FIELD_EVALUATION_V3_20261112.md#实拍失效) · [楼宇三维渲染入口](../lab/features/fire/training/scripts/render_blender_fire_dataset.py)
-2. **状态与约束。** 先按[火焰特征与扰动](DATASET_DESIGN.md#楼名文字与火焰数据集方案)保留唯一图案身份及每个可辨实例的标签；以任务点正对构图为基准，结合合理非正面视角以及楼面、尺度和成像变化，避免将正面或固定背景当作目标。安排零张、单张及多张目标和独立灯具负例，避免假设每图必有目标或只识别一个。图像负例须确认画面中没有火焰贴纸；该楼可能贴放区域未全部覆盖时逐楼总数记未知。遮挡、缩放、透视和裁切按实际可见状态更新标签。
-3. **小样用途。** 按本次授权和可用来源安排目标、背景及状态组合，记录实际基底、生成参数、标签和未知项；小样用于确定后续使用的基底和制作方式，不把计划或设计目的写成已证明的模型效果。
-4. **场景边界。** 用户确认灯具与楼体不在同一地点，小车路线看不到灯与楼同框。楼面样本按实际贴纸数量和可见性制作；灯具单独作为无楼体负帧。
-5. **标签与验收。** 从对象 ID 图和原尺寸实例掩膜导出 YOLO 框，逐框登记楼号、可见楼面位置、贴纸实例 ID 与观察区间。贴纸裁切或过曝时按可辨证据复核，并记录现有导出器的拒收原因。画面含待核目标时进入复核队列。本轮不安排固定回归，召回、误报、重复框及逐楼计数效果保持未知；同一贴纸跨帧计数须去重。
-
-#### 楼名纸条检测
-
-1. **来源与排版。** 从现有三栋楼的纸条、楼顶位置和真实字形确定纸面边界。正面与斜视使用同一平面四角投影。以三个车载候选宽 51–114 px 为参照，小样设约 50、80、110 px。用许可已核的字体拟合打印文字，轮换字数、字形相近的字、字距、实际纸面与未见全名。变化施加到整幅画面后再取裁剪。自定义陌生楼名出现在楼顶指定纸面时仍是正例，窗格、其他白条、火焰贴白底和位置不符的相似文字作干扰。[楼宇场景合成](../lab/features/fire/training/scripts/compose_scene_fire.py)
-2. **状态与约束。** 按任务点正面构图交叉纸宽、清晰／偏暗／方向拖影、纸条完整／画外裁边，以及全文可读／全文不可核。纸条裁边但全文仍可读时保留 OCR 监督；文字无法辨认时只使用有证据的纸条检测标签。目标身份待核时保留未知状态。
-3. **32 个审图槽位。** 12 张正常正例覆盖三档纸宽并轮换文本与楼面。8 张困难正例改变清晰度、曝光、纸边裁切和相近字形。8 张负例含 4 张无楼名纸的可核画面与 4 张带相似白纸、窗格或反光的画面。4 张拒识或待核图包含裁边、过曝和拖影至无法转写。
-4. **可复现的困难对照。** 选约 80 px 宽的同一纸条，固定楼面与文字，做正面清晰、正面偏暗、约 2 px 拖影和纸边裁切四张。按原图分别确认纸面范围、四角及可读性。用人工四角校正的裁剪与模型检测裁剪运行同一 OCR，分开统计定位造成的错读和字符识别错读。
-5. **标签与验收。** 导出纸条框、四角、楼号、完整转写、可见文本状态和父图 ID。现有 OCR 导出器的裁边、框高、字均宽和对比度检查用于筛候选，通过后仍须逐字复核。OCR 调试同时保留候选裁剪和拒收清单，按全名与母样分组留出未见文字。本轮不安排回归或 OCR 引擎对照，误报、召回、文字识别和逐楼关联效果保持未知。[OCR 裁剪导出入口](../lab/features/fire/training/scripts/export_name_ocr_candidates.py) · [楼名与火焰任务定义](../config/perception_tasks.json)
-
-#### 楼名中文 OCR
-
-- **素材与制作。** 实拍样本保留画面中纸条的逐字转写真值。合成样本按纸条行数、字距与可用字体随机生成全文，同一楼面与背景轮换不同文字，同一文字也用于不同背景，覆盖不同长度、形近字和未见全名，避免楼面或固定名称代替文字识别。先贴回完整楼面并经过全帧成像，再由真值四角和检测框分别导出裁剪。用透视校正保持笔画比例。
-- **状态与配额。** 在三档纸宽的任务点正面构图中安排 12 个可读槽位。8 个困难对照改变拖影、字体笔画、纸边裁切或曝光。8 个干扰槽位使用窗格、白纸及非目标文字。4 个拒识槽位包含裁断、强光与过度拖影。固定同一纸面换相近字，再固定同一文字改变成像条件，验证模型输出跟随像素证据。文字无法辨认时保留生成时全文，当前裁剪记为不可读。
-- **标签与验收。** 记录父图、楼号、四角、全文、可读性及裁剪来源。分别报人工校正、检测裁剪的整串正确与误接受，按全名和来源组留出未见文字。最后用同一观察区间对齐逐楼名称和计数。[OCR 裁剪导出](../lab/features/fire/training/scripts/export_name_ocr_candidates.py)
-
-红黄信号灯位于独立地点，用无楼体灯具帧作为火焰硬负例；红桶等其他干扰按已有场景证据安排。只框真实火焰贴纸，红桶和灯不增加类别。既有[误报研究](research/DATASET_COVERAGE_TRAINING.md#火焰误报与过拟合处理)保留历史诊断，不构成本轮验证或微调对照指令。
-
-### 禁行牌具
-
-**素材与制作。** 从归档的牌具旋转视频选择正面、两侧、斜背和背面，同一物理牌具及视频作为一个来源组。补录 `scene_03` 用于核对近景裁切，`scene_08` 用于核对白墙前的牌背。车载候选框高约 179–295 px，先按约 180、235、290 px 试做远、中、近档。两种可能摆位分别按候选观察位置构图。保持杆与底座接地，用真实对应视角裁片及一致的透视、比例和阴影。将旧合成的 960×480 画幅、固定完整入镜与单一视角扩成车载 640×480 的多视角构图。[素材索引](../Archive/technical/materials/ASSETS_INDEX.md) · [视频区段](../datasets/annotated/site_capture_20261112/segments.csv) · [牌具场景合成](../lab/features/sign/training/scripts/compose_sign_scene.py)
-
-| 维度 | 分档与制作方式 |
-| --- | --- |
-| 摆位和视角 | 两个摆位分别覆盖近正、侧、斜背和背面。侧背面沿用真实裁片轮廓，保持牌面图案与场地朝向在各视角中的真实方向。 |
-| 背景和成像 | 正常、暗背景、白墙低反差三档。白墙前用同牌具同姿态成对试不同反差。另做相同构图的原清晰度与轻拖影。 |
-| 可见性和负例 | 完整与边缘裁切分别核对。侧背和裁切只要仍能辨认实物，就依据可见的牌面、杆、底座取单类框。物体存在但无法辨认时留作未知。确认空岔口、灯杆、相似立牌及仅有倒影的画面可作难负例。 |
-
-**32 张审图建议。** 12 张基本正例覆盖两个摆位 × 三个尺寸 × 两个视角组。8 张困难正例做四组配对，分别检验白墙低反差、前景挡杆、近边裁切和转向拖影。8 张负例包含两个已核空岔口和灯杆、其他牌、倒影等。4 张边界图覆盖仅露杆底、侧背几不可辨或摆位无法区分。复合对照先固定牌背和白墙背景，再引入近边裁切。检查模型能否仍定位实物，以及观察位置是否足以确定摆位。V3 在白墙前漏检牌背，另有近景截断框口径不一致的样本，分别保留为回归条件。[实拍诊断](research/FIELD_EVALUATION_V3_20261112.md#实拍失效)
-
-**标签与安全状态。** 保存来源、摆位真值、观察身份、视角、可见实例框、截断与检测可判性和摆位可判性。训练标签为一个整牌具类别，检测框与摆位真值分别审查。漏检、误报与路线决策效果本轮不测，状态保持未知。现场“摆放区域 → 受限路段 → 允许路线”的对应关系待标定，缺失、冲突或超时应输出未知并在安全等待位置保持停车，按限时重试方案记录。未知状态必须阻止错误选路。[禁行任务与路线流程](research/OPEN_SOURCE_METHODS.md#sign)
-
-### 红绿灯 HSV 与时序标定
-
-**素材与制作。** 以归档车载信号灯正面照片及补录 `scene_10` 的灯杆正面为灯箱和 ROI 布局候选。该区段灯色仍待逐帧复核。`scene_01`、`scene_14`、`scene_19` 的灯杆、背面和转场可核对缺灯与背景干扰。两处灯组各自记录等待线前观察位、相机朝向、允许位置偏差和原图分辨率。用真实可靠灯色框出亮区，在原图归一化坐标上拟合从左到右的红、黄、绿竖向长条 ROI，分别审定 HSV 区间和最小连通面积。合成回放可在同机位片段添加反光、平移 ROI、重复旧帧和停止供帧，保留来源及改动参数，国赛两处灯的实际标定值以实测为准。[素材索引](../Archive/technical/materials/ASSETS_INDEX.md) · [视频区段](../datasets/annotated/site_capture_20261112/segments.csv) · [HSV 与状态器](../ws/src/aec_vision/src/aec_vision/traffic_light.py)
-
-| 维度 | 分档与制作方式 |
-| --- | --- |
-| 灯位、灯色与观察位 | 两处灯分别覆盖红、黄、绿。标定时从现场已确认的正对位置向左右轻微偏移，逐档查看三条 ROI 是否仍包含对应亮区。物理灯色取可核验画面或同时间信号记录。 |
-| 视觉干扰 | 常态、阴影或背光、强反光三档。相同颜色对照正常与过曝。用非对应亮区或背景绿物体检查位置约束，缺灯、同帧多个颜色候选和画质不足均检查未知路径。 |
-| 时序与有效性 | 稳定、切换、整窗断流分开回放，保留原始顺序和时间戳。另测重复戳、晚到旧帧、超过有效期和离开观察位。红黄绿正常灯态同一时刻只亮一盏。断流意味着窗口没有新鲜数据，实际灯色可由同步记录保留。 |
-
-**32 段审图建议。** 12 段稳定颜色取两处灯 × 三色 × 两种观察构图。8 段切换与重启覆盖两处灯各一组红到绿、绿到黄、黄到红及切换期间的旧帧回放。8 段视觉难例覆盖两处灯各四组背光、反光、ROI 偏移、画质不足或无灯。4 段时效边界覆盖两处灯各一组过期和断流。每段以真实可核时间或受控回放脚本记录持续时间与事件顺序，原视频的邻帧仍属同一来源。典型配对为同灯位同绿灯画面分别持续输入和在已确认绿灯后停止供帧，核对停止供帧超过期限后状态撤销。规则中的红 10 秒、绿 15 秒、黄 3 秒用于背景记录，回放的真值与通行依据取实际视觉观测和有效性。
-
-**标签与验收。** 每帧或事件记录灯组、三色真值或未知、来源、图像时刻、回放时刻、观察位有效性、ROI 与亮区、干扰及丢帧原因。标注实际灯色与期望发布状态两列，例如物理绿灯仍亮而输入过期，期望输出未知。按灯位分别报告颜色混淆、红黄或未知误报可靠绿灯的次数和分母、绿灯确认延迟、过期撤销延迟及断流覆盖。只有稳定、新鲜且已确认观察位置的绿灯可交给导航作为通行视觉依据。连续帧门槛和时效由国赛标定决定，单元回放和实际停车位验收分别记录。[红绿灯任务与状态流程](research/OPEN_SOURCE_METHODS.md#traffic_light)
-
-### D 楼热异常与逐层判定
-
-**素材与制作。** 以 D 楼三列四层和中央一根竖直电阻的已确认结构规划采集。两侧列可用作同层背景。CarRealPicture 已提供 D 楼可见光画面；红外温度通道、设备型号及跨传感器配准记录另行核对，RGB 画面不提供温度真值。先核对可见光外轮廓、楼顶楼底、四层编号、每层边界及中央带。红外设备可用后，按一次从冷态、升温、稳定到冷却的过程建立采集轮次，在同一观察位同时保存原始红外数据和可见光，记录两路时间、分辨率、视角和设备输出单位。用能在两路图中确认的楼面对应点配准，独立记录误差。通过已知通断时间、独立测温或可追溯人工记录确认逐层真值。开关时刻只作输入事件，楼层异常真值依据实际温升和已核楼层范围。[热异常任务与设备边界](research/OPEN_SOURCE_METHODS.md#thermal) · [原始数据状态](../datasets/README.md)
-
-| 维度 | 分档与制作方式 |
-| --- | --- |
-| 热源与阶段 | 冷态、升温、稳定、冷却保留连续顺序。异常覆盖实测单层和多层，以及中央连续热区。现有电阻能否独立控制单层待核，按实测结果登记单层、多层和待核缺口。 |
-| 楼面与层界 | 基准视角和偏斜视角分别标定四层。看中央带位于层内、邻近层界、跨层时，逐层核对响应、有效面积和投影误差。冷态的热源邻界或跨层字段不适用。单层异常可存在可见热扩散，实际异常层集合以逐层真值为准。 |
-| 背景与数据 | 正常背景、整体温度变化和局部非目标干扰分别保留。用中央带与同层两侧冷区的差值核对相对响应。配准失效、楼层出画、饱和、缺帧或读数单位不明分开标注。只有强度时保留原单位，伪彩图供可视化。 |
-
-**32 个回放槽位建议。** 12 段基础槽位按两个视角分别保留三段冷态、三段热态，热态按实际可证的层数填充。8 段层界难例覆盖层内、邻界、跨层和回冷残留。8 段干扰槽位覆盖背景升温、侧区局部热干扰、相机偏斜及局部热噪声。4 段无效槽位用于错配、出画、丢帧及饱和。短片段可来自同一轮次，统计和切分按完整轮次计数。首个复合对照在同一姿态记录冷态和连续竖直热区，按时间配对四层边界与热响应，核对跨层时逐层判定。缺实测时可用标有来源的合成数组验证层索引、边界和无效数据处理，阈值与实际楼层表现待真实轮次验证。
-
-**标签与验收。** 保存原始热阵列或设备强度图、可见光帧、两路时间与配准、四层区域、中央带及两侧背景 ROI、供电阶段、逐层状态及真值依据。逐层计算中央相对热响应和有效热面积，热区跨层按四层分别判定。有效像素或映射不足的楼层记未知，其他已确认层保留结论。用独立轮次检验逐层漏报、误报、未知率、异常楼层集合完整匹配及框图与楼层的对应，区分设备输出单位、合成流程测试和实测结果。[热异常任务与验收](research/OPEN_SOURCE_METHODS.md#thermal)
-
-### 桶开闭与 24 类垃圾贴纸
-
-#### 桶开闭检测
-
-1. **来源与尺度。** 用四色桶开闭视频和既有三维资产核对铰链位置、桶口形状与盖板后垂外观，竖起作为合成扩展。16 个实拍桶候选框高约 126–171 px，建议按 130、150、170 px 排样。V3 的 14 个漏配中有 7 个和另一状态类别框高重叠，首批优先核查盖板口径和同色开闭混淆。[桶素材索引](../Archive/technical/materials/ASSETS_INDEX.md#垃圾桶7-段) · [V3 实拍失效](research/FIELD_EVALUATION_V3_20261112.md#实拍失效)
-2. **状态与约束。** 每色均有开和闭，再交叉常规／低视点、均衡光／侧光／桶口或盖板全挡。后垂与竖起都是开盖姿态，同一盖板在同一帧只占一个姿态。按实际可见桶口判开，按贴合的可见盖板判闭。盖证据全挡、开闭过渡、画外或观测区只有桶身时，物理状态可由来源另存，当前图记状态未知。用现有四桶 16 种开闭布局交叉桶色与开闭，逐个检查同一色桶在两种状态出现。
-3. **32 个审图槽位。** 12 张正常正例为三档桶高 × 两种视点 × 一对开闭互补布置。8 张困难正例包含四组仍可判定的相邻盖重叠、低视点薄证据、竖盖和侧光配对。8 张负例中 4 张确认无桶，4 张带方箱、桶色相近物或被移除桶后的场景。4 张待核图覆盖盖证据完全被遮、开闭过渡和裁边。
-4. **可复现的困难对照。** 固定颜色、桶底、相机和光照，将四桶开闭从一组改成逐桶取反的一组。用同一低视点，再将其中一个桶的盖从打开改成关闭。比较状态变化前后的盖板证据和整桶框，核查错误来自状态分类、位置变化还是强报未知。
-5. **标签与验收。** 从桶身及可见盖板掩膜导出整桶框，记录桶 ID、色、布置、物理开闭和当前可判状态，并保留开桶口或闭盖板的证据图。颜色识别使用桶身稳定区域，按任务配置映射桶类型。状态证据不完整的图按现有导出策略留复核。本轮不安排回归，开闭混淆、漏检、未知图强报及桶 ID 关联效果保持未知。[桶三维渲染入口](../lab/features/waste_bin/training/scripts/render_blender_waste_bin.py) · [可见性口径](../lab/features/waste_bin/training/scripts/bin_render_contract.py)
-
-#### 垃圾贴纸识别与投放归属
-
-1. **来源与制作。** 按[垃圾贴纸数据设计](DATASET_DESIGN.md#垃圾贴纸数据设计)使用唯一带贴实拍组、空桶视频、固定 24 张图案与 Blender。以小车停稳画面为贴纸比例和位置参考。贴纸放在桶体正面下方，按该区域四角投影，跟随桶面透视和局部光照。每张合成图沿用实际图案类别，记录贴纸可见框和所属桶。[桶场景合成](../lab/features/waste_bin/training/scripts/composite_bin_real_scene.py)
-2. **状态与约束。** 每桶正面下方恰好一张既定 24 图案之一的贴纸，按任务点正面拍摄、清晰／偏暗／局部高光、桶类型和投放归属。桶身固有类别图标与物品贴纸分别标注。正例覆盖与桶类别相符和错投。桶色、桶盖状态和贴纸图案独立轮换。过曝导致图案不可辨、桶归属不清时单列待核，不把它当作无贴负例。
-3. **32 个审图槽位。** 12 张正常正例覆盖三档候选图案尺度及单桶／多桶。8 张困难正例包含同图换桶色、同桶换图案、相邻桶错投及边缘反光四组。8 张干扰图检查桶身固有类别图标与物品贴纸的区分。4 张待核图覆盖过曝、反光和归属边界。全类颜色覆盖专项可用 24 张四色同屏图，四桶分别从类别索引 0、6、12、18 起轮换完整 24 类，每张 4 个实例，共覆盖 96 个类与桶色配对。该专项与首批接触表可按条件复用合格样本。
-4. **可复现的困难对照。** 固定两个相邻桶、机位及投影尺寸，在同一桶位把底色换成另一类别，保持原贴纸及其名称，再互换相邻桶的贴纸位置。每版核对物品名是否随图案变化、桶 ID 是否正确、投放对错是否随物品与桶的映射变化。
-5. **标签与验收。** 导出既定 24 类贴纸框并登记贴纸实例 ID、桶 ID、图案来源、桶色和桶类型，按任务配置派生投放对错。类别图标保留为已确认的干扰背景。本轮不安排回归，24 类召回、检出、误报、贴纸归属和投放判断效果保持未知；既有实拍与合成来源分别记录。图案类别和桶色映射以任务配置为准。[垃圾投放任务与映射](../config/perception_tasks.json)
-
-#### 桶色识别与投放关联
-
-- **素材与制作。** 从真实桶视频核对桶身稳定色区和相邻桶间距。保留原曝光，分别模拟阴影覆盖、反射偏色和背景色串入。每张登记桶体、稳定色区及前景贴纸候选。使用任务配置定义的桶色及物品类别关系。
-- **状态与配额。** 12 个基础槽位覆盖四色各三档光照，8 个困难槽位覆盖不同光照、相邻桶同屏、局部反光及错投，8 个干扰槽位使用相似色箱，4 个待核槽位覆盖颜色证据不足及贴纸归属边界。固定机位将相邻两桶分别换色、换物品及互换摆位，每次只改一项。图案存在但关联未定时保留未知，
-- **标签与验收。** 保存桶体区域、颜色依据、桶类别、物品实例、归属及派生投放状态。分别验收颜色混淆、错归属、投放错判及未知。按桶而非画面给出每项分母。[颜色解耦与贴纸依据](DATASET_DESIGN.md#已定的颜色解耦与视频数据方向)
-
-### 温湿度表与数显电表
-
-| 工序 | 制作设置与标签 |
-| --- | --- |
-| 布景和尺寸 | 沿用新版站房 Blender 原型。黑色数显电表、支架、银色温湿表、深地面、白墙、侧窗、顶灯、标线和围板使用已对照实拍的布局。渲染为 640×480。以六张车载图作为构图参照，表心约在 x=52%–68%、y=35%–41%，短长轴比约 0.78–0.87。表盘宽分 87–101、102–116、117–133 px 三档。更小、更大及画外截断先作审图候选。 |
-| 安装与取景 | 按用户要求表盘离竖直后仰约 20°–30°，对地角取 60°、65°、70° 三档，65° 为名义值。固定箱体、支架与数显窗。相机分别取基准、从左和从右观察，用最终轮廓、表心与像素大小拟合。相机俯仰和表盘装配角独立登记。正面、左右与近远采用有限组合，保留观察位置和种子。 |
-| 光线与反射 | 用现有室内 World、两盏顶灯和侧窗。固定机位比较顶灯主导、均衡和窗光主导三种。原型名义灯能量为 1120／780／430，World 强度 0.24。小样可将窗光降到原值 0.3 倍做顶灯主导，或将顶灯降到 0.55 倍、窗光升到 1.5 倍做窗光主导。这些是 Blender 原型参数。先固定曝光看高光是否合理落在玻璃，调整光源位置让反光扫过边缘、盖住一个关键点或挡住读数。再做少量全帧曝光和清晰度变化。 |
-| 双针和关键点 | 在每个量程选经过刻度核对的五档，包括两端附近、四分位和中值。保留温湿两针的独立角度和读数。增加临刻度线、两针投影靠近刻度、单点被反光淹没的组合。投影顺序为温轴、温尖、湿轴、湿尖、温最小、温最大、湿最小、湿最大。用表盘外沿掩膜得到框，用投影核对画外或裁边。高光压住点位需按原尺寸人工核对可辨性。几何坐标、可见性、刻度和可读状态分别保留，读数按现场标定映射。 |
-| 数显窗 | 保存显示窗自身四角，按左上、右上、右下、左下排列，再校正 ROI。覆盖完整数字、前导零、小数点、斜视、局部过曝、屏幕偏离和裁切。原型目前显示 `1234`，制作前扩展实际需要的数字段及小数点。屏幕字符串、单位来源和可读性独立登记。只显示电表的样本可作为温湿表的负例。 |
-
-温湿度表建议首轮审 32 张。8 张正常与安装角对照、6 张机位与尺度变化、6 张不同反光位置、4 张困难组合边界、8 张负例。负例包括仅电表、圆形灯具或圆牌、强反光空背景及站房无表盘。固定 65° 对地安装角及约 110 px 表盘宽，保持针位和相机，分别让高光扫过刻度、温度针尖和下方数显窗。随后只移除上方表盘保留站房，验证负例。每张并排看原图、框点叠图、等比例表盘裁切及同类型车载参考。原型预览要求投影点全部入画。旧渲染与增强使用方形图和旧场景。生产前扩展裁切、负例、4:3 构图及可见性处理。[仪表专项设计](research/METER_VISION.md#按车载实拍重做合成数据) · [旧原型投影与环境参数](../datasets/assets/blender/meter/blender_9011_power_meter_prototype_tilt_20261112/prototype_manifest.json) · [室内布景与灯光代码](../lab/features/meter/training/scripts/power_meter_room.py)
-
-#### 数显电表 ROI 与 OCR 制作
-
-- **素材与制作。** 优先从同张站房原图和现有原型取显示窗，分别校准四角、亮度和数码笔画。清晰原图可读时才登记实拍字符串。原型数码段按真实显示格式扩展，保留带前导零、小数点和易混笔画的候选。每张先输出原图，再派生透视校正和按预计 ROI 裁剪的两份输入。[数显 ROI 专项](research/METER_VISION.md#数显电表的-roi-与-ocr)
-- **组合和排样。** 以窗面居中／偏移／近边、近正／斜视、清晰／暗部／局部过曝及数字边缘清晰度组织。整位或小数点因成像无法辨认时当前串待核。32 个槽位用 12 个可读完整、8 个反光或角度对照、8 个确认没有有效显示窗的干扰、4 个不可读或位置未知。固定房间和相机只改变显示窗高光与字串，检查温湿表的结果是否维持各自状态。
-- **标签与验收。** 保存四角、真值字符串、前导零、小数位、单位来源、窗是否可定位及可读性。分别报告真值窗和标定窗 OCR 的整串正确、小数点错误、误接受和拒识。空窗、偏出标定范围与过曝保留状态。评估读数以实际可核的原始画面为准。
-
-## 4. 按用途安排组合配额
-
-各任务的规模、状态和标注各有分母。依据现有资料和逻辑一次列出可行组合、重要多因素失效与因素对。多项极端叠加时，分别安排仍可辨的困难监督、当前不可判的拒识样本以及故障回放。每个槽位登记来源组、共同出现的状态、证据等级与任务失败事件。相似源的重复帧只增加帧数。错误放行、未知强报等重点风险纳入设计；真值或结果缺失时保持未知，不安排回放验证。[组合概率与极端状态](research/DATASET_COVERAGE_TRAINING.md#1-组合概率和极端状态) · [全任务交互演示](DATASET_DESIGN_DEMO.html#sampling)
-
-## 5. 生产记录与交接
-
-1. **入口和状态。** 记录实际使用的入口、输入、参数、计划、回执和输出；已发现错误按证据处理并标注受影响范围，不能把计划、退出码或回执当作语义正确的证明。
-2. **样本和标签。** 沿用现有清单记录图像 ID、父素材与时间戳、场景和物料组、用途、变换参数、种子、标签及其状态。Pose 文件使用既定八点和 `[8, 3]`；坐标缺失、已知但遮挡和可见分开记录。OCR 记录父图、裁剪坐标、完整转写和可读性。YOLO 检测框和关键点按实际导出图像宽高归一化。[Ultralytics 检测标注格式](https://docs.ultralytics.com/datasets/detect/) · [Ultralytics Pose 标注格式](https://docs.ultralytics.com/datasets/pose/)
-3. **实际组成。** 按实际用途分别统计帧数、实例数、来源组数、六层状态、负例、未知、pending 和有证据的排除数，记录多父样及已知复用。不同文件或随机种子不证明独立来源。
-4. **未测状态。** 本轮不以常规数据或模型验证选模或迭代；用户明确授权的有限检查按指定范围执行。已用于问题分析的资料保留历史用途，未确认的标签和未测端到端效果保持未知。
+[2026-11-15 已撤出生产路径的批次记录](../refs/archive/DATASET_BACKGROUND_2026-11-15.md)

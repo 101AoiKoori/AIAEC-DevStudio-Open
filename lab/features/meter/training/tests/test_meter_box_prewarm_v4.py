@@ -1,8 +1,9 @@
 """Check the restricted box-only adapter, without running training."""
 import importlib.util
+import tempfile
 import unittest
 from pathlib import Path
-from types import SimpleNamespace
+from unittest.mock import patch
 
 ROOT=Path(__file__).resolve().parents[5]
 PATH=ROOT/'lab/features/meter/training/scripts/train_meter_box_prewarm_v4.py'
@@ -31,24 +32,65 @@ class BoxPrewarmEncoding(unittest.TestCase):
         row['keypoint_visibility']['humidity_tip']='unknown';row['dial_raster_evidence']['bbox_status']='unknown'
         with self.assertRaisesRegex(ValueError,'raster evidence'):module.assert_unknown_points(row)
 
-    def test_specialized_trainer_skips_validation_and_writes_only_last(self):
-        class Parent:
-            def validate(self):raise AssertionError('base validator must never run')
-            def final_eval(self):raise AssertionError('base final evaluation must never run')
-            def save_model(self):raise AssertionError('base best-model selection must never run')
-        class Model:
-            def half(self):return self
-        writes=[]
-        fake_torch=SimpleNamespace(save=lambda obj,path:writes.append((obj,path)))
+    def test_specialized_trainer_uses_the_shared_fixed_policy(self):
+        class FixedTrainer:
+            def validate(self):return {}, None
+            def final_eval(self):return None
+            def save_model(self):return None
+
         counters={'validation_calls_skipped':0,'final_eval_calls_skipped':0,'checked_batches':0}
-        cls=module.make_box_only_trainer(Parent,fake_torch,'test',counters)
-        trainer=object.__new__(cls);trainer.epoch=0;trainer.ema=SimpleNamespace(ema=Model(),updates=2)
-        trainer.args=SimpleNamespace(pose=0.,kobj=0.);trainer.last=Path('last.pt');trainer.best=Path('best.pt')
-        self.assertEqual(trainer.validate(),({},0.));trainer.final_eval();trainer.save_model()
-        self.assertEqual(counters['validation_calls_skipped'],1);self.assertEqual(counters['final_eval_calls_skipped'],1)
-        self.assertEqual(len(writes),1);checkpoint,path=writes[0]
-        self.assertEqual(path,Path('last.pt'));self.assertIsNone(checkpoint['best_fitness'])
-        self.assertEqual(checkpoint['train_metrics'],{});self.assertIsNone(checkpoint['optimizer'])
+        cls=module.make_box_only_trainer(FixedTrainer,None,counters)
+        trainer=object.__new__(cls)
+        self.assertEqual(trainer.validate(),({},None))
+        self.assertIsNone(trainer.final_eval())
+        self.assertEqual(counters['validation_calls_skipped'],1)
+        self.assertEqual(counters['final_eval_calls_skipped'],1)
+        self.assertIs(cls.save_model, FixedTrainer.save_model)
+
+    def test_legacy_checkpoint_without_optimizer_is_explicitly_rejected(self):
+        with self.assertRaisesRegex(ValueError, 'no saved optimizer state and cannot resume'):
+            module.validate_box_resume({'epoch': 0, 'optimizer': None}, {'epochs': 3}, None)
+
+    def test_resume_requires_matching_fixed_policy_and_unfinished_epoch_budget(self):
+        config={'epochs': 3}
+        signature=module.prewarm_run_signature(config,'fixture-data')
+        resume={'schema_version':1,'task':'pose','policy':module.BOX_POLICY,'epochs':3,
+                'run_signature':signature,'trained_epochs':1,'terminal':False,
+                'model':{'weight':0},'ema':{'weight':0},'scheduler':{'last_epoch':0},
+                'rng':dict.fromkeys(('python','numpy','torch','cuda')),'stopper':{}}
+        checkpoint={'epoch':0,'optimizer':{'state':{},'param_groups':[{}]},'scaler':{},
+                    'updates':1,'policy_resume':resume}
+        self.assertEqual(module.validate_box_resume(checkpoint,config,signature),1)
+        with self.assertRaisesRegex(ValueError,'signature differs'):
+            module.validate_box_resume(checkpoint,config,'different')
+        resume['terminal']=True
+        with self.assertRaisesRegex(ValueError,'finished training run'):
+            module.validate_box_resume(checkpoint,config,signature)
+
+    def test_resume_dispatches_original_budget_without_preparing_sources(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root=Path(temporary)
+            base=root/'runs/meter'
+            run=base/'copied'
+            checkpoint=run/'training/weights/last.pt'
+            checkpoint.parent.mkdir(parents=True)
+            checkpoint.write_bytes(b'fixture')
+            metadata=run/'metadata'
+            module.write_json(metadata/'config.json',{'epochs':3,'device_requested':'cpu','samples':40})
+            with patch.multiple(module,ROOT=root,RUNS=base):
+                def fixture_child(command, deadline, log, cwd):
+                    self.assertEqual(cwd,root)
+                    self.assertEqual(command[command.index('--epochs')+1],'3')
+                    self.assertEqual(command[command.index('--device')+1],'cpu')
+                    self.assertEqual(root/command[command.index('--resume')+1],checkpoint)
+                    attempt=command[command.index('--attempt')+1]
+                    module.write_json(metadata/f'result_{attempt}.json',
+                                      {'status':'completed','optimizer_updates':4,'checkpoint':str(checkpoint)})
+
+                with patch.object(module,'prepare',side_effect=AssertionError('Cannot prepare on resume')), \
+                        patch.object(module,'run_bounded',side_effect=fixture_child) as controller:
+                    module.main(['--resume',str(checkpoint.relative_to(root))])
+                    controller.assert_called_once()
 
 
 if __name__=='__main__':unittest.main()

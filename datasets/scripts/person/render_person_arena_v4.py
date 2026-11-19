@@ -6,7 +6,6 @@ are source-linked render candidates and do not carry complete training labels.
 """
 
 import argparse
-import filecmp
 import json
 import math
 import random
@@ -21,6 +20,7 @@ ROOT = Path(__file__).resolve().parents[3]
 sys.path.insert(0, str(ROOT))
 from lab.training_common.production_guard import generation_guard
 from datasets.scripts.common.config import load_task_config, source_path
+from datasets.scripts.common.blender_workspace import ARENA, DETAILED, activate_scene
 from datasets.scripts.common.paths import sample_dir, split_dir
 from datasets.scripts.person.person_blender_plan import validate_production_plan, select_occlusion_sources
 _SOURCE = load_task_config('person')[1]
@@ -84,9 +84,11 @@ def main():
     textures = json.loads(texture_manifest.read_text(encoding='utf8'))['records']
     scene_source = USER_MASTER if args.scene == 'user-master' else SCENE_SOURCE
     working_scene = PERSON_WORKING_SCENE if args.scene == 'user-master' else SCENE_SOURCE
+    if Path(bpy.data.filepath).resolve() != working_scene:
+        raise ValueError('expected source arena scene')
     procedural = list(dict.fromkeys((scene_source, working_scene, texture_manifest, plan_path,
         ROOT / ('datasets/annotated/person/v4_user_master_production_plan_20261113.json' if args.scene == 'user-master' else
-                'datasets/assets/blender/shared/arena_4m2_pbr_20261112/detail_provenance.json'))))
+                'Archive/technical/revisions/arena/blender_sources_20261116/arena_4m2_pbr_20261112/detail_provenance.json'))))
     media = {ROOT / row[key] for row in textures for key in ('artwork', 'image')}
     if needs_vehicle:
         vehicle_manifest = VEHICLE_MANIFEST
@@ -94,7 +96,7 @@ def main():
         for row in json.loads(vehicle_manifest.read_text(encoding='utf8'))['records']:
             media.update(ROOT / row[key] for key in ('cropped_image', 'path', 'source_frame', 'source_video'))
     for image in bpy.data.images:
-        if image.source != 'FILE':
+        if image.source != 'FILE' or image.packed_file:
             continue
         if not image.filepath:
             raise ValueError('scene image has no traceable source: ' + image.name)
@@ -108,13 +110,14 @@ def main():
                   'render_device': args.render_device}
     with generation_guard('person.render_arena_v4:' + args.output.relative_to(ROOT).as_posix(),
                           list(media) + procedural, [args.output], parameters,
-                          code_paths=[Path(__file__), ROOT/'datasets/scripts/person/person_blender_plan.py', ROOT/'datasets/scripts/common/blender_standees.py', ROOT/'datasets/scripts/common/config.py', ROOT/'datasets/scripts/common/paths.py'], procedural_inputs=procedural, root=ROOT,
+                          code_paths=[Path(__file__), ROOT/'datasets/scripts/person/person_blender_plan.py', ROOT/'datasets/scripts/common/blender_standees.py', ROOT/'datasets/scripts/common/config.py', ROOT/'datasets/scripts/common/paths.py', ROOT/'datasets/scripts/common/blender_workspace.py'], procedural_inputs=procedural, root=ROOT,
                           production_plan=declaration, sample_output_paths=[args.output/'images'],
                           auxiliary_output_paths=[args.output/'instance_ids', args.output/'instance_full',
                                                   args.output/'instance_without_vehicle', args.output/'rejected']) as run:
         if run.reused:
             print('reused indexed production output', flush=True)
             return
+        activate_scene(ARENA if args.scene == 'user-master' else DETAILED)
         _produce(args, run)
 
 
@@ -126,8 +129,6 @@ def _produce(args, run):
     working_scene = PERSON_WORKING_SCENE if args.scene == 'user-master' else SCENE_SOURCE
     if Path(bpy.data.filepath).resolve() != working_scene.resolve():
         raise ValueError('expected source arena scene')
-    if args.scene == 'user-master' and not filecmp.cmp(source_scene, working_scene, shallow=False):
-        raise ValueError('person working scene differs from user master')
     if not 0 <= args.camera_jitter <= .05:
         raise ValueError('camera jitter must be between 0 and 0.05 m')
     if not 0 <= args.position_jitter <= .025:
@@ -312,7 +313,7 @@ def _produce(args, run):
         print('completed',index+1,flush=True)
     data = {'status':'train_candidates_semantic_review_pending','source_scene':source_scene.relative_to(ROOT).as_posix(),
             'working_scene':working_scene.relative_to(ROOT).as_posix(),
-            'source_scene_reference':('datasets/annotated/person/v4_user_master_production_plan_20261113.json' if args.scene == 'user-master' else 'datasets/assets/blender/shared/arena_4m2_pbr_20261112/detail_provenance.json'),
+            'source_scene_reference':('datasets/annotated/person/v4_user_master_production_plan_20261113.json' if args.scene == 'user-master' else 'Archive/technical/revisions/arena/blender_sources_20261116/arena_4m2_pbr_20261112/detail_provenance.json'),
             'texture_manifest':(TEXTURES/'manifest.json').relative_to(ROOT).as_posix(),
             'image_size':[640,480],'split':'train_candidate','seed':args.seed,'count':len(records),
             'camera_jitter_m':args.camera_jitter,

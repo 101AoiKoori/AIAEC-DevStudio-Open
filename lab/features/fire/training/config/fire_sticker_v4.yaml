@@ -3,73 +3,23 @@ task_id: fire
 model_key: fire_sticker
 version: v4
 task: detect
-data: datasets/exports/fire/fire_sticker_v4_candidate_entry_20261113/data.yaml
-data_overrides:
-  train:
-  - images: datasets/exports/fire/v4_integrated_candidates_20261112/fire_sticker/images/train
-    labels: datasets/exports/fire/v4_integrated_candidates_20261112/fire_sticker/labels/train
-    source_group: datasets/exports/fire/v4_integrated_candidates_20261112/fire_sticker/source_manifest.json
-  - images: datasets/exports/fire/fire_sticker_v4_arena_v4_train_20261113/images/train
-    labels: datasets/exports/fire/fire_sticker_v4_arena_v4_train_20261113/labels/train
-    source_group: datasets/exports/fire/fire_sticker_v4_arena_v4_train_20261113/manifest.json
-  - images: datasets/exports/fire/fire_sticker_v4_distractors_v4_train_20261113/images/train
-    labels: datasets/exports/fire/fire_sticker_v4_distractors_v4_train_20261113/labels/train
-    source_group: datasets/exports/fire/fire_sticker_v4_distractors_v4_train_20261113/manifest.json
-  - images: datasets/exports/fire/fire_sticker_v4_blue_vehicle_train_20261113/images/train
-    labels: datasets/exports/fire/fire_sticker_v4_blue_vehicle_train_20261113/labels/train
-    source_group: datasets/exports/fire/fire_sticker_v4_blue_vehicle_train_20261113/manifest.json
-  - images: datasets/exports/fire/fire_sticker_v4_multiview_train_candidates_20261113/images/train
-    labels: datasets/exports/fire/fire_sticker_v4_multiview_train_candidates_20261113/labels/train
-    source_group: datasets/exports/fire/fire_sticker_v4_multiview_train_candidates_20261113/manifest.json
-  - images: datasets/exports/fire/fire_sticker_v4_train_supplement_20261113/images/train
-    labels: datasets/exports/fire/fire_sticker_v4_train_supplement_20261113/labels/train
-    source_group: datasets/exports/fire/fire_sticker_v4_train_supplement_20261113/manifest.json
-  - images: datasets/exports/fire/fire_sticker_v4_vehicle_train_candidates_20261113/images/train
-    labels: datasets/exports/fire/fire_sticker_v4_vehicle_train_candidates_20261113/labels/train
-    source_group: datasets/exports/fire/fire_sticker_v4_vehicle_train_candidates_20261113/manifest.json
-  - images: datasets/exports/fire/fire_sticker_v4_video_train_candidates_20261113/images/train
-    labels: datasets/exports/fire/fire_sticker_v4_video_train_candidates_20261113/labels/train
-    source_group: datasets/exports/fire/fire_sticker_v4_video_train_candidates_20261113/manifest.json
-  - images: datasets/exports/fire/fire_sticker_v4_b_oblique_train_20261113/images/train
-    labels: datasets/exports/fire/fire_sticker_v4_b_oblique_train_20261113/labels/train
-    source_group: datasets/exports/fire/fire_sticker_v4_b_oblique_train_20261113/manifest.json
-  - images: datasets/exports/fire/fire_sticker_v4_real_facade_train_20261113/images/train
-    labels: datasets/exports/fire/fire_sticker_v4_real_facade_train_20261113/labels/train
-    source_group: datasets/exports/fire/fire_sticker_v4_real_facade_train_20261113/manifest.json
-  - images: datasets/exports/fire/fire_sticker_v4_vehicle_crossing_train_20261113/images/train
-    labels: datasets/exports/fire/fire_sticker_v4_vehicle_crossing_train_20261113/labels/train
-    source_group: datasets/exports/fire/fire_sticker_v4_vehicle_crossing_train_20261113/manifest.json
-  - images: datasets/exports/fire/fire_sticker_v4_facade_real_negatives_640_20261113/images/train
-    labels: datasets/exports/fire/fire_sticker_v4_facade_real_negatives_640_20261113/labels/train
-    source_group: datasets/exports/fire/fire_sticker_v4_facade_real_negatives_640_20261113/manifest.json
-  - images: datasets/exports/fire/fire_sticker_v4_legacy_mothers_20261113/images/train
-    labels: datasets/exports/fire/fire_sticker_v4_legacy_mothers_20261113/labels/train
-    source_group: datasets/exports/fire/fire_sticker_v4_legacy_mothers_20261113/manifest.json
-  - images: datasets/exports/fire/fire_sticker_v4_legacy_pairs_20261113/images/train
-    labels: datasets/exports/fire/fire_sticker_v4_legacy_pairs_20261113/labels/train
-    source_group: datasets/exports/fire/fire_sticker_v4_legacy_pairs_20261113/manifest.json
-  - images: datasets/exports/fire/fire_sticker_v4_real_train_candidates_20261113/images/train
-    labels: datasets/exports/fire/fire_sticker_v4_real_train_candidates_20261113/labels/train
-    source_group: datasets/exports/fire/fire_sticker_v4_real_train_candidates_20261113/manifest.json
-  - images: datasets/exports/fire/fire_sticker_v4_video_real_train_20261113/images/train
-    labels: datasets/exports/fire/fire_sticker_v4_video_real_train_20261113/labels/train
-    source_group: datasets/exports/fire/fire_sticker_v4_video_real_train_20261113/manifest.json
+data: datasets/exports/fire/data.yaml
 model: runs/fire_sticker/runs/fire_sticker/v3_20261111_144145_539022/training/weights/best.pt
 output_root: runs/fire_sticker
-description: V4 火焰候选数据；红桶、灯具和车辆为干扰物，仅标火焰；最终测试为合成压力候选。
+description: V4 火焰贴纸检测。
 imgsz: 640
-epochs: 16
+epochs: 150
 batch: 16
 workers: 0
 patience: 0
 seed: 42
 device: '0'
 optimizer: AdamW
-lr0: 0.0003
-lrf: 0.05
+lr0: 0.0002
+lrf: 0.08
 momentum: 0.9
 weight_decay: 0.0005
-warmup_epochs: 1
+warmup_epochs: 3
 cos_lr: true
 close_mosaic: 0
 amp: false
@@ -79,11 +29,17 @@ diagnostic_conf: 0.25
 match_iou: 0.5
 nms_iou: 0.7
 preview_limit: 48
+training_policy:
+  mode: early_stopping
+  min_epochs: 120
+  patience: 15
+  min_delta: 0.001
+  save_period: 5
 evaluate_after_training: true
 augment:
-  degrees: 3.0
-  translate: 0.05
-  scale: 0.18
+  degrees: 2.0
+  translate: 0.02
+  scale: 0.05
   shear: 0.0
   perspective: 0.0
   flipud: 0.0
@@ -91,17 +47,11 @@ augment:
   mosaic: 0.0
   mixup: 0.0
   copy_paste: 0.0
-  hsv_h: 0.005
-  hsv_s: 0.1
-  hsv_v: 0.12
+  hsv_h: 0.015
+  hsv_s: 0.3
+  hsv_v: 0.2
 source_notes:
-- 候选配置；数据与审核清单尚未冻结，禁止将候选预算视为已执行。
-- 现有 1922／50／50 候选另加 96 张实拍楼面合成训练候选；来源和楼宇模型复用，开发／测试贴纸宽度拟合约 3.0 cm，与 2.5 cm 需求不同。
-- 来源门控和语义审核尚未完成；合成测试候选不是独立实拍，正式测试须选模并冻结。
-- 按来源、片段、主体及状态预选并审核数据；同源和物理素材复用分别报告。
-- 阶段参数按实际数据量、有效更新数与开发曲线复核；业务分层选模和最终测试另行执行。
-- 车载参考 640×480；制作数据不超过 720p。统计源图有效目标像素，放大不增加真实细节。
-- 另加入 216 张按既有背景审核和实例框回算的干扰候选；场地、视频、楼宇模型及暗色变体复用，非独立采集。
-- 五批 677 张候选的背景审核记录、生成器实例掩膜与火焰标签已自动对应；同源视频、物料及帧 008185 的邻近关系保留。
-- 三批共 560 张真实楼面合成与色调候选按来源、纸张变换和框核对；指定面身份、物理尺寸未实测，同源复用保留。
-- 既有 1434 张候选逐批按已记录的背景审核、实例、楼面几何、实拍标注或旧图裁切回算并接入；标签为 AI 候选审核，场地与素材复用，按来源记录。
+- 当前训练输入、实际覆盖和来源接触见数据入口同目录 workspace_sources.json 及分集清单。
+- 首轮学习方案及当前制作状态见 datasets/scripts/fire/config/first_round_learning.yaml 和实际 workspace_sources.json；有无贴纸与干扰物同框分别记录，不从空标签推断干扰类型。
+- 150轮上限，前120轮不累计早停耐心，之后15轮无至少0.001的验证mAP50-95改善则停；严格最高验证分数仍逐轮保存。单次36000秒硬时限由launcher维护，超时不记为完成。
+- 正例、硬负例与同框干扰使用同一增强；保留主要颜色，轻度几何变化避免继续缩小8-16像素目标。Test仅在选模冻结后使用，不用于早停或阈值选择。

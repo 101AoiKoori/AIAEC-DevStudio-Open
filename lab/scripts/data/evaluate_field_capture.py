@@ -3,6 +3,7 @@
 import argparse
 from collections import Counter, defaultdict
 import csv
+import filecmp
 import json
 import math
 import os
@@ -17,14 +18,18 @@ REVIEW_STATUSES = {'visual_candidate', 'visual_negative', 'partial', 'partial_un
 STATUS_ALIASES = {'partial_unlabeled': 'partial'}
 CONFIDENCE_FLOOR = .01
 MATCH_IOU = .5
+CAPTURE_IMAGE_ROOTS = ('datasets/raw', 'Archive/Assets/captures')
+SELECTION_IMAGE_ROOTS = (*CAPTURE_IMAGE_ROOTS, 'Archive/Assets/CarRealPicture', 'datasets/annotated')
+SOURCE_COPY_MANIFEST = 'datasets/source_copy_manifest.jsonl'
 
 
-def workspace_path(value, parent):
+def workspace_path(value, *parents):
     path = (ROOT / value).resolve()
-    base = (ROOT / parent).resolve()
-    if not base.is_relative_to(ROOT) or path == base or not path.is_relative_to(base):
-        raise ValueError(f'路径须在 {parent} 下：{value}')
-    return path
+    for parent in parents:
+        base = (ROOT / parent).resolve()
+        if base != ROOT and base.is_relative_to(ROOT) and path != base and path.is_relative_to(base):
+            return path
+    raise ValueError(f'路径须在 {" 或 ".join(parents)} 下：{value}')
 
 
 def read_json(path):
@@ -42,7 +47,7 @@ def csv_rows(path):
 
 def source_images(batch):
     photos = {
-        workspace_path(row['current_path'], 'datasets/raw'): 'vehicle_camera'
+        workspace_path(row['current_path'], *CAPTURE_IMAGE_ROOTS): 'vehicle_camera'
         for row in csv_rows(batch / 'source_inventory.csv') if row['media_type'] == 'image'
     }
     extract = batch / 'extract_v1'
@@ -62,12 +67,11 @@ def selected_images(selection):
     if not isinstance(group, str) or not group:
         raise ValueError('选择清单缺少有效 batch_id')
     sources = {}
-    allowed = [(ROOT / part).resolve() for part in ('datasets/raw', 'datasets/annotated')]
     for row in manifest['items']:
         raw = Path(row['path'])
-        path = (ROOT / raw).resolve()
-        if raw.is_absolute() or not any(path.is_relative_to(base) for base in allowed):
+        if raw.is_absolute():
             raise ValueError(f'选择原图须位于工作空间数据或素材区：{raw}')
+        path = workspace_path(raw, *SELECTION_IMAGE_ROOTS)
         if not path.is_file() or path.suffix.lower() not in {'.jpg', '.jpeg', '.png', '.ppm'}:
             raise ValueError(f'选择原图缺失或格式不支持：{raw}')
         relative = path.relative_to(ROOT).as_posix()
@@ -294,6 +298,33 @@ def score_candidate(candidate, prediction, confidence, class_names):
             'truth': truth, 'active_predictions': active}
 
 
+def file_copy_aliases():
+    aliases = defaultdict(set)
+    manifest = ROOT / SOURCE_COPY_MANIFEST
+    if manifest.is_file():
+        with manifest.open(encoding='utf-8-sig') as stream:
+            for line in stream:
+                if not line.strip():
+                    continue
+                row = json.loads(line)
+                if row.get('generation_method') == 'file_copy':
+                    image, original = row['path'], row['original_path']
+                    aliases[image].add(original)
+                    aliases[original].add(image)
+    return aliases
+
+
+def same_copied_image(image, alias):
+    if Path(image).is_absolute() or Path(alias).is_absolute():
+        return False
+    try:
+        source = workspace_path(image, *SELECTION_IMAGE_ROOTS)
+        copy = workspace_path(alias, *SELECTION_IMAGE_ROOTS)
+    except ValueError:
+        return False
+    return source.is_file() and copy.is_file() and filecmp.cmp(source, copy, shallow=False)
+
+
 def score(run, label_files, output, confidence):
     if not CONFIDENCE_FLOOR <= confidence <= 1:
         raise ValueError('置信度超出已保存的推理范围')
@@ -308,6 +339,7 @@ def score(run, label_files, output, confidence):
     report = {'confidence': confidence, 'match_iou': MATCH_IOU,
               'scope': 'independent visual candidates; descriptive box diagnostics',
               'inputs': [p.relative_to(ROOT).as_posix() for p in label_files], 'models': {}}
+    aliases = None
     per_image = []
     for key in sorted({name for name, _ in labels} | base['models'].keys()):
         subset = {image: row for (name, image), row in labels.items() if name == key}
@@ -321,10 +353,27 @@ def score(run, label_files, output, confidence):
             continue
         with (run / 'predictions' / f'{key}.jsonl').open(encoding='utf-8') as stream:
             predictions = {item['image']: item for item in map(json.loads, stream)}
-        if complete.keys() - predictions.keys():
-            raise ValueError(f'{key} 的候选图缺少冻结推理结果')
-        results = [score_candidate(row, predictions[image], confidence, record['class_names'])
-                   for image, row in complete.items()]
+        matched = {image: image for image in complete.keys() & predictions.keys()}
+        missing = complete.keys() - matched.keys()
+        if missing and aliases is None:
+            aliases = file_copy_aliases()
+        for image in sorted(missing):
+            candidates = [alias for alias in aliases[image] & predictions.keys()
+                          if same_copied_image(image, alias)]
+            if len(candidates) != 1:
+                raise ValueError(f'{key} 的候选图缺少唯一的冻结推理结果：{image}')
+            matched[image] = candidates[0]
+        if len(set(matched.values())) != len(matched):
+            raise ValueError(f'{key} 的多条候选标注对应同一冻结推理结果')
+        results = []
+        for image, row in complete.items():
+            prediction_image = matched[image]
+            result = score_candidate(row, predictions[prediction_image], confidence, record['class_names'])
+            if prediction_image != image:
+                result['prediction_image'] = prediction_image
+                result['prediction_match'] = {'method': 'verified_byte_identical_file_copy',
+                                              'manifest': SOURCE_COPY_MANIFEST}
+            results.append(result)
         per_image.extend(results)
         sources = defaultdict(Counter)
         for row in results:

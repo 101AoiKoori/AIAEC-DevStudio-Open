@@ -4,15 +4,24 @@ param(
     [string]$Python = '',
     [ValidateRange(1,65535)][int]$Port = 6006,
     [string]$Config = 'config/train.yaml',
+    [string]$Resume = '',
     [double]$WallSeconds = 0,
-    [switch]$NoWait
+    [ValidateRange(1,2147483647)][int]$Epochs,
+    [switch]$NoWait,
+    [switch]$NoTensorBoard
 )
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 $packageRoot = Split-Path -Parent $PSScriptRoot
 $launch = Join-Path $PSScriptRoot 'launch.py'
-$scriptArgs = @('--root', $packageRoot, '--port', "$Port", '--config', $Config)
+$scriptArgs = @('--root', $packageRoot, '--port', "$Port")
+if ($Resume) { $scriptArgs += @('--resume', $Resume) }
+if (-not $Resume -or $PSBoundParameters.ContainsKey('Config')) {
+    $scriptArgs += @('--config', $Config)
+}
 if ($NoWait) { $scriptArgs += '--no-wait' }
+if ($NoTensorBoard) { $scriptArgs += '--no-tensorboard' }
+if ($PSBoundParameters.ContainsKey('Epochs')) { $scriptArgs += @('--epochs', "$Epochs") }
 if ($PSBoundParameters.ContainsKey('WallSeconds')) {
     $scriptArgs += @('--wall-seconds', $WallSeconds.ToString('R', [System.Globalization.CultureInfo]::InvariantCulture))
 }

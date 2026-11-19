@@ -24,7 +24,7 @@
       "failure_event": "recorded_sticker_label_missing",
       "conditions": [],
       "background": {
-        "image": "datasets/raw/car_real_capture_20261112/frames_20261112_152304/V_20261112_152304_002016.jpg"
+        "image": "Archive/Assets/captures/car_real_capture_20261112/frames_20261112_152304/V_20261112_152304_002016.jpg"
       },
       "target": {
         "kind": "existing_stickers"
@@ -41,8 +41,8 @@
         "saturation_gain": 1.0
       },
       "sources": [
-        "datasets/raw/car_real_capture_20261112/frames_20261112_152304/V_20261112_152304_002016.jpg",
-        "datasets/raw/car_real_capture_20261112/V_20261112_152304.mp4"
+        "Archive/Assets/captures/car_real_capture_20261112/frames_20261112_152304/V_20261112_152304_002016.jpg",
+        "Archive/Assets/captures/car_real_capture_20261112/V_20261112_152304.mp4"
       ]
     }
   ]

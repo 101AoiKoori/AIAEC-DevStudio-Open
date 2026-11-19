@@ -229,7 +229,7 @@ class SourceLedgerTest(unittest.TestCase):
             )
         )
 
-    def test_train_cap_is_enforced_per_role(self):
+    def test_train_concentration_is_reported_without_blocking_strict_check(self):
         paths = "datasets/raw/person/bg/a.png"
         self.write_text(paths)
         backgrounds = []
@@ -239,13 +239,28 @@ class SourceLedgerTest(unittest.TestCase):
             backgrounds.append(item)
         self.person_pairing(task_real=[], backgrounds=backgrounds, data_sources=[], blender=[])
         ledger = build_ledger(self.root, ["person"])
-        errors = [
-            item
-            for item in ledger["issues"]
-            if item["level"] == "error" and item["code"] == "BSL011"
-        ]
-        self.assertTrue(errors)
-        self.assertIn("background/composite_background", errors[0]["message"])
+        issue, = [item for item in ledger["issues"] if item["code"] == "BSL011"]
+        self.assertEqual(issue["level"], "info")
+        self.assertIn("background/composite_background", issue["message"])
+        self.assertEqual(ledger["tasks"]["person"]["train_cap"]["roles"][0]["train_fraction"], 1)
+        with contextlib.redirect_stdout(io.StringIO()):
+            self.assertEqual(main(["check", "--root", str(self.root), "--task", "person", "--strict-warnings"]), 0)
+
+    def test_small_pool_and_unassigned_candidate_are_reported_without_assigning_source(self):
+        self.person_pairing(task_real=[], backgrounds=[self.background(primary="unassigned")], data_sources=[], blender=[])
+        ledger = build_ledger(self.root, ["person"])
+        self.assertTrue(any(item["code"] == "BSL011" and item["level"] == "info" for item in ledger["issues"]))
+        for split in ("train", "val", "test"):
+            item, = background_candidates(ledger, "person", "composite_background", split)["eligible"]
+            self.assertEqual(item["reason"], "unassigned_source")
+            self.assertEqual(item["split"]["primary"], "unassigned")
+
+    def test_active_validation_and_test_policy_can_record_planned_counts(self):
+        pairing = self.person_pairing()
+        pairing["policy"]["val_test_mode"] = "assigned_sources_with_split_specific_foregrounds"
+        pairing["backgrounds"][0]["count"] = 10
+        self.write_source("person", {"task": "person", "pairing": pairing})
+        self.assertEqual(issue_counts(build_ledger(self.root, ["person"]))["error"], 0)
 
     def test_reserve_only_rejects_budget_fields(self):
         pairing = self.person_pairing()
@@ -281,6 +296,17 @@ class SourceLedgerTest(unittest.TestCase):
                 if item["level"] == "error"
             )
         )
+
+    def test_unassigned_parent_can_supply_an_assigned_derivative(self):
+        source = {
+            "id": "ds1", "kind": "fixed_artwork", "path": "datasets/raw/person/art/a.png",
+            "parent_group": "tr1", "roles": ["target_foreground"],
+            "split": {"primary": "val", "status": "confirmed"},
+        }
+        self.person_pairing(task_real=[self.task_real(primary="unassigned")], data_sources=[source])
+        result = build_ledger(self.root, ["person"])
+        self.assertEqual(issue_counts(result)["error"], 0)
+        self.assertEqual(result["tasks"]["person"]["data_sources"][0]["parent_group"], "tr1")
 
     def test_capture_placeholder_and_capture_link(self):
         placeholder = "datasets/raw/sign/capture_test/"
@@ -359,6 +385,32 @@ class SourceLedgerTest(unittest.TestCase):
         self.assertTrue(
             any(item["code"] == "BSL023" for item in ledger["issues"] if item["level"] == "warning")
         )
+
+    def test_current_shared_pool_joins_original_paths_and_counts_capture_once_per_task(self):
+        from datasets.scripts.common.background_pool import POOL_MANIFEST
+
+        parent = "Archive/Assets/camera.mp4"
+        source = f"{POOL}/images/a_001.jpg"
+        uses = {"uses": ["composite_background"], "split": "train"}
+        records = []
+        for name in ("a.jpg", "copy.jpg"):
+            alias = f"datasets/raw/shared/backgrounds/camera/camera/{name}"
+            self.write_text(alias)
+            records.append({"image": alias, "source_image": source, "source_group": "camera_alias",
+                            "parent_group": parent, "capture_identity": "frame-1",
+                            "tasks": {"person": uses, "sign": uses}})
+        self.write_text(source)
+        self.write_json(POOL_MANIFEST, {"records": records})
+        for task in ("person", "sign"):
+            self.write_source(task, {"task": task, "shared_background_pool_manifest": POOL_MANIFEST,
+                                     "current_selection": {"backgrounds": [source]}})
+        pool = build_ledger(self.root, ["person", "sign"])["shared"]["background_pool"]
+        self.assertEqual(pool["manifest"], POOL_MANIFEST)
+        group, = pool["parent_groups"]
+        self.assertEqual(group["parent_group"], parent)
+        self.assertEqual({row["task"]: row["allocated_by_split"] for row in group["tasks"]},
+                         {"person": {"train": 1}, "sign": {"train": 1}})
+        self.assertTrue(all(row["selected"] == 1 for row in group["tasks"]))
 
     def test_blender_scene_usage_is_aggregated_across_tasks(self):
         self.write_text("datasets/assets/blender/shared/a.blend")

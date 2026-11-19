@@ -12,7 +12,7 @@ from lab.training_common.ground_placement import (
 
 def project_corners(width, height, yaw, pitch, roll):
     """Project a flat image with bounded yaw, pitch and roll."""
-    if width < 2 or height < 2 or abs(yaw) > 15 or abs(pitch) > 8 or abs(roll) > 4:
+    if width < 2 or height < 2 or abs(yaw) > 60 or abs(pitch) > 8 or abs(roll) > 4:
         raise ValueError('invalid image or projection angles')
     yr, pr, rr = map(math.radians, (yaw, pitch, roll))
     result = []

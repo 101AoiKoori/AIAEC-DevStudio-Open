@@ -2,7 +2,7 @@
 
 Run from the workspace root using Blender 5.2, loading the source scene first::
 
-    blender -b datasets/assets/blender/fire/blender_buildings_v13/three_buildings.blend \
+    blender -b datasets/assets/blender/aiaec_dataset.blend \
       --python-exit-code 1 --python datasets/scripts/fire/render_blender_fire_dataset.py -- \
       --output datasets/samples/fire --count 10 --device OPTIX
 
@@ -30,7 +30,7 @@ if str(ROOT) not in sys.path:
 sys.path.insert(0, str(ROOT))
 from lab.training_common.production_guard import generation_guard
 from datasets.scripts.common.bayesian import plan_production
-from datasets.scripts.common.config import source_path
+from datasets.scripts.common.config import load_task_config, source_path
 from datasets.scripts.common.paths import sample_dir, split_dir
 from datasets.scripts.fire.fire_blender_labels import decode_ids, explicit_scenario, fire_label_suppression, fire_scale_suppression, front_facade_slots, label_state, paper_depth_supported, rectangle_uncovered_area, rotated_paper_envelope, ocr_status, placement_violations, scenario, srgb_to_linear, visible_bbox, yolo_row
 
@@ -61,6 +61,7 @@ def parse_args():
                         help='fit a wider building side for the bounded vehicle pilot')
     parser.add_argument('--vehicle-background-manifest',
                         help='workspace JSON of reviewed fire/name-negative real backgrounds')
+    parser.add_argument('--current-geometry', help='current database-backed photo camera/ground review JSON')
     parser.add_argument('--review-only', action='store_true',
                         help='write a visual-review pilot to the unassigned split')
     parser.add_argument('--scenario-offset', type=int, default=0,
@@ -156,6 +157,10 @@ def read_production_declaration(path, args, backgrounds):
         if set(state) != allowed_state_fields:
             raise ValueError('production state has missing or unsupported fields')
         target = state.get('target')
+        hybrid_id = state.get('background', {}).get('photo_geometry_id')
+        hybrid = getattr(args, 'photo_geometries', {}).get(hybrid_id) if hybrid_id else None
+        if hybrid_id and hybrid is None:
+            raise ValueError('Production state refers to an unknown photo geometry fit')
         if not isinstance(target, dict):
             raise ValueError('unsupported Blender scenario state')
         is_explicit = target.get('scenario') == 'explicit'
@@ -180,6 +185,7 @@ def read_production_declaration(path, args, backgrounds):
             if target != expected_target:
                 raise ValueError('scenario target fields do not match the renderer schedule')
             state_key = ('legacy', scenario_index)
+        state_key = (*state_key, hybrid_id)
         if state_key in seen:
             raise ValueError('each executable Blender scenario may appear only once in the plan')
         seen.add(state_key)
@@ -190,6 +196,9 @@ def read_production_declaration(path, args, backgrounds):
                                'traffic_signal_injection': 'none'}
         if backgrounds:
             expected_background.update(source_ids=[item['id'] for item in backgrounds], sampling='seeded_uniform')
+        if hybrid:
+            expected_background = {'domain': 'calibrated_real_scene', 'traffic_signal_injection': 'none',
+                                   'photo_geometry_id': hybrid_id, 'parent_group': hybrid['parent_group']}
         if state.get('background') != expected_background:
             raise ValueError('unsupported background state; this renderer does not add traffic signals to building scenes')
         expected_labels = {
@@ -204,6 +213,8 @@ def read_production_declaration(path, args, backgrounds):
         if backgrounds:
             expected_augmentation.update(tone_sampling='seeded_uniform',
                 tone_profiles=[{'exposure_ev': e, 'saturation': s} for e in (-0.5, 0.0) for s in (0.65, 1.0)])
+        if hybrid:
+            expected_augmentation['lighting'] = 'photo_estimated_physical_shadow'
         if state.get('augmentation') != expected_augmentation:
             raise ValueError('unsupported augmentation state')
         expected_parameters = {'scenario_index': scenario_index, 'scenario_offset': args.scenario_offset,
@@ -212,7 +223,8 @@ def read_production_declaration(path, args, backgrounds):
                                'mode': 'vehicle_pilot' if args.vehicle_pilot else 'standard'}
         if state.get('parameters') != expected_parameters:
             raise ValueError('renderer parameters in production plan differ from CLI settings')
-        if state.get('sources') != expected_sources:
+        state_sources = sorted([*expected_sources, 'reviewed_real_building_background']) if hybrid else expected_sources
+        if state.get('sources') != state_sources:
             raise ValueError('production state sources differ from actual renderer source groups')
         expected_conditions = ([f"scenario:explicit", f"visibility:{target['visibility']}",
                                 'traffic_signal_injection:none'] if is_explicit else
@@ -267,7 +279,7 @@ def verify_c_supported_wall(groups):
     """Reject if the loaded C wall cannot support every bounded paper footprint."""
     artwork = bpy.data.images.get('image1.png')
     if (artwork is None or artwork.packed_file is None or
-            bytes(artwork.packed_file.data) != (ROOT / 'datasets/raw/fire/team_assets/image1.png').read_bytes()):
+            bytes(artwork.packed_file.data) != (ROOT / 'Archive/Assets/working_sources/digital/fire/team_assets/image1.png').read_bytes()):
         raise ValueError('packed fire artwork does not match the official image')
     originals = {obj for group in groups.values() for obj in group['originals']}
     textured = set()
@@ -377,36 +389,81 @@ def create_stickers(groups):
             original.hide_render = True
         group['pool'] = pool
         group['paper_base_y'] = [[float(v.co.y) for v in obj.data.vertices] for obj in pool]
+        front = bpy.data.objects[{'A': 'A_front_window_bands', 'B': 'B_front_glazed_openings',
+                                  'C': 'C_front_small_holes'}[key]]
+        heights = [(front.matrix_world @ vertex.co).z for vertex in front.data.vertices]
+        group['facade_height_m'] = max(heights) - min(heights)
+        group['wall_front_y_m'] = min((front.matrix_world @ vertex.co).y for vertex in front.data.vertices)
 
 
-def place_stickers(group, count, rng, placement='all'):
+def place_stickers(group, count, rng, placement='all', size_policy=None, building=None, wall_offset=None):
     # Each footprint is separated from its neighbours by more than the paper
     # width or height, so anti-aliased instance masks do not blend targets.
     slots = front_facade_slots(placement)
-    selected = rng.sample(slots, count)
+    selected = [(dx, z, 1, None) for dx, z in rng.sample(slots, count)]
+    if size_policy is not None:
+        lower, upper = size_policy['height_fraction'][building]
+        for attempt in range(size_policy['placement_attempts']):
+            selected, boxes = [], []
+            for index, (dx, z) in enumerate(rng.sample(slots, count)):
+                template = group['originals'][index % len(group['originals'])]
+                fraction = rng.uniform(lower, upper)
+                multiplier = group['facade_height_m'] * fraction / template.dimensions.z
+                half_x, half_z = rotated_paper_envelope(
+                    template.dimensions.x * multiplier / 2, template.dimensions.z * multiplier / 2,
+                    FIRE_PLACEMENT_JITTER_M, FIRE_ROTATION_MAX_RAD)
+                box = (dx-half_x, z-half_z, dx+half_x, z+half_z)
+                if any(box[0] < other[2] and other[0] < box[2] and
+                       box[1] < other[3] and other[1] < box[3] for other in boxes):
+                    break
+                boxes.append(box)
+                selected.append((dx, z, multiplier, fraction))
+            if len(selected) == count:
+                break
+        if len(selected) != count:
+            raise ValueError(f'No separated scaled paper layout for building {building}')
     for index, obj in enumerate(group['pool']):
         obj.hide_render = index >= count
         if index < count:
-            dx, z = selected[index]
+            dx, z, multiplier, fraction = selected[index]
+            obj.scale = (multiplier, 1, multiplier)
+            obj['scale_from_reference'] = multiplier
+            if fraction is not None:
+                obj['height_fraction'] = fraction
+                obj['reference_facade_height_m'] = group['facade_height_m']
             obj.location.x = group['x'] + dx + rng.uniform(-FIRE_PLACEMENT_JITTER_M, FIRE_PLACEMENT_JITTER_M)
             obj.location.z = z + rng.uniform(-FIRE_PLACEMENT_JITTER_M, FIRE_PLACEMENT_JITTER_M)
             obj.rotation_euler.y = rng.uniform(-FIRE_ROTATION_MAX_RAD, FIRE_ROTATION_MAX_RAD)
             # Tiny independent ripple at the paper edge; preserve its centre,
             # width, height, UVs, measured template thickness and nominal shape.
-            amplitude = rng.uniform(-FIRE_PAPER_RIPPLE_MAX_M, FIRE_PAPER_RIPPLE_MAX_M)
+            amplitude = (rng.uniform(-FIRE_PAPER_RIPPLE_MAX_M, FIRE_PAPER_RIPPLE_MAX_M)
+                         if wall_offset is None else 0)
             baseline = group['paper_base_y'][index]
             for j, vertex in enumerate(obj.data.vertices):
                 u, v = (j % 13) / 12.0, (j // 13) / 12.0
                 edge = max(abs(2*u-1), abs(2*v-1))
-                vertex.co.y = baseline[j] + amplitude * math.sin(3*math.pi*u) * math.sin(2*math.pi*v) * edge**2
+                vertex.co.y = (baseline[j] + amplitude * math.sin(3*math.pi*u) * math.sin(2*math.pi*v) * edge**2
+                               if wall_offset is None else group['wall_front_y_m'] - wall_offset - obj.location.y)
             obj.data.update()
             obj['paper_ripple_m'] = amplitude
+            if wall_offset is not None:
+                obj['wall_plane_y_m'] = group['wall_front_y_m']
+                obj['wall_offset_m'] = wall_offset
 
 
 def set_camera(scene, groups, active, kind, rng, view=None):
     camera = scene.camera
     if camera is None:
         raise ValueError('场景没有相机')
+    if view and view.startswith('orange_peel_'):
+        from datasets.scripts.fire.camera_trajectory import apply_pose, orange_peel_pose
+        config = load_task_config('fire')[1]['camera_trajectory']
+        centers = [groups[key]['x'] for key in active]
+        pose = orange_peel_pose(config, int(view.rsplit('_', 1)[1]),
+                                sum(centers) / len(centers), max(centers) - min(centers))
+        camera.animation_data_clear()
+        apply_pose(camera, pose)
+        return pose
     single = len(active) == 1
     center = groups[active[0]]['x'] if single else sum(groups[k]['x'] for k in active) / len(active)
     distance = (.78 if kind == 'truncated' else
@@ -448,7 +505,7 @@ def set_lighting(rng):
 
 def vehicle_background(scene, path=None):
     """Place a real frame on a camera-aligned plane behind the rendered scene."""
-    path = path or (ROOT / 'datasets/raw/car_real_capture_20261112/P12_TL2.png')
+    path = path or (ROOT / 'Archive/Assets/captures/car_real_capture_20261112/P12_TL2.png')
     if not path.is_file():
         raise FileNotFoundError('P12 car background missing')
     camera = scene.camera
@@ -816,7 +873,7 @@ def render_id_pass(scene, targets, filename, mask_material):
     old_override = layer.material_override
     objects = [o for o in scene.objects if o.type in {'MESH', 'FONT', 'CURVE', 'SURFACE', 'META'}]
     colors = [(o, tuple(o.color)) for o in objects]
-    bg = scene.world.node_tree.nodes.get('Background')
+    bg = next(node for node in scene.world.node_tree.nodes if node.type == 'BACKGROUND')
     old_world = tuple(bg.inputs['Color'].default_value)
     old_strength = float(bg.inputs['Strength'].default_value)
     old_view = scene.view_settings.view_transform
@@ -905,7 +962,7 @@ def scene_external_libraries():
 def configured_fire_artwork():
     """Require the configured artwork to be the actual loaded scene texture."""
     path = source_path('fire', 'target_artwork')
-    permitted = (ROOT / 'datasets/raw/fire/team_assets').resolve()
+    permitted = (ROOT / 'Archive/Assets/working_sources/digital/fire/team_assets').resolve()
     if not path.is_relative_to(permitted):
         raise ValueError('fire artwork must come from the user-designated team_assets')
     expected = path.read_bytes()
@@ -953,12 +1010,16 @@ def background_guard_inputs(background_manifest, backgrounds):
 def _produce(args, source, background_manifest, backgrounds, run):
     groups = get_source()
     scene = bpy.context.scene
+    sticker_size_policy = load_task_config('fire')[1]['sample_recipe'].get('sticker_size')
+    wall_projection = load_task_config('fire')[1]['sample_recipe'].get('wall_projection', {})
     support_geometry = None
-    if any(state['target'].get('placement') in SUPPORTED_C_PLACEMENTS for state in run.plan['strata']):
-        if source != ROOT / 'datasets/assets/blender/fire/blender_buildings_v13/three_buildings.blend':
+    if any(state['target'].get('placement') in SUPPORTED_C_PLACEMENTS or
+           state['target'].get('view', '').startswith('orange_peel_') for state in run.plan['strata']):
+        if source != source_path('fire', 'scene'):
             raise ValueError('supported C wall states require the verified building scene')
         support_geometry = verify_c_supported_wall(groups)
-    if scene.world is None or not scene.world.use_nodes or scene.world.node_tree.nodes.get('Background') is None:
+    if (scene.world is None or not scene.world.use_nodes or
+            not any(node.type == 'BACKGROUND' for node in scene.world.node_tree.nodes)):
         raise ValueError('场景没有可控的节点世界背景')
     devices = configure_device(scene, args.device)
     if args.output.exists() and any(args.output.iterdir()):
@@ -991,6 +1052,9 @@ def _produce(args, source, background_manifest, backgrounds, run):
                 'input_source_refs': run.source_refs}
     if support_geometry is not None:
         metadata['verified_wall_support'] = support_geometry
+        metadata['verified_wall_support_scope'] = 'unscaled_source_templates'
+    if sticker_size_policy is not None:
+        metadata['sticker_size_policy'] = sticker_size_policy
     if backgrounds:
         metadata.update(background_manifest=background_manifest.relative_to(ROOT).as_posix(),
                         background_count=len(backgrounds), scenario_offset=args.scenario_offset,
@@ -1009,6 +1073,10 @@ def _produce(args, source, background_manifest, backgrounds, run):
         metadata['floor_horizontal_scale_multiplier'] = 10
         write_run(args.output / 'run.json', metadata)
         create_stickers(groups)
+        baseline = None
+        if args.current_geometry:
+            from datasets.scripts.fire.hybrid_render import capture_scene
+            baseline = capture_scene(scene)
         mask_material = material_override()
         rng = random.Random(args.seed)
         scene.render.resolution_x, scene.render.resolution_y = args.resolution, args.height
@@ -1053,6 +1121,11 @@ def _produce(args, source, background_manifest, backgrounds, run):
                 sample_seed = args.seed + index
                 rng = random.Random(sample_seed)
                 target_state = planned_state['target']
+                photo_geometry_id = planned_state.get('background', {}).get('photo_geometry_id')
+                photo_review = args.photo_geometries.get(photo_geometry_id) if photo_geometry_id else None
+                if baseline is not None:
+                    from datasets.scripts.fire.hybrid_render import reset_scene
+                    reset_scene(scene, baseline)
                 state_index = target_state.get('scenario_index')
                 plan = (explicit_scenario(target_state) if target_state.get('scenario') == 'explicit'
                         else scenario(state_index))
@@ -1068,7 +1141,14 @@ def _produce(args, source, background_manifest, backgrounds, run):
                     reset_name(group['text'], names[key])
                     if args.vehicle_pilot:
                         group['text'].scale.x *= .80 if args.vehicle_oblique_pilot else .65
-                    place_stickers(group, counts[key], rng, placement=plan.get('placement', 'all'))
+                    placement = plan.get('placement', 'all')
+                    if key == 'C' and plan.get('view', '').startswith('orange_peel_'):
+                        placement = rng.choice(SUPPORTED_C_PLACEMENTS)
+                    size_policy = (sticker_size_policy
+                                   if plan.get('view', '').startswith('orange_peel_') else None)
+                    place_stickers(group, counts[key], rng, placement=placement,
+                                   size_policy=size_policy, building=key,
+                                   wall_offset=wall_projection.get('blender_offset_m') if size_policy else None)
                     targets.append({'id': len(targets) + 1, 'kind': 'name_sign', 'building': key,
                                     'text': names[key], 'object': group['sign']})
                     for sticker in group['pool'][:counts[key]]:
@@ -1076,7 +1156,12 @@ def _produce(args, source, background_manifest, backgrounds, run):
                                         'building': key, 'object': sticker})
                 placement_result = None
                 background_record = None
-                if backgrounds:
+                if photo_review:
+                    from datasets.scripts.fire.hybrid_render import prepare_photo
+                    camera = prepare_photo(scene, groups, active, photo_review, rng, baseline)
+                    placement_result = {'status': 'estimated_photo_fit', 'geometry_id': photo_geometry_id,
+                                        'ground_anchor_px': camera['ground_anchor_px']}
+                elif backgrounds:
                     background_record, exposure, saturation = sample_real_scene(backgrounds, rng)
                     camera, placement_result = place_buildings_on_reviewed_ground(
                         scene, groups, active, plan['kind'], background_record['placement'], rng,
@@ -1094,7 +1179,7 @@ def _produce(args, source, background_manifest, backgrounds, run):
                     camera = (vehicle_camera(scene, groups['A'], args.vehicle_oblique_pilot) if args.vehicle_pilot
                               else set_camera(scene, groups, active, plan['kind'], rng, view=plan.get('view')))
                 lights = ({name: float(bpy.data.objects[name].data.energy) for name in ('Broad softbox', 'Soft fill')}
-                          if args.vehicle_pilot else set_lighting(rng))
+                          if args.vehicle_pilot or photo_review else set_lighting(rng))
                 background_crop, tone_record = None, None
                 if backgrounds:
                     background_crop = set_vehicle_background(scene, ROOT / background_record['image'])
@@ -1111,10 +1196,13 @@ def _produce(args, source, background_manifest, backgrounds, run):
                 scene.cycles.samples = args.samples
                 scene.cycles.use_denoising = True
                 scene.cycles.seed = args.seed + index
-                scene.render.filepath = str(args.output / 'images' / partition / (stem + '.png'))
+                image_relative = f'render_layers/{stem}.png' if photo_review else f'images/{partition}/{stem}.png'
+                if photo_review:
+                    (args.output/'render_layers').mkdir(exist_ok=True)
+                scene.render.filepath = str(args.output / image_relative)
                 bpy.ops.render.render(write_still=True)
                 if args.save_preview_scene and (index == 1 or args.count == 1):
-                    preview_scene = ROOT / 'datasets/assets/blender/batch_scenes/fire' / args.output.name / 'preview_scene.blend'
+                    preview_scene = ROOT / 'Archive/technical/datasets/fire' / args.output.name / 'preview_scene.blend'
                     preview_scene.parent.mkdir(parents=True, exist_ok=True)
                     bpy.ops.wm.save_as_mainfile(filepath=str(preview_scene), copy=True)
                     metadata['editable_preview_scene'] = preview_scene.relative_to(ROOT).as_posix()
@@ -1148,6 +1236,36 @@ def _produce(args, source, background_manifest, backgrounds, run):
                     if target['kind'] == 'fire_sticker':
                         data['paper_ripple_m'] = float(target['object'].get('paper_ripple_m', 0))
                         data['paper_rotation_rad'] = float(target['object'].rotation_euler.y)
+                        data['scale_from_reference'] = float(target['object'].get('scale_from_reference', 1))
+                        if 'height_fraction' in target['object']:
+                            data['height_fraction'] = float(target['object']['height_fraction'])
+                            data['reference_facade_height_m'] = float(target['object']['reference_facade_height_m'])
+                            if photo_review:
+                                data['reference_facade_height_m'] *= camera['model_scale']
+                                data['scale_from_reference'] *= camera['model_scale']
+                            vertices = target['object'].data.vertices
+                            data['paper_height_m'] = float((max(v.co.z for v in vertices) -
+                                                            min(v.co.z for v in vertices)) * target['object'].scale.z)
+                        if 'wall_plane_y_m' in target['object']:
+                            obj = target['object']
+                            plane, offset = float(obj['wall_plane_y_m']), float(obj['wall_offset_m'])
+                            if photo_review:
+                                transform = np.asarray(camera['world_transform'])
+                                point = (transform @ [0,plane,0,1])[:3]
+                                normal = transform[:3,:3] @ [0,1,0]
+                                normal /= np.linalg.norm(normal)
+                                offset *= camera['model_scale']
+                                error = max(abs(np.dot(np.asarray(obj.matrix_world @ v.co)-point,normal)+offset)
+                                            for v in obj.data.vertices)
+                            else:
+                                error = max(abs((obj.matrix_world @ vertex.co).y - (plane-offset))
+                                            for vertex in obj.data.vertices)
+                            if error > 1e-6:
+                                raise ValueError('Fire paper vertices left the assigned facade plane')
+                            data['wall_contact'] = {'plane_y_m': plane, 'offset_m': offset,
+                                                    'max_plane_error_m': float(error)}
+                            if photo_review:
+                                data['wall_contact'].update(plane_point_m=point.tolist(),plane_normal_xyz=normal.tolist())
                     obj_records.append(data)
                 name_reference_missing = (
                     not any(o['kind'] == 'name_sign' and o['visible_pixels'] >= 12 for o in obj_records) and
@@ -1166,9 +1284,11 @@ def _produce(args, source, background_manifest, backgrounds, run):
                 if name_reference_missing:
                     fire_suppression = 'instance_reference_missing_or_hidden'
                 if not unknown_fires and fire_suppression is None:
-                    fire_label = f'labels/fire/{partition}/{stem}.txt'
+                    fire_label = (f'labels/{partition}/{stem}.txt' if args.current_geometry
+                                  else f'labels/fire/{partition}/{stem}.txt')
+                    (args.output/fire_label).parent.mkdir(parents=True, exist_ok=True)
                     (args.output / fire_label).write_text('\n'.join(fire_rows) + ('\n' if fire_rows else ''), encoding='utf-8')
-                sample = {'image': f'images/{partition}/{stem}.png', 'instance_pass': f'instance_pass/{stem}.png',
+                sample = {'image': image_relative, 'instance_pass': f'instance_pass/{stem}.png',
                           'fire_label': fire_label,
                           'fire_label_suppression_reason': fire_suppression,
                           'status': 'candidate_requires_visual_review', 'source_group': 'blender_v13_shared_model',
@@ -1184,6 +1304,10 @@ def _produce(args, source, background_manifest, backgrounds, run):
                 sample['production_state_id'] = planned_state['id']
                 sample['production_state_sample_index'] = state_sample_index
                 sample['sample_seed'] = sample_seed
+                if photo_review:
+                    sample.update(generation_method='blender_real_background_composite',
+                                  photo_geometry_id=photo_geometry_id, photo_review=photo_review,
+                                  placement=placement_result, source_assets=[source.relative_to(ROOT).as_posix(), photo_review['source_image']])
                 if backgrounds:
                     sample.update(background=background_record, background_crop=background_crop,
                                   tone=tone_record, state_index=state_index, placement=placement_result,
@@ -1196,8 +1320,8 @@ def _produce(args, source, background_manifest, backgrounds, run):
                     sources=planned_state['sources'], parameters=planned_state['parameters'],
                     actual={
                         'actual_sources': [source.relative_to(ROOT).as_posix(),
-                                           'datasets/raw/fire/team_assets/image1.png',
-                                           *(['datasets/raw/car_real_capture_20261112/P12_TL2.png']
+                                           'Archive/Assets/working_sources/digital/fire/team_assets/image1.png',
+                                           *(['Archive/Assets/captures/car_real_capture_20261112/P12_TL2.png']
                                              if args.vehicle_pilot else []),
                                            *([background_record['image']] if background_record else [])],
                         'scene_index': state_index, 'sample_index': index,
@@ -1226,13 +1350,22 @@ def _produce(args, source, background_manifest, backgrounds, run):
 
 def main():
     args, source = parse_args()
+    from datasets.scripts.common.blender_workspace import BUILDINGS, activate_scene
+    activate_scene(load_task_config('fire')[1].get('blender_scene_name', BUILDINGS))
+    args.photo_geometries = {}
+    if args.current_geometry:
+        geometry_path = (ROOT/args.current_geometry).resolve()
+        if not geometry_path.is_relative_to(ROOT):
+            raise ValueError('Photo geometry must stay in the workspace')
+        geometry = json.loads(geometry_path.read_text(encoding='utf8'))
+        args.photo_geometries = {r['id']: r for r in geometry['backgrounds']}
     background_manifest, backgrounds = (read_vehicle_backgrounds(args.vehicle_background_manifest)
                                         if args.vehicle_background_manifest else (None, None))
     plan_path, declaration = read_production_declaration(args.production_plan, args, backgrounds)
     supported = any(state['target'].get('placement') in SUPPORTED_C_PLACEMENTS
                     for state in declaration['strata'])
     if supported:
-        expected_scene = ROOT / 'datasets/assets/blender/fire/blender_buildings_v13/three_buildings.blend'
+        expected_scene = source_path('fire', 'scene')
         if source != expected_scene:
             raise ValueError('supported C wall states require the verified building scene')
         verify_c_supported_wall(get_source())
@@ -1245,11 +1378,14 @@ def main():
             if sum(counts.values()) == 0 and state['planned_count'] > 1:
                 raise ValueError('fixed empty vehicle-pilot state cannot produce repeated distinct samples')
     media, procedural = background_guard_inputs(background_manifest, backgrounds)
+    if args.current_geometry:
+        procedural.add(geometry_path)
+        media.update(ROOT/r['source_image'] for r in args.photo_geometries.values())
     media.update(scene_external_media())
     # The building library was constructed from this workspace fire artwork.
     media.add(configured_fire_artwork())
     if args.vehicle_pilot:
-        media.add(ROOT / 'datasets/raw/car_real_capture_20261112/P12_TL2.png')
+        media.add(ROOT / 'Archive/Assets/captures/car_real_capture_20261112/P12_TL2.png')
     procedural.update(scene_external_libraries())
     procedural.add(source)
     procedural.add(plan_path)
@@ -1258,16 +1394,19 @@ def main():
     parameters['source_scene'] = source.relative_to(ROOT).as_posix()
     outputs = [args.output]
     if args.save_preview_scene:
-        outputs.append(ROOT / 'datasets/assets/blender/batch_scenes/fire' / args.output.name / 'preview_scene.blend')
+        outputs.append(ROOT / 'Archive/technical/datasets/fire' / args.output.name / 'preview_scene.blend')
     with generation_guard(
         'fire.render_blender_fire_dataset:' + args.output.relative_to(ROOT).as_posix(),
         sorted(media | procedural), outputs, parameters,
         code_paths=[Path(__file__), SCRIPTS / 'fire_blender_labels.py', ROOT / 'datasets/scripts/common/annotations.py',
                     ROOT / 'lab/training_common/bayesian_allocation.py', ROOT / 'datasets/scripts/common/bayesian.py',
-                    ROOT / 'datasets/scripts/common/config.py', ROOT / 'datasets/scripts/common/paths.py'],
+                    ROOT / 'datasets/scripts/common/config.py', ROOT / 'datasets/scripts/common/paths.py',
+                    ROOT / 'datasets/scripts/common/blender_workspace.py',
+                    SCRIPTS / 'camera_trajectory.py', SCRIPTS / 'hybrid_render.py', SCRIPTS / 'photo_geometry.py'],
         procedural_inputs=sorted(procedural),
         production_plan=declaration,
-        sample_output_paths=[args.output / 'images' / output_partition(args, backgrounds)],
+        sample_output_paths=[args.output / 'images' / output_partition(args, backgrounds),
+                             *([args.output / 'render_layers'] if args.current_geometry else [])],
         auxiliary_output_paths=[args.output / 'instance_pass'],
     ) as run:
         if run.plan != planned:

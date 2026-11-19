@@ -1,7 +1,7 @@
 """Export reviewed frame annotations as OCR crops and YOLO fire labels."""
 
 if __name__ == "__main__":
-    raise SystemExit("Legacy dataset CLI is retired; use datasets/scripts/fire/. Production remains paused.")
+    raise SystemExit("Legacy dataset CLI is retired; use datasets/scripts/fire/.")
 
 import argparse
 import json
@@ -179,10 +179,10 @@ def export_signal_negatives(source, output):
                 'human_acceptance': 'not_confirmed'}):
         raise ValueError('unsupported signal-negative model, split or constraints')
     allowed_images = {
-        'datasets/raw/car_real_capture_20261112/P01_TL1.png': 'car_real_capture_20261112',
-        'datasets/raw/car_real_capture_20261112/P12_TL2.png': 'car_real_capture_20261112',
-        'datasets/raw/site_capture_20261112/onboard_camera_images/vehicle_0043.png': 'site_capture_20261112_vehicle_route',
-        'datasets/raw/site_capture_20261112/onboard_camera_images/vehicle_0088.png': 'site_capture_20261112_vehicle_route',
+        'Archive/Assets/captures/car_real_capture_20261112/P01_TL1.png': 'car_real_capture_20261112',
+        'Archive/Assets/captures/car_real_capture_20261112/P12_TL2.png': 'car_real_capture_20261112',
+        'Archive/Assets/captures/site_capture_20261112/onboard_camera_images/vehicle_0043.png': 'site_capture_20261112_vehicle_route',
+        'Archive/Assets/captures/site_capture_20261112/onboard_camera_images/vehicle_0088.png': 'site_capture_20261112_vehicle_route',
     }
     states = plan.get('strata')
     if not isinstance(states, list) or not states:

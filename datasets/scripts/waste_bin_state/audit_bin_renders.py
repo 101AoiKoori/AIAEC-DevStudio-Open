@@ -9,7 +9,9 @@ import numpy as np
 
 import sys
 sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
-from datasets.scripts.waste_bin_state.bin_render_contract import STATE_CONTRACT, attach_state_evidence, decode_mask, measure_visibility
+from datasets.scripts.waste_bin_state.bin_render_contract import (
+    MIN_MOUTH_THICKNESS_PX, STATE_CONTRACT, attach_state_evidence, decode_mask, measure_visibility, mouth_thickness,
+)
 
 
 def read_mask(root, relative):
@@ -45,13 +47,22 @@ def audit_masks(root, sample, data):
                           'visible_fraction', 'label_eligible', 'rejection_reasons'):
                 if checked_evidence[field] != evidence[field]:
                     errors.append(f"state mask {field} mismatch for {sample['image']} {item['bin']}")
-            expected = attach_state_evidence(measured, checked_evidence, item['state'])
+            raised_lid = evidence['kind'] == 'raised_lid' and sample.get('open_pose') == 'upright'
+            expected = attach_state_evidence(measured, checked_evidence, item['state'],
+                                             raised_lid=raised_lid)
             if evidence['kind'] != expected['state_evidence']['kind']:
                 errors.append(f"state evidence kind mismatch for {sample['image']} {item['bin']}")
             for field in ('target_eligible', 'target_rejection_reasons'):
                 if item[field] != expected[field]:
                     errors.append(f"target {field} mismatch for {sample['image']} {item['bin']}")
             measured = expected
+            if 'max_vertical_mouth_pixels' in evidence:
+                thickness = mouth_thickness(decode_mask(state_visible, item['bin']))
+                if thickness != evidence['max_vertical_mouth_pixels'] or evidence['kind'] != 'mouth_proxy':
+                    errors.append(f"mouth thickness mismatch for {sample['image']} {item['bin']}")
+                if thickness < MIN_MOUTH_THICKNESS_PX:
+                    measured['label_eligible'] = False
+                    measured['rejection_reasons'].append('state_evidence:mouth_too_thin')
             contrast = evidence.get('image_pixel_contrast')
             if contrast is not None and contrast.get('passed') is False:
                 measured['label_eligible'] = False

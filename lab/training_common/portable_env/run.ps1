@@ -16,13 +16,27 @@ $ErrorActionPreference = 'Stop'
 $modeCount = 0
 foreach ($mode in @([bool]$Script, [bool]$Module, [bool]$Check)) { if ($mode) { $modeCount++ } }
 if ($modeCount -ne 1) { throw 'Choose exactly one of -Check, -Script or -Module.' }
-$manifestPath = Join-Path $PSScriptRoot 'manifest.json'
-if (-not (Test-Path -LiteralPath $manifestPath -PathType Leaf)) { throw 'Copy a built environment bundle, including manifest.json and site-packages.' }
 $bundleOptions = [System.Collections.Generic.List[object]]::new()
+$bundleFailures = [System.Collections.Generic.List[string]]::new()
 foreach ($bundleRoot in @($PSScriptRoot, (Join-Path $PSScriptRoot 'cp314'))) {
-    $candidateManifest = Join-Path $bundleRoot 'manifest.json'
-    if (Test-Path -LiteralPath $candidateManifest -PathType Leaf) {
-        $bundleOptions.Add([pscustomobject]@{ Root = $bundleRoot; Manifest = (Get-Content -LiteralPath $candidateManifest -Raw | ConvertFrom-Json) })
+    # An absent optional bundle is normal; an incomplete present one must not
+    # prevent another compatible bundle from being selected.
+    if ($bundleRoot -ne $PSScriptRoot -and -not (Test-Path -LiteralPath $bundleRoot -PathType Container)) { continue }
+    try {
+        $candidateManifest = Join-Path $bundleRoot 'manifest.json'
+        if (-not (Test-Path -LiteralPath $candidateManifest -PathType Leaf)) { throw 'manifest.json missing' }
+        if (-not (Test-Path -LiteralPath (Join-Path $bundleRoot 'bootstrap.py') -PathType Leaf)) { throw 'bootstrap.py missing' }
+        if (-not (Test-Path -LiteralPath (Join-Path $bundleRoot 'site-packages') -PathType Container)) { throw 'site-packages directory missing' }
+        $manifest = Get-Content -LiteralPath $candidateManifest -Raw | ConvertFrom-Json
+        if ($null -eq $manifest -or -not $manifest.python_implementation -or
+            @($manifest.python_version).Count -lt 2 -or -not $manifest.bits -or -not $manifest.platform) {
+            throw 'manifest lacks Python compatibility fields'
+        }
+        $bundleOptions.Add([pscustomobject]@{ Root = $bundleRoot; Manifest = $manifest })
+    } catch {
+        $failure = "$bundleRoot : $($_.Exception.Message)"
+        $bundleFailures.Add($failure)
+        Write-Warning "Skipping unavailable portable bundle: $failure"
     }
 }
 $candidates = [System.Collections.Generic.List[string]]::new()
@@ -81,7 +95,7 @@ foreach ($candidate in @($candidates | Select-Object -Unique)) {
     } catch { $failures.Add("$candidate : $($_.Exception.Message)") }
 }
 if (-not $selected) {
-    throw ("Compatible Windows x64 CPython 3.12 or 3.14 for an available dependency bundle was not found. Python 3.13 is unsupported. Install the matching interpreter or pass -Python; no dependency installation is attempted. Candidates: " + ($failures -join '; '))
+    throw ("Compatible Windows x64 CPython 3.12 or 3.14 for an available dependency bundle was not found. Python 3.13 is unsupported. Install the matching interpreter or pass -Python; no dependency installation is attempted. Bundles: " + ($bundleFailures -join '; ') + ". Candidates: " + ($failures -join '; '))
 }
 $invokeArgs = @('-I', '-S', '-B', (Join-Path $selectedBundle 'bootstrap.py'))
 if ($Check) { $invokeArgs += '--check' }

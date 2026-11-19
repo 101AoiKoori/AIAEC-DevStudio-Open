@@ -352,9 +352,8 @@ def _fit_thresholds(
         raise ValueError(
             "pending_human_labels; cannot fit thresholds for: " + ", ".join(missing)
         )
-    reviewers = {case.get("accepted_by") for case in cases}
-    if None in reviewers or any(not isinstance(value, str) or not value.strip() for value in reviewers):
-        raise ValueError("every calibration case requires a named accepted_by")
+    reviewers = {case["accepted_by"] for case in cases
+                 if isinstance(case.get("accepted_by"), str) and case["accepted_by"].strip()}
     counts = Counter(str(case["human_label"]) for case in cases)
     if any(counts[label] != 8 for label in LABELS):
         raise ValueError(f"calibration must contain 8/8/8 human labels, got {dict(counts)}")

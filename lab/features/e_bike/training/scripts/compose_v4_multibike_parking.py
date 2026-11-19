@@ -1,7 +1,7 @@
 """Combine reviewed multi-bike frames with varied fallen views on the ground."""
 
 if __name__ == "__main__":
-    raise SystemExit("Legacy dataset CLI is retired; use datasets/scripts/e_bike/. Production remains paused.")
+    raise SystemExit("Legacy dataset CLI is retired; use datasets/scripts/e_bike/.")
 
 import argparse
 import json

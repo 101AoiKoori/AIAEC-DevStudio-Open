@@ -14,6 +14,7 @@ COMMON = ROOT / 'scripts/common' if PACKAGED else ROOT / 'lab/training_common'
 sys.path.insert(0, str(COMMON))
 from engine.cli import main as engine_main
 from engine.config import resolve
+from engine.meter_report import write_meter_report
 
 DEFAULT_CONFIG = 'lab/features/meter/training/config/meter_v4.yaml'
 if PACKAGED:
@@ -43,6 +44,21 @@ def keypoint_errors(rows):
 
 def main(argv=None):
     argv = list(sys.argv[1:] if argv is None else argv)
+    if argv and argv[0] == 'meter-report':
+        parser = argparse.ArgumentParser(description=write_meter_report.__doc__)
+        parser.add_argument('--root', type=Path, default=ROOT)
+        parser.add_argument('--evaluation', required=True)
+        args = parser.parse_args(argv[1:])
+        try:
+            root = args.root.resolve()
+            evaluation = resolve(root, args.evaluation)
+            if 'runs' not in evaluation.relative_to(root).parts:
+                raise ValueError('Evaluation must be inside runs')
+            print(write_meter_report(evaluation).name + ' ready')
+            return 0
+        except (OSError, ValueError, KeyError, IndexError, TypeError) as error:
+            print(f'ERROR: {type(error).__name__}: {error}', file=sys.stderr)
+            return 1
     if argv and argv[0] == 'keypoint-report':
         parser = argparse.ArgumentParser(description=keypoint_errors.__doc__)
         parser.add_argument('--root', type=Path, default=ROOT)

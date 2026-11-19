@@ -19,6 +19,8 @@ from datasets.scripts.common.perspective import planar_warp  # noqa: E402
 from datasets.scripts.common.composite import alpha_place, visible_masks  # noqa: E402
 
 from datasets.scripts.common.config import source_path
+from datasets.scripts.common.frame_environment import image_digest, query_frames
+from datasets.scripts.common.review.placement_record import decode_placement_record
 BACKGROUND = source_path('e_bike', 'ground_background_manifest')
 SEED = 20261118
 TONES = {'original':(1.,1.), 'mild':(.9,.85), 'moderate':(.7,.6)}
@@ -220,14 +222,85 @@ def validate_backgrounds(backgrounds):
         ground_zone(bg)
 
 
+def bind_background_reviews(backgrounds, split, source_config):
+    """Bind the plan's exact image versions to current ingest decisions."""
+    database = ROOT / source_config['databases']['frame_environment']
+    by_role = {}
+    for role in ('composite_background', 'empty_negative'):
+        reviews = query_frames(task='e_bike', role=role, split=split,
+                               status=None, database=database)
+        by_role[role] = {path: review for review in reviews for path in review['paths']}
+    missing = []
+    bound = []
+    for row in backgrounds:
+        eligible = {}
+        reasons = []
+        for role in by_role:
+            review = by_role[role].get(row['image'])
+            label = review.get('label', {}) if review else {}
+            placement = review.get('geometry', {}).get('placeable_ground') if review else None
+            presence = label.get('presence')
+            if (not review or review['status'] != 'eligible' or
+                    presence not in (('absent', 'present') if role == 'composite_background' else ('absent',)) or
+                    label.get('completeness') != 'complete' or
+                    label.get('scope', {}).get('kind') != 'frame' or
+                    (role == 'composite_background' and not placement)):
+                reason = ','.join(review['reason_codes']) if review else 'frame_not_registered'
+                reasons.append(f'{role}={reason}')
+                continue
+            if review['image_size'] != [640, 480] or image_digest(row['image']) != review['content_sha256']:
+                raise ValueError(f"Reviewed e-bike frame pixels changed: {row['id']}")
+            if role == 'composite_background':
+                if placement.get('image_shape') != [480, 640]:
+                    raise ValueError(f"Reviewed e-bike frame coordinates changed: {row['id']}")
+                decode_placement_record(placement)
+            eligible[role] = review
+        if not eligible:
+            missing.append(f"{row['id']}:{';'.join(reasons)}")
+        bound.append({**row, '_frame_reviews': eligible})
+    if missing:
+        raise ValueError('E-bike backgrounds lack ingest eligibility: ' + '; '.join(missing))
+    return bound
+
+
+def background_review_reference(review):
+    result = {'review_role': review['role'], 'frame_id': review['frame_id'], 'record_id': review['record_id'],
+            'evidence_ids': sorted(item['evidence_id'] for item in review['evidence']),
+            'placement_algorithm': None}
+    if review['role'] == 'composite_background':
+        result['placement_algorithm'] = review['geometry']['placeable_ground']['algorithm_version']
+    return result
+
+
+def recorded_ground_contact(actor, background):
+    """Check an actor's actual bottom silhouette against saved contact pixels."""
+    review = background.get('_frame_reviews', {}).get('composite_background')
+    if review is None:
+        return 'candidate' if grounded(actor, ground_zone(background)) else 'unknown'
+    alpha = actor['sprite'][:, :, 3] > 127
+    yy, xx = np.nonzero(alpha)
+    if not len(xx):
+        return 'unknown'
+    bottom = int(yy.max())
+    contact_x = xx[yy >= bottom - 2]
+    left = round(actor['foot_x'] - alpha.shape[1] / 2)
+    top = round(actor['foot_y'] - alpha.shape[0])
+    placement = decode_placement_record(review['geometry']['placeable_ground'])
+    return placement.contact_status((left + float(np.median(contact_x)), top + bottom),
+                                    contact_width=float(contact_x.max() - contact_x.min()))
+
+
 def validate_ground_plan(plan, backgrounds, vehicles, known):
     top = {'schema_version', 'model_key', 'target_split', 'purpose', 'budget', 'uncertainty_weight',
            'independence_basis', 'constraints', 'strata'}
     fields = {'id', 'failure_event', 'min_count', 'max_count', 'prior', 'exposure_weight', 'failure_cost',
               'conditions', 'background', 'target', 'labels', 'augmentation', 'parameters', 'sources'}
-    if (not isinstance(plan, dict) or set(plan) not in (top, top | {'sampling'}, top | {'allocation_evidence'}) or
+    if (not isinstance(plan, dict) or not top <= set(plan) or
+            set(plan) - top - {'sampling', 'allocation_evidence', 'design_context'} or
             plan['model_key'] != 'e_bike' or plan['target_split'] not in ('train', 'test', 'val')):
         raise ValueError('unsupported plan, model or split')
+    if 'design_context' in plan and not isinstance(plan['design_context'], dict):
+        raise ValueError('design context must be an object')
     if 'sampling' in plan and (not isinstance(plan['sampling'], dict) or not plan['sampling']):
         raise ValueError('sampling metadata must be a nonempty object')
     if 'allocation_evidence' in plan and (not isinstance(plan['allocation_evidence'], dict) or not plan['allocation_evidence']):
@@ -249,12 +322,21 @@ def validate_ground_plan(plan, backgrounds, vehicles, known):
         if type(state['max_count']) is not int or state['max_count'] > 1:
             raise ValueError('each exact state can generate at most one image')
         bg = state['background']
-        if not isinstance(bg, dict) or set(bg) != {'id', 'image'}:
+        old_fields = {'id', 'image'}
+        reviewed_fields = old_fields | {'review_role', 'frame_id', 'record_id', 'evidence_ids', 'placement_algorithm'}
+        if not isinstance(bg, dict) or set(bg) not in (old_fields, reviewed_fields):
             raise ValueError('unsupported background')
         matches = [row for row in backgrounds if row['id'] == bg['id'] and row['image'] == bg['image']]
         if len(matches) != 1:
             raise ValueError('background does not match one fitted ground zone')
         row = matches[0]
+        if '_frame_reviews' in row:
+            needed_role = ('composite_background' if state['target'].get('vehicles') or
+                           state['target'].get('people') else 'empty_negative')
+            review = row['_frame_reviews'].get(needed_role)
+            if review is None or bg != {'id': row['id'], 'image': row['image'],
+                                       **background_review_reference(review)}:
+                raise ValueError(f'E-bike plan lacks current {needed_role} ingest decision')
         if plan['constraints'] == SAFE_CONSTRAINTS:
             safe = row.get('safe_regions')
             if not isinstance(safe, list) or not safe or any(
@@ -271,11 +353,12 @@ def validate_ground_plan(plan, backgrounds, vehicles, known):
         parent = row['parent_image']
         if parent not in background_roles:
             background_roles[parent] = source_role(ROOT, ROOT / parent, known)
-        if row['task_state'] != 'candidate_complete_negative' or background_roles[parent][0] == 'regression':
+        if '_frame_reviews' not in row and (row['task_state'] != 'candidate_complete_negative' or
+                                           background_roles[parent][0] == 'regression'):
             raise ValueError('background is not eligible for training')
         target = state['target']
-        if not isinstance(target, dict) or set(target) not in ({'vehicles'}, {'vehicles', 'people'}) or not isinstance(target['vehicles'], list) or len(target['vehicles']) > 7:
-            raise ValueError('only zero to seven explicitly declared vehicles are supported')
+        if not isinstance(target, dict) or set(target) not in ({'vehicles'}, {'vehicles', 'people'}) or not isinstance(target['vehicles'], list) or len(target['vehicles']) > 12:
+            raise ValueError('only zero to twelve explicitly declared vehicles are supported')
         if state['labels'] != GROUND_LABELS:
             raise ValueError('unsupported labels')
         augmentation = state['augmentation']
@@ -297,9 +380,12 @@ def validate_ground_plan(plan, backgrounds, vehicles, known):
             if not isinstance(target_item, dict) or set(target_item) != {'class', 'source'} or target_item['class'] not in ('upright', 'fallen'):
                 raise ValueError('unsupported vehicle target')
             keys = {'foot_x', 'foot_y', 'size_px', 'yaw', 'pitch', 'roll', 'relative_exposure'}
-            if not isinstance(actor, dict) or set(actor) != keys:
+            if not isinstance(actor, dict) or set(actor) not in (keys, keys | {'mirrored'}):
                 raise ValueError('actor must explicitly provide position, size, angles and exposure')
-            if any(isinstance(v, bool) or not isinstance(v, (float, int)) or not np.isfinite(v) for v in actor.values()):
+            if 'mirrored' in actor and type(actor['mirrored']) is not bool:
+                raise ValueError('mirrored must be a boolean')
+            if any(isinstance(v, bool) or not isinstance(v, (float, int)) or not np.isfinite(v)
+                   for key, v in actor.items() if key != 'mirrored'):
                 raise ValueError('actor parameters must be finite numbers')
             if (type(actor['size_px']) is not int or not 1 <= actor['size_px'] <= 640 or
                     not -12 <= actor['yaw'] <= 12 or not -6 <= actor['pitch'] <= 6 or
@@ -349,43 +435,103 @@ def validate_people(targets, placements):
     return used
 
 
-def place_actor(canvas, sprite, x, y, allow_truncation):
+def place_actor(canvas, sprite, x, y, allow_truncation, occupancy_only=False):
     """Clip a declared edge case and keep its exact visible occupancy for labels."""
-    if not allow_truncation:
+    if not allow_truncation and not occupancy_only:
         return alpha_place(canvas, sprite, x, y)
     height, width = canvas.shape[:2]
     sh, sw = sprite.shape[:2]
     left, top = round(x-sw/2), round(y-sh)
+    if not allow_truncation and (left<0 or top<0 or left+sw>width or top+sh>height):
+        raise ValueError('sprite outside frame')
     x1,y1,x2,y2 = max(0,left), max(0,top), min(width,left+sw), min(height,top+sh)
     if x1 >= x2 or y1 >= y2:
         raise ValueError('truncated actor is entirely outside the image')
     patch = sprite[y1-top:y2-top, x1-left:x2-left]
-    alpha = patch[:,:,3:4].astype(np.float32)/255
-    canvas[y1:y2,x1:x2] = np.clip(patch[:,:,:3]*alpha + canvas[y1:y2,x1:x2]*(1-alpha), 0, 255).astype(np.uint8)
+    if not occupancy_only:
+        alpha = patch[:,:,3:4].astype(np.float32)/255
+        canvas[y1:y2,x1:x2] = np.clip(patch[:,:,:3]*alpha + canvas[y1:y2,x1:x2]*(1-alpha), 0, 255).astype(np.uint8)
     mask = np.zeros((height,width), bool)
     mask[y1:y2,x1:x2] = patch[:,:,3] > 127
     return mask
 
 
-def render_ground_state(state, backgrounds, vehicles, allow_truncation=False):
+def existing_vehicle_labels(background):
+    """Return complete source-pixel boxes; generated actors may not cover them."""
+    review = background.get('_frame_reviews', {}).get('composite_background')
+    if review is None:
+        return []
+    label = review['label']
+    instances = label.get('instances') or []
+    if label['presence'] == 'absent':
+        if instances:
+            raise ValueError('empty e-bike background contains target boxes')
+        return []
+    if label['presence'] != 'present' or not instances:
+        raise ValueError('positive e-bike background needs complete visible boxes')
+    classes = {value: key for key, value in GROUND_LABELS['classes'].items()}
+    result = []
+    for item in instances:
+        cls, box = item.get('class_id'), item.get('xyxy')
+        if (type(cls) is not int or cls not in classes or not isinstance(box, list) or len(box) != 4 or
+                any(type(v) is not int for v in box) or
+                not 0 <= box[0] < box[2] <= 640 or not 0 <= box[1] < box[3] <= 480):
+            raise ValueError('existing e-bike label needs an exact class and source-pixel box')
+        result.append({'class': classes[cls], 'bbox_xyxy': box,
+                       'source_role': 'existing_background', 'object_id': item.get('object_id')})
+    return result
+
+
+def draw_contact_shadow(frame, actor):
+    """Anchor the shadow to actual silhouette contacts rather than the canvas centre."""
+    alpha = actor['sprite'][:,:,3] > 127
+    yy,xx = np.nonzero(alpha)
+    bottom = int(yy.max())
+    contact = xx[yy >= bottom-2]
+    left = round(actor['foot_x']-alpha.shape[1]/2)
+    top = round(actor['foot_y']-alpha.shape[0])
+    layer = np.zeros(frame.shape[:2],np.uint8)
+    groups = np.split(np.unique(contact),np.where(np.diff(np.unique(contact))>4)[0]+1)
+    for group in groups:
+        if len(group):
+            cv2.ellipse(layer,(left+round(float(np.median(group))),top+bottom),
+                        (max(3,round((group[-1]-group[0])/2)+3),2),0,0,360,170,-1)
+    soft = cv2.GaussianBlur(layer,(0,0),1.8).astype(np.float32)/255
+    frame[:] = np.clip(frame.astype(np.float32)*(1-.45*soft[:,:,None]),0,255).astype(np.uint8)
+
+
+def render_ground_state(state, backgrounds, vehicles, allow_truncation=False, working=None, render_rgb=True, minimum_visible_fraction=None):
+    if minimum_visible_fraction is None:
+        minimum_visible_fraction = GROUND_CONSTRAINTS['minimum_visible_fraction']
+    if not 0 < minimum_visible_fraction <= 1:
+        raise ValueError('minimum_visible_fraction must be in (0, 1]')
     bg = next(row for row in backgrounds if row['id'] == state['background']['id'])
-    frame = read_image(ROOT / bg['image'])
+    path = working.path(bg['image']) if working else ROOT / bg['image']
+    frame = read_image(path) if render_rgb else np.zeros((480,640,3),np.uint8)
     if frame.shape != (480, 640, 3):
         raise ValueError('background dimensions changed')
+    existing = existing_vehicle_labels(bg)
     actors = []
-    for target, spec in zip(state['target']['vehicles'], state['parameters']['actors']):
+    for target_index, (target, spec) in enumerate(zip(state['target']['vehicles'], state['parameters']['actors'])):
         source, sprite = next(item for item in vehicles[target['class']] if item[0]['path'] == target['source'])
         sprite = planar_warp(sprite, spec['yaw'], spec['pitch'], spec['roll'])
         sprite = bike.scene.assets.resized(sprite, **({'height': spec['size_px']} if target['class'] == 'upright' else {'width': spec['size_px']}))
+        if spec.get('mirrored', False):
+            sprite = np.ascontiguousarray(sprite[:, ::-1])
         sprite = sprite.copy()
         sprite[:, :, :3] = np.clip(sprite[:, :, :3].astype(np.float32) * spec['relative_exposure'], 0, 255).astype(np.uint8)
         actor = {'kind': 'vehicle', 'category': target['class'], 'source': source,
+                 'object_id': f'vehicle_{target_index:02d}',
+                 'mirrored': spec.get('mirrored', False),
                  'sprite': sprite, 'foot_x': spec['foot_x'], 'foot_y': spec['foot_y'],
                  'angles_degrees': {key: spec[key] for key in ('yaw', 'pitch', 'roll')}}
         if not allow_truncation:
             bike.scene.validate_actor_placement(actor, 'ground_only')
-        if not grounded(actor, ground_zone(bg)):
-            raise ValueError('vehicle contact is outside the fitted ground zone')
+        contact = recorded_ground_contact(actor, bg)
+        if contact != 'candidate':
+            if '_frame_reviews' not in bg:
+                raise ValueError('vehicle contact is outside the fitted ground zone')
+            raise ValueError(f'vehicle contact is {contact} in saved ground record')
         if 'safe_regions' in bg:
             validate_safe_placement(actor, bg)
         actors.append(actor)
@@ -397,31 +543,58 @@ def render_ground_state(state, backgrounds, vehicles, allow_truncation=False):
         actor = {'kind': 'person', 'category': 'occluder', 'source': target,
                  'sprite': sprite, 'foot_x': spec['foot_x'], 'foot_y': spec['foot_y'],
                  'angles_degrees': {key: spec[key] for key in ('yaw','pitch','roll')}}
-        if not grounded(actor, ground_zone(bg)):
-            raise ValueError('person occluder contact is outside the ground zone')
+        contact = recorded_ground_contact(actor, bg)
+        if contact != 'candidate':
+            if '_frame_reviews' not in bg:
+                raise ValueError('person occluder contact is outside the ground zone')
+            raise ValueError(f'person occluder contact is {contact} in saved ground record')
         actors.append(actor)
     actors.sort(key=lambda actor: actor['foot_y'])
-    for actor in actors:
-        bike.scene.draw_shadow(frame, actor)
-    masks = [place_actor(frame, actor['sprite'], actor['foot_x'], actor['foot_y'], allow_truncation) for actor in actors]
+    if render_rgb:
+        for actor in actors:
+            draw_contact_shadow(frame, actor)
+    masks = [place_actor(frame, actor['sprite'], actor['foot_x'], actor['foot_y'], allow_truncation,
+                        occupancy_only=not render_rgb) for actor in actors]
+    for box in (item['bbox_xyxy'] for item in existing):
+        x1, y1, x2, y2 = box
+        if any(mask[y1:y2, x1:x2].any() for mask in masks):
+            raise ValueError('new actor obscures a labelled background vehicle')
     visible = visible_masks(masks)
     objects, target_masks = [], []
-    for actor, mask, shown in zip(actors, masks, visible):
+    for actor_index, (actor, mask, shown) in enumerate(zip(actors, masks, visible)):
         if actor['kind'] != 'vehicle':
             continue
         original_pixels = int(np.count_nonzero(actor['sprite'][:,:,3] > 127))
-        if mask.sum() < 120 or shown.sum() < 120 or not original_pixels or shown.sum() / original_pixels < .7:
+        if mask.sum() < 120 or shown.sum() < 120 or not original_pixels or shown.sum() / original_pixels < minimum_visible_fraction:
             raise ValueError('vehicle visibility below supported constraint')
         target_masks.append(shown)
+        occluders = []
+        for j in range(actor_index + 1, len(actors)):
+            # Visible front masks partition the pixels actually hidden from this vehicle.
+            pixels = int(np.count_nonzero(mask & visible[j]))
+            if pixels:
+                occluders.append({'kind': actors[j]['kind'], 'class': actors[j]['category'],
+                                  'object_id': actors[j].get('object_id', f'person_{j:02d}'),
+                                  'pixels': pixels, 'fraction': pixels / original_pixels})
         yy, xx = np.nonzero(shown)
+        full_y,full_x = np.nonzero(mask)
+        contact_y = int(full_y.max())
+        contact_x = float(np.median(full_x[full_y >= contact_y-2]))
         objects.append({'class': actor['category'], 'bbox_xyxy': [int(xx.min()), int(yy.min()), int(xx.max())+1, int(yy.max())+1],
+                        'object_id': actor['object_id'], 'occluded_by': occluders,
+                        'mirrored': actor['mirrored'],
+                        'contact_xy': [contact_x,contact_y],
+                        'isolated_pixels': original_pixels, 'visible_pixels': int(shown.sum()),
                         'visible_fraction': float(shown.sum()/original_pixels), 'truncated_pixels': original_pixels-int(mask.sum()),
                         'foreground_source': actor['source'],
                         'foot_xy': [actor['foot_x'], actor['foot_y']], 'angles_degrees': actor['angles_degrees']})
     p = state['parameters']
-    if state['augmentation']['tone'] != 'original':
+    if render_rgb and state['augmentation']['tone'] != 'original':
         frame = apply_tone(frame, value_gain=p['value_gain'], saturation_gain=p['saturation_gain'])
-    return frame, objects, target_masks, bg
+    objects.extend(existing)
+    target_masks.extend([None] * len(existing))
+    return frame, objects, target_masks, {key: value for key, value in bg.items()
+                                          if key != '_frame_reviews'}
 
 
 def validate_safe_placement(actor, background):
@@ -438,9 +611,64 @@ def validate_safe_placement(actor, background):
         raise ValueError('vehicle canvas overlaps a recorded obstacle')
 
 
+def write_previews(out, records, plan, published_out=None):
+    """Keep full-size visible-box previews and a browsable review page beside samples."""
+    import html
+    from PIL import Image, ImageDraw
+    coverage = {r['state_id']: r for r in plan.get('sampling', {}).get('coverage', [])}
+    preview_dir = out / 'overlays'
+    preview_dir.mkdir(exist_ok=True)
+    cards, selected, branches = [], [], set()
+    order = {'direct_real_review_partial':0,'direct_real':1,'real_background_composite':2,'blender_background_composite':3}
+    for row in sorted(records,key=lambda r:order.get(r.get('branch'),3)):
+        frame = read_image(out / 'images' / Path(row['image']).name)
+        counts = Counter(o['class'] for o in row['objects'])
+        for index,obj in enumerate(row['objects']):
+            x1,y1,x2,y2 = obj['bbox_xyxy']
+            color = (30,220,50) if obj['class']=='upright' else (0,155,255)
+            cv2.rectangle(frame,(x1,y1),(x2-1,y2-1),color,2)
+            visibility = f"{obj['visible_fraction']:.0%}" if 'visible_fraction' in obj else 'real'
+            text = f"{index+1} {obj['class']} {visibility}"
+            cv2.putText(frame,text,(x1,max(45,y1-5)),cv2.FONT_HERSHEY_SIMPLEX,.43,color,1,cv2.LINE_AA)
+        for region in row.get('unresolved_regions',[]):
+            x1,y1,x2,y2=region['xyxy']
+            cv2.rectangle(frame,(x1,y1),(x2,y2),(220,70,210),2)
+            cv2.putText(frame,'unresolved: no count',(x1,max(55,y1-6)),cv2.FONT_HERSHEY_SIMPLEX,.4,(220,70,210),1,cv2.LINE_AA)
+        meta = coverage.get(row['state_id'],row)
+        branch = meta.get('branch','sample')
+        if row.get('branch'):
+            branch = row['branch'] + ':' + branch
+        header = f"{row['state_id']} U={counts['upright']} F={counts['fallen']} mirror={meta.get('mirrored',False)}"
+        if row.get('unresolved_regions'):
+            header += ' PARTIAL'
+        cv2.rectangle(frame,(0,0),(640,39),(25,25,25),-1)
+        cv2.putText(frame,header,(7,16),cv2.FONT_HERSHEY_SIMPLEX,.43,(255,255,255),1,cv2.LINE_AA)
+        cv2.putText(frame,branch,(7,33),cv2.FONT_HERSHEY_SIMPLEX,.43,(255,255,255),1,cv2.LINE_AA)
+        dest = preview_dir / Path(row['image']).name
+        write_image(dest,frame)
+        row['overlay'] = rel((published_out or out) / 'overlays' / dest.name)
+        key = (branch,meta.get('mirrored',False))
+        if key not in branches:
+            selected.append(dest);branches.add(key)
+        cards.append(f'<figure><a href="overlays/{dest.name}"><img loading="lazy" src="overlays/{dest.name}"></a>'
+                     f'<figcaption>{html.escape(header)}<br>{html.escape(branch)}</figcaption></figure>')
+    selected = selected[:24]
+    sheet = Image.new('RGB',(960,264*((len(selected)+2)//3)),(240,240,240))
+    for i,path in enumerate(selected):
+        im=Image.open(path).convert('RGB');im.thumbnail((320,240))
+        x,y=i%3*320,i//3*264;sheet.paste(im,(x,y))
+        ImageDraw.Draw(sheet).text((x+4,y+242),path.stem,fill=(20,20,20))
+    sheet.save(out/'contact_sheet.jpg',quality=94)
+    (out/'review.html').write_text('<!doctype html><meta charset="utf-8"><title>电动车低视角小样</title>'
+        '<style>body{font:16px sans-serif;background:#eee;margin:24px}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(450px,1fr));gap:16px}figure{margin:0;background:white;padding:10px}img{width:100%}</style>'
+        '<h1>电动车低视角 · 可见框与姿态</h1><p>绿框 upright 直立；橙框 fallen 倒伏。紫框为未决区域，不猜数量或姿态；PARTIAL 图片的 U/F 仅为已确认下限，不是总数，不作完整训练标签。百分比为合成实际可见率；real 为实拍框，未估算可见率。点击查看原尺寸预览。</p>'
+        '<div class="grid">'+''.join(cards)+'</div>',encoding='utf-8')
+
+
 def main():
     from lab.training_common.production_guard import generation_guard
     from datasets.scripts.common.config import load_task_config
+    from datasets.scripts.common.working_inputs import CODE as WORKING_INPUTS_CODE, WorkingInputs
     from datasets.scripts.common.paths import sample_dir, split_dir
     from datasets.scripts.e_bike.e_bike_queue_inputs import queue_input_report
     from lab.scripts.data import v4_source_gate as gate
@@ -463,9 +691,12 @@ def main():
         raise ValueError('output must be the sample or declared split')
     backgrounds = json.loads(background_path.read_text(encoding='utf-8'))['backgrounds']
     validate_backgrounds(backgrounds)
-    if background_path == BACKGROUND and set(row['id'] for row in backgrounds) != set(ZONES):
-        raise ValueError('background set differs from fitted ground zones')
-    _, vehicles = bike.sources(selection=selection_path, include_people=False)
+    backgrounds = bind_background_reviews(backgrounds, plan['target_split'], source_config)
+    background_inputs = {row['image'] for row in backgrounds}
+    working = WorkingInputs('e_bike', backgrounds=background_inputs,
+                            targets={path for s in plan['strata'] for path in s['sources']} - background_inputs,
+                            split=plan['target_split'])
+    _, vehicles = bike.sources(selection=selection_path, include_people=False, working=working)
     known = build_queue(ROOT)
     validate_ground_plan(plan, backgrounds, vehicles, known)
     background_roles = {row['id']: source_role(ROOT, ROOT / row['parent_image'], known)
@@ -473,7 +704,9 @@ def main():
     media = {(ROOT / source).resolve() for state in plan['strata'] for source in state['sources']}
     qm, qp, missing_inputs = queue_input_report(ROOT, known, media)
     media.update(qm)
-    procedural = set(qp) | {plan_path, background_path, selection_path,
+    media.update(working.media)
+    procedural = set(qp) | working.evidence | {plan_path, background_path, selection_path,
+                            ROOT / source_config['databases']['frame_environment'],
                             ROOT/'datasets/scripts/e_bike/config/dataset.yaml',
                             ROOT/'datasets/scripts/e_bike/config/source.yaml'}
     history = {'exposure_status': 'incomplete' if missing_inputs or known.get('missing_exposure_paths') or known.get('unavailable_exposure_paths')
@@ -481,60 +714,74 @@ def main():
                'missing_input_paths': missing_inputs,
                'missing_exposure_paths': known.get('missing_exposure_paths', []),
                'unavailable_exposure_paths': known.get('unavailable_exposure_paths', [])}
-    code = {Path(__file__).resolve(), Path(bike.__file__).resolve(), Path(bike.scene.__file__).resolve(),
+    code = {Path(__file__).resolve(), WORKING_INPUTS_CODE, Path(bike.__file__).resolve(), Path(bike.scene.__file__).resolve(),
             Path(bike.scene.assets.__file__).resolve(), Path(gate.__file__).resolve(),
             TASK_HELPERS / 'e_bike_queue_inputs.py', ROOT / 'lab/training_common/camera_tone.py',
             ROOT / 'datasets/scripts/common/config.py', ROOT / 'datasets/scripts/common/paths.py',
             ROOT / 'datasets/scripts/common/perspective.py', ROOT / 'datasets/scripts/common/composite.py', ROOT / 'datasets/scripts/common/annotations.py',
+            ROOT / 'datasets/scripts/common/frame_environment.py',
+            ROOT / 'datasets/scripts/common/review/placement_record.py',
             ROOT / 'lab/training_common/production_guard.py'}
     if 'sampling' in plan:
         code.add(TASK_HELPERS / 'plan_grounded_distribution.py')
+        if plan['sampling'].get('recipe'):
+            procedural.add(ROOT / plan['sampling']['recipe'])
+            code.add(TASK_HELPERS / 'plan_low_angle_batch.py')
     if 'allocation_evidence' in plan:
         code.add(TASK_HELPERS / 'plan_safe_distribution.py')
     with generation_guard('e_bike.compose_v4_grounded_train:' + rel(out), sorted(media), [out],
                           {'plan': rel(plan_path), 'background_manifest': rel(background_path), 'historical_exposure': history,
                            'sampling': plan.get('sampling'), 'allocation_evidence': plan.get('allocation_evidence')}, procedural_inputs=sorted(procedural),
                           code_paths=sorted(code), root=ROOT, production_plan=plan,
-                          sample_output_paths=[out / 'images'], auxiliary_output_paths=[out / 'masks']) as run:
+                          sample_output_paths=[out / 'images'], auxiliary_output_paths=[out / 'masks',out / 'overlays',out / 'contact_sheet.jpg']) as run:
         if run.reused:
             return
-        if out.exists() and any(out.iterdir()):
+        if out.exists() and any(p.is_file() for p in out.rglob('*')):
             raise ValueError('output is not empty')
         states = run.plan['strata']
         if any(type(state.get('planned_count')) is not int or state['planned_count'] not in (0, 1) for state in states):
             raise ValueError('allocation exceeds one image per exact state')
         for state in states:
-            render_ground_state(state, backgrounds, vehicles, plan['constraints']['allow_truncation'])
+            render_ground_state(state, backgrounds, vehicles, plan['constraints']['allow_truncation'], working)
         for folder in ('images', 'labels', 'masks'):
             (out / folder).mkdir(parents=True, exist_ok=True)
         records = []
         for index, state in enumerate(item for item in states if item['planned_count']):
-            frame, objects, masks, bg = render_ground_state(state, backgrounds, vehicles, plan['constraints']['allow_truncation'])
+            frame, objects, masks, bg = render_ground_state(
+                state, backgrounds, vehicles, plan['constraints']['allow_truncation'], working)
             stem = f'bike_{index+1:06d}'
             image, label = out / 'images' / (stem + '.png'), out / 'labels' / (stem + '.txt')
             write_image(image, frame)
             lines = []
             for number, (obj, mask) in enumerate(zip(objects, masks)):
                 lines.append(bike.scene.yolo_row(GROUND_LABELS['classes'][obj['class']], obj['bbox_xyxy'], 640, 480))
+                if mask is None:
+                    continue
                 mask_path = out / 'masks' / f'{stem}_{number:02d}.png'
                 write_image(mask_path, mask.astype(np.uint8)*255)
                 obj['visible_mask'] = rel(mask_path)
             label.write_text('\n'.join(lines) + ('\n' if lines else ''), encoding='utf-8')
-            actual = {'background': bg, 'ground_zone': ground_zone(bg),
+            actual = {'background': bg, 'background_review': state['background'],
+                      'working_background': working.actual(bg['image']),
+                      'working_targets': {v['source']: working.actual(v['source']) for v in state['target']['vehicles']},
+                      'ground_zone': ground_zone(bg),
                       'historical_source_role': background_roles[bg['id']],
                       'objects': objects, 'parameters': state['parameters'],
                       'augmentation': state['augmentation'], 'media': state['sources']}
             run.record_sample(state['id'], output=image, sources=state['sources'],
                               parameters=state['parameters'], actual=actual)
             records.append({'image': rel(image), 'label': rel(label), 'state_id': state['id'],
-                            'background': bg, 'ground_zone': ground_zone(bg),
+                            'background': bg, 'working_background': actual['working_background'],
+                            'working_targets': actual['working_targets'], 'ground_zone': ground_zone(bg),
                             'historical_source_role': background_roles[bg['id']],
                             'objects': objects, 'augmentation': state['augmentation'],
                             'parameters': state['parameters'], 'sources': state['sources'],
                             'generation_method': 'real_scene_composite', 'label_review': 'visible_mask_candidate'})
-        manifest = {'status': 'training_candidates_not_deliverable', 'plan': rel(plan_path),
+        write_previews(out, records, plan)
+        manifest = {'status': 'sample_candidates_for_user_review', 'plan': rel(plan_path),
                     'historical_exposure': history,
                     'sampling': plan.get('sampling'),
+                    'allocation_evidence': plan.get('allocation_evidence'),
                     'background_manifest': rel(background_path), 'records': records,
                     'scope': 'Ground polygons use 640x480 pixels; silhouette-bottom contact is approximate. '
                              'Generated masks and labels are candidates.'}

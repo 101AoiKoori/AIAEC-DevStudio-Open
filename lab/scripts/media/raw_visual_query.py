@@ -1,4 +1,4 @@
-"""Read raw-image visual candidates and their provenance from the media cache.
+"""Read source-image visual candidates and their provenance from the media cache.
 
 The result preserves each source declaration and its review scope. Instances
 from separate records may refer to the same object and are not deduplicated.
@@ -51,11 +51,11 @@ def possible_duplicates(instances, threshold=0.8):
 
 
 def query_image(path: str) -> dict:
-    """Return source claims, regions and instance candidates for one raw image."""
+    """Return source claims, regions and instance candidates for one image."""
     current = core.inside(path)
-    raw = (core.ROOT / 'datasets/raw').resolve()
-    if not current.is_relative_to(raw) or not current.is_file():
-        raise ValueError('path must be an existing image below datasets/raw')
+    source_roots = [core.ROOT / name for name in ('datasets/raw', 'Archive/Assets')]
+    if not current.is_file() or not any(current.is_relative_to(root) for root in source_roots):
+        raise ValueError('path must be an existing image below datasets/raw or Archive/Assets')
     rel = core.relative(current)
     if current.suffix.lower() not in core.IMAGES:
         raise ValueError('path must be an image')
@@ -128,7 +128,7 @@ def query_image(path: str) -> dict:
 
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--path', required=True, help='workspace-relative raw image path')
+    parser.add_argument('--path', required=True, help='workspace-relative source image path')
     args = parser.parse_args()
     print(json.dumps(query_image(args.path), ensure_ascii=False))
 

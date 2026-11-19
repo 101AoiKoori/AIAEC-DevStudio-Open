@@ -21,10 +21,10 @@ if str(ROOT) not in sys.path:
 from lab.training_common.production_guard import generation_guard
 from lab.features.plate.training.scripts.plate_guard_inputs import blender_external_dependencies
 
-SCENE = ROOT / 'datasets/assets/blender/plate/v4_arena_vehicle_20261113/arena_plate_working.blend'
+SCENE = ROOT / 'Archive/technical/revisions/plate/blender_sources_20261116/v4_arena_vehicle_20261113/arena_plate_working.blend'
 FRAME = ROOT / 'datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_003927.png'
-VIDEO = ROOT / 'datasets/raw/site_capture_20261112/videos/full_scene.mp4'
-ORIGIN = ROOT / 'datasets/assets/blender/plate/v4_arena_vehicle_20261113/source_assets.json'
+VIDEO = ROOT / 'Archive/Assets/captures/site_capture_20261112/videos/full_scene.mp4'
+ORIGIN = ROOT / 'Archive/technical/revisions/plate/blender_sources_20261116/v4_arena_vehicle_20261113/source_assets.json'
 REVIEW = ROOT / 'datasets/annotated/plate/v4_sequence_screen_20261113/candidate_manifest.json'
 BASE = ROOT / 'datasets/exports/plate'
 

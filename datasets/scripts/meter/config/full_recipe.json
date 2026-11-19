@@ -1,0 +1,17 @@
+{
+  "seed": 2026111801,
+  "cycles_samples": 64,
+  "chunk_size": 48,
+  "composition_chunk_size": 250,
+  "geometry_groups": {"train": 648, "val": 135, "test": 135},
+  "continuous_reading_share": 0.7,
+  "scale_factor_range": [0.65, 1.15],
+  "degradation_distribution": {"clean": 0.4, "soft_blur": 0.2, "jpeg": 0.2, "sensor_noise": 0.1, "blur_jpeg": 0.1},
+  "background_frames": {"val": [11.5, 53.5, 97.5], "test": [23.25, 66.25, 111.25]},
+  "lens_scale": {"train": 1.0, "val": 1.025, "test": 0.975},
+  "render_exposure_ev": {"train": 0.0, "val": 0.10, "test": -0.10},
+  "background_lens_scale": {"val": 0.96, "test": 1.04},
+  "background_exposure_ev": {"val": 0.12, "test": -0.08},
+  "work_root": "datasets/annotated/meter/full_production",
+  "scope": "Current full working dataset; no formal release tag or version directory."
+}

@@ -1,0 +1,1638 @@
+{
+  "schema_version": 1,
+  "model_key": "fire_sticker",
+  "target_split": "train",
+  "purpose": "real_bin_hard_negatives_and_small_fire_stickers",
+  "budget": 3624,
+  "seed": 2026111807,
+  "base_package": "training_packages/fire_sticker",
+  "output": "training_packages/fire_sticker/dataset_finetune",
+  "annotation_manifest": "datasets/annotated/waste_bin_state/reshoot/manifest.json",
+  "initial_weights": "training_packages/fire_sticker/fire_sticker_best_Val_Test/best.pt",
+  "review_output": "datasets/annotated/fire/reshoot_finetune",
+  "train": {
+    "replay": 3000,
+    "real_bin_negatives": 264,
+    "positive_with_real_bin": 180,
+    "small_sticker": 180
+  },
+  "negative_recipe": {
+    "variants_per_photo": 6,
+    "extra_variants_per_red_photo": 6
+  },
+  "positive_recipe": {
+    "per_building": 60,
+    "single_per_building": 30,
+    "triple_per_building": 30,
+    "red_images": 90
+  },
+  "small_recipe": {
+    "per_building": 60,
+    "images_8_16_per_building": 40,
+    "images_16_32_per_building": 20
+  },
+  "paired_wall_frame_prefixes": {
+    "A": "113d45ced4",
+    "B": "ded3e45e68",
+    "C": "488b058b71"
+  },
+  "independence_basis": "All 36 reshoot photos and their derivatives belong to bins_reshoot_20261118, Train only. All facade parents already belong to Train. Original Val/Test remain byte-identical known-source regression sets; original Test was inspected during development.",
+  "constraints": {
+    "class_ids": [
+      0
+    ],
+    "negative_labels": "paired_empty_files",
+    "parent_split": "inherit_all_parents",
+    "building_truth": "from_existing_wall_registration",
+    "whole_building_count": null,
+    "training_authorized": false
+  },
+  "uncertainty_weight": 0,
+  "training_proposal": {
+    "imgsz": 640,
+    "batch": 4,
+    "epochs": 40,
+    "lr0": 4e-05,
+    "min_epochs": 10,
+    "patience": 8,
+    "wall_seconds": 7200
+  },
+  "strata": [
+    {
+      "id": "positive_with_real_bin_0000",
+      "min_count": 15,
+      "max_count": 15,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "target": {
+        "count": 1,
+        "fire_counts": {
+          "A": 1
+        }
+      },
+      "context": {
+        "distractor": "other_color_bin"
+      },
+      "parameters": {
+        "generation_method": "real_background_composite"
+      },
+      "sources": [
+        "positive_with_real_bin"
+      ],
+      "conditions": [],
+      "failure_event": "fire_sticker_miss_or_color_confusion"
+    },
+    {
+      "id": "positive_with_real_bin_0001",
+      "min_count": 15,
+      "max_count": 15,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "target": {
+        "count": 1,
+        "fire_counts": {
+          "A": 1
+        }
+      },
+      "context": {
+        "distractor": "red_orange_bin"
+      },
+      "parameters": {
+        "generation_method": "real_background_composite"
+      },
+      "sources": [
+        "positive_with_real_bin"
+      ],
+      "conditions": [],
+      "failure_event": "fire_sticker_miss_or_color_confusion"
+    },
+    {
+      "id": "positive_with_real_bin_0002",
+      "min_count": 15,
+      "max_count": 15,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "target": {
+        "count": 1,
+        "fire_counts": {
+          "B": 1
+        }
+      },
+      "context": {
+        "distractor": "other_color_bin"
+      },
+      "parameters": {
+        "generation_method": "real_background_composite"
+      },
+      "sources": [
+        "positive_with_real_bin"
+      ],
+      "conditions": [],
+      "failure_event": "fire_sticker_miss_or_color_confusion"
+    },
+    {
+      "id": "positive_with_real_bin_0003",
+      "min_count": 15,
+      "max_count": 15,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "target": {
+        "count": 1,
+        "fire_counts": {
+          "B": 1
+        }
+      },
+      "context": {
+        "distractor": "red_orange_bin"
+      },
+      "parameters": {
+        "generation_method": "real_background_composite"
+      },
+      "sources": [
+        "positive_with_real_bin"
+      ],
+      "conditions": [],
+      "failure_event": "fire_sticker_miss_or_color_confusion"
+    },
+    {
+      "id": "positive_with_real_bin_0004",
+      "min_count": 15,
+      "max_count": 15,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "target": {
+        "count": 1,
+        "fire_counts": {
+          "C": 1
+        }
+      },
+      "context": {
+        "distractor": "other_color_bin"
+      },
+      "parameters": {
+        "generation_method": "real_background_composite"
+      },
+      "sources": [
+        "positive_with_real_bin"
+      ],
+      "conditions": [],
+      "failure_event": "fire_sticker_miss_or_color_confusion"
+    },
+    {
+      "id": "positive_with_real_bin_0005",
+      "min_count": 15,
+      "max_count": 15,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "target": {
+        "count": 1,
+        "fire_counts": {
+          "C": 1
+        }
+      },
+      "context": {
+        "distractor": "red_orange_bin"
+      },
+      "parameters": {
+        "generation_method": "real_background_composite"
+      },
+      "sources": [
+        "positive_with_real_bin"
+      ],
+      "conditions": [],
+      "failure_event": "fire_sticker_miss_or_color_confusion"
+    },
+    {
+      "id": "positive_with_real_bin_0006",
+      "min_count": 15,
+      "max_count": 15,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "target": {
+        "count": 3,
+        "fire_counts": {
+          "A": 3
+        }
+      },
+      "context": {
+        "distractor": "other_color_bin"
+      },
+      "parameters": {
+        "generation_method": "real_background_composite"
+      },
+      "sources": [
+        "positive_with_real_bin"
+      ],
+      "conditions": [],
+      "failure_event": "fire_sticker_miss_or_color_confusion"
+    },
+    {
+      "id": "positive_with_real_bin_0007",
+      "min_count": 15,
+      "max_count": 15,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "target": {
+        "count": 3,
+        "fire_counts": {
+          "A": 3
+        }
+      },
+      "context": {
+        "distractor": "red_orange_bin"
+      },
+      "parameters": {
+        "generation_method": "real_background_composite"
+      },
+      "sources": [
+        "positive_with_real_bin"
+      ],
+      "conditions": [],
+      "failure_event": "fire_sticker_miss_or_color_confusion"
+    },
+    {
+      "id": "positive_with_real_bin_0008",
+      "min_count": 15,
+      "max_count": 15,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "target": {
+        "count": 3,
+        "fire_counts": {
+          "B": 3
+        }
+      },
+      "context": {
+        "distractor": "other_color_bin"
+      },
+      "parameters": {
+        "generation_method": "real_background_composite"
+      },
+      "sources": [
+        "positive_with_real_bin"
+      ],
+      "conditions": [],
+      "failure_event": "fire_sticker_miss_or_color_confusion"
+    },
+    {
+      "id": "positive_with_real_bin_0009",
+      "min_count": 15,
+      "max_count": 15,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "target": {
+        "count": 3,
+        "fire_counts": {
+          "B": 3
+        }
+      },
+      "context": {
+        "distractor": "red_orange_bin"
+      },
+      "parameters": {
+        "generation_method": "real_background_composite"
+      },
+      "sources": [
+        "positive_with_real_bin"
+      ],
+      "conditions": [],
+      "failure_event": "fire_sticker_miss_or_color_confusion"
+    },
+    {
+      "id": "positive_with_real_bin_0010",
+      "min_count": 15,
+      "max_count": 15,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "target": {
+        "count": 3,
+        "fire_counts": {
+          "C": 3
+        }
+      },
+      "context": {
+        "distractor": "other_color_bin"
+      },
+      "parameters": {
+        "generation_method": "real_background_composite"
+      },
+      "sources": [
+        "positive_with_real_bin"
+      ],
+      "conditions": [],
+      "failure_event": "fire_sticker_miss_or_color_confusion"
+    },
+    {
+      "id": "positive_with_real_bin_0011",
+      "min_count": 15,
+      "max_count": 15,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "target": {
+        "count": 3,
+        "fire_counts": {
+          "C": 3
+        }
+      },
+      "context": {
+        "distractor": "red_orange_bin"
+      },
+      "parameters": {
+        "generation_method": "real_background_composite"
+      },
+      "sources": [
+        "positive_with_real_bin"
+      ],
+      "conditions": [],
+      "failure_event": "fire_sticker_miss_or_color_confusion"
+    },
+    {
+      "id": "real_bin_negative_0012",
+      "min_count": 168,
+      "max_count": 168,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "target": {
+        "count": 0
+      },
+      "context": {
+        "distractor": "other_color_bin"
+      },
+      "parameters": {
+        "generation_method": "direct_real"
+      },
+      "sources": [
+        "real_bin_negative"
+      ],
+      "conditions": [],
+      "failure_event": "fire_sticker_miss_or_color_confusion"
+    },
+    {
+      "id": "real_bin_negative_0013",
+      "min_count": 96,
+      "max_count": 96,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "target": {
+        "count": 0
+      },
+      "context": {
+        "distractor": "red_orange_bin"
+      },
+      "parameters": {
+        "generation_method": "direct_real"
+      },
+      "sources": [
+        "real_bin_negative"
+      ],
+      "conditions": [],
+      "failure_event": "fire_sticker_miss_or_color_confusion"
+    },
+    {
+      "id": "replay_0014",
+      "min_count": 18,
+      "max_count": 18,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "target": {
+        "count": 0
+      },
+      "context": {
+        "distractor": "unknown"
+      },
+      "parameters": {
+        "generation_method": "blender_real_background_composite"
+      },
+      "sources": [
+        "replay"
+      ],
+      "conditions": [],
+      "failure_event": "fire_sticker_miss_or_color_confusion"
+    },
+    {
+      "id": "replay_0015",
+      "min_count": 32,
+      "max_count": 32,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "target": {
+        "count": 1,
+        "fire_counts": {
+          "A": 1
+        }
+      },
+      "context": {
+        "distractor": "unknown"
+      },
+      "parameters": {
+        "generation_method": "blender_real_background_composite"
+      },
+      "sources": [
+        "replay"
+      ],
+      "conditions": [],
+      "failure_event": "fire_sticker_miss_or_color_confusion"
+    },
+    {
+      "id": "replay_0016",
+      "min_count": 32,
+      "max_count": 32,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "target": {
+        "count": 1,
+        "fire_counts": {
+          "B": 1
+        }
+      },
+      "context": {
+        "distractor": "unknown"
+      },
+      "parameters": {
+        "generation_method": "blender_real_background_composite"
+      },
+      "sources": [
+        "replay"
+      ],
+      "conditions": [],
+      "failure_event": "fire_sticker_miss_or_color_confusion"
+    },
+    {
+      "id": "replay_0017",
+      "min_count": 32,
+      "max_count": 32,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "target": {
+        "count": 1,
+        "fire_counts": {
+          "C": 1
+        }
+      },
+      "context": {
+        "distractor": "unknown"
+      },
+      "parameters": {
+        "generation_method": "blender_real_background_composite"
+      },
+      "sources": [
+        "replay"
+      ],
+      "conditions": [],
+      "failure_event": "fire_sticker_miss_or_color_confusion"
+    },
+    {
+      "id": "replay_0018",
+      "min_count": 32,
+      "max_count": 32,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "target": {
+        "count": 3,
+        "fire_counts": {
+          "A": 3
+        }
+      },
+      "context": {
+        "distractor": "unknown"
+      },
+      "parameters": {
+        "generation_method": "blender_real_background_composite"
+      },
+      "sources": [
+        "replay"
+      ],
+      "conditions": [],
+      "failure_event": "fire_sticker_miss_or_color_confusion"
+    },
+    {
+      "id": "replay_0019",
+      "min_count": 32,
+      "max_count": 32,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "target": {
+        "count": 3,
+        "fire_counts": {
+          "B": 3
+        }
+      },
+      "context": {
+        "distractor": "unknown"
+      },
+      "parameters": {
+        "generation_method": "blender_real_background_composite"
+      },
+      "sources": [
+        "replay"
+      ],
+      "conditions": [],
+      "failure_event": "fire_sticker_miss_or_color_confusion"
+    },
+    {
+      "id": "replay_0020",
+      "min_count": 32,
+      "max_count": 32,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "target": {
+        "count": 3,
+        "fire_counts": {
+          "C": 3
+        }
+      },
+      "context": {
+        "distractor": "unknown"
+      },
+      "parameters": {
+        "generation_method": "blender_real_background_composite"
+      },
+      "sources": [
+        "replay"
+      ],
+      "conditions": [],
+      "failure_event": "fire_sticker_miss_or_color_confusion"
+    },
+    {
+      "id": "replay_0021",
+      "min_count": 150,
+      "max_count": 150,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "target": {
+        "count": 0
+      },
+      "context": {
+        "distractor": "other_red_orange_object"
+      },
+      "parameters": {
+        "generation_method": "blender_render"
+      },
+      "sources": [
+        "replay"
+      ],
+      "conditions": [],
+      "failure_event": "fire_sticker_miss_or_color_confusion"
+    },
+    {
+      "id": "replay_0022",
+      "min_count": 150,
+      "max_count": 150,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "target": {
+        "count": 0
+      },
+      "context": {
+        "distractor": "red_orange_bin"
+      },
+      "parameters": {
+        "generation_method": "blender_render"
+      },
+      "sources": [
+        "replay"
+      ],
+      "conditions": [],
+      "failure_event": "fire_sticker_miss_or_color_confusion"
+    },
+    {
+      "id": "replay_0023",
+      "min_count": 150,
+      "max_count": 150,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "target": {
+        "count": 0
+      },
+      "context": {
+        "distractor": "red_signal_lamp"
+      },
+      "parameters": {
+        "generation_method": "blender_render"
+      },
+      "sources": [
+        "replay"
+      ],
+      "conditions": [],
+      "failure_event": "fire_sticker_miss_or_color_confusion"
+    },
+    {
+      "id": "replay_0024",
+      "min_count": 100,
+      "max_count": 100,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "target": {
+        "count": 1,
+        "fire_counts": {
+          "A": 1
+        }
+      },
+      "context": {
+        "distractor": "other_red_orange_object"
+      },
+      "parameters": {
+        "generation_method": "blender_render"
+      },
+      "sources": [
+        "replay"
+      ],
+      "conditions": [],
+      "failure_event": "fire_sticker_miss_or_color_confusion"
+    },
+    {
+      "id": "replay_0025",
+      "min_count": 100,
+      "max_count": 100,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "target": {
+        "count": 1,
+        "fire_counts": {
+          "A": 1
+        }
+      },
+      "context": {
+        "distractor": "red_orange_bin"
+      },
+      "parameters": {
+        "generation_method": "blender_render"
+      },
+      "sources": [
+        "replay"
+      ],
+      "conditions": [],
+      "failure_event": "fire_sticker_miss_or_color_confusion"
+    },
+    {
+      "id": "replay_0026",
+      "min_count": 100,
+      "max_count": 100,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "target": {
+        "count": 1,
+        "fire_counts": {
+          "A": 1
+        }
+      },
+      "context": {
+        "distractor": "red_signal_lamp"
+      },
+      "parameters": {
+        "generation_method": "blender_render"
+      },
+      "sources": [
+        "replay"
+      ],
+      "conditions": [],
+      "failure_event": "fire_sticker_miss_or_color_confusion"
+    },
+    {
+      "id": "replay_0027",
+      "min_count": 20,
+      "max_count": 20,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "target": {
+        "count": 1,
+        "fire_counts": {
+          "A": 1
+        }
+      },
+      "context": {
+        "distractor": "unknown"
+      },
+      "parameters": {
+        "generation_method": "blender_render"
+      },
+      "sources": [
+        "replay"
+      ],
+      "conditions": [],
+      "failure_event": "fire_sticker_miss_or_color_confusion"
+    },
+    {
+      "id": "replay_0028",
+      "min_count": 33,
+      "max_count": 33,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "target": {
+        "count": 1,
+        "fire_counts": {
+          "B": 1
+        }
+      },
+      "context": {
+        "distractor": "unknown"
+      },
+      "parameters": {
+        "generation_method": "blender_render"
+      },
+      "sources": [
+        "replay"
+      ],
+      "conditions": [],
+      "failure_event": "fire_sticker_miss_or_color_confusion"
+    },
+    {
+      "id": "replay_0029",
+      "min_count": 31,
+      "max_count": 31,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "target": {
+        "count": 1,
+        "fire_counts": {
+          "C": 1
+        }
+      },
+      "context": {
+        "distractor": "unknown"
+      },
+      "parameters": {
+        "generation_method": "blender_render"
+      },
+      "sources": [
+        "replay"
+      ],
+      "conditions": [],
+      "failure_event": "fire_sticker_miss_or_color_confusion"
+    },
+    {
+      "id": "replay_0030",
+      "min_count": 29,
+      "max_count": 29,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "target": {
+        "count": 2,
+        "fire_counts": {
+          "A": 2
+        }
+      },
+      "context": {
+        "distractor": "unknown"
+      },
+      "parameters": {
+        "generation_method": "blender_render"
+      },
+      "sources": [
+        "replay"
+      ],
+      "conditions": [],
+      "failure_event": "fire_sticker_miss_or_color_confusion"
+    },
+    {
+      "id": "replay_0031",
+      "min_count": 29,
+      "max_count": 29,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "target": {
+        "count": 2,
+        "fire_counts": {
+          "B": 2
+        }
+      },
+      "context": {
+        "distractor": "unknown"
+      },
+      "parameters": {
+        "generation_method": "blender_render"
+      },
+      "sources": [
+        "replay"
+      ],
+      "conditions": [],
+      "failure_event": "fire_sticker_miss_or_color_confusion"
+    },
+    {
+      "id": "replay_0032",
+      "min_count": 100,
+      "max_count": 100,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "target": {
+        "count": 3,
+        "fire_counts": {
+          "A": 3
+        }
+      },
+      "context": {
+        "distractor": "other_red_orange_object"
+      },
+      "parameters": {
+        "generation_method": "blender_render"
+      },
+      "sources": [
+        "replay"
+      ],
+      "conditions": [],
+      "failure_event": "fire_sticker_miss_or_color_confusion"
+    },
+    {
+      "id": "replay_0033",
+      "min_count": 100,
+      "max_count": 100,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "target": {
+        "count": 3,
+        "fire_counts": {
+          "A": 3
+        }
+      },
+      "context": {
+        "distractor": "red_orange_bin"
+      },
+      "parameters": {
+        "generation_method": "blender_render"
+      },
+      "sources": [
+        "replay"
+      ],
+      "conditions": [],
+      "failure_event": "fire_sticker_miss_or_color_confusion"
+    },
+    {
+      "id": "replay_0034",
+      "min_count": 100,
+      "max_count": 100,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "target": {
+        "count": 3,
+        "fire_counts": {
+          "A": 3
+        }
+      },
+      "context": {
+        "distractor": "red_signal_lamp"
+      },
+      "parameters": {
+        "generation_method": "blender_render"
+      },
+      "sources": [
+        "replay"
+      ],
+      "conditions": [],
+      "failure_event": "fire_sticker_miss_or_color_confusion"
+    },
+    {
+      "id": "replay_0035",
+      "min_count": 6,
+      "max_count": 6,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "target": {
+        "count": 3,
+        "fire_counts": {
+          "A": 3
+        }
+      },
+      "context": {
+        "distractor": "unknown"
+      },
+      "parameters": {
+        "generation_method": "blender_render"
+      },
+      "sources": [
+        "replay"
+      ],
+      "conditions": [],
+      "failure_event": "fire_sticker_miss_or_color_confusion"
+    },
+    {
+      "id": "replay_0036",
+      "min_count": 3,
+      "max_count": 3,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "target": {
+        "count": 3,
+        "fire_counts": {
+          "B": 1,
+          "C": 2
+        }
+      },
+      "context": {
+        "distractor": "unknown"
+      },
+      "parameters": {
+        "generation_method": "blender_render"
+      },
+      "sources": [
+        "replay"
+      ],
+      "conditions": [],
+      "failure_event": "fire_sticker_miss_or_color_confusion"
+    },
+    {
+      "id": "replay_0037",
+      "min_count": 2,
+      "max_count": 2,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "target": {
+        "count": 3,
+        "fire_counts": {
+          "B": 2,
+          "C": 1
+        }
+      },
+      "context": {
+        "distractor": "unknown"
+      },
+      "parameters": {
+        "generation_method": "blender_render"
+      },
+      "sources": [
+        "replay"
+      ],
+      "conditions": [],
+      "failure_event": "fire_sticker_miss_or_color_confusion"
+    },
+    {
+      "id": "replay_0038",
+      "min_count": 6,
+      "max_count": 6,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "target": {
+        "count": 3,
+        "fire_counts": {
+          "B": 3
+        }
+      },
+      "context": {
+        "distractor": "unknown"
+      },
+      "parameters": {
+        "generation_method": "blender_render"
+      },
+      "sources": [
+        "replay"
+      ],
+      "conditions": [],
+      "failure_event": "fire_sticker_miss_or_color_confusion"
+    },
+    {
+      "id": "replay_0039",
+      "min_count": 9,
+      "max_count": 9,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "target": {
+        "count": 3,
+        "fire_counts": {
+          "C": 3
+        }
+      },
+      "context": {
+        "distractor": "unknown"
+      },
+      "parameters": {
+        "generation_method": "blender_render"
+      },
+      "sources": [
+        "replay"
+      ],
+      "conditions": [],
+      "failure_event": "fire_sticker_miss_or_color_confusion"
+    },
+    {
+      "id": "replay_0040",
+      "min_count": 18,
+      "max_count": 18,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "target": {
+        "count": 0
+      },
+      "context": {
+        "distractor": "unknown"
+      },
+      "parameters": {
+        "generation_method": "direct_real"
+      },
+      "sources": [
+        "replay"
+      ],
+      "conditions": [],
+      "failure_event": "fire_sticker_miss_or_color_confusion"
+    },
+    {
+      "id": "replay_0041",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "target": {
+        "count": 3,
+        "fire_counts": {
+          "B": 3
+        }
+      },
+      "context": {
+        "distractor": "unknown"
+      },
+      "parameters": {
+        "generation_method": "direct_real"
+      },
+      "sources": [
+        "replay"
+      ],
+      "conditions": [],
+      "failure_event": "fire_sticker_miss_or_color_confusion"
+    },
+    {
+      "id": "replay_0042",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "target": {
+        "count": 4,
+        "fire_counts": {
+          "A": 4
+        }
+      },
+      "context": {
+        "distractor": "unknown"
+      },
+      "parameters": {
+        "generation_method": "direct_real"
+      },
+      "sources": [
+        "replay"
+      ],
+      "conditions": [],
+      "failure_event": "fire_sticker_miss_or_color_confusion"
+    },
+    {
+      "id": "replay_0043",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "target": {
+        "count": 4,
+        "fire_counts": {
+          "C": 4
+        }
+      },
+      "context": {
+        "distractor": "unknown"
+      },
+      "parameters": {
+        "generation_method": "direct_real"
+      },
+      "sources": [
+        "replay"
+      ],
+      "conditions": [],
+      "failure_event": "fire_sticker_miss_or_color_confusion"
+    },
+    {
+      "id": "replay_0044",
+      "min_count": 114,
+      "max_count": 114,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "target": {
+        "count": 0
+      },
+      "context": {
+        "distractor": "unknown"
+      },
+      "parameters": {
+        "generation_method": "real_background_composite"
+      },
+      "sources": [
+        "replay"
+      ],
+      "conditions": [],
+      "failure_event": "fire_sticker_miss_or_color_confusion"
+    },
+    {
+      "id": "replay_0045",
+      "min_count": 240,
+      "max_count": 240,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "target": {
+        "count": 1,
+        "fire_counts": {
+          "A": 1
+        }
+      },
+      "context": {
+        "distractor": "unknown"
+      },
+      "parameters": {
+        "generation_method": "real_background_composite"
+      },
+      "sources": [
+        "replay"
+      ],
+      "conditions": [],
+      "failure_event": "fire_sticker_miss_or_color_confusion"
+    },
+    {
+      "id": "replay_0046",
+      "min_count": 240,
+      "max_count": 240,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "target": {
+        "count": 1,
+        "fire_counts": {
+          "B": 1
+        }
+      },
+      "context": {
+        "distractor": "unknown"
+      },
+      "parameters": {
+        "generation_method": "real_background_composite"
+      },
+      "sources": [
+        "replay"
+      ],
+      "conditions": [],
+      "failure_event": "fire_sticker_miss_or_color_confusion"
+    },
+    {
+      "id": "replay_0047",
+      "min_count": 240,
+      "max_count": 240,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "target": {
+        "count": 1,
+        "fire_counts": {
+          "C": 1
+        }
+      },
+      "context": {
+        "distractor": "unknown"
+      },
+      "parameters": {
+        "generation_method": "real_background_composite"
+      },
+      "sources": [
+        "replay"
+      ],
+      "conditions": [],
+      "failure_event": "fire_sticker_miss_or_color_confusion"
+    },
+    {
+      "id": "replay_0048",
+      "min_count": 240,
+      "max_count": 240,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "target": {
+        "count": 3,
+        "fire_counts": {
+          "A": 3
+        }
+      },
+      "context": {
+        "distractor": "unknown"
+      },
+      "parameters": {
+        "generation_method": "real_background_composite"
+      },
+      "sources": [
+        "replay"
+      ],
+      "conditions": [],
+      "failure_event": "fire_sticker_miss_or_color_confusion"
+    },
+    {
+      "id": "replay_0049",
+      "min_count": 239,
+      "max_count": 239,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "target": {
+        "count": 3,
+        "fire_counts": {
+          "B": 3
+        }
+      },
+      "context": {
+        "distractor": "unknown"
+      },
+      "parameters": {
+        "generation_method": "real_background_composite"
+      },
+      "sources": [
+        "replay"
+      ],
+      "conditions": [],
+      "failure_event": "fire_sticker_miss_or_color_confusion"
+    },
+    {
+      "id": "replay_0050",
+      "min_count": 238,
+      "max_count": 238,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "target": {
+        "count": 3,
+        "fire_counts": {
+          "C": 3
+        }
+      },
+      "context": {
+        "distractor": "unknown"
+      },
+      "parameters": {
+        "generation_method": "real_background_composite"
+      },
+      "sources": [
+        "replay"
+      ],
+      "conditions": [],
+      "failure_event": "fire_sticker_miss_or_color_confusion"
+    },
+    {
+      "id": "small_sticker_0051",
+      "min_count": 30,
+      "max_count": 30,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "target": {
+        "count": 1,
+        "fire_counts": {
+          "A": 1
+        }
+      },
+      "context": {
+        "distractor": "unknown"
+      },
+      "parameters": {
+        "generation_method": "real_background_composite"
+      },
+      "sources": [
+        "small_sticker"
+      ],
+      "conditions": [],
+      "failure_event": "fire_sticker_miss_or_color_confusion"
+    },
+    {
+      "id": "small_sticker_0052",
+      "min_count": 30,
+      "max_count": 30,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "target": {
+        "count": 1,
+        "fire_counts": {
+          "B": 1
+        }
+      },
+      "context": {
+        "distractor": "unknown"
+      },
+      "parameters": {
+        "generation_method": "real_background_composite"
+      },
+      "sources": [
+        "small_sticker"
+      ],
+      "conditions": [],
+      "failure_event": "fire_sticker_miss_or_color_confusion"
+    },
+    {
+      "id": "small_sticker_0053",
+      "min_count": 30,
+      "max_count": 30,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "target": {
+        "count": 1,
+        "fire_counts": {
+          "C": 1
+        }
+      },
+      "context": {
+        "distractor": "unknown"
+      },
+      "parameters": {
+        "generation_method": "real_background_composite"
+      },
+      "sources": [
+        "small_sticker"
+      ],
+      "conditions": [],
+      "failure_event": "fire_sticker_miss_or_color_confusion"
+    },
+    {
+      "id": "small_sticker_0054",
+      "min_count": 30,
+      "max_count": 30,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "target": {
+        "count": 3,
+        "fire_counts": {
+          "A": 3
+        }
+      },
+      "context": {
+        "distractor": "unknown"
+      },
+      "parameters": {
+        "generation_method": "real_background_composite"
+      },
+      "sources": [
+        "small_sticker"
+      ],
+      "conditions": [],
+      "failure_event": "fire_sticker_miss_or_color_confusion"
+    },
+    {
+      "id": "small_sticker_0055",
+      "min_count": 30,
+      "max_count": 30,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "target": {
+        "count": 3,
+        "fire_counts": {
+          "B": 3
+        }
+      },
+      "context": {
+        "distractor": "unknown"
+      },
+      "parameters": {
+        "generation_method": "real_background_composite"
+      },
+      "sources": [
+        "small_sticker"
+      ],
+      "conditions": [],
+      "failure_event": "fire_sticker_miss_or_color_confusion"
+    },
+    {
+      "id": "small_sticker_0056",
+      "min_count": 30,
+      "max_count": 30,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "target": {
+        "count": 3,
+        "fire_counts": {
+          "C": 3
+        }
+      },
+      "context": {
+        "distractor": "unknown"
+      },
+      "parameters": {
+        "generation_method": "real_background_composite"
+      },
+      "sources": [
+        "small_sticker"
+      ],
+      "conditions": [],
+      "failure_event": "fire_sticker_miss_or_color_confusion"
+    }
+  ],
+  "base_source_manifest_sha256": "0d6906bbd9c4d47866198ef3616b9621aba2766090878e5dfe61f8883266bdaf",
+  "initial_weights_sha256": "da6ce0d7589552f0880640f7f7ce5e6c6689423949e6e22939c24612f7154528"
+}

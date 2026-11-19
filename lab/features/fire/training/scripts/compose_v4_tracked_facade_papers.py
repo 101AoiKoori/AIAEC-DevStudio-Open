@@ -7,7 +7,7 @@ synthetic stress sets, not independently collected blind-camera tests.
 """
 
 if __name__ == "__main__":
-    raise SystemExit("Legacy dataset CLI is retired; use datasets/scripts/fire/. Production remains paused.")
+    raise SystemExit("Legacy dataset CLI is retired; use datasets/scripts/fire/.")
 
 import argparse
 import json
@@ -28,8 +28,8 @@ from lab.training_common.production_guard import generation_guard  # noqa: E402
 
 SEQUENCES=ROOT/'datasets/annotated/fire/v4_facade_video_sequences_20261112'
 EXPORTS=ROOT/'datasets/exports/fire'
-FIRE_ICON=ROOT/'datasets/raw/fire/team_assets/image1.png'
-FONT=ROOT/'datasets/assets/blender/fire/blender_buildings_v13/NotoSansSC.ttf'
+FIRE_ICON=ROOT/'Archive/Assets/working_sources/digital/fire/team_assets/image1.png'
+FONT=ROOT/'datasets/raw/building_name_paper/targets/digital/typeface/NotoSansSC.ttf'
 REVIEW=SEQUENCES/'facade_review.json'
 SPECS=(
     {'id':'scene_001','split':'val','anchor':300,'targets':[220,260,300,340,380],

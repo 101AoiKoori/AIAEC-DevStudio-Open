@@ -34,7 +34,7 @@
           {
             "image": "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_004921.png",
             "source_group": "site_capture_20261112_full_scene",
-            "parent_source": "datasets/raw/site_capture_20261112/videos/full_scene.mp4",
+            "parent_source": "Archive/Assets/captures/site_capture_20261112/videos/full_scene.mp4",
             "generation_method": "video_decoded_area_downscale",
             "image_size": [
               640,
@@ -43,7 +43,15 @@
             "coverage": "complete_candidate",
             "coverage_evidence": "datasets/annotated/site_capture_20261112/fire_name_v4_review/review_manifest.json#images[5].tasks.building_name_paper",
             "existing_papers": [],
-            "regions": []
+            "regions": [],
+            "source_review": {
+              "role": "empty_negative",
+              "frame_id": "16cfa63922d2385e3254c82f1e13055ad4ef538e0e171eeb8d2f4d5188009970",
+              "record_id": "4415bee49471fe039e1325b2ab1622bd5887e46729f20f7d8b6af7cfcd847467",
+              "evidence_ids": [
+                "ef8e8fd0f1ea462089308213c5e9b2ea363da579a31aa7abce2e669f9bd2f3b1"
+              ]
+            }
           }
         ]
       },
@@ -90,7 +98,7 @@
           {
             "image": "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_002701.png",
             "source_group": "site_capture_20261112_full_scene",
-            "parent_source": "datasets/raw/site_capture_20261112/videos/full_scene.mp4",
+            "parent_source": "Archive/Assets/captures/site_capture_20261112/videos/full_scene.mp4",
             "generation_method": "video_decoded_area_downscale",
             "image_size": [
               640,
@@ -99,7 +107,15 @@
             "coverage": "complete_candidate",
             "coverage_evidence": "datasets/annotated/site_capture_20261112/fire_name_v4_review/review_manifest.json#images[2].tasks.building_name_paper",
             "existing_papers": [],
-            "regions": []
+            "regions": [],
+            "source_review": {
+              "role": "empty_negative",
+              "frame_id": "b5368c01fb638c3570fe350d9bc5776ace4f2e0736ef629c4b9fce81044ee113",
+              "record_id": "1215c50f070091edccb2b92c98295b9175aa875edddb6cf39dda91bc748d03c7",
+              "evidence_ids": [
+                "f6ad45a5f9d8f0d4fa79fe74fd870e599b0880cde6bc56c62d8a6bb2ad8166ee"
+              ]
+            }
           }
         ]
       },
@@ -146,7 +162,7 @@
           {
             "image": "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_005101.png",
             "source_group": "site_capture_20261112_full_scene",
-            "parent_source": "datasets/raw/site_capture_20261112/videos/full_scene.mp4",
+            "parent_source": "Archive/Assets/captures/site_capture_20261112/videos/full_scene.mp4",
             "generation_method": "video_decoded_area_downscale",
             "image_size": [
               640,
@@ -168,7 +184,15 @@
                 "evidence": "datasets/annotated/site_capture_20261112/fire_name_v4_review/review_manifest.json#images[6].tasks.building_name_paper"
               }
             ],
-            "regions": []
+            "regions": [],
+            "source_review": {
+              "role": "direct_target",
+              "frame_id": "9b4af4b725188adaf5bbc008a9e5908bd904e7b6d48780371d5d02d0a0624be9",
+              "record_id": "fc26d50958e87ea6a8fe3320599c66331e23fa0de2d2ed6a49a1685fc598e7ab",
+              "evidence_ids": [
+                "c741e967c3ae6a6d934fdb1f99e3e2831e1ed0f9221e2b22a94cec68917a497d"
+              ]
+            }
           }
         ]
       },
@@ -215,7 +239,7 @@
           {
             "image": "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_002551.png",
             "source_group": "site_capture_20261112_full_scene",
-            "parent_source": "datasets/raw/site_capture_20261112/videos/full_scene.mp4",
+            "parent_source": "Archive/Assets/captures/site_capture_20261112/videos/full_scene.mp4",
             "generation_method": "video_decoded_area_downscale",
             "image_size": [
               640,
@@ -224,7 +248,15 @@
             "coverage": "complete_candidate",
             "coverage_evidence": "datasets/annotated/site_capture_20261112/fire_name_v4_review/review_manifest.json#images[1].tasks.building_name_paper",
             "existing_papers": [],
-            "regions": []
+            "regions": [],
+            "source_review": {
+              "role": "empty_negative",
+              "frame_id": "d74645d8475283fc46e2bb638de562425e123296162cb01917f7b32526b6990f",
+              "record_id": "5416751072b8747cb1252175a3b24dfc23cf0791b097dc6214aaeee9737a5479",
+              "evidence_ids": [
+                "15e2b085c64deb2331d2b83806bfcd985c8a3faf186c69a4b7ed5e7831b39780"
+              ]
+            }
           }
         ]
       },
@@ -271,7 +303,7 @@
           {
             "image": "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_003391.png",
             "source_group": "site_capture_20261112_full_scene",
-            "parent_source": "datasets/raw/site_capture_20261112/videos/full_scene.mp4",
+            "parent_source": "Archive/Assets/captures/site_capture_20261112/videos/full_scene.mp4",
             "generation_method": "video_decoded_area_downscale",
             "image_size": [
               640,
@@ -293,7 +325,15 @@
                 "evidence": "datasets/annotated/site_capture_20261112/fire_name_v4_review/review_manifest.json#images[4].tasks.building_name_paper"
               }
             ],
-            "regions": []
+            "regions": [],
+            "source_review": {
+              "role": "direct_target",
+              "frame_id": "63536c767c6ee6e78db2fae6c4cd1e71860f514c08005875a039c55eb0afd453",
+              "record_id": "6116a2f08d5d371e2497e5c9f8d1c60a938f8c564811bcaa2c10aa0116947b81",
+              "evidence_ids": [
+                "06ca0d39b0c43edf79a7df7ff1d61ad2ef916031670ba9d4e23a3a8c145e453c"
+              ]
+            }
           }
         ]
       },
@@ -340,7 +380,7 @@
           {
             "image": "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_005101.png",
             "source_group": "site_capture_20261112_full_scene",
-            "parent_source": "datasets/raw/site_capture_20261112/videos/full_scene.mp4",
+            "parent_source": "Archive/Assets/captures/site_capture_20261112/videos/full_scene.mp4",
             "generation_method": "video_decoded_area_downscale",
             "image_size": [
               640,
@@ -387,7 +427,16 @@
                 "evidence": "datasets/annotated/site_capture_20261112/fire_name_v4_review/review_manifest.json#images[6].tasks.building_name_paper",
                 "replacement_of": "frame_005101_paper_0"
               }
-            ]
+            ],
+            "source_review": {
+              "role": "composite_background",
+              "frame_id": "9b4af4b725188adaf5bbc008a9e5908bd904e7b6d48780371d5d02d0a0624be9",
+              "record_id": "9b7a695e660c3899b09e2a57d813218a20c1e63caec7ff8b3a97ece0c94df208",
+              "evidence_ids": [
+                "d5c1b4e9523b25cc2bf643085f721ed3a0434db40ac390e51137ddccf065d7d9",
+                "c5cb190979223b26852f759f00bb6cc706cac06e6f397caf4e228ef10df2b57b"
+              ]
+            }
           }
         ]
       },
@@ -439,7 +488,7 @@
           {
             "image": "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_003391.png",
             "source_group": "site_capture_20261112_full_scene",
-            "parent_source": "datasets/raw/site_capture_20261112/videos/full_scene.mp4",
+            "parent_source": "Archive/Assets/captures/site_capture_20261112/videos/full_scene.mp4",
             "generation_method": "video_decoded_area_downscale",
             "image_size": [
               640,
@@ -486,7 +535,16 @@
                 "evidence": "datasets/annotated/site_capture_20261112/fire_name_v4_review/review_manifest.json#images[4].tasks.building_name_paper",
                 "replacement_of": "frame_003391_paper_0"
               }
-            ]
+            ],
+            "source_review": {
+              "role": "composite_background",
+              "frame_id": "63536c767c6ee6e78db2fae6c4cd1e71860f514c08005875a039c55eb0afd453",
+              "record_id": "0bdfd466a3ca7a800b2afeeb2e0ad3bcbf9fa4174bf9d4d45ce1d6174371a64e",
+              "evidence_ids": [
+                "849c0e01db5ffb7779b0a11bc08dd8297e72206faf20f32cf6d9a9fe126d162a",
+                "d056b2e2842a85e26fa46f8460fd1db6ef4029a7b4819cc14cd2e5743fac6add"
+              ]
+            }
           }
         ]
       },
@@ -532,7 +590,6 @@
   },
   "execution": {
     "entry": "datasets/scripts/building_name_paper/compose_rooftop_papers.py",
-    "output": "datasets/exports/building_name_paper/train",
-    "production_paused": true
+    "output": "datasets/exports/building_name_paper/train"
   }
 }

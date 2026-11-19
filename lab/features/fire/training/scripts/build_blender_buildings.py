@@ -4,7 +4,7 @@ Run from the workspace root with Blender 5.2::
 
     blender --background --factory-startup --python-exit-code 1 \
       --python lab/features/fire/training/scripts/build_blender_buildings.py -- \
-      --font datasets/assets/blender/fire/blender_buildings_v13/NotoSansSC.ttf \
+      --font datasets/raw/building_name_paper/targets/digital/typeface/NotoSansSC.ttf \
       --output datasets/assets/blender/fire/blender_buildings_new --seed 431
 
 Physical dimensions are estimates derived from photographs and the user's
@@ -427,7 +427,7 @@ def fire_stickers(coll, x, front_y, shell_factor, material, rng):
         paper_y=front_y-.00093*shell_factor-.00008
         obj=paper_mesh('Fire paper %02d'%index,coll,material,x+xx,paper_y,zz,.025,.035,
                        rng.uniform(.00040,.00070))
-        obj['source_art']='datasets/raw/fire/team_assets/image1.png'
+        obj['source_art']='Archive/Assets/working_sources/digital/fire/team_assets/image1.png'
         obj['placement']='illustrative; glue fixed, no visible adhesive'
 
 
@@ -438,7 +438,7 @@ def add_light(name, energy, size, location, target):
 
 
 def _produce(args):
-    artwork=ROOT/'datasets/raw/fire/team_assets/image1.png'
+    artwork=ROOT/'Archive/Assets/working_sources/digital/fire/team_assets/image1.png'
     if not artwork.is_file():
         raise FileNotFoundError('fire image missing')
     args.output.mkdir(parents=True,exist_ok=False)
@@ -568,7 +568,7 @@ def _produce(args):
 
 def main():
     args = parse_args()
-    artwork = ROOT / 'datasets/raw/fire/team_assets/image1.png'
+    artwork = ROOT / 'Archive/Assets/working_sources/digital/fire/team_assets/image1.png'
     procedural = [args.font, args.font.parent / 'OFL.txt']
     with generation_guard(
         'fire.build_blender_buildings:' + args.output.relative_to(ROOT).as_posix(),

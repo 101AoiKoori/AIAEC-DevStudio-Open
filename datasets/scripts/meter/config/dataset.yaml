@@ -1,11 +1,13 @@
 task: meter
-status: canonical_entry_sources_connected_production_paused
+status: full_working_dataset_complete
 allocation: {required: true, engine: datasets/scripts/common/bayesian.py, weights: per_plan_design_assumptions}
 goal: 定位双针温湿度表盘并标注可辨的八个关键点，反光时仍定位可辨表盘。
 states: [无表, 单表, 双针位置, 距离, 轻偏航, 明暗, 饱和度, 反光, 遮挡]
-train_target_images: 3500
+train_target_images: 6480
+full_design: config/full_train_allocation.yaml
 source_mix_initial: {direct_real: 0.10, real_background_composite: 0.40, blender_background: 0.50}
 source_config: config/source.yaml
 sample_output: datasets/samples/meter
 dataset_output: datasets/exports/meter
+actual_manifest: datasets/exports/meter/manifest.json
 design_reference: docs/DATASET_DESIGN.md

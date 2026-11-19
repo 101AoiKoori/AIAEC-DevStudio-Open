@@ -1,0 +1,24 @@
+# Shared Windows launcher defaults. The model's training YAML sets the epoch budget.
+wall_seconds: null  # Set a positive number before starting. Resume can reuse the previous limit.
+tensorboard: true
+open_browser: true
+port: 0  # Pick a free localhost port.
+keep_tensorboard_open: true  # Wait for Enter on successful completion.
+
+# Optional workspace overrides keyed by the PS1 task name. Values use the keys above.
+# train_config may point to an approved training YAML relative to the workspace.
+tasks:
+  meter:
+    wall_seconds: 36000
+  fire:
+    wall_seconds: 36000
+  building_name_paper:
+    wall_seconds: 36000
+  sign:
+    wall_seconds: 36000
+  waste_bin_state:
+    wall_seconds: 7200  # Same ceiling as the previous local bin fine-tune.
+    train_config: lab/features/waste_bin/training/config/waste_bin_state_reshoot_finetune_v4.yaml
+  waste_sticker:
+    wall_seconds: 36000
+    train_config: lab/features/waste_bin/training/config/waste_sticker_white_stripe_finetune_v4.yaml

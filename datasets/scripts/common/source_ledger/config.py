@@ -11,14 +11,13 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Any, Iterable, Mapping
 
+from ..background_pool import LEGACY_POOL, POOL_MANIFEST, POOL_ROOT
 from ..config import read_yaml
 from ..paths import TASKS
 from .schema import DataSource, ParentGroup
 
-SHARED_POOL_MANIFEST = (
-    "datasets/annotated/mixed_scene/v4_compositing_backgrounds_20261113/manifest.json"
-)
-SHARED_POOL_PREFIX = "datasets/annotated/mixed_scene/v4_compositing_backgrounds_20261113"
+SHARED_POOL_MANIFEST = POOL_MANIFEST
+SHARED_POOL_PREFIXES = (POOL_ROOT, str(Path(LEGACY_POOL).parent.as_posix()))
 BLENDER_REGISTRY = "datasets/blender_source_registry.sqlite3"
 DEFAULT_TASKS = tuple(sorted(TASKS))
 
@@ -39,6 +38,13 @@ def load_source_config(root: Path, task: str) -> dict[str, Any]:
 
 def normalize_path(value: str) -> str:
     return str(value).replace("\\", "/").strip().rstrip("/")
+
+
+def is_shared_pool_path(path: str) -> bool:
+    lower = normalize_path(path).casefold()
+    return (lower == SHARED_POOL_MANIFEST.casefold()
+            or any(lower == prefix.casefold() or lower.startswith(prefix.casefold() + "/")
+                   for prefix in SHARED_POOL_PREFIXES))
 
 
 def is_workspace_path(value: str) -> bool:
@@ -82,9 +88,7 @@ def classify_reference(key_path: tuple[str, ...], path: str) -> str:
         return "blender_backup"
     if lower.endswith(".blend"):
         return "blender_scene"
-    if lower == SHARED_POOL_MANIFEST.casefold() or lower.startswith(
-        SHARED_POOL_PREFIX.casefold() + "/"
-    ):
+    if is_shared_pool_path(path):
         return "shared_pool"
     if "shared_background" in key:
         return "shared_pool"
@@ -310,7 +314,7 @@ def shared_pool_references(
     found: dict[tuple[str, str], dict[str, Any]] = {}
     for group in groups:
         for path in group.paths:
-            if path == SHARED_POOL_MANIFEST or path.startswith(SHARED_POOL_PREFIX + "/"):
+            if is_shared_pool_path(path):
                 found[(group.group_id, path)] = {
                     "origin": "pairing",
                     "group": group.group_id,
@@ -318,10 +322,7 @@ def shared_pool_references(
                 }
         for evidence in group.evidence:
             manifest = evidence.get("manifest")
-            if isinstance(manifest, str) and (
-                normalize_path(manifest) == SHARED_POOL_MANIFEST
-                or normalize_path(manifest).startswith(SHARED_POOL_PREFIX + "/")
-            ):
+            if isinstance(manifest, str) and is_shared_pool_path(manifest):
                 found[(group.group_id, normalize_path(manifest))] = {
                     "origin": "pairing",
                     "group": group.group_id,
@@ -338,7 +339,7 @@ def shared_pool_references(
         }
     for item in selections:
         path = item.get("path", "")
-        if path == SHARED_POOL_MANIFEST or path.startswith(SHARED_POOL_PREFIX + "/"):
+        if is_shared_pool_path(path):
             found[("selection", path)] = {
                 "origin": "selection",
                 "group": None,

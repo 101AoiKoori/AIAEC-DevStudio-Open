@@ -35,6 +35,12 @@ def fixture():
 
 
 class GroundPlanTest(unittest.TestCase):
+    def test_design_reference_does_not_prevent_valid_plan_execution(self):
+        plan, _, bg, vehicles = fixture()
+        plan['design_context'] = {'task': 'e_bike', 'coverage': 'unverified', 'executable': False}
+        with mock.patch.object(entry, 'source_role', return_value=('train', None)):
+            entry.validate_ground_plan(plan, [bg], vehicles, {})
+
     def test_declared_source_and_layout_drive_image_and_label(self):
         plan, state, bg, vehicles = fixture()
         with mock.patch.object(entry, 'source_role', return_value=('train', None)), \
@@ -48,11 +54,26 @@ class GroundPlanTest(unittest.TestCase):
         self.assertEqual(len(masks), 1)
         self.assertEqual(objects[0]['foot_xy'], [320, 400])
 
+    def test_complete_existing_vehicle_is_retained_only_when_new_actor_is_disjoint(self):
+        _, state, bg, vehicles = fixture()
+        review = {'label': {'presence': 'present', 'instances': [
+            {'class_id': 1, 'xyxy': [40, 40, 80, 80], 'object_id': 'bike-existing'}]}}
+        bg['_frame_reviews'] = {'composite_background': review}
+        with mock.patch.object(entry, 'read_image', return_value=np.full((480, 640, 3), 120, np.uint8)), \
+             mock.patch.object(entry, 'recorded_ground_contact', return_value='candidate'):
+            _, objects, masks, _ = entry.render_ground_state(state, [bg], vehicles)
+            self.assertEqual([obj['class'] for obj in objects], ['upright', 'fallen'])
+            self.assertEqual(objects[1]['object_id'], 'bike-existing')
+            self.assertIsNone(masks[1])
+            review['label']['instances'][0]['xyxy'] = [310, 350, 330, 390]
+            with self.assertRaisesRegex(ValueError, 'obscures a labelled background vehicle'):
+                entry.render_ground_state(state, [bg], vehicles)
+
     def test_unsupported_targets_and_duplicate_states_fail(self):
         plan, state, bg, vehicles = fixture()
         with mock.patch.object(entry, 'source_role', return_value=('train', None)):
-            state['target']['vehicles'] *= 8
-            with self.assertRaisesRegex(ValueError, 'zero to seven'):
+            state['target']['vehicles'] *= 13
+            with self.assertRaisesRegex(ValueError, 'zero to twelve'):
                 entry.validate_ground_plan(plan, [bg], vehicles, {})
             state['target']['vehicles'] = state['target']['vehicles'][:1]
             state['max_count'] = 2

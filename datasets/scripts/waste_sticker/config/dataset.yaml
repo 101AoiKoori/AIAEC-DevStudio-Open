@@ -1,12 +1,15 @@
 task: waste_sticker
-status: canonical_entry_sources_connected_production_paused
+status: canonical_entry_sources_connected
 allocation: {required: true, engine: datasets/scripts/common/bayesian.py, weights: per_plan_design_assumptions}
-goal: 识别24类物品贴纸并关联垃圾桶；投放正确性由后处理判断。
-states: [24类均衡, 四色桶, 桶位, 开闭, 单桶, 多桶, 偏航, 明暗, 饱和度, 反光, 遮挡]
-train_target_images: 7200
-source_mix_initial: {direct_real: 0.10, real_background_composite: 0.40, blender_background: 0.50}
+goal: 识别并定位 24 类物品贴纸。现场投放判定由下游关联贴纸和桶，并根据桶类与物品集合计算。
+states: [24类按有效实例均衡, 0至4张可见贴纸, 1至4个可见桶且每桶至多一贴, 载体, 背景, 面内位置, 面内旋转, 尺度, 正斜视角, 明暗, 部分遮挡]
+train_target_images: 1800
+# 旧 0/30/70 仅用于兼容历史设计与读取方；当前编批不以此限制实拍目标。
+source_mix_initial: {direct_real: 0.00, real_background_composite: 0.30, blender_background: 0.70}
+source_mix_initial_status: historical_reference
+source_mix_policy: 纳入可用直接实拍目标并结合合成，实际比例随当批选源和计划确定；直接实拍不足不阻止可行合成。
 source_config: config/source.yaml
-placement: 按实拍参考桶面比例放置，避免遮挡桶身固有分类标志。
+placement: 桶面合成按可贴区域与车载低机位透视放置，核对贴纸可见范围及桶身固有分类标志。机位沿用统一工程已存车辆视角，整桶叠入实拍底图时先匹配低机位。
 sample_output: datasets/samples/waste_sticker
 dataset_output: datasets/exports/waste_sticker
 design_reference: docs/DATASET_DESIGN.md

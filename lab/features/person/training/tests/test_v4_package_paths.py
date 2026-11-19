@@ -11,7 +11,7 @@ import yaml
 ROOT = Path(__file__).resolve().parents[5]
 CASES = (
     ('e_bike', 'e_bike'), ('fire', 'fire_sticker'),
-    ('meter', 'meter'), ('plate', 'plate_detection'),
+    ('meter', 'meter'), ('plate', 'plate_detection'), ('person', 'person'),
 )
 
 
@@ -47,6 +47,12 @@ class PackagePathTests(unittest.TestCase):
                     self.assertIn('missing-' + model + '.pt', result.stderr)
                     self.assertIn(str(package), result.stderr)
                     self.assertNotIn('config/train.yaml\'', result.stderr)
+                    if model == 'person':
+                        shutil.copy2(source, launcher)
+                        result = subprocess.run([sys.executable, '-I', str(launcher), 'check'], cwd=ROOT,
+                                                capture_output=True, text=True, encoding='utf-8', errors='replace')
+                        self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
+                        self.assertIn(str(package / 'weights/missing-person.pt'), result.stderr)
 
 
 if __name__ == '__main__':

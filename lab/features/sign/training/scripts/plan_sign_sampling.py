@@ -11,7 +11,7 @@ import compose_sign_scene as scene
 import compose_sign_v4_measured as measured
 
 ROOT = scene.ROOT
-SCENE_VIDEO = 'datasets/raw/site_archive_legacy/场景/综合视频/空场与场景物料_001.mp4'
+SCENE_VIDEO = 'Archive/Assets/working_sources/legacy/site/场景/综合视频/空场与场景物料_001.mp4'
 VIEWS = list(measured.VIEWS)
 MODES = ('far_full', 'mid_full', 'near_full', 'top_clipped', 'bottom_clipped')
 

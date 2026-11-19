@@ -1,7 +1,7 @@
 """Reference-based indoor lighting and backdrop for the power meter preview."""
 
 if __name__ == "__main__":
-    raise SystemExit("Task helper is import-only; use the primary entry in datasets/scripts/meter/. Production remains paused.")
+    raise SystemExit("Task helper is import-only; use the primary entry in datasets/scripts/meter/.")
 
 
 from array import array

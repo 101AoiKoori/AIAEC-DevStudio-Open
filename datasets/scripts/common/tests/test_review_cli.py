@@ -9,7 +9,7 @@ from types import SimpleNamespace
 from unittest import mock
 
 from datasets.scripts.common.review import cli, evidence
-from datasets.scripts.common.review.schema import FrameRef, MetricRecord, Verdict
+from datasets.scripts.common.review.schema import EmptinessReport, FrameRef, GroundObservation, MetricRecord, Verdict
 
 
 def write_review_plan(tmp, task="person", batch="unit_batch"):
@@ -122,13 +122,17 @@ class AnalyzeRecordTest(unittest.TestCase):
         import cv2
         import numpy as np
 
-        from datasets.scripts.common.review.schema import EmptinessReport, GroundObservation
-
         with TemporaryDirectory() as tmp:
             tmp = Path(tmp)
             image_path = tmp / "frame.png"
             cv2.imwrite(str(image_path), np.zeros((60, 80, 3), np.uint8))
             config = write_review_plan(tmp)
+            plan = evidence.read_json(config)
+            plan["emptiness"] = {
+                "reference_frame_height": 30,
+                "spec": {"min_height_fraction": 0.28, "below_min_scale": "suspect"},
+            }
+            evidence.write_json(config, plan)
             batch = tmp / "batch"
             batch.mkdir()
             frame = {
@@ -144,8 +148,10 @@ class AnalyzeRecordTest(unittest.TestCase):
                 return GroundObservation(ok=True, polygon=[[1, 1], [70, 1], [70, 50], [1, 50]],
                                          foot_xy=[30, 40])
 
-            def fake_emptiness(image, *, boxes, templates_bgr, params=None):
+            def fake_emptiness(image, *, boxes, templates_bgr, params=None, spec=None):
                 seen["boxes"] = list(boxes)
+                seen["params"] = params
+                seen["spec"] = spec
                 return EmptinessReport(clean=False, suspects=[{"xyxy": [2, 2, 8, 8], "score": 0.9}])
 
             output = io.StringIO()
@@ -158,10 +164,17 @@ class AnalyzeRecordTest(unittest.TestCase):
                 code = cli.main(["analyze", "--task", "person", "--overlay"])
             self.assertEqual(code, 0)
             self.assertEqual([box.class_name for box in seen["boxes"]], ["community"])
+            self.assertEqual(seen["spec"], {"min_height_fraction": 0.28, "below_min_scale": "suspect"})
+            self.assertEqual(seen["params"]["scales"][:3], (0.4, 0.6, 0.9))
             header, rows = evidence.read_metrics(batch / "metrics.jsonl")
             self.assertEqual(len(rows), 1)
             self.assertEqual(rows[0]["extra"]["parent_link_verified"], False)
             self.assertEqual(rows[0]["extra"]["image_shape"], [60, 80])
+            self.assertEqual(rows[0]["extra"]["existing_targets"], [{
+                "class_name": "community", "xyxy": [1, 2, 3, 4], "physical_instance_id": None,
+            }])
+            self.assertEqual(rows[0]["extra"]["emptiness_search"]["scales"], list(seen["params"]["scales"]))
+            self.assertEqual(rows[0]["extra"]["emptiness_search"]["reference_frame_height"], 30)
             manifest = evidence.read_json(batch / "manifest.json")
             self.assertEqual(manifest["templates"]["loaded"], 0)
             self.assertEqual(len(list((batch / "overlays").glob("*.png"))), 1)
@@ -319,6 +332,83 @@ class ReportCommandTest(unittest.TestCase):
 
 
 class ApplyCommandTest(unittest.TestCase):
+    def test_new_machine_observation_updates_background_with_uncertain_placement(self):
+        import cv2
+        import numpy as np
+
+        from datasets.scripts.person import compile_background_dispatch as dispatch
+
+        with TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            config = write_review_plan(root)
+            plan = evidence.read_json(config)
+            plan["placement"] = {"required": True}
+            evidence.write_json(config, plan)
+            batch = root / "batch"
+            selection = root / "review_selection.json"
+            task_plan = root / "production_plan.json"
+            source = root / "source.yaml"
+            output = root / "background_dispatch.json"
+            image = np.zeros((60, 80, 3), np.uint8)
+            polygon = [[5, 20], [75, 20], [75, 57], [5, 57]]
+            patch = [[12, 28], [68, 28], [78, 55], [2, 55]]
+            existing_box = {"class_name": "community", "xyxy": [4, 15, 12, 45]}
+            paths = ("frame.png", "known_label.png", "new_suspect.png", "old_measurement.png")
+            source_rows = []
+            measures = []
+            for path in paths:
+                self.assertTrue(cv2.imwrite(str(root / path), image))
+                source_rows.append({
+                    "image": path, "split": "val", "source_group": "held_out",
+                    "state": "candidate_complete_negative" if path == "new_suspect.png" else "unknown",
+                    "semantic_status": "unknown",
+                    "boxes": [existing_box] if path == "known_label.png" else [],
+                })
+                suspects = [{"xyxy": [4, 15, 12, 45], "score": 0.85}] if path == "new_suspect.png" else []
+                extra = {"image_shape": [60, 80]}
+                if path != "old_measurement.png":
+                    extra["emptiness_search"] = {"reference_frame_height": 360}
+                measures.append(MetricRecord(
+                    frame=FrameRef(path=path, source_group="observed"),
+                    task="person",
+                    ground=GroundObservation(ok=True, polygon=polygon, placement_patch=patch, foot_xy=[39, 47]),
+                    emptiness=EmptinessReport(clean=not suspects, suspects=suspects),
+                    extra=extra, code_hash="new_measurement",
+                ))
+            evidence.write_metrics(batch / "metrics.jsonl", measures, task="person")
+            evidence.write_json(selection, {"batch": "unit_batch", "records": [{
+                "frame": {"path": paths[0]}, "verdict": "unknown",
+                "evidence": {"automatic_empty_observation": {"clean": False}},
+            }]})
+            evidence.write_json(task_plan, {"model_key": "person", "target_split": "train", "strata": [{}]})
+            evidence.write_json(output, {"split_assignment": "source_pairing", "records": source_rows})
+            source.write_text("roles:\n  reviewed_background: existing.json\n", encoding="utf-8")
+
+            with mock.patch.object(cli, "review_plan_path", return_value=config), \
+                    mock.patch.object(cli, "batch_dir", return_value=batch), \
+                    mock.patch.object(cli, "default_selection_path", return_value=selection), \
+                    redirect_stdout(io.StringIO()):
+                self.assertEqual(cli.main(["apply", "--task", "person"]), 0)
+            reviewed = evidence.read_json(selection)["records"][0]
+            self.assertEqual(reviewed["reason_codes"], ["placement_patch_unsure"])
+            self.assertTrue(reviewed["evidence"]["automatic_empty_observation"]["clean"])
+            self.assertEqual(reviewed["evidence"]["measured_placement_patch"], patch)
+
+            with mock.patch.multiple(dispatch, ROOT=root, SELECTION=selection, PLAN=task_plan,
+                                     SOURCE=source, DISPATCH=output):
+                dispatch.compile_dispatch(update_plan=False)
+            updated, untouched, contradicted, old_only = evidence.read_json(output)["records"]
+            self.assertEqual(updated["state"], "candidate_complete_negative")
+            self.assertEqual(updated["semantic_status"], "auto_candidate_complete_negative")
+            self.assertEqual(updated["review_verdict"], "unknown")
+            self.assertEqual(updated["automatic_observation_code_hash"], "new_measurement")
+            self.assertIsNone(updated["accepted_by"])
+            self.assertEqual((updated["split"], updated["source_group"]), ("val", "held_out"))
+            self.assertEqual(untouched, source_rows[1])
+            self.assertEqual(contradicted["state"], "unknown")
+            self.assertEqual(contradicted["review_reason_codes"], ["unlabelled_target_suspected"])
+            self.assertEqual(old_only, source_rows[3])
+
     def test_apply_preserves_same_batch_acceptance(self):
         with TemporaryDirectory() as tmp:
             config = write_review_plan(tmp)
@@ -345,6 +435,36 @@ class ApplyCommandTest(unittest.TestCase):
             actual = evidence.read_json(selection)["records"][0]
             self.assertEqual(actual["accepted_by"], "reviewer")
             self.assertEqual(actual["evidence"]["acceptance_scope"], "verdict")
+
+    def test_apply_keeps_changed_verdict_acceptance_as_history(self):
+        with TemporaryDirectory() as tmp:
+            config = write_review_plan(tmp)
+            batch = Path(tmp) / "batch"
+            record = MetricRecord(frame=FrameRef(path="frames/a.png"), task="person")
+            evidence.write_metrics(batch / "metrics.jsonl", [record], task="person")
+            selection = Path(tmp) / "review_selection.json"
+            untouched = {"frame": {"path": "frames/b.png"}, "verdict": "ready", "accepted_by": "reviewer"}
+            evidence.write_json(selection, {"batch": "unit_batch", "records": [{
+                "frame": {"path": "frames/a.png"}, "verdict": "ready", "accepted_by": "reviewer",
+                "evidence": {"acceptance_scope": "placement", "parent_relation_verified_by": "owner"},
+            }, untouched], "previous_batches": [{"batch": "earlier"}]})
+            with mock.patch.object(cli, "review_plan_path", return_value=config), \
+                    mock.patch.object(cli, "batch_dir", return_value=batch), \
+                    mock.patch.object(cli, "default_selection_path", return_value=selection), \
+                    redirect_stdout(io.StringIO()):
+                for _ in range(2):
+                    self.assertEqual(cli.main(["apply", "--task", "person"]), 0)
+            result = evidence.read_json(selection)
+            changed, remaining = result["records"]
+            self.assertEqual(changed["verdict"], "unknown")
+            self.assertIsNone(changed["accepted_by"])
+            self.assertNotIn("acceptance_scope", changed["evidence"])
+            self.assertEqual(changed["evidence"]["previous_acceptances"], [{
+                "verdict": "ready", "accepted_by": "reviewer", "acceptance_scope": "placement",
+            }])
+            self.assertEqual(changed["evidence"]["parent_relation_verified_by"], "owner")
+            self.assertEqual(remaining, untouched)
+            self.assertEqual(result["previous_batches"], [{"batch": "earlier"}])
 
     def test_dry_run_uses_judge_without_writing_selection(self):
         with TemporaryDirectory() as tmp:

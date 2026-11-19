@@ -1,0 +1,141 @@
+version: 1
+task: person
+purpose: 小样问题和改进记录，供生成器与下一轮工作直接使用。机器观察、用户反馈分别记录。
+rounds:
+- id: person_sample_20261116_72
+  sample_path: datasets/samples/person
+  image_count: 72
+  source: 现有样本清单及本次对话
+  issues:
+  - id: person_count
+    source: manifest
+    observation: 72 张中 54 张单人、18 张双人，未覆盖 3 至 6 人。
+    next_action: 每张生成 2 至 6 人，按条件组合分配。
+  - id: yaw
+    source: manifest
+    observation: 人物偏航仅 0、-5、5 度，视觉变化较小。
+    next_action: 使用正面或大幅偏航，并记录实际立牌旋转及视面。
+  - id: lighting
+    source: user_request
+    observation: 应覆盖更暗的比赛环境。
+    next_action: 优先使用 dark、very_dark，保留来源亮度与实际增益。
+  - id: sample_quality
+    source: user_feedback
+    observation: 用户指出本轮小样仍有一些问题，未指定逐图问题。
+    next_action: 依据本轮明确要求更新组合并重做小样。
+  manifest_sha256: d1d05ba2af248c3e1fb1d6089ecae565fe31fd67a93d3204c4f0caf18555574b
+  visual_reference: datasets/annotated/person/sample_feedback/person_sample_20261116_72/contact.png
+- id: person_sample_20261116_100
+  sample_path: datasets/samples/person
+  image_count: 100
+  source: 本轮清单和生成结果
+  manifest_sha256: bcd1474ec89fd31ebdf4efce5c38968bcc7286da397354bbc03121c7ef377231
+  visual_reference: datasets/annotated/person/sample_feedback/person_sample_20261116_100/contact.png
+  observations:
+  - 2 至 6 人各 20 张，使用 21 个背景；偏航为正面或 ±30、±45、±60 度。
+  - 当前偏航是正面平面素材的变换，不是真实人物侧面；后续补充侧面素材。
+  - 16:9 来源等比缩放至 640×360 后填充到 640×480，上下有黑边；并非 720p 输出。
+  - 3 张来自已有 Blender 画面的亮度或饱和度变体，尚未使用新八相机母场景渲染。
+  - 新增 720p 背景的空场状态为 unknown，沿用已有机器几何，未做独立空场确认。
+  - 目视发现部分垃圾桶背景带有未标注人物立牌，已剔除这些背景并重跑。
+  next_action: 根据画面需要直接调整来源和生成配置，使用 --replace 重跑本任务小样；无需另设人工审查前置。
+- id: person_sample_20261116_100_r2
+  sample_path: datasets/samples/person
+  image_count: 100
+  manifest_sha256: d4e90791c4acd3e259230fd6a1cf8a937cf1839859ff8e952e14daec097dcfe1
+  visual_reference: datasets/annotated/person/sample_feedback/person_sample_20261116_100_r2/contact.png
+  observations:
+  - 已剔除上一轮目视确认带未标注人物立牌的四张背景。
+  - 2 至 6 人各 20 张；平面正面素材的偏航不是真实侧面。
+  - 16:9 背景缩放后填充为 640×480，带上下黑边；已有 Blender 画面不是新相机的渲染。
+  - 其余 unknown 背景的目标完整性仍未逐帧确认。
+  next_action: 继续按实际画面更换素材或调整配置，错误小样直接 --replace 重跑。
+  issues:
+  - source: user_feedback
+    observation: 人物沿同一条线排开，未体现各自的地面位置、远近及偏航。
+    next_action: 利用地面坐标分散足点，按相对深度改变尺度并独立安排偏航。
+  - source: user_feedback
+    observation: 电动车和人物的前后与遮挡关系不自然。
+    next_action: 按地面足点的前后深度确定绘制顺序及遮挡位置。
+  status: 已按用户反馈清理生成结果，保留参考图
+- id: person_sample_20261116_spatial_draft
+  image_count: 100
+  status: 已清理
+  visual_reference: datasets/tmp/person_spatial_preview.png
+  issues:
+  - source: assistant_visual_observation
+    observation: 部分背景的地面放置区域包含楼体，人物贴在楼体上。
+    next_action: 缩小或修正受影响背景的地面放置区域，再重新生成。
+- id: person_sample_20261116_ground
+  sample_path: datasets/samples/person
+  image_count: 100
+  manifest_sha256: c611c3eb80e27b92c9b1731507918864c95513bbedb558f5ba5355e7ef71ee50
+  visual_reference: datasets/annotated/person/sample_feedback/person_sample_20261116_ground/contact.png
+  observations:
+  - 人物有独立地面足点和偏航，采用 GroundSpace 的近似纵深及透视比例；人车按脚点近远绘制。
+  - 楼体附近采用本批画面的局部地面范围，尚不是通用障碍分割。
+  - 正面平面素材的偏航不是真实侧面；部分背景仍有黑边。
+  - 这批暂未使用旧 Blender 排队预览；新母场景相机尚未用于生成。
+  next_action: 按实际效果调整来源和生成参数；小样错误时直接替换重跑。
+- id: person_sample_20261116_placeable
+  sample_path: datasets/samples/person
+  image_count: 100
+  manifest_sha256: 964fd011fd6ef63813f19bdaa262c447462257b052d042ce80d45202373f577a
+  visual_reference: datasets/annotated/person/sample_feedback/person_sample_20261116_placeable/contact.png
+  observations:
+  - 地面放置接口复用本批已有局部地面范围，人物与车辆落脚点避开疑似障碍。
+  - 2 至 6 人各 20 张；本批使用 11 个背景，4 个地面判断 unknown 的旧背景未选用。
+  - 地面支持为局部近似而非通用分割；偏航依然是平面立牌变换。
+  next_action: 有具体问题时调整对应背景或组合，直接替换重跑。
+  status: 已按用户反馈清理生成结果，保留参考图
+  issues:
+  - source: user_feedback
+    observation: 直立电动车遮挡偏少，部分遮挡不自然；人物整体偏小。
+    next_action: 增加直立电动车组合，改善地面接触和前后关系；参考实拍放大人物并提高最小尺度。
+- id: person_sample_20261116_near_vehicle
+  sample_path: datasets/samples/person
+  image_count: 100
+  manifest_sha256: 023856912635325bcc0dde098e8d6ad97887b662007b55b0b53529d631f3bd26
+  visual_reference: datasets/annotated/person/sample_feedback/person_sample_20261116_near_vehicle/contact.png
+  observations:
+  - 参考 raw_202521.png 的中近景人物大小，人物尺寸中位数为 174 像素，范围 128 至 234 像素；场景中保留远近差异。
+  - 100 张中 49 张有直立车、21 张有倒地车；人物之间允许遮挡和框重叠。
+  - 仍使用平面人物素材与近似地面透视，不代表真实三维侧面。
+  next_action: 按实际效果调整具体问题，必要时直接替换重跑。
+  status: 已按用户反馈清理生成结果，保留参考图
+  issues:
+  - source: user_feedback
+    observation: person_000044 中后方人物被严重遮挡，画面中正面和类别难以辨认。
+    next_action: 设置可调遮挡上下限，保留人物和电动车遮挡，同时让正面暴露更多。
+- id: person_sample_20261116_controlled_occlusion
+  sample_path: datasets/samples/person
+  image_count: 100
+  manifest_sha256: 41a6ca36b033ec5ea35152e8d6df2b870e344f063a9b7a790e48e5aec721ac8b
+  visual_reference: datasets/annotated/person/sample_feedback/person_sample_20261116_controlled_occlusion/contact.png
+  observations:
+  - 保留人物互挡和电动车遮挡，发生遮挡时以人物前景像素计限制在 2% 至 55%，也允许无遮挡。
+  - 上身几何区域至少可见 70%，源人物素材顶部四分之一前景至少可见 80%；这只是近似，不是人脸或身份可识别性的实测。
+  - 100 张中 2 至 6 人各 20 张，保留人物和车辆重叠；人物与背景仍是平面合成。
+  next_action: 按实际小样调整遮挡范围或素材，必要时替换重跑。
+- id: person_sample_20261116_white_back_with_direct
+  sample_path: datasets/samples/person
+  manifest: datasets/samples/person/manifest.json
+  image_count: 60
+  observations:
+  - 52 张合成含 8 张纯空场、8 张单人、8 张仅白背、8 张正背同框和 20 张 2 至 6 人。另有 8 张来自 train 父视频的完整实拍。
+  - 实际 YOLO 标签共 106 框，其中社区 84 框、非社区 22 框。仅白背合成图的标签为空，正背同框各保留一个正面框。
+  - 数字白背由 18 张带白边正面纹理水平镜像透明轮廓并置白 RGB。小样使用其中 6 张；正面父图和处理方式见白背来源清单。
+  status: 混合小样已逐项核对图片与标签配对
+exclude_backgrounds:
+- image: datasets/annotated/mixed_scene/v4_compositing_backgrounds_20261113/images/bins_004_017.jpg
+  reason: 背景中存在未标注的人物立牌或其局部，避免漏标。
+- image: datasets/annotated/mixed_scene/v4_compositing_backgrounds_20261113/images/bins_004_003.jpg
+  reason: 背景中存在未标注的人物立牌或其局部，避免漏标。
+- image: datasets/annotated/mixed_scene/v4_compositing_backgrounds_20261113/images/bins_004_014.jpg
+  reason: 背景中存在未标注的人物立牌或其局部，避免漏标。
+- image: datasets/annotated/person/background_720p/bins_004_017_5cc1636b58a1.png
+  reason: 背景中存在未标注的人物立牌或其局部，避免漏标。
+- image: datasets/annotated/mixed_scene/v4_compositing_backgrounds_20261113/images/junction_005_001.jpg
+  reason: 画面内有未标注的场外真人。
+- image: datasets/annotated/person/background_720p/junction_005_001_39a3323bd822.png
+  reason: 画面内有未标注的场外真人。

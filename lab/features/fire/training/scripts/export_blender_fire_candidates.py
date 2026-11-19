@@ -5,7 +5,7 @@ independent evaluation set. Source files and earlier exports are never changed.
 """
 
 if __name__ == "__main__":
-    raise SystemExit("Legacy dataset CLI is retired; use datasets/scripts/fire/. Production remains paused.")
+    raise SystemExit("Legacy dataset CLI is retired; use datasets/scripts/fire/.")
 
 import argparse
 import json

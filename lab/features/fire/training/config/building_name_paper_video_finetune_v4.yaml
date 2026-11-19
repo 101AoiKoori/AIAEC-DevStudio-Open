@@ -1,0 +1,61 @@
+# Paths are relative to training_packages/building_name_paper.
+schema_version: 3
+task_id: fire
+model_key: building_name_paper
+version: v4
+task: detect
+data: finetune_dataset/data.yaml
+model: building_name_paper_best_Val_Test/best.pt
+output_root: runs/video_finetune
+description: 三段新视频及其派生图的独立微调，原训练图参与数为0。
+imgsz: 640
+epochs: 60
+batch: 4
+workers: 0
+patience: 0
+seed: 42
+device: '0'
+optimizer: AdamW
+lr0: 0.00005
+lrf: 0.1
+momentum: 0.9
+weight_decay: 0.0005
+warmup_epochs: 2
+warmup_bias_lr: 0.00005
+warmup_momentum: 0.8
+cos_lr: true
+close_mosaic: 0
+amp: false
+deterministic: true
+max_det: 100
+diagnostic_conf: 0.25
+match_iou: 0.5
+nms_iou: 0.7
+preview_limit: 48
+training_policy:
+  mode: early_stopping
+  min_epochs: 20
+  patience: 10
+  min_delta: 0.001
+  save_period: 5
+evaluate_after_training: true
+test_unavailable: true
+augment:
+  degrees: 3.0
+  translate: 0.02
+  scale: 0.05
+  shear: 0.0
+  perspective: 0.0
+  flipud: 0.0
+  fliplr: 0.0
+  mosaic: 0.0
+  mixup: 0.0
+  copy_paste: 0.0
+  hsv_h: 0.005
+  hsv_s: 0.1
+  hsv_v: 0.10
+source_notes:
+- 仅三段用户新拍视频，禁止原训练集回放；Train用buildingname1/2，Val用buildingname。
+- 裁剪和多视图拼接均由新视频派生，逐纸完整标注，窗格和火焰贴纸作纸条任务负例。
+- 三视频共享场景与楼体，Val为已接触的同场景视频诊断，不声称独立现场泛化。
+- 新模型从下载的best.pt初始化；原权重保留，当前轮数及优化器从新微调重新计数。

@@ -26,7 +26,7 @@ def plan(root, cls=3, count=2):
              'labels': {'format': 'yolo_detection', 'class_id': cls},
              'augmentation': {'gain': .72, 'saturation': .65, 'variation': 'seeded_position_scale_and_paper'},
              'sources': [bg, 'scene.png', 'mask.png'] +
-                        ([f'datasets/raw/waste_bin/toolkit/SourcePic/{name}.png'] if name else [])}
+                        ([f'Archive/Assets/working_sources/digital/waste_sticker/toolkit/SourcePic/{name}.png'] if name else [])}
     return {'model_key': 'waste_sticker', 'target_split': 'train',
             'constraints': dict(entry.CONSTRAINTS), 'strata': [state]}
 

@@ -1,7 +1,7 @@
 """Compose planned name-paper candidates on existing real-image backgrounds."""
 
 if __name__ == "__main__":
-    raise SystemExit("Legacy dataset CLI is retired; use datasets/scripts/building_name_paper/. Production remains paused.")
+    raise SystemExit("Legacy dataset CLI is retired; use datasets/scripts/building_name_paper/.")
 
 import argparse
 import json

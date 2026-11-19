@@ -40,8 +40,8 @@
         "kind": "explicit_arena_parameters"
       },
       "sources": [
-        "datasets/assets/blender/shared/arena_4m2_pbr_20261112/arena_master_user_20261113.blend",
-        "datasets/assets/blender/meter/v4_parametric_station_v2_20261113/station.blend"
+        "datasets/assets/blender/aiaec_dataset.blend",
+        "datasets/assets/blender/aiaec_dataset.blend#Meter Station"
       ],
       "parameters": {
         "temperature_fraction": 0.1,
@@ -81,8 +81,8 @@
         "kind": "explicit_arena_parameters"
       },
       "sources": [
-        "datasets/assets/blender/shared/arena_4m2_pbr_20261112/arena_master_user_20261113.blend",
-        "datasets/assets/blender/meter/v4_parametric_station_v2_20261113/station.blend"
+        "datasets/assets/blender/aiaec_dataset.blend",
+        "datasets/assets/blender/aiaec_dataset.blend#Meter Station"
       ],
       "parameters": {
         "temperature_fraction": 0.1,
@@ -122,8 +122,8 @@
         "kind": "explicit_arena_parameters"
       },
       "sources": [
-        "datasets/assets/blender/shared/arena_4m2_pbr_20261112/arena_master_user_20261113.blend",
-        "datasets/assets/blender/meter/v4_parametric_station_v2_20261113/station.blend"
+        "datasets/assets/blender/aiaec_dataset.blend",
+        "datasets/assets/blender/aiaec_dataset.blend#Meter Station"
       ],
       "parameters": {
         "temperature_fraction": 0.26,
@@ -163,8 +163,8 @@
         "kind": "explicit_arena_parameters"
       },
       "sources": [
-        "datasets/assets/blender/shared/arena_4m2_pbr_20261112/arena_master_user_20261113.blend",
-        "datasets/assets/blender/meter/v4_parametric_station_v2_20261113/station.blend"
+        "datasets/assets/blender/aiaec_dataset.blend",
+        "datasets/assets/blender/aiaec_dataset.blend#Meter Station"
       ],
       "parameters": {
         "temperature_fraction": 0.26,
@@ -204,8 +204,8 @@
         "kind": "explicit_arena_parameters"
       },
       "sources": [
-        "datasets/assets/blender/shared/arena_4m2_pbr_20261112/arena_master_user_20261113.blend",
-        "datasets/assets/blender/meter/v4_parametric_station_v2_20261113/station.blend"
+        "datasets/assets/blender/aiaec_dataset.blend",
+        "datasets/assets/blender/aiaec_dataset.blend#Meter Station"
       ],
       "parameters": {
         "temperature_fraction": 0.42,
@@ -245,8 +245,8 @@
         "kind": "explicit_arena_parameters"
       },
       "sources": [
-        "datasets/assets/blender/shared/arena_4m2_pbr_20261112/arena_master_user_20261113.blend",
-        "datasets/assets/blender/meter/v4_parametric_station_v2_20261113/station.blend"
+        "datasets/assets/blender/aiaec_dataset.blend",
+        "datasets/assets/blender/aiaec_dataset.blend#Meter Station"
       ],
       "parameters": {
         "temperature_fraction": 0.42,
@@ -286,8 +286,8 @@
         "kind": "explicit_arena_parameters"
       },
       "sources": [
-        "datasets/assets/blender/shared/arena_4m2_pbr_20261112/arena_master_user_20261113.blend",
-        "datasets/assets/blender/meter/v4_parametric_station_v2_20261113/station.blend"
+        "datasets/assets/blender/aiaec_dataset.blend",
+        "datasets/assets/blender/aiaec_dataset.blend#Meter Station"
       ],
       "parameters": {
         "temperature_fraction": 0.58,
@@ -327,8 +327,8 @@
         "kind": "explicit_arena_parameters"
       },
       "sources": [
-        "datasets/assets/blender/shared/arena_4m2_pbr_20261112/arena_master_user_20261113.blend",
-        "datasets/assets/blender/meter/v4_parametric_station_v2_20261113/station.blend"
+        "datasets/assets/blender/aiaec_dataset.blend",
+        "datasets/assets/blender/aiaec_dataset.blend#Meter Station"
       ],
       "parameters": {
         "temperature_fraction": 0.58,
@@ -368,8 +368,8 @@
         "kind": "explicit_arena_parameters"
       },
       "sources": [
-        "datasets/assets/blender/shared/arena_4m2_pbr_20261112/arena_master_user_20261113.blend",
-        "datasets/assets/blender/meter/v4_parametric_station_v2_20261113/station.blend"
+        "datasets/assets/blender/aiaec_dataset.blend",
+        "datasets/assets/blender/aiaec_dataset.blend#Meter Station"
       ],
       "parameters": {
         "temperature_fraction": 0.74,
@@ -409,8 +409,8 @@
         "kind": "explicit_arena_parameters"
       },
       "sources": [
-        "datasets/assets/blender/shared/arena_4m2_pbr_20261112/arena_master_user_20261113.blend",
-        "datasets/assets/blender/meter/v4_parametric_station_v2_20261113/station.blend"
+        "datasets/assets/blender/aiaec_dataset.blend",
+        "datasets/assets/blender/aiaec_dataset.blend#Meter Station"
       ],
       "parameters": {
         "temperature_fraction": 0.74,
@@ -450,8 +450,8 @@
         "kind": "explicit_arena_parameters"
       },
       "sources": [
-        "datasets/assets/blender/shared/arena_4m2_pbr_20261112/arena_master_user_20261113.blend",
-        "datasets/assets/blender/meter/v4_parametric_station_v2_20261113/station.blend"
+        "datasets/assets/blender/aiaec_dataset.blend",
+        "datasets/assets/blender/aiaec_dataset.blend#Meter Station"
       ],
       "parameters": {
         "temperature_fraction": 0.9,
@@ -491,8 +491,8 @@
         "kind": "explicit_arena_parameters"
       },
       "sources": [
-        "datasets/assets/blender/shared/arena_4m2_pbr_20261112/arena_master_user_20261113.blend",
-        "datasets/assets/blender/meter/v4_parametric_station_v2_20261113/station.blend"
+        "datasets/assets/blender/aiaec_dataset.blend",
+        "datasets/assets/blender/aiaec_dataset.blend#Meter Station"
       ],
       "parameters": {
         "temperature_fraction": 0.9,
@@ -510,18 +510,17 @@
   ],
   "execution": {
     "entry": "datasets/scripts/meter/render_meter_arena_v4.py",
-    "loaded_scene": "datasets/assets/blender/shared/arena_4m2_pbr_20261112/arena_master_user_20261113.blend",
-    "station": "datasets/assets/blender/meter/v4_parametric_station_v2_20261113/station.blend",
+    "loaded_scene": "datasets/assets/blender/aiaec_dataset.blend",
+    "station": "datasets/assets/blender/aiaec_dataset.blend#Meter Station",
     "endpoints": "lab/features/meter/training/config/meter_parametric_endpoints_v4.json",
-    "face": "datasets/assets/blender/meter/v4_parametric_station_v2_20261113/face.png",
+    "face": "datasets/raw/meter/targets/digital/station_face/face.png",
     "output": "datasets/samples/meter",
     "device": "OPTIX",
     "cycles_samples": 16,
     "count": 12,
     "pose": true,
     "foreground": true,
-    "offset": 0,
-    "production_paused": true
+    "offset": 0
   },
   "input_scope": {
     "direct_photo_pose": "excluded: existing real rows have unresolved eight-point labels",

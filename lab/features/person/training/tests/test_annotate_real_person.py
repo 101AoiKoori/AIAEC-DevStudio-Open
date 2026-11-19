@@ -10,8 +10,8 @@ from datasets.scripts.person import annotate_real_person as subject
 
 class RealAnnotationPlanTest(unittest.TestCase):
     def declaration(self, folder='社区人员'):
-        source = 'datasets/raw/car_real_capture_20261112/frame.png'
-        ref = f'datasets/raw/person/team_assets/{folder}/1.png'
+        source = 'Archive/Assets/captures/car_real_capture_20261112/frame.png'
+        ref = f'Archive/Assets/working_sources/digital/person/team_assets/{folder}/1.png'
         state = {'id': 'one', 'failure_event': 'candidate', 'min_count': 1, 'max_count': 1,
                  'prior': {'alpha': 1, 'beta': 1}, 'exposure_weight': 1, 'failure_cost': 1,
                  'conditions': [], 'background': {'source_image': source},
@@ -38,7 +38,7 @@ class RealAnnotationPlanTest(unittest.TestCase):
              mock.patch.object(Path, 'exists', return_value=False), \
              mock.patch.object(Path, 'read_text', return_value=json.dumps(plan)), \
              mock.patch.object(subject.Image, 'open', return_value=image), \
-             mock.patch.object(subject, 'source_path', side_effect=lambda task,key: subject.ROOT/('datasets/raw/person/team_assets' if key == 'person_artwork_root' else 'datasets/raw/car_real_capture_20261112')), \
+             mock.patch.object(subject, 'source_path', side_effect=lambda task,key: subject.ROOT/('Archive/Assets/working_sources/digital/person/team_assets' if key == 'person_artwork_root' else 'Archive/Assets/captures/car_real_capture_20261112')), \
              mock.patch.object(subject, 'generation_guard', fake_guard), \
              mock.patch.object(subject.shutil, 'copy2'), mock.patch.object(subject.shutil, 'copyfile'), \
              mock.patch.object(Path, 'mkdir'), mock.patch.object(Path, 'write_text') as write:

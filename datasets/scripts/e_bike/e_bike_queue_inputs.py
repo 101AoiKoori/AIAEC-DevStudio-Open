@@ -4,7 +4,7 @@ This only discovers inputs; the production guard performs the index lookup.
 """
 
 if __name__ == "__main__":
-    raise SystemExit("Task helper is import-only; use the primary entry in datasets/scripts/e_bike/. Production remains paused.")
+    raise SystemExit("Task helper is import-only; use the primary entry in datasets/scripts/e_bike/.")
 
 import json
 from pathlib import Path

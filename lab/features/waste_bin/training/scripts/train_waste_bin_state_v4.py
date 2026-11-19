@@ -11,10 +11,11 @@ ROOT = PACKAGE_ROOT if PACKAGED else HERE.parents[5]
 sys.path.insert(0, str(ROOT / 'scripts/common' if PACKAGED else ROOT / 'lab/training_common'))
 from engine.cli import main as engine_main
 from engine.config import resolve
+from engine.bin_state_report import write_bin_state_report
 from engine.reporting import box_iou
 
 DEFAULT_CONFIG = 'config/train.yaml' if PACKAGED else 'lab/features/waste_bin/training/config/waste_bin_state_v4.yaml'
-COLORS = ('blue', 'red', 'green', 'gray', 'unknown')
+COLORS = ('blue', 'red', 'green', 'gray', 'black', 'unknown')
 STATES = ('open', 'closed')
 
 
@@ -71,6 +72,22 @@ def reviewed_color_states(rows, reviews, threshold):
 
 def main(argv=None):
     argv = list(sys.argv[1:] if argv is None else argv)
+    if argv and argv[0] == 'bin-state-report':
+        parser = argparse.ArgumentParser(description=write_bin_state_report.__doc__)
+        parser.add_argument('--root', type=Path, default=ROOT)
+        parser.add_argument('--evaluation', required=True)
+        parser.add_argument('--dataset-manifest', required=True)
+        args = parser.parse_args(argv[1:])
+        try:
+            root = args.root.resolve()
+            evaluation = resolve(root, args.evaluation)
+            dataset_manifest = resolve(root, args.dataset_manifest)
+            path = write_bin_state_report(evaluation, dataset_manifest, root=root)
+            print(path.name + ' ready')
+            return 0
+        except (OSError, ValueError, KeyError, IndexError, TypeError) as error:
+            print(f'ERROR: {type(error).__name__}: {error}', file=sys.stderr)
+            return 1
     if argv and argv[0] == 'color-state-report':
         parser = argparse.ArgumentParser(description=reviewed_color_states.__doc__)
         parser.add_argument('--root', type=Path, default=ROOT); parser.add_argument('--evaluation', required=True)

@@ -20,7 +20,7 @@ class ExportGuardTest(unittest.TestCase):
             parent = root / 'datasets/exports/authoritative/fire_sticker'
             parent.mkdir(parents=True)
             source, output = parent / 'plan.json', parent / 'output'
-            image_name = 'datasets/raw/car_real_capture_20261112/P01_TL1.png'
+            image_name = 'Archive/Assets/captures/car_real_capture_20261112/P01_TL1.png'
             image = root / image_name
             image.parent.mkdir(parents=True)
             image.write_bytes(b'original image fixture')

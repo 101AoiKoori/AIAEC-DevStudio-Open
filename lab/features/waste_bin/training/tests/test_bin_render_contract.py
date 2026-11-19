@@ -55,6 +55,10 @@ class BinRenderContractTest(unittest.TestCase):
                                 'min_visibility': .7, 'min_visible_pixels': 24},
                 'strata': [state, other]}
         self.assertEqual(len(contract.standalone_planned_jobs(plan, 'bin.blend', 640, 480, .7, 24)), 2)
+        state['target']['open_pose'] = 'upright'
+        with self.assertRaisesRegex(ValueError, 'folded behind'):
+            contract.standalone_planned_jobs(plan, 'bin.blend', 640, 480, .7, 24)
+        state['target']['open_pose'] = 'hanging_back'
         other['target']['bins']['blue'] = 'open'
         other['parameters']['camera_location'][0] = 0.0
         with self.assertRaises(ValueError):
@@ -158,6 +162,11 @@ class BinRenderContractTest(unittest.TestCase):
         self.assertFalse(open_item['label_eligible'])
         self.assertEqual(open_item['state_evidence']['kind'], 'mouth_proxy')
         self.assertIn('state_evidence:occluded_below_threshold', open_item['rejection_reasons'])
+        raised_item = contract.attach_state_evidence(target, target, 'open', raised_lid=True)
+        self.assertTrue(raised_item['label_eligible'])
+        self.assertEqual(raised_item['state_evidence']['kind'], 'raised_lid')
+        hidden_lid = contract.attach_state_evidence(target, hidden, 'open', raised_lid=True)
+        self.assertFalse(hidden_lid['label_eligible'])
         closed_item = contract.attach_state_evidence(target, target, 'closed')
         self.assertTrue(closed_item['label_eligible'])
         self.assertEqual(closed_item['state_evidence']['kind'], 'lid')

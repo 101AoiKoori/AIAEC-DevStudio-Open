@@ -1,11 +1,35 @@
 task: fire
-status: canonical_entry_sources_connected_production_paused
-allocation: {required: true, engine: datasets/scripts/common/bayesian.py, weights: per_plan_design_assumptions}
+status: first_round_recipe_materialized_ready_for_packaging
+allocation:
+  required: true
+  engine: datasets/scripts/common/bayesian.py
+  weights: per_plan_design_assumptions
 goal: 定位指定火焰贴纸并按楼宇关联计数，真实火焰和烟雾不是贴纸正例。
-states: [零贴, 单贴, 多贴, 不同楼面, 不同位置, 合理比例, 偏航, 遮挡, 明暗, 饱和度]
+states:
+- 零贴
+- 单贴
+- 多贴
+- 不同楼面
+- 不同位置
+- 合理比例
+- 偏航
+- 遮挡
+- 明暗
+- 饱和度
 train_target_images: 3000
-source_mix_initial: {direct_real: 0.20, real_background_composite: 0.40, blender_background: 0.40}
+source_mix_initial:
+  direct_real: 0.007
+  real_background_composite: 0.593
+  blender_background: 0.4
 source_config: config/source.yaml
 sample_output: datasets/samples/fire
 dataset_output: datasets/exports/fire
+actual_manifest: datasets/exports/fire/workspace_sources.json
+fine_tune_manifest: training_packages/fire_sticker/dataset_finetune_compact/workspace_sources.json
+fine_tune_data: training_packages/fire_sticker/dataset_finetune_compact/data.yaml
+fine_tune_plan: datasets/scripts/fire/config/reshoot_compact_finetune_plan.json
+fine_tune_candidate_pool: training_packages/fire_sticker/dataset_finetune/workspace_sources.json
 design_reference: docs/DATASET_DESIGN.md
+entry: datasets/scripts/fire/compose_real_facades.py
+full_dataset_plan: datasets/scripts/fire/config/full_dataset_plan.json
+first_round_learning_plan: datasets/scripts/fire/config/first_round_learning.yaml

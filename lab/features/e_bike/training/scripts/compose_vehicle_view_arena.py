@@ -5,7 +5,7 @@ camera and physical dimensions are fitted, not measured vehicle calibration.
 """
 
 if __name__ == "__main__":
-    raise SystemExit("Legacy dataset CLI is retired; use datasets/scripts/e_bike/. Production remains paused.")
+    raise SystemExit("Legacy dataset CLI is retired; use datasets/scripts/e_bike/.")
 
 import argparse
 import json

@@ -1,7 +1,7 @@
 """Pure checks for bounded, source-aware bin-lid render candidates."""
 
 if __name__ == "__main__":
-    raise SystemExit("Task helper is import-only; use the primary entry in datasets/scripts/waste_bin_state/. Production remains paused.")
+    raise SystemExit("Task helper is import-only; use the primary entry in datasets/scripts/waste_bin_state/.")
 
 import math
 
@@ -17,6 +17,7 @@ MASK_COLORS = {
 }
 OPEN_POSES = {'hanging_back': -270, 'upright': -90}
 STATE_CONTRACT = 'whole_bin_state_with_mouth_or_lid_evidence_v1'
+MIN_MOUTH_THICKNESS_PX = 5
 BALANCED_ORDER = (0, 15, 5, 10, 3, 12, 6, 9, 1, 14, 2, 13, 4, 11, 7, 8)
 
 
@@ -96,6 +97,8 @@ def standalone_planned_jobs(plan, scene_path, width, height, min_visibility, min
         if target['open_pose'] not in OPEN_POSES or any(
                 name not in BIN_NAMES or value not in ('open', 'closed') for name, value in target['bins'].items()):
             raise ValueError('unsupported bin state or pose')
+        if 'open' in target['bins'].values() and target['open_pose'] != 'hanging_back':
+            raise ValueError('standalone bin-state supervision requires a lid folded behind the bin')
         if state['labels'] != {'mode': 'candidate', 'open': 0, 'closed': 1} or aug != {'mode': 'none'}:
             raise ValueError('unsupported labels or augmentation')
         required = {'camera_location', 'camera_aim', 'yaw_degrees', 'lens_mm', 'key_energy', 'fill_energy',
@@ -178,6 +181,11 @@ def decode_mask(rgba, name):
     return mask
 
 
+def mouth_thickness(opening):
+    """Measure the visible opening at its thickest image column, in pixels."""
+    return int(opening.sum(axis=0).max())
+
+
 def measure_visibility(visible, solo, inside_frame, min_visibility=.70, min_pixels=24):
     visible = np.asarray(visible, dtype=bool)
     solo = np.asarray(solo, dtype=bool)
@@ -233,15 +241,18 @@ def required_hinge_shift(back_y, panel_front_y, clearance=.015, max_shift=.15):
     return shift
 
 
-def attach_state_evidence(target, evidence, state):
-    """Require both a visible bin and its open-mouth or closed-lid evidence."""
+def attach_state_evidence(target, evidence, state, *, raised_lid=False):
+    """Require both a visible bin and evidence from its mouth or lid."""
     if state not in ('open', 'closed'):
         raise ValueError('unknown bin state')
     result = dict(target)
     result['target_eligible'] = target['label_eligible']
     result['target_rejection_reasons'] = list(target['rejection_reasons'])
     result['state_evidence'] = dict(evidence)
-    result['state_evidence']['kind'] = 'mouth_proxy' if state == 'open' else 'lid'
+    evidence_kind = 'lid'
+    if state == 'open':
+        evidence_kind = 'raised_lid' if raised_lid else 'mouth_proxy'
+    result['state_evidence']['kind'] = evidence_kind
     result['label_eligible'] = target['label_eligible'] and evidence['label_eligible']
     result['rejection_reasons'] = (list(target['rejection_reasons']) +
         ['state_evidence:' + reason for reason in evidence['rejection_reasons']])

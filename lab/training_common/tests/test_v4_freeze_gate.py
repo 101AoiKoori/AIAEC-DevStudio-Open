@@ -80,9 +80,10 @@ class FreezeGateTests(unittest.TestCase):
         with self.assertRaises(FileExistsError):
             self.freeze()
 
-    def test_missing_selection_reason_is_rejected(self):
-        with self.assertRaisesRegex(ValueError, 'selection reason'):
-            freeze_selection(self.root, self.config, self.run, self.weights, 'val', '  ')
+    def test_selection_reason_is_optional(self):
+        selected = freeze_selection(self.root, self.config, self.run, self.weights, 'val')
+        record = require_frozen_selection(self.root, self.config, self.run, selected)
+        self.assertNotIn('selection_reason', record)
 
     def test_val_or_config_change_rejects_test(self):
         selected = self.freeze()

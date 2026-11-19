@@ -1,0 +1,146 @@
+{
+  "schema_version": 1,
+  "model_key": "waste_bin_state",
+  "target_split": "train",
+  "budget": 2,
+  "purpose": "Train pilot replay using two newly approved shared-pool camera backgrounds",
+  "independence_basis": "two camera parent videos and one Waste Bins Photo foreground scene",
+  "uncertainty_weight": 0,
+  "constraints": {
+    "resolution": [
+      640,
+      480
+    ],
+    "label_mode": "candidate",
+    "ground_placement": "stored_contact_mask"
+  },
+  "strata": [
+    {
+      "id": "qualified_pool_020",
+      "conditions": [],
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "failure_event": "bin_state_label_unavailable",
+      "background": {
+        "manifest": "datasets/annotated/common/sources/frame_environment.sqlite3",
+        "id": "pool_0d205a64e31be45a4c172bc1b96cb51211d160dd69a0eea7b150079cb4498ded",
+        "frame_id": "0d205a64e31be45a4c172bc1b96cb51211d160dd69a0eea7b150079cb4498ded",
+        "record_id": "c689c3c676301f630f479b29612bb08c84f8cdcdfe55a7f48a42f20c7470bf9a"
+      },
+      "target": {
+        "render_manifest": "datasets/annotated/waste_bin_state/foreground/manifest.json",
+        "render_image": "images/planned_000000.png",
+        "bins": {
+          "blue": "open"
+        }
+      },
+      "labels": {
+        "mode": "candidate",
+        "open": 0,
+        "closed": 1
+      },
+      "augmentation": {
+        "value_gain": 1.0,
+        "saturation_gain": 1.0,
+        "shadow": "simulated_gaussian"
+      },
+      "parameters": {
+        "placement_xywh": [
+          252,
+          356,
+          62,
+          85
+        ]
+      },
+      "sources": [
+        "datasets/raw/shared/backgrounds/camera/full_scene__f1d1d71586/background_002850__aa2d56fb69.png",
+        "datasets/annotated/waste_bin_state/foreground/images/planned_000000.png",
+        "datasets/annotated/waste_bin_state/foreground/mask_visible/planned_000000.png"
+      ]
+    },
+    {
+      "id": "qualified_pool_185",
+      "conditions": [],
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "failure_event": "bin_state_label_unavailable",
+      "background": {
+        "manifest": "datasets/annotated/common/sources/frame_environment.sqlite3",
+        "id": "pool_2b49a5c68535eb59c454d76ce92d3b5785d9343eb0aee70f8d4ebcd9c9a1b0aa",
+        "frame_id": "2b49a5c68535eb59c454d76ce92d3b5785d9343eb0aee70f8d4ebcd9c9a1b0aa",
+        "record_id": "93ee7e76024a492fa8f1393349e8acbc0ef2fd28131d48ac80e5e2a8bd6f8d54"
+      },
+      "target": {
+        "render_manifest": "datasets/annotated/waste_bin_state/foreground/manifest.json",
+        "render_image": "images/planned_000016.png",
+        "bins": {
+          "blue": "open",
+          "red": "closed",
+          "green": "open",
+          "gray": "closed"
+        }
+      },
+      "labels": {
+        "mode": "candidate",
+        "open": 0,
+        "closed": 1
+      },
+      "augmentation": {
+        "value_gain": 1.0,
+        "saturation_gain": 1.0,
+        "shadow": "simulated_gaussian"
+      },
+      "parameters": {
+        "placement_xywh": [
+          61,
+          325,
+          286,
+          85
+        ]
+      },
+      "sources": [
+        "datasets/raw/shared/backgrounds/camera/空场与场景物料_001__7e6f6d08fd/bg_00000_f00001__f7dcb5f54b.jpg",
+        "datasets/annotated/waste_bin_state/foreground/images/planned_000016.png",
+        "datasets/annotated/waste_bin_state/foreground/mask_visible/planned_000016.png"
+      ]
+    }
+  ],
+  "planning": {
+    "seed": 1918,
+    "render_manifest": "datasets/annotated/waste_bin_state/foreground/manifest.json",
+    "excluded_render_samples": [],
+    "background_without_stored_qualification": [],
+    "background_count": 2,
+    "qualified_frame_ids": [
+      "0d205a64e31be45a4c172bc1b96cb51211d160dd69a0eea7b150079cb4498ded",
+      "2b49a5c68535eb59c454d76ce92d3b5785d9343eb0aee70f8d4ebcd9c9a1b0aa"
+    ],
+    "selected_pool_indices": [
+      20,
+      185
+    ],
+    "qualification_receipt": "datasets/annotated/common/review/bin_pool_v5_new_foreground_import_20261117/import_receipt.json",
+    "excluded_by_historical_exposure": [
+      {
+        "pool_index": 45,
+        "reason": "known_exposed_image_or_identical_bytes"
+      },
+      {
+        "pool_index": 46,
+        "reason": "known_exposed_image_or_identical_bytes"
+      }
+    ]
+  }
+}

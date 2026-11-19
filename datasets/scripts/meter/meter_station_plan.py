@@ -5,9 +5,57 @@ state and record each produced image through the shared production guard.
 """
 
 if __name__ == "__main__":
-    raise SystemExit("Task helper is import-only; use the primary entry in datasets/scripts/meter/. Production remains paused.")
+    raise SystemExit("Task helper is import-only; use the primary entry in datasets/scripts/meter/.")
 
 import math
+
+
+def restore_station_production_frame(bpy):
+    """Use the calibrated local frame in background copies of the upright editor scene.
+
+    The saved scene has one Z-up, metre-scale parent for viewing. Render plans
+    still express the original station-local units; detach only that parent,
+    leaving needle, endpoint and ROI parent transforms intact.
+    """
+    frame = bpy.data.objects.get('Meter Station | Editor Z-up frame')
+    if frame is None:
+        return False
+    if not bpy.app.background:
+        raise ValueError('station production frame may only be restored in background Blender')
+    if frame.get('aec_meter_editor_frame') != 1:
+        raise ValueError('unrecognized meter editor frame')
+    station = bpy.data.scenes['Meter Station']
+    previous_scene = bpy.context.window.scene
+    bpy.context.window.scene = station
+    bpy.context.view_layer.update()
+    depsgraph = bpy.context.evaluated_depsgraph_get()
+    # Bake the editor orbit before removing its drivers and look-at target.
+    # Production plans subsequently set camera locations in the legacy frame.
+    for obj in station.objects:
+        if obj.get('aec_meter_orbit_camera') == 1:
+            local = frame.matrix_world.inverted() @ obj.evaluated_get(depsgraph).matrix_world
+            obj.animation_data_clear()
+            obj.data.driver_remove('lens')
+            for constraint in list(obj.constraints):
+                if constraint.name == 'Meter orbit aim':
+                    obj.constraints.remove(constraint)
+            obj.matrix_basis = local
+    for obj in list(station.objects):
+        if obj.get('aec_meter_orbit_target') == 1:
+            bpy.data.objects.remove(obj, do_unlink=True)
+    if station.world and station.world.use_nodes:
+        for node in station.world.node_tree.nodes:
+            if 'aec_meter_legacy_angle' in node:
+                node.inputs['Angle'].default_value = node['aec_meter_legacy_angle']
+    for obj in station.objects:
+        if obj.type == 'LIGHT' and 'aec_meter_legacy_energy' in obj:
+            obj.data.energy = obj['aec_meter_legacy_energy']
+    for obj in list(frame.children):
+        obj.parent = None
+    bpy.data.objects.remove(frame, do_unlink=True)
+    bpy.context.view_layer.update()
+    bpy.context.window.scene = previous_scene
+    return True
 
 
 LIMITS = {

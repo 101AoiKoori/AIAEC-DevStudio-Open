@@ -1,0 +1,388 @@
+{
+  "schema_version": 1,
+  "model_key": "waste_bin_state",
+  "target_split": "train",
+  "budget": 6,
+  "purpose": "Current real-background compositions from actual rendered bin evidence",
+  "independence_basis": "one source model and selected recorded background parents; not independent capture",
+  "uncertainty_weight": 0,
+  "constraints": {
+    "resolution": [
+      640,
+      480
+    ],
+    "label_mode": "candidate",
+    "ground_placement": "stored_contact_mask"
+  },
+  "strata": [
+    {
+      "id": "composite_00000",
+      "conditions": [],
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "failure_event": "bin_state_label_unavailable",
+      "background": {
+        "manifest": "datasets/annotated/waste_bin/v4_grounded_backgrounds_20261112/backgrounds.json",
+        "id": "train_000163",
+        "frame_id": "ab60f6a52a48ec3b97fa492904233f113d37e6a10eff9405b2fd3e484e7b0f28",
+        "record_id": "f84ea5d48396bc9c01658d7778d58adea7074aff96aa864063b29a4ed65694b8"
+      },
+      "target": {
+        "render_manifest": "datasets/annotated/waste_bin_state/foreground/manifest.json",
+        "render_image": "images/planned_000016.png",
+        "bins": {
+          "blue": "open",
+          "red": "closed",
+          "green": "open",
+          "gray": "closed"
+        }
+      },
+      "labels": {
+        "mode": "candidate",
+        "open": 0,
+        "closed": 1
+      },
+      "augmentation": {
+        "value_gain": 1.0,
+        "saturation_gain": 1.0,
+        "shadow": "simulated_gaussian"
+      },
+      "parameters": {
+        "placement_xywh": [
+          57,
+          174,
+          544,
+          162
+        ]
+      },
+      "sources": [
+        "datasets/annotated/sign/v4_training_backgrounds_20261112/images/background_01.png",
+        "datasets/annotated/waste_bin_state/foreground/images/planned_000016.png",
+        "datasets/annotated/waste_bin_state/foreground/mask_visible/planned_000016.png"
+      ]
+    },
+    {
+      "id": "composite_00001",
+      "conditions": [],
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "failure_event": "bin_state_label_unavailable",
+      "background": {
+        "manifest": "datasets/annotated/waste_bin/v4_grounded_backgrounds_20261112/backgrounds.json",
+        "id": "train_000163",
+        "frame_id": "ab60f6a52a48ec3b97fa492904233f113d37e6a10eff9405b2fd3e484e7b0f28",
+        "record_id": "f84ea5d48396bc9c01658d7778d58adea7074aff96aa864063b29a4ed65694b8"
+      },
+      "target": {
+        "render_manifest": "datasets/annotated/waste_bin_state/foreground/manifest.json",
+        "render_image": "images/planned_000016.png",
+        "bins": {
+          "blue": "open",
+          "red": "closed",
+          "green": "open",
+          "gray": "closed"
+        }
+      },
+      "labels": {
+        "mode": "candidate",
+        "open": 0,
+        "closed": 1
+      },
+      "augmentation": {
+        "value_gain": 0.76,
+        "saturation_gain": 0.72,
+        "shadow": "simulated_gaussian"
+      },
+      "parameters": {
+        "placement_xywh": [
+          85,
+          110,
+          464,
+          138
+        ]
+      },
+      "sources": [
+        "datasets/annotated/sign/v4_training_backgrounds_20261112/images/background_01.png",
+        "datasets/annotated/waste_bin_state/foreground/images/planned_000016.png",
+        "datasets/annotated/waste_bin_state/foreground/mask_visible/planned_000016.png"
+      ]
+    },
+    {
+      "id": "composite_00002",
+      "conditions": [],
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "failure_event": "bin_state_label_unavailable",
+      "background": {
+        "manifest": "datasets/annotated/waste_bin/v4_grounded_backgrounds_20261112/backgrounds.json",
+        "id": "train_000091",
+        "frame_id": "4ca252cab277ff31e747e2e4075c85c1d4d8ec388ad1ff55cf0cd11cde164d5f",
+        "record_id": "02941f4aeb8ad390e7035191ad9baba93853d034ae7cffc09187ae7816328707"
+      },
+      "target": {
+        "render_manifest": "datasets/annotated/waste_bin_state/foreground/manifest.json",
+        "render_image": "images/planned_000016.png",
+        "bins": {
+          "blue": "open",
+          "red": "closed",
+          "green": "open",
+          "gray": "closed"
+        }
+      },
+      "labels": {
+        "mode": "candidate",
+        "open": 0,
+        "closed": 1
+      },
+      "augmentation": {
+        "value_gain": 1.0,
+        "saturation_gain": 1.0,
+        "shadow": "simulated_gaussian"
+      },
+      "parameters": {
+        "placement_xywh": [
+          123,
+          225,
+          464,
+          138
+        ]
+      },
+      "sources": [
+        "datasets/annotated/sign/v4_training_backgrounds_20261112/images/background_seq_000091.png",
+        "datasets/annotated/waste_bin_state/foreground/images/planned_000016.png",
+        "datasets/annotated/waste_bin_state/foreground/mask_visible/planned_000016.png"
+      ]
+    },
+    {
+      "id": "composite_00003",
+      "conditions": [],
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "failure_event": "bin_state_label_unavailable",
+      "background": {
+        "manifest": "datasets/annotated/waste_bin/v4_grounded_backgrounds_20261112/backgrounds.json",
+        "id": "train_000091",
+        "frame_id": "4ca252cab277ff31e747e2e4075c85c1d4d8ec388ad1ff55cf0cd11cde164d5f",
+        "record_id": "02941f4aeb8ad390e7035191ad9baba93853d034ae7cffc09187ae7816328707"
+      },
+      "target": {
+        "render_manifest": "datasets/annotated/waste_bin_state/foreground/manifest.json",
+        "render_image": "images/planned_000016.png",
+        "bins": {
+          "blue": "open",
+          "red": "closed",
+          "green": "open",
+          "gray": "closed"
+        }
+      },
+      "labels": {
+        "mode": "candidate",
+        "open": 0,
+        "closed": 1
+      },
+      "augmentation": {
+        "value_gain": 0.76,
+        "saturation_gain": 0.72,
+        "shadow": "simulated_gaussian"
+      },
+      "parameters": {
+        "placement_xywh": [
+          176,
+          243,
+          430,
+          128
+        ]
+      },
+      "sources": [
+        "datasets/annotated/sign/v4_training_backgrounds_20261112/images/background_seq_000091.png",
+        "datasets/annotated/waste_bin_state/foreground/images/planned_000016.png",
+        "datasets/annotated/waste_bin_state/foreground/mask_visible/planned_000016.png"
+      ]
+    },
+    {
+      "id": "composite_00004",
+      "conditions": [],
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "failure_event": "bin_state_label_unavailable",
+      "background": {
+        "manifest": "datasets/annotated/waste_bin/v4_grounded_backgrounds_20261112/backgrounds.json",
+        "id": "train_002188",
+        "frame_id": "5c726167368acacc1de6e66d77f1dc4c645266f02d1db97693a3dd5d56758608",
+        "record_id": "b43ab712e0a598a91649b1288a162869ef3b930c92535f682dd8ce8b28edcf46"
+      },
+      "target": {
+        "render_manifest": "datasets/annotated/waste_bin_state/foreground/manifest.json",
+        "render_image": "images/planned_000016.png",
+        "bins": {
+          "blue": "open",
+          "red": "closed",
+          "green": "open",
+          "gray": "closed"
+        }
+      },
+      "labels": {
+        "mode": "candidate",
+        "open": 0,
+        "closed": 1
+      },
+      "augmentation": {
+        "value_gain": 1.0,
+        "saturation_gain": 1.0,
+        "shadow": "simulated_gaussian"
+      },
+      "parameters": {
+        "placement_xywh": [
+          121,
+          256,
+          501,
+          149
+        ]
+      },
+      "sources": [
+        "datasets/annotated/sign/v4_training_backgrounds_20261112/images/background_seq_002188.png",
+        "datasets/annotated/waste_bin_state/foreground/images/planned_000016.png",
+        "datasets/annotated/waste_bin_state/foreground/mask_visible/planned_000016.png"
+      ]
+    },
+    {
+      "id": "composite_00005",
+      "conditions": [],
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "failure_event": "bin_state_label_unavailable",
+      "background": {
+        "manifest": "datasets/annotated/waste_bin/v4_grounded_backgrounds_20261112/backgrounds.json",
+        "id": "train_002188",
+        "frame_id": "5c726167368acacc1de6e66d77f1dc4c645266f02d1db97693a3dd5d56758608",
+        "record_id": "b43ab712e0a598a91649b1288a162869ef3b930c92535f682dd8ce8b28edcf46"
+      },
+      "target": {
+        "render_manifest": "datasets/annotated/waste_bin_state/foreground/manifest.json",
+        "render_image": "images/planned_000016.png",
+        "bins": {
+          "blue": "open",
+          "red": "closed",
+          "green": "open",
+          "gray": "closed"
+        }
+      },
+      "labels": {
+        "mode": "candidate",
+        "open": 0,
+        "closed": 1
+      },
+      "augmentation": {
+        "value_gain": 0.76,
+        "saturation_gain": 0.72,
+        "shadow": "simulated_gaussian"
+      },
+      "parameters": {
+        "placement_xywh": [
+          173,
+          262,
+          443,
+          132
+        ]
+      },
+      "sources": [
+        "datasets/annotated/sign/v4_training_backgrounds_20261112/images/background_seq_002188.png",
+        "datasets/annotated/waste_bin_state/foreground/images/planned_000016.png",
+        "datasets/annotated/waste_bin_state/foreground/mask_visible/planned_000016.png"
+      ]
+    }
+  ],
+  "planning": {
+    "seed": 1918,
+    "render_manifest": "datasets/annotated/waste_bin_state/foreground/manifest.json",
+    "excluded_render_samples": [
+      {
+        "image": "images/planned_000016.png",
+        "background": "train_005751",
+        "tone": "normal",
+        "reason": "No floor-valid placement after 300 attempts; review background polygons"
+      },
+      {
+        "image": "images/planned_000016.png",
+        "background": "train_005751",
+        "tone": "dark",
+        "reason": "No floor-valid placement after 300 attempts; review background polygons"
+      },
+      {
+        "image": "images/planned_000016.png",
+        "background": "train_005277",
+        "tone": "normal",
+        "reason": "No floor-valid placement after 300 attempts; review background polygons"
+      },
+      {
+        "image": "images/planned_000016.png",
+        "background": "train_005277",
+        "tone": "dark",
+        "reason": "No floor-valid placement after 300 attempts; review background polygons"
+      },
+      {
+        "image": "images/planned_000016.png",
+        "background": "train_005996",
+        "tone": "normal",
+        "reason": "No floor-valid placement after 300 attempts; review background polygons"
+      },
+      {
+        "image": "images/planned_000016.png",
+        "background": "train_005996",
+        "tone": "dark",
+        "reason": "No floor-valid placement after 300 attempts; review background polygons"
+      },
+      {
+        "image": "images/planned_000016.png",
+        "background": "train_007045",
+        "tone": "normal",
+        "reason": "No floor-valid placement after 300 attempts; review background polygons"
+      },
+      {
+        "image": "images/planned_000016.png",
+        "background": "train_007045",
+        "tone": "dark",
+        "reason": "No floor-valid placement after 300 attempts; review background polygons"
+      }
+    ],
+    "background_without_stored_qualification": [],
+    "background_count": 10,
+    "qualified_frame_ids": []
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "status": "research_candidate_not_deployed",
+  "pipeline": "semantic_joint_640_c025_i030",
+  "detector": {
+    "path": "runs/e_bike/keypoint_control_20261118/training/weights/best.pt",
+    "sha256": "ee2b3fd7970047fde9133538eccbb13123922002efdc191550652b7c09d3db5d"
+  },
+  "classifier": {
+    "path": "runs/e_bike/candidate_verifier_20261118/classifier/weights/last.pt",
+    "sha256": "33c0374b7b72d0134304914d46c751a0725eafedb61fe48daa88466a1a2c4e9a"
+  },
+  "scope": "Per-image visible-instance research only. No calibrated street/parking ROI, coverage guarantee, cross-frame aggregation or ROS behavior. Old26/layout32 are exposed development diagnostics."
+}

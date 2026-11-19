@@ -1,19 +1,25 @@
 """Bounded training, explicit evaluation and validation-only experiment helpers."""
 from pathlib import Path
 from copy import deepcopy
+from datetime import datetime, timezone
+import csv
+import hashlib
 import itertools
 import json
 import math
 import shutil
+from tempfile import TemporaryDirectory
 import time
 import uuid
 import yaml
-from .config import TRAIN_KEYS, load_config, resolve, validate
+from .config import TRAIN_KEYS, VALIDATING_MODES, load_config, resolve, validate
 from .config import read_yaml
-from .data import inspect_dataset, stage_dataset, relocate_staged_data
-from .runtime import environment, new_run, prepare_ultralytics, run_context, write_json
+from .data import (_file_sha256, preflight_dataset, relocate_staged_data, stage_dataset,
+                   staged_dataset_signature, validate_staged_resume_data)
+from .runtime import environment, new_run, prepare_ultralytics, run_context, training_lock, write_json
 from .reporting import diagnostics, metric_report, tensorboard_report, write_csv, match_detections, artifact_manifest
 from .bounded import BudgetExhausted, command as child_command, run_bounded
+from .training_policy import NonFiniteTrainingError, build_policy_trainer, validate_policy_checkpoint
 
 
 def preflight(root, config):
@@ -21,9 +27,11 @@ def preflight(root, config):
     model = resolve(root, config['model'])
     if model.suffix.lower() != '.pt' or not model.is_file():
         raise ValueError('Local pretrained/checkpoint .pt missing: ' + str(model))
-    header, records, report = inspect_dataset(root, config)
+    header, _, report = preflight_dataset(root, config)
     return {**report, 'class_names': header['names'], 'task': config['task'],
-            'model': config['model'], 'environment': environment(root)}
+            'model': config['model'], 'environment': environment(root),
+            **({'training_policy': config['training_policy'], 'epochs': config.get('epochs')}
+               if 'training_policy' in config else {})}
 
 
 def _training_options(config, data_path, run_dir):
@@ -36,22 +44,28 @@ def _training_options(config, data_path, run_dir):
                'val': True, 'verbose': True}
     options.update({key: config[key] for key in TRAIN_KEYS if key in config})
     options.update(config.get('augment', {}))
+    if policy := config.get('training_policy'):
+        options.update(val=policy['mode'] in VALIDATING_MODES, patience=0,
+                       save_period=policy['save_period'])
     if config['task'] == 'pose': options.update(fliplr=0.0, flipud=0.0)
     if config.get('time_hours'): options['time'] = config['time_hours']
     return options
 
 
-def _attach_tensorboard(model, run_dir):
+def _phase_name(kind):
+    return kind + datetime.now(timezone.utc).strftime('_%Y%m%dT%H%M%S_%fZ')
+
+
+def _attach_tensorboard(model, run_dir, attempt=None):
     from torch.utils.tensorboard import SummaryWriter
-    writer = SummaryWriter(str(Path(run_dir) / 'tensorboard/train'))
+    writer = SummaryWriter(str(Path(run_dir) / 'tensorboard' / (attempt or _phase_name('train'))))
     def epoch_metrics(trainer):
         epoch = trainer.epoch + 1
         metrics = dict(getattr(trainer, 'metrics', {}) or {})
         metrics.update(getattr(trainer, 'lr', {}) or {})
         loss = getattr(trainer, 'tloss', None)
         if loss is not None:
-            for index, value in enumerate(loss.detach().cpu().flatten().tolist()):
-                metrics['train/loss_' + str(index)] = value
+            metrics.update(trainer.label_loss_items(loss, prefix='train'))
         for key, value in metrics.items():
             try: value = float(value)
             except (TypeError, ValueError): continue
@@ -109,6 +123,14 @@ def _evaluate_loaded(model, config, run_dir, data_path, split, name):
     summary['evaluation_config'] = {'imgsz': config['imgsz'], 'class_names': config.get('class_names'),
                                     'diagnostic_conf': config.get('diagnostic_conf', .25), 'match_iou': config.get('match_iou', .5)}
     write_json(actual / 'summary.json', summary)
+    if config['model_key'] == 'meter':
+        from .meter_report import write_meter_report
+        report = write_meter_report(actual)
+        summary['task_report'] = report.relative_to(actual).as_posix()
+    if config['model_key'] == 'waste_sticker':
+        from .sticker_report import write_sticker_report
+        report = write_sticker_report(actual, summary['evaluation_config']['class_names'])
+        summary['task_report'] = report.relative_to(actual).as_posix()
     tensorboard_report(run_dir, name, summary, class_rows, diagnostic)
     manifest = artifact_manifest(actual, config['task'])
     summary['artifact_manifest'] = manifest.relative_to(actual).as_posix()
@@ -116,33 +138,37 @@ def _evaluate_loaded(model, config, run_dir, data_path, split, name):
     return summary
 
 
+def _resume_checkpoint(root, value):
+    checkpoint = resolve(root, value, allow_absolute=True)
+    if checkpoint.is_dir():
+        checkpoint = resolve(root, checkpoint / 'training/weights/last.pt', allow_absolute=True)
+    if tuple(checkpoint.parts[-3:]) != ('training', 'weights', 'last.pt'):
+        raise ValueError('Resume expects an engine run or its training/weights/last.pt')
+    if not checkpoint.is_file() or 'runs' not in checkpoint.relative_to(root).parts[:-3]:
+        raise ValueError('Resume checkpoint is missing or outside runs: ' + str(checkpoint))
+    return checkpoint
+
+
+def recorded_resume_config(root, resume):
+    checkpoint = _resume_checkpoint(root, resume)
+    return validate(json.loads((checkpoint.parents[2] / 'config/effective.json').read_text(encoding='utf-8')),
+                    require_epochs=True)
+
+
 def resume_configuration(root, requested, run_dir, checkpoint):
     """Use the recorded run and staged inputs; source-package paths are not reused."""
     root, run_dir = Path(root).resolve(), Path(run_dir).resolve()
     if not run_dir.is_relative_to(root) or 'runs' not in run_dir.relative_to(root).parts:
         raise ValueError('Resume directory must be inside runs')
-    previous = validate(json.loads((run_dir / 'config/effective.json').read_text(encoding='utf-8')))
+    previous = recorded_resume_config(root, checkpoint)
+    requested = requested if requested is not None else previous
     allowed = {'batch', 'workers', 'device'}
     unused_inputs = {'data', 'model', 'data_overrides', 'output_root', 'amp_check_model', 'source_notes', 'description'}
     semantic = lambda value: {key:item for key,item in value.items() if key not in allowed | unused_inputs}
     if semantic(previous) != semantic(requested):
         raise ValueError('Resume config differs from recorded training semantics; only batch/workers/device may change')
     stage = run_dir / 'data'
-    header = read_yaml(stage / 'data.yaml')
-    samples = json.loads((stage / 'samples.json').read_text(encoding='utf-8'))
-    for sample in samples:
-        for key in ('run_image', 'run_label'):
-            if not resolve(run_dir, sample[key]).is_file():
-                raise ValueError('Recorded resume input missing: ' + str(sample[key]))
-    if set(sample['split'] for sample in samples) != {'train', 'val', 'test'}:
-        raise ValueError('Recorded run does not contain all dataset splits')
-    names = header['names']
-    if isinstance(names, dict): names = [names[index] for index in range(len(names))]
-    if previous.get('class_names') is not None:
-        expected_names = previous['class_names']
-        if isinstance(expected_names, dict): expected_names = [expected_names[index] for index in range(len(expected_names))]
-        if list(map(str, names)) != list(map(str, expected_names)):
-            raise ValueError('Frozen dataset class order differs from recorded training configuration')
+    data_signature = validate_staged_resume_data(run_dir, previous)
     effective = deepcopy(previous)
     for key in allowed:
         if key in requested: effective[key] = requested[key]
@@ -154,34 +180,85 @@ def resume_configuration(root, requested, run_dir, checkpoint):
     return effective, {'input_authority': 'Existing run/data and config/effective.json',
                        'ignored_source_fields': {key:requested[key] for key in sorted(unused_inputs) if key in requested},
                        'allowed_overrides': {key:effective.get(key) for key in sorted(allowed)},
-                       'staged_data': effective['data'], 'checkpoint': effective['model']}
+                       'staged_data': effective['data'], 'checkpoint': effective['model'],
+                       'dataset_signature': data_signature}
 
 
-def train_run(root, config, run_name=None, resume=None):
-    root = Path(root).resolve(); config = validate(deepcopy(config))
-    if config['version'].lower() == 'v4' and resume:
-        raise ValueError('V4 resume with per-step accounting is not implemented')
-    model_path = resolve(root, resume or config['model'])
+def _run_signature(run_dir, data_signature):
+    recorded = json.loads((run_dir / 'config/effective.json').read_text(encoding='utf-8'))
+    payload = json.dumps([recorded, data_signature], sort_keys=True, ensure_ascii=False)
+    return hashlib.sha256(payload.encode('utf-8')).hexdigest()
+
+
+def _restore_checkpoint_outputs(run_dir, checkpoint_path, checkpoint, completed):
+    """Rollback the CSV to the checkpoint and finish any same-epoch weight copies."""
+    results = checkpoint.get('train_results')
+    if (not isinstance(results, dict) or results.get('epoch') != list(range(1, completed + 1))
+            or any(not isinstance(values, list) or len(values) != completed for values in results.values())):
+        raise ValueError('Checkpoint does not contain a complete training metrics history')
+    training = run_dir / 'training'
+    state = checkpoint['policy_resume']
+    copies = ['best.pt'] if state['best_checkpoint'] else []
+    if state['periodic_checkpoint']:
+        copies.append(state['periodic_checkpoint'])
+    if state['periodic_checkpoint'] not in (None, f'epoch{completed}.pt', f'epoch{completed - 1}.pt'):
+        raise ValueError('Checkpoint has an invalid periodic weights name')
+    if (state['stopper'].get('best_epoch') and 'best.pt' not in copies
+            and not (checkpoint_path.parent / 'best.pt').is_file()):
+        raise ValueError('The run is missing its selected best.pt; copy the full training run')
+    with TemporaryDirectory(prefix='.resume-', dir=training) as temporary:
+        pending = Path(temporary) / 'results.csv'
+        with pending.open('w', newline='', encoding='utf-8') as stream:
+            writer = csv.writer(stream)
+            writer.writerow(results.keys())
+            writer.writerows(zip(*results.values(), strict=True))
+        pending.replace(training / 'results.csv')
+        for name in copies:
+            pending = Path(temporary) / name
+            shutil.copyfile(checkpoint_path, pending)
+            pending.replace(checkpoint_path.parent / name)
+
+
+def train_run(root, config, run_name=None, resume=None, *, attempt=None, controller_wall_seconds=None):
+    root = Path(root).resolve()
+    if controller_wall_seconds is not None and (not math.isfinite(controller_wall_seconds)
+                                                 or controller_wall_seconds <= 0):
+        raise ValueError('controller_wall_seconds must be finite and positive')
+    if attempt is not None and (not resume or not attempt.startswith('resume_') or not attempt.isidentifier()):
+        raise ValueError('Invalid resume attempt identifier')
+    if resume:
+        if run_name:
+            raise ValueError('Resume uses the original run directory')
+        model_path = _resume_checkpoint(root, resume)
+        run_dir = model_path.parents[2]
+        attempt = attempt or _phase_name('resume')
+    else:
+        config = validate(deepcopy(config), require_epochs=True)
+        model_path = resolve(root, config['model'])
+        run_dir = None
     if not model_path.is_file() or model_path.suffix.lower() != '.pt':
         raise ValueError('Local model/checkpoint missing: ' + str(model_path))
     if resume:
-        run_dir = model_path.parents[2]
-        if model_path.parent.name != 'weights' or model_path.parent.parent.name != 'training':
-            raise ValueError('Resume needs this engine run/training/weights/last.pt')
         config, resume_mapping = resume_configuration(root, config, run_dir, model_path)
     else:
         run_dir = new_run(root, config, run_name)
     print('RUN_DIR:', run_dir, flush=True)
-    with run_context(root, config, run_dir, 'resume' if resume else 'train'):
-        if config['version'].lower() == 'v4':
+    with training_lock(run_dir), run_context(root, config, run_dir, attempt or 'train'):
+        if controller_wall_seconds is not None:
+            write_json(run_dir / 'metadata/wall_budget.json',
+                       {'wall_seconds': controller_wall_seconds, 'attempt': attempt or 'train'})
+        if config['version'].lower() == 'v4' and not resume:
             write_json(run_dir / 'metadata/final_test_status.json', {'status': 'not_executed'})
         if resume:
-            data_path = relocate_staged_data(run_dir)
-            write_json(run_dir / 'metadata/resume_mapping.json', resume_mapping)
+            data_path = run_dir / 'data/data.yaml'
+            data_signature = resume_mapping['dataset_signature']
         else:
             data_path, selection = stage_dataset(root, config, run_dir)
             print('Data selection:', selection, flush=True)
-        config_yaml = run_dir / 'config' / ('resume_effective.yaml' if resume else 'effective.yaml')
+            data_signature = staged_dataset_signature(run_dir)
+        run_signature = _run_signature(run_dir, data_signature)
+        suffix = '_' + attempt if attempt else ''
+        config_yaml = run_dir / 'config' / ('effective' + suffix + '.yaml')
         config_yaml.write_text(yaml.safe_dump(config, allow_unicode=True, sort_keys=False), encoding='utf-8')
         if config.get('amp', False) and not (resume and (run_dir / 'yolov8n.pt').is_file()):
             if not config.get('amp_check_model'):
@@ -189,21 +266,49 @@ def train_run(root, config, run_name=None, resume=None):
             shutil.copy2(resolve(root, config['amp_check_model']), run_dir / 'yolov8n.pt')
         YOLO = prepare_ultralytics(run_dir)
         import torch
-        write_json(run_dir / 'metadata/hardware.json', {'cuda_available': torch.cuda.is_available(),
+        write_json(run_dir / 'metadata' / ('hardware' + suffix + '.json'), {'cuda_available': torch.cuda.is_available(),
                     'torch_cuda': torch.version.cuda,
                     'devices': [torch.cuda.get_device_name(i) for i in range(torch.cuda.device_count())]})
         model = YOLO(str(model_path), task=config['task'])
-        if resume: assert_model_contract(model, data_path, config)
-        writer = _attach_tensorboard(model, run_dir)
+        policy = config.get('training_policy')
+        legacy_resume = False
+        initial_steps = initial_epochs = 0
+        if resume:
+            assert_model_contract(model, data_path, config)
+            checkpoint = model.ckpt
+            if 'policy_resume' not in checkpoint and config['version'].lower() == 'v3':
+                # Preserve the original V3 compatibility path for stock Ultralytics checkpoints.
+                initial_epochs = checkpoint.get('epoch', -1) + 1
+                if not 0 < initial_epochs < config['epochs'] or not checkpoint.get('optimizer'):
+                    raise ValueError('V3 checkpoint has no unfinished optimizer state')
+                legacy_resume = True
+                print('Legacy V3 checkpoint: using native Ultralytics resume with limited early-stopping history.',
+                      flush=True)
+            else:
+                initial_epochs = validate_policy_checkpoint(checkpoint, config['task'], policy,
+                                                            config['epochs'], run_signature=run_signature)
+                initial_steps = checkpoint['policy_resume']['optimizer_steps']
+                previous = recorded_resume_config(root, model_path)
+                if config['batch'] != previous['batch']:
+                    raise ValueError('Resume must preserve the recorded batch size and gradient accumulation')
+                _restore_checkpoint_outputs(run_dir, model_path, checkpoint, initial_epochs)
+            resume_mapping.update(checkpoint_epochs=initial_epochs, checkpoint_optimizer_steps=initial_steps,
+                                  run_signature=run_signature, legacy_checkpoint=legacy_resume)
+            data_path = relocate_staged_data(run_dir)
+            write_json(run_dir / 'metadata' / ('resume_mapping' + suffix + '.json'), resume_mapping)
+        writer = _attach_tensorboard(model, run_dir, attempt)
         options = _training_options(config, data_path, run_dir)
-        write_json(run_dir / 'config/framework_options.json', options)
+        if resume:
+            options['exist_ok'] = True
+        write_json(run_dir / 'config' / ('framework_options' + suffix + '.json'), options)
         recorder = None
-        if config['version'].lower() == 'v4':
+        if not legacy_resume:
             from .telemetry import attach_update_recorder
-            recorder = attach_update_recorder(model, run_dir, config['epochs'])
+            recorder = attach_update_recorder(model, run_dir, config['epochs'], attempt=attempt,
+                                              initial_steps=initial_steps, initial_epochs=initial_epochs)
         reason = 'failed'
         try:
-            if resume:
+            if legacy_resume:
                 if config['task'] == 'pose':
                     from ultralytics.models.yolo.pose import PoseTrainer as BaseTrainer
                 else:
@@ -218,7 +323,9 @@ def train_run(root, config, run_name=None, resume=None):
                             self.args.save_dir = str(run_dir / 'training')
                 model.train(resume=True, trainer=RelocatedResumeTrainer, **options)
             else:
-                model.train(**options)
+                trainer_type = build_policy_trainer(config['task'], policy, run_signature=run_signature,
+                                                    optimizer_steps=lambda: recorder.total_steps)
+                model.train(resume=bool(resume), trainer=trainer_type, **options)
             if recorder is not None:
                 if not recorder.registered:
                     raise RuntimeError('Training returned without an optimizer-step recorder')
@@ -227,8 +334,17 @@ def train_run(root, config, run_name=None, resume=None):
                     raise RuntimeError('Training completed without any optimizer updates')
                 trainer = getattr(model, 'trainer', None)
                 completed_epoch = getattr(trainer, 'epoch', -1) + 1
-                reason = ('completed_epoch_budget' if completed_epoch >= config['epochs']
-                          else 'framework_stopped_early_reason_unconfirmed')
+                if completed_epoch >= config['epochs']:
+                    reason = 'completed_epoch_budget'
+                elif trainer.stopped_early:
+                    reason = 'validation_early_stop'
+                elif policy:
+                    raise RuntimeError('Training returned before its budget without a validation early stop')
+                else:
+                    reason = 'framework_stopped_early_reason_unconfirmed'
+        except NonFiniteTrainingError:
+            reason = 'non_finite_training'
+            raise
         except KeyboardInterrupt:
             reason = 'interrupted'
             raise
@@ -237,6 +353,11 @@ def train_run(root, config, run_name=None, resume=None):
                 recorder.close(reason, getattr(model, 'trainer', None))
             writer.close()
         best = run_dir / 'training/weights/best.pt'
+        if policy:
+            artifacts = _record_policy_artifacts(run_dir, model.trainer, policy, reason)
+            del model
+            _finalize_policy_training(YOLO, config, run_dir, data_path, artifacts)
+            return run_dir
         if not best.is_file(): raise RuntimeError('Training completed without best.pt')
         write_json(run_dir / 'metadata/artifacts.json', {'best': 'training/weights/best.pt',
                     'last': 'training/weights/last.pt', 'training_metrics': 'training/results.csv',
@@ -245,6 +366,88 @@ def train_run(root, config, run_name=None, resume=None):
             name = 'val' if not resume else 'val_resume_' + str(int(time.time()))
             _evaluate_loaded(YOLO(str(best), task=config['task']), config, run_dir, data_path, 'val', name)
     return run_dir
+
+
+def _record_policy_artifacts(run_dir, trainer, policy, reason):
+    weights = run_dir / 'training/weights'
+    last = weights / 'last.pt'
+    best = weights / 'best.pt'
+    completed_epochs = trainer.epoch + 1
+    period = policy['save_period']
+    checkpoints = [weights / f'epoch{epoch}.pt' for epoch in range(period, completed_epochs + 1, period)]
+    if any(not path.is_file() for path in [last, *checkpoints]):
+        raise RuntimeError('Training completed without its last or scheduled checkpoint')
+    selection = None
+    if policy['mode'] in VALIDATING_MODES:
+        if not best.is_file() or trainer.best_epoch is None or trainer.best_score is None:
+            raise RuntimeError('Validation training completed without a selected checkpoint')
+        selection = {'metric': 'Box mAP50-95' if trainer.args.task == 'detect' else 'Pose mAP50-95',
+                     'split': 'val', 'epoch': trainer.best_epoch, 'score': trainer.best_score}
+    elif best.exists():
+        raise RuntimeError('Fixed-budget training unexpectedly produced a selected checkpoint')
+    artifacts = {
+        'training_policy': policy, 'stop_reason': reason, 'completed_epochs': completed_epochs,
+        'last': last.relative_to(run_dir).as_posix(),
+        'best': best.relative_to(run_dir).as_posix() if selection else None,
+        'selection': selection,
+        'periodic_checkpoints': [path.relative_to(run_dir).as_posix() for path in checkpoints],
+        'training_metrics': 'training/results.csv', 'tensorboard': 'tensorboard',
+        'dataset': 'data/data.yaml', 'post_training': 'metadata/post_training.json',
+        'best_format': 'training_checkpoint' if selection else None,
+    }
+    write_json(run_dir / 'metadata/artifacts.json', artifacts)
+    return artifacts
+
+
+def _export_inference_checkpoint(source, destination):
+    """Apply YOLO FP16 inference finalization without changing the resume checkpoint."""
+    from ultralytics.utils.torch_utils import strip_optimizer
+
+    with TemporaryDirectory(prefix='.inference-', dir=destination.parent) as temporary:
+        pending = Path(temporary) / destination.name
+        # Ultralytics strips its own fields. Drop the additional V4 training tensors as well.
+        stripped = strip_optimizer(source, s=str(pending), updates={'policy_resume': None, 'scaler': None})
+        if not stripped or not pending.is_file():
+            raise RuntimeError('Could not export an inference checkpoint from ' + str(source))
+        pending.replace(destination)
+
+
+def _finalize_policy_training(YOLO, config, run_dir, data_path, artifacts):
+    status_path = run_dir / artifacts['post_training']
+    artifact_path = run_dir / 'metadata/artifacts.json'
+    state = {'status': 'running', 'phase': 'export', 'evaluation': None, 'inference_weights': {}}
+    write_json(status_path, state)
+    try:
+        last = run_dir / artifacts['last']
+        last_inference = last.with_name('last_inference.pt')
+        _export_inference_checkpoint(last, last_inference)
+        artifacts['last_inference'] = last_inference.relative_to(run_dir).as_posix()
+        state['inference_weights']['last'] = {'path': artifacts['last_inference'], 'bytes': last_inference.stat().st_size}
+        write_json(artifact_path, artifacts)
+        write_json(status_path, state)
+        if artifacts['best']:
+            best = run_dir / artifacts['best']
+            _export_inference_checkpoint(best, best)
+            artifacts['best_format'] = 'inference_fp16'
+            state['inference_weights']['best'] = {'path': artifacts['best'], 'bytes': best.stat().st_size}
+            write_json(artifact_path, artifacts)
+            write_json(status_path, state)
+        if config.get('evaluate_after_training', False):
+            name = 'val_final'
+            state.update(phase='validation', evaluation=f'evaluation/{name}/summary.json')
+            write_json(status_path, state)
+            best = run_dir / artifacts['best']
+            summary = _evaluate_loaded(YOLO(str(best), task=config['task']), config, run_dir, data_path, 'val', name)
+            summary.update(checkpoint=artifacts['best'], checkpoint_sha256=_file_sha256(best),
+                           model_selection=artifacts['selection'])
+            write_json(run_dir / state['evaluation'], summary)
+        state['status'] = 'complete'
+    except BaseException as error:
+        state.update(status='interrupted' if isinstance(error, KeyboardInterrupt) else 'failed',
+                     error=f'{type(error).__name__}: {error}')
+        raise
+    finally:
+        write_json(status_path, state)
 
 
 def evaluate_run(root, config, weights, split='val', run_dir=None, name=None):
@@ -269,8 +472,13 @@ def evaluate_run(root, config, weights, split='val', run_dir=None, name=None):
         raise FileExistsError('V4 evaluation name already used: ' + name)
     with run_context(root, config, run_dir, 'evaluate_' + name):
         data_path = run_dir / 'data/data.yaml'
-        if not data_path.exists(): data_path, _ = stage_dataset(root, config, run_dir)
-        else: data_path = relocate_staged_data(run_dir)
+        if not data_path.exists():
+            data_path, _ = stage_dataset(root, config, run_dir, training=False,
+                                         validation_only=config['version'].lower() == 'v4' and split == 'val')
+        else:
+            data_path = relocate_staged_data(run_dir)
+        if config.get('training_policy') and not read_yaml(data_path).get(split):
+            raise ValueError('The training data snapshot has no ' + split + ' split for evaluation')
         YOLO = prepare_ultralytics(run_dir)
         snapshot = None
         dataset_snapshot = None
@@ -405,22 +613,38 @@ def compare_runs(root, config, paths, run_name=None):
 def _mark_budget_exhausted(run_dir, phase):
     path = Path(run_dir) / 'metadata' / (phase + '_status.json')
     state = json.loads(path.read_text(encoding='utf-8')) if path.exists() else {'phase': phase}
-    state.update(status='budget_exhausted', error='Parent wall-clock deadline stopped the owned process tree')
+    state.update(status='budget_exhausted', error='Parent wall-clock deadline stopped the experiment')
     write_json(path, state)
     write_json(Path(run_dir) / 'metadata/status.json', state)
 
 
-def _record_abrupt_training_stop(run_dir, status, message):
+def _record_abrupt_training_stop(run_dir, status, message, *, attempt=None):
     """Record forced termination without claiming a complete optimizer-step count."""
     run_dir = Path(run_dir)
-    path = run_dir / 'metadata/train_status.json'
-    state = json.loads(path.read_text(encoding='utf-8')) if path.exists() else {'phase': 'train'}
+    metadata = run_dir / 'metadata'
+    path = metadata / ((attempt or 'train') + '_status.json')
+    entered_run = not attempt or path.exists()
+    try:
+        state = json.loads(path.read_text(encoding='utf-8'))
+    except (FileNotFoundError, UnicodeDecodeError, json.JSONDecodeError):
+        state = {'phase': attempt or 'train'}
     if state.get('status') not in ('complete', 'failed', 'interrupted', 'budget_exhausted'):
         state.update(status=status, error=message)
         write_json(path, state)
-        write_json(run_dir / 'metadata/status.json', state)
-    update_log = run_dir / 'metadata/optimizer_updates.jsonl'
-    if not (run_dir / 'metadata/optimization_summary.json').exists():
+        if entered_run:
+            write_json(metadata / 'status.json', state)
+    suffix = '_' + attempt if attempt else ''
+    finalization_path = metadata / 'post_training.json'
+    try:
+        finalization = json.loads(finalization_path.read_text(encoding='utf-8'))
+    except (FileNotFoundError, UnicodeDecodeError, json.JSONDecodeError):
+        finalization = {}
+    if finalization.get('status') == 'running':
+        finalization.update(status=status, error=message)
+        write_json(finalization_path, finalization)
+    update_log = metadata / ('optimizer_updates' + suffix + '.jsonl')
+    summary_path = metadata / ('optimization_summary' + suffix + '.json')
+    if not summary_path.exists():
         recorded = 0
         if update_log.is_file():
             for line in update_log.read_text(encoding='utf-8').splitlines():
@@ -429,47 +653,69 @@ def _record_abrupt_training_stop(run_dir, status, message):
                 except json.JSONDecodeError:
                     break
                 recorded += 1
-        write_json(run_dir / 'metadata/optimization_summary.json',
-                   {'status': status, 'recorded_optimizer_steps': recorded,
-                    'actual_optimizer_steps': None,
-                    'step_log': 'optimizer_updates.jsonl' if update_log.is_file() else None,
-                    'scope': 'An abrupt stop can interrupt recording; completed records are a lower bound.'})
+        summary = {'status': status, 'recorded_optimizer_steps': recorded,
+                   'actual_optimizer_steps': None,
+                   'step_log': update_log.name if update_log.is_file() else None,
+                   'scope': 'An abrupt stop can interrupt recording; completed records are a lower bound.'}
+        write_json(summary_path, summary)
+        if attempt and entered_run:
+            write_json(metadata / 'optimization_summary.json', summary)
     if not (run_dir / 'metadata/final_test_status.json').exists():
         write_json(run_dir / 'metadata/final_test_status.json', {'status': 'not_executed'})
 
 
-def bounded_train(root, config, config_path, wall_seconds, run_name=None):
+def bounded_train(root, config, config_path, wall_seconds, run_name=None, *, resume=None):
     """Enforce an external deadline without changing framework scheduler settings."""
-    root = Path(root).resolve(); validate(config)
+    root = Path(root).resolve()
+    attempt = None
+    if resume:
+        if run_name:
+            raise ValueError('Resume uses the original run directory')
+        checkpoint = _resume_checkpoint(root, resume)
+        resume = checkpoint.relative_to(root).as_posix()
+        run_dir = checkpoint.parents[2]
+        output = run_dir.parent
+        name = None
+        attempt = _phase_name('resume')
+        config = config if config is not None else recorded_resume_config(root, checkpoint)
+    else:
+        name = run_name or (config['version'] + '_' + uuid.uuid4().hex)
+        if Path(name).name != name or name in {'.', '..'}:
+            raise ValueError('run-name must be one directory name')
+        output = resolve(root, config['output_root'])
+        run_dir = output / name
+        if run_dir.exists():
+            raise FileExistsError('Run already exists: ' + str(run_dir))
+    validate(config, require_epochs=True)
     seconds = float(wall_seconds)
     if not math.isfinite(seconds) or seconds <= 0:
         raise ValueError('wall_seconds must be finite and positive')
-    name = run_name or (config['version'] + '_' + uuid.uuid4().hex)
-    if Path(name).name != name or name in {'.', '..'}:
-        raise ValueError('run-name must be one directory name')
-    output = resolve(root, config['output_root'])
-    run_dir = output / name
-    if run_dir.exists():
-        raise FileExistsError('Run already exists: ' + str(run_dir))
     controller = output / '_controllers' / uuid.uuid4().hex
     controller.mkdir(parents=True, exist_ok=False)
     state = {'phase': 'train_controller', 'status': 'running', 'wall_seconds': seconds,
-             'run': run_dir.relative_to(root).as_posix(), 'elapsed_seconds': None}
+             'run': run_dir.relative_to(root).as_posix(), 'elapsed_seconds': None, 'attempt': attempt}
     write_json(controller / 'status.json', state)
     started = time.monotonic()
     try:
-        arguments = child_command('train', root, config_path, run_name=name)
-        run_bounded(arguments, started + seconds, controller / 'child.log', root)
+        if resume or config.get('training_policy'):
+            # Freeze the effective budget, including any CLI override, before launching the child.
+            snapshot = controller / 'train.yaml'
+            snapshot.write_text(yaml.safe_dump(config, allow_unicode=True, sort_keys=False),
+                                encoding='utf-8')
+            config_path = snapshot.relative_to(root).as_posix()
+        arguments = child_command('train', root, config_path, run_name=name, resume=resume, attempt=attempt,
+                                  controller_wall_seconds=seconds)
+        run_bounded(arguments, started + seconds, controller / 'child.log', root, display_output=True)
         state['status'] = 'complete'
     except BudgetExhausted as error:
         state.update(status='budget_exhausted', error=str(error))
-        _record_abrupt_training_stop(run_dir, 'budget_exhausted', str(error))
+        _record_abrupt_training_stop(run_dir, 'budget_exhausted', str(error), attempt=attempt)
         raise
     except BaseException as error:
         state.update(status='interrupted' if isinstance(error, KeyboardInterrupt) else 'failed',
                      error=f'{type(error).__name__}: {error}')
-        if config['version'].lower() == 'v4':
-            _record_abrupt_training_stop(run_dir, state['status'], state['error'])
+        if resume or config['version'].lower() == 'v4':
+            _record_abrupt_training_stop(run_dir, state['status'], state['error'], attempt=attempt)
         raise
     finally:
         state['elapsed_seconds'] = time.monotonic() - started
@@ -528,7 +774,7 @@ def threshold_scan_in_process(root, config, weights, run_name=None, run_dir=None
     if not checkpoint.is_file(): raise ValueError('Threshold tuning checkpoint missing')
     run_dir = resolve(root, run_dir, allow_absolute=True) if run_dir is not None else new_run(root, config, run_name)
     with run_context(root, config, run_dir, 'threshold_tuning'):
-        data_path, _ = stage_dataset(root, config, run_dir)
+        data_path, _ = stage_dataset(root, config, run_dir, training=False)
         YOLO = prepare_ultralytics(run_dir); model = YOLO(str(checkpoint), task=config['task'])
         assert_model_contract(model, data_path, config)
         started = time.monotonic(); rows = []

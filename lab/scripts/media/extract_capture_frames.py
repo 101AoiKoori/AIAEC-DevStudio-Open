@@ -51,12 +51,13 @@ class Segment:
     source_row: dict
 
 
-def path_under(value, base):
-    base = (ROOT / base).resolve()
+def path_under(value, *allowed_roots):
     path = (ROOT / value).resolve()
-    if not base.is_relative_to(ROOT) or not path.is_relative_to(base) or path == base:
-        raise ValueError(f'路径须位于工作空间的 {base.name}/ 子目录内：{value}')
-    return path
+    for allowed_root in allowed_roots:
+        base = (ROOT / allowed_root).resolve()
+        if base != ROOT and base.is_relative_to(ROOT) and path != base and path.is_relative_to(base):
+            return path
+    raise ValueError(f'路径须位于工作空间的 {" 或 ".join(allowed_roots)} 子目录内：{value}')
 
 
 def probe_video(ffprobe, path):
@@ -275,7 +276,7 @@ def main():
     parser.add_argument('--output', required=True, type=Path)
     args = parser.parse_args()
     try:
-        raw_batch = path_under(args.raw_batch, 'datasets/raw')
+        raw_batch = path_under(args.raw_batch, 'datasets/raw', 'Archive/Assets')
         segment_path = path_under(args.segments, 'datasets/annotated')
         output = path_under(args.output, 'datasets/annotated')
         if not raw_batch.is_dir() or not segment_path.is_file():

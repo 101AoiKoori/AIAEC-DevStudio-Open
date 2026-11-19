@@ -1,0 +1,8 @@
+{
+  "purpose": "Bounded first baseline on current complete samples; no formal dataset release",
+  "validation_parent_groups": [
+    "Archive/Assets/电动车与人物/照片/小车摄像头实拍_停车区多车_直立与倒伏近景_006.ppm",
+    "Archive/Assets/电动车与人物/视频/场地多辆电动车_直立与倒伏混合_俯角_002.mp4",
+    "datasets/raw/site_capture_20261112/onboard_camera_images"
+  ]
+}

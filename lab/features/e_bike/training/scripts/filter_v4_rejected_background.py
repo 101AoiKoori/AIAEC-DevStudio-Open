@@ -25,9 +25,9 @@ from lab.scripts.data.v4_source_gate import build_queue  # noqa: E402
 SOURCE = ROOT / 'datasets/annotated/e_bike/v4_858_source_20261113/staged_source_gate.json'
 DISTRIBUTION = ROOT / 'datasets/annotated/e_bike/v4_858_source_20261113/distribution_manifest.json'
 CONFIG = ROOT / 'lab/features/e_bike/training/config/e_bike_v4_reviewed_858.yaml'
-REJECTED_VIDEO = 'datasets/raw/site_archive_legacy/场景/综合视频/空场与场景物料_001.mp4'
-FIELD_VIDEO = 'datasets/raw/site_capture_20261112/videos/full_scene.mp4'
-EVAL_VIDEO = 'datasets/raw/e_bike/archive_assets_legacy/视频/场地多辆电动车_直立与倒伏混合_较低视角_003.mp4'
+REJECTED_VIDEO = 'Archive/Assets/working_sources/legacy/site/场景/综合视频/空场与场景物料_001.mp4'
+FIELD_VIDEO = 'Archive/Assets/captures/site_capture_20261112/videos/full_scene.mp4'
+EVAL_VIDEO = 'Archive/Assets/working_sources/legacy/e_bike/视频/场地多辆电动车_直立与倒伏混合_较低视角_003.mp4'
 FIELD_FRAMES = 'datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/'
 ALLOWED_TRAIN = FIELD_FRAMES + 'frame_005751.png'
 REJECTED_TRAIN = {FIELD_FRAMES + 'frame_007000.png', FIELD_FRAMES + 'frame_007045.png'}

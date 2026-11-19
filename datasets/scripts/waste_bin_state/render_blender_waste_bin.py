@@ -13,15 +13,16 @@ from mathutils import Quaternion, Vector
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from datasets.scripts.waste_bin_state.bin_render_contract import (BIN_NAMES, MASK_COLORS, OPEN_POSES, STATE_CONTRACT,
+from datasets.scripts.waste_bin_state.bin_render_contract import (BIN_NAMES, MASK_COLORS, MIN_MOUTH_THICKNESS_PX,
+                                 OPEN_POSES, STATE_CONTRACT,
                                  attach_state_evidence, capture_material_baseline,
-                                 decode_mask, measure_visibility, mouth_pixel_contrast, projected_points_fit, standalone_planned_jobs,
+                                 decode_mask, measure_visibility, mouth_thickness, projected_points_fit, standalone_planned_jobs,
                                  required_hinge_shift, vary_material)
 
 
 ROOT = Path(__file__).resolve().parents[3]
 from datasets.scripts.common.config import source_path
-from datasets.scripts.common.paths import sample_dir
+from datasets.scripts.common.paths import BIN_STATE_RENDER_FOLDERS, bin_state_foreground_dir
 GEOMETRY_TYPES = {'MESH', 'CURVE', 'SURFACE', 'FONT', 'META'}
 
 
@@ -297,14 +298,20 @@ def create_coverage_occluder(scene):
 def _generate(run, args, jobs, media):
     out = within_workspace(args.out)
     source = within_workspace(bpy.data.filepath)
-    if out != sample_dir('waste_bin_state').resolve():
-        raise ValueError('render output must be datasets/samples/waste_bin_state')
-    if (out.exists() and any(out.iterdir())) or not source.is_file():
-        raise ValueError('output exists or loaded scene is missing')
+    destination = bin_state_foreground_dir(run.plan['target_split'])
+    if out != destination.resolve():
+        raise ValueError(f'render output must be {destination.relative_to(ROOT).as_posix()}')
+    if (out / 'manifest.json').exists() or any(
+            (out / name).exists() and any((out / name).iterdir()) for name in BIN_STATE_RENDER_FOLDERS):
+        raise ValueError('managed bin-state render outputs must be empty')
+    if not source.is_file():
+        raise ValueError('loaded scene is missing')
     scene = bpy.context.scene
     if scene.render.engine != 'CYCLES' or not scene.camera:
         raise ValueError('source scene must contain a camera and use Cycles')
-    baselines = capture_material_baseline(bpy.data.materials)
+    body_materials = {name + ' adjustable body color': scene.objects[name + ' body'].active_material
+                      for name in BIN_NAMES}
+    baselines = capture_material_baseline(body_materials)
     camera = scene.camera
     ground_contact = ground_bins(scene)
     pivots = [bpy.data.objects[name + ' lid pivot - rotate X'] for name in BIN_NAMES]
@@ -320,13 +327,12 @@ def _generate(run, args, jobs, media):
             raise ValueError(name + ': missing bin body or flange')
     proxies = create_mouth_proxies(scene)
     out.mkdir(parents=True, exist_ok=True)
-    for folder in ('images', 'labels_candidate', 'mask_visible', 'mask_isolated',
-                   'mask_state_visible', 'mask_state_isolated'):
-        (out / folder).mkdir()
+    for folder in BIN_STATE_RENDER_FOLDERS:
+        (out / folder).mkdir(exist_ok=True)
     report = {'status': 'running', 'seed': args.seed, 'requested_images': len(jobs),
               'render_device': args.device, 'devices': [], 'samples_per_pixel': args.samples,
               'blender_version': bpy.app.version_string, 'resolution': [args.width, args.height],
-              'scene_file': source.relative_to(ROOT).as_posix(), 'scene_unit_cm': 10,
+              'scene_file': source.relative_to(ROOT).as_posix(), 'scene_name': scene.name, 'scene_unit_cm': 10,
               'camera_distance_note': 'declared scene coordinates; not a calibrated vehicle route',
               'classes': {'0': 'open', '1': 'closed'}, 'split': run.plan['target_split'],
               'label_contract_id': STATE_CONTRACT, 'hinge_clearance_adjustment': hinge_clearance,
@@ -357,13 +363,13 @@ def _generate(run, args, jobs, media):
             camera.data.lens = params['lens_mm']
             bpy.data.objects['Key'].data.energy = params['key_energy']
             bpy.data.objects['Fill'].data.energy = params['fill_energy']
-            for name, key in (('Floor', 'floor_gray'), ('Backdrop', 'backdrop_gray')):
+            for name, key in (('Ground', 'floor_gray'), ('Background wall', 'backdrop_gray')):
                 shade = background[key]
-                node = bpy.data.materials[name].node_tree.nodes.get('Principled BSDF')
+                node = scene.objects[name].active_material.node_tree.nodes.get('Principled BSDF')
                 node.inputs['Base Color'].default_value = (shade, shade, shade, 1)
             colors, roughness = {}, {}
             for name in BIN_NAMES:
-                node = bpy.data.materials[name + ' adjustable body color'].node_tree.nodes.get('Principled BSDF')
+                node = body_materials[name + ' adjustable body color'].node_tree.nodes.get('Principled BSDF')
                 rgb, rough = vary_material(baselines[name], params['color_factor'], params['roughness_delta'])
                 node.inputs['Base Color'].default_value = (*rgb, 1)
                 node.inputs['Roughness'].default_value = rough
@@ -382,26 +388,22 @@ def _generate(run, args, jobs, media):
                 parts = {name: target_parts[name] for name in BIN_NAMES if name in selected}
                 mask_paths, targets = render_target_masks(scene, camera, parts, out, stem,
                     args.min_visibility, args.min_visible_pixels, 'mask_visible', 'mask_isolated')
-                evidence_parts = {name: ([proxies[name]] if states[name] == 'open' else lid_parts[name])
+                open_bins = {name for name in selected if states[name] == 'open'}
+                evidence_parts = {name: ([proxies[name]] if name in open_bins else lid_parts[name])
                                   for name in BIN_NAMES if name in selected}
-                open_proxies = [proxies[name] for name in BIN_NAMES if name in selected and states[name] == 'open']
                 state_paths, evidence = render_target_masks(scene, camera, evidence_parts, out, stem,
                     args.min_visibility, args.min_visible_pixels, 'mask_state_visible', 'mask_state_isolated',
-                    force_visible=open_proxies)
+                    force_visible=[proxies[name] for name in open_bins])
                 labels = [attach_state_evidence(item, evidence[i], states[item['bin']])
                           for i, item in enumerate(targets)]
-                image_pixels = read_rgba(out / 'images' / filename)
-                visible_pixels = read_rgba(out / mask_paths['visible'])
                 mouth_pixels = read_rgba(out / state_paths['visible'])
                 for item in labels:
-                    if item['state'] == 'open':
-                        name = item['bin']
-                        contrast = mouth_pixel_contrast(image_pixels, decode_mask(mouth_pixels, name),
-                                                        decode_mask(visible_pixels, name), args.min_visible_pixels)
-                        item['state_evidence']['image_pixel_contrast'] = contrast
-                        if not contrast['passed']:
+                    if item['state_evidence']['kind'] == 'mouth_proxy':
+                        thickness = mouth_thickness(decode_mask(mouth_pixels, item['bin']))
+                        item['state_evidence']['max_vertical_mouth_pixels'] = thickness
+                        if thickness < MIN_MOUTH_THICKNESS_PX:
                             item['label_eligible'] = False
-                            item['rejection_reasons'].append('state_evidence:mouth_pixel_contrast_unconfirmed')
+                            item['rejection_reasons'].append('state_evidence:mouth_too_thin')
             else:
                 mask_paths, state_paths, labels = {'visible': None}, {'visible': None}, []
                 if any(not obj.hide_render for parts in target_parts.values() for obj in parts):
@@ -414,7 +416,7 @@ def _generate(run, args, jobs, media):
                     x1, y1, x2, y2 = item['candidate_xyxy_normalized']
                     rows.append(f"{0 if item['state'] == 'open' else 1} {(x1+x2)/2:.6f} {(y1+y2)/2:.6f} {x2-x1:.6f} {y2-y1:.6f}")
                 (out / candidate).write_text('\n'.join(rows) + ('\n' if rows else ''), encoding='utf-8')
-            actual = {'scene': source.relative_to(ROOT).as_posix(), 'state_id': job['id'],
+            actual = {'scene': source.relative_to(ROOT).as_posix(), 'scene_name': scene.name, 'state_id': job['id'],
                       'visible_bins': [name for name in BIN_NAMES if name in selected],
                       'bin_states': {name: states[name] for name in BIN_NAMES if name in selected},
                       'open_pose': target['open_pose'], 'camera_location': list(camera.location),
@@ -458,6 +460,8 @@ def _guard_inputs():
         raise RuntimeError('could not reload the guarded scene')
     if Path(bpy.data.filepath).resolve() != scene:
         raise RuntimeError('loaded scene changed during source discovery')
+    from datasets.scripts.common.blender_workspace import BIN_PHOTO, BINS_PHOTO_SCENE, activate_scene
+    activate_scene(BINS_PHOTO_SCENE, (BIN_PHOTO,))
     procedural, media = {scene}, set()
     sidecar = scene.parent / 'manifest.json'
     if sidecar.is_file():
@@ -496,21 +500,24 @@ def main():
             min(args.width, args.height) > 720 or not 0 < args.min_visibility <= 1 or args.min_visible_pixels < 1):
         parser.error('invalid render dimensions, samples or visibility thresholds')
     out, plan_path = within_workspace(args.out), within_workspace(args.plan)
-    if out != sample_dir('waste_bin_state').resolve():
-        parser.error('render output must be datasets/samples/waste_bin_state')
     source = within_workspace(bpy.data.filepath)
     if not plan_path.is_file() or not bpy.data.filepath or not source.is_file():
         raise ValueError('load an existing scene and provide an existing plan inside the workspace')
     declaration = json.loads(plan_path.read_text(encoding='utf-8-sig'))
+    destination = bin_state_foreground_dir(declaration['target_split'])
+    if out != destination.resolve():
+        parser.error(f'render output must be {destination.relative_to(ROOT).as_posix()}')
     if source != source_path('waste_bin_state', 'standalone_scene'):
         raise ValueError('loaded scene differs from waste_bin_state source.yaml')
     sys.path.insert(0, str(ROOT))
     from lab.training_common.production_guard import generation_guard
     media, procedural = _guard_inputs()
     with generation_guard('waste_bin.render_state:' + str(out.relative_to(ROOT)),
-                          media, [out], {'argv': raw, 'blender_version': bpy.app.version_string},
+                          media, [out / name for name in (*BIN_STATE_RENDER_FOLDERS, 'manifest.json')],
+                          {'argv': raw, 'blender_version': bpy.app.version_string},
                           code_paths=[Path(__file__).resolve(), ROOT / 'datasets/scripts/waste_bin_state/bin_render_contract.py',
-                                      ROOT / 'datasets/scripts/common/blender_masks.py'],
+                                      ROOT / 'datasets/scripts/common/blender_masks.py',
+                                      ROOT / 'datasets/scripts/common/blender_workspace.py'],
                           procedural_inputs=[*procedural, plan_path, ROOT/'datasets/scripts/waste_bin_state/config/source.yaml', ROOT/'datasets/scripts/waste_bin_state/config/dataset.yaml'], root=ROOT, production_plan=declaration,
                           sample_output_paths=[out / 'images'],
                           auxiliary_output_paths=[out / name for name in ('mask_visible', 'mask_isolated',

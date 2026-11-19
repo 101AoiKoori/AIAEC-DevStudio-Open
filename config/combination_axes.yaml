@@ -1,115 +1,892 @@
-# 八任务组合轴声明（噪声/干扰，不是训练目标）。
-# 这些轴用于人为排除与 YOLOv8 目标特征无关的条件，设计覆盖、交叉和干扰方案；
-# 它们不是类别、关键点、OCR 或计数目标。训练目标见 config/task_targets.yaml。
-# 修改后运行：python lab/scripts/contracts/state_coverage.py --write
+# 组合轴用于打破目标标签与场景、成像或其他易误学特征的伪相关。
+# axes 是本轮有具体对照用途的干扰条件；crosses 说明配对和核对方法。
+# 在实际标签和对应实例或有证据的场景上查联合格，按 split、来源和父组看重复。
+# 不因缺少可选观察字段而阻断无关的生成或标注；不对所有 axes 做全排列。
+# 修改后由设计文档负责人运行 python lab/scripts/contracts/state_coverage.py --write。
 version: 1
+structured_semantics:
+  executable: false
+  multi_dimension_variation: unresolved
+  meaning: 多维变化不声明联合、独立或全排列；未结构化部分仍以原文为准。
+scene_inputs:
+  ingest: 首次录入同一图时读取一次像素，合并写入各任务的目标标签与背景空间结果，并保留适用范围。空间结果记录可用、不可用或尚待补证。
+  composite_background: 可优先从其他任务目录发现候选，按画面判断接收任务的主体和目标有无。以接收任务目标为主体的帧作直接目标素材，从常规合成底图池排除。非主体的范围内目标须有完整标签并随变换保留。范围外物体可留作背景，空间核对考虑实际占位和遮挡。
+  empty_negative: 对整帧按接收任务定义确认无识别范围内目标，可用于空标签监督。空间不可用或待补证时仍保留此资格。作合成底图另需 composite_background。裁区无目标的证据限于裁区。
+  geometry_reference: 支持几何或视角参考。进入有监督的合成背景前还需该用途对应的标签证据。
+  split_selection: 入库确认任务用途资格。已合格而未分配的图从编批时选取并落实 split。同一合格图可形成多个有效布局，按成图计量，父场景按实际来源追溯。按评估目的登记同源诊断或独立来源验证。
+  use: 计划消费适用角色、坐标与证据版本。合成检验本次新增布局、遮挡和标签是否正确，直接沿用原帧已入库的审查结论。
+evidence_states:
+  unknown: 适用但没有足够证据确定取值。
+  not_applicable: 已知该条件不适用，例如确认空场没有目标桶色。
+generation_defaults:
+  lighting:
+    # HSV V 增益档位和优先顺序由人物编译入口消费。它们描述生成控制。
+    image_value_gain:
+      very_dark: [0.30, 0.40]
+      dark: [0.50, 0.65]
+      normal: [0.80, 1.0]
+    priority: [very_dark, dark, normal]
 tasks:
   person:
-    plans:
-      - config/production_plan.json
+    structure:
+      objects:
+        target: 可辨正面人物立牌及白背对照
+        scene: 场景或机位
+        context: 干扰物、遮挡或成像条件
+      dimensions:
+        scene.background:
+          object: scene
+          role: nuisance
+          value_source: axes.background
+        target.class:
+          object: target
+          role: target
+          value_source: targets.classes
+        target.position:
+          object: target
+          role: nuisance
+          value_source: axes.position
+        context.vehicle_occlusion:
+          object: context
+          role: nuisance
+          value_source: axes.vehicle_occlusion
+        target.scale:
+          object: target
+          role: nuisance
+          value_source: unknown
+        target.face:
+          object: target
+          role: nuisance
+          value_source: unknown
+    placement: 在原图坐标核对地面支撑、目标尺寸和遮挡，保留背景中的正面框和白背区域。尺度缺少实测时记录近似依据。
+    generation:
+      # 由 build_full_person_plan.py 消费；在正面纹理上做平面偏航。
+      yaw_degrees: [-60, -45, -30, 0, 30, 45, 60]
     axes:
       background: dynamic
       position: dynamic
-      view: [front, oblique, side, back]
-      lighting: [normal, dark, bright]
-      saturation: [normal, low, high]
+      view: [front, oblique]
       mutual_occlusion: [none, present]
       vehicle_occlusion: [none, upright, fallen]
-      scale: [near, far, unknown]
-      crop: [complete, cropped]
-    notes: 电动车直立/倒伏在这里只是人物目标的遮挡干扰，不是人物类别。
+    crosses:
+      - id: category_context
+        purpose: 立牌类别不能由背景、脚点或车的姿态猜出。
+        pairs: 同背景内安排两类可辨正面，交换脚点；让两类各出现于无遮挡和直立／倒伏车有效遮挡。
+        check: 按人物实例将类别、背景父组、脚点、可见框与遮挡者连接；用 actor ID 关联重叠，画面中有车不能单独证明挡住了谁。
+        structured:
+          completeness: partial
+          contrasts:
+          - hold:
+            - scene.background
+            vary:
+            - target.class
+            - target.position
+            variation: unresolved
+          - hold:
+            - target.class
+            vary:
+            - context.vehicle_occlusion
+            variation: single
+          constraints:
+          - kind: evidence_rule
+            rule: occlusion_requires_actor_overlap
+            source_field: check
+          evidence_links:
+          - kind: historical_observation
+            task: person
+            cross_id: category_context
+          - kind: required_observation
+            dimensions:
+            - context.vehicle_occlusion
+            - scene.background
+            - target.class
+            - target.position
+      - id: front_back
+        purpose: 立牌轮廓或白板不能代替正面类别特征。
+        pairs: 同尺寸段的可辨正面和白背单独出现，再用白背加另一块可辨正面作对照；单列真实薄边／纯侧背。
+        check: 用清单白背位置、真实视面和最终 YOLO 框核对三种场景；仅白背为完整空标签，正背同框只标可辨正面。
+        structured:
+          completeness: partial
+          contrasts:
+          - hold:
+            - target.scale
+            vary:
+            - target.face
+            variation: single
+          unresolved:
+          - 白背与可辨正面同框、真实薄边及纯侧背的关系尚未结构化，按 pairs 原文理解。
+          constraints:
+          - kind: evidence_rule
+            rule: annotate_identifiable_front_only
+            source_field: check
+          evidence_links:
+          - kind: historical_observation
+            task: person
+            cross_id: front_back
+          - kind: required_observation
+            dimensions:
+            - target.face
+            - target.scale
   e_bike:
-    plans:
-      - config/production_plan.json
-      - config/direct_real_plan.json
+    structure:
+      objects:
+        target: 直立或倒伏电动车
+        scene: 场景或机位
+        context: 干扰物、遮挡或成像条件
+      dimensions:
+        scene.background:
+          object: scene
+          role: nuisance
+          value_source: axes.background
+        target.count:
+          object: target
+          role: target
+          value_source: targets.counts
+        target.class:
+          object: target
+          role: target
+          value_source: targets.classes
+        scene.location:
+          object: scene
+          role: nuisance
+          value_source: axes.location
+        context.tone:
+          object: context
+          role: nuisance
+          value_source: unknown
+        context.person_occlusion:
+          object: context
+          role: nuisance
+          value_source: axes.person_occlusion
+        context.vehicle_occlusion:
+          object: context
+          role: nuisance
+          value_source: axes.vehicle_occlusion
+        target.view:
+          object: target
+          role: nuisance
+          value_source: axes.view
+    placement: 街道／停车区的可用接地区域、车辆尺寸和遮挡，保留已有车辆标签。可用的远近和尺度证据用于细化布局，缺失时记录近似依据。
     axes:
       background: dynamic
-      location: [street, parking, unknown]
-      view: [front, side, back, unknown]
-      distance: [near, far, unknown]
-      truncation: [none, partial, unknown]
-      person_occlusion: [none, present, unknown]
-      vehicle_occlusion: [none, present, unknown]
-      lighting: [normal, adjusted]
-      saturation: [normal, adjusted]
-    notes: 直立/倒伏是电动车任务的目标类别，不放在组合轴；这里只放场景和遮挡噪声。
+      location: [street, parking]
+      view: [front, side, back]
+      person_occlusion: [none, present]
+      vehicle_occlusion: [none, present]
+    crosses:
+      - id: pose_context
+        purpose: 车的有无和姿态不能由路面或背景猜出。
+        pairs: 同一确定无车底图配空场、单直立、单倒伏；再在可行的街道和停车区复用两种姿态，并让两态复用相同调色范围。
+        check: 同底图或相同场地角色内用实际标签核对零／直立／倒伏，按父视频统计独立覆盖。
+        structured:
+          completeness: partial
+          contrasts:
+          - hold:
+            - scene.background
+            vary:
+            - target.count
+            - target.class
+            variation: unresolved
+          - hold:
+            - target.class
+            vary:
+            - scene.location
+            - context.tone
+            variation: unresolved
+          constraints:
+          - kind: applicability
+            dimension: target.class
+            when: target.count=empty
+            result: not_applicable
+          - kind: evidence_rule
+            rule: empty_background_requires_no_vehicle
+            source_field: check
+          evidence_links:
+          - kind: historical_observation
+            task: e_bike
+            cross_id: pose_context
+          - kind: required_observation
+            dimensions:
+            - context.tone
+            - scene.background
+            - scene.location
+            - target.class
+            - target.count
+      - id: occlusion_view
+        purpose: 有人、相邻车辆或某一视面不能成为倒伏提示。
+        pairs: 同姿态有／无人车有效遮挡；在可辨视面中安排两态以及少量两态同框。
+        check: 用实例类别与真实视面、可见率和遮挡者交集逐框连接；总可见率无法区分人挡和车挡。
+        structured:
+          completeness: partial
+          contrasts:
+          - hold:
+            - target.class
+            vary:
+            - context.person_occlusion
+            - context.vehicle_occlusion
+            - target.view
+            variation: unresolved
+          constraints:
+          - kind: evidence_rule
+            rule: distinguish_occluder_and_actual_overlap
+            source_field: check
+          evidence_links:
+          - kind: historical_observation
+            task: e_bike
+            cross_id: occlusion_view
+          - kind: required_observation
+            dimensions:
+            - context.person_occlusion
+            - context.vehicle_occlusion
+            - target.class
+            - target.view
   fire:
-    plans:
-      - config/production_plan.json
+    structure:
+      objects:
+        target: 指定火焰图案贴纸
+        scene: 场景或机位
+        context: 干扰物、遮挡或成像条件
+      dimensions:
+        scene.facade:
+          object: scene
+          role: nuisance
+          value_source: axes.facade
+        target.count:
+          object: target
+          role: target
+          value_source: targets.counts
+        target.class:
+          object: target
+          role: target
+          value_source: targets.classes
+        target.position:
+          object: target
+          role: nuisance
+          value_source: axes.position
+        context.distractor:
+          object: context
+          role: nuisance
+          value_source: axes.distractor
+    placement: 指定输出裁区、楼面 ID 和贴放四边形；保留已有贴纸及各自楼面归属。
     axes:
       facade: dynamic
       position: dynamic
-      scale: [normal, enlarged, reduced, unknown]
-      yaw: [frontal, oblique, unknown]
-      occlusion: [none, present, unknown]
-      lighting: [normal, adjusted, unknown]
-      saturation: [normal, adjusted, unknown]
-      crop: [complete, cropped, unknown]
-    notes: 零/单/多贴是目标计数；真实火焰、烟雾、楼面和贴放位置是干扰/场景条件。
+      distractor: [none, red_signal_lamp, red_orange_bin, other_red_orange_object]
+    crosses:
+      - id: shape_color_contrast
+        purpose: 识别指定火焰图案的结构和边界，红橙颜色及亮区本身不能代替目标身份。
+        pairs: 同背景对照仅有干扰物与贴纸加干扰物；指定贴纸跨楼面位置，红灯、红橙桶及其他红橙物独立变化大小、位置和明暗。
+        check: 核对当前图签及干扰类型元数据；无指定贴纸的画面为空负，有贴画面保留全部指定贴纸框。首轮先共同学习，专项误报率验证后续再做。
+        structured:
+          completeness: partial
+          contrasts:
+          - hold:
+            - scene.facade
+            - context.distractor
+            vary:
+            - target.count
+            variation: single
+          - hold:
+            - target.class
+            vary:
+            - context.distractor
+            variation: single
+          constraints:
+          - kind: evidence_rule
+            rule: negative_requires_no_target_sticker
+            source_field: check
+          evidence_links:
+          - kind: historical_observation
+            task: fire
+            cross_id: shape_color_contrast
+          - kind: required_observation
+            dimensions:
+            - scene.facade
+            - target.class
+            - target.count
+            - context.distractor
+      - id: facade_position
+        purpose: 楼面身份、固定贴放位或红橙色物体不能代替指定火焰图案。
+        pairs: 同楼面配零贴与有贴，同一图案跨多个楼面及可行贴放位；另补确认无指定贴纸的相似图案或火焰／烟雾。
+        check: 用 source_image、楼面与实际贴放位置连接框；同一楼面查有无两格，硬负查真实内容及完整空标签。
+        structured:
+          completeness: partial
+          contrasts:
+          - hold:
+            - scene.facade
+            vary:
+            - target.count
+            variation: single
+          - hold:
+            - target.class
+            vary:
+            - scene.facade
+            - target.position
+            variation: unresolved
+          constraints:
+          - kind: evidence_rule
+            rule: negative_requires_no_target_sticker
+            source_field: check
+          evidence_links:
+          - kind: historical_observation
+            task: fire
+            cross_id: facade_position
+          - kind: required_observation
+            dimensions:
+            - scene.facade
+            - target.class
+            - target.count
+            - target.position
+      - id: building_counts
+        purpose: 一张图或一栋楼不能成为固定报数的线索。
+        pairs: 同楼面配单贴和多贴，两楼同框时改变各楼贴数并保留含零贴楼的组合。
+        check: 每图每楼按实际有效实例与 building 归属计数；请求贴数、图片数和被挡后可标实例数分别核对。
+        structured:
+          completeness: partial
+          contrasts:
+          - hold:
+            - scene.facade
+            vary:
+            - target.count
+            variation: single
+          constraints:
+          - kind: evidence_rule
+            rule: count_visible_instances_per_building
+            source_field: check
+          evidence_links:
+          - kind: historical_observation
+            task: fire
+            cross_id: building_counts
+          - kind: required_observation
+            dimensions:
+            - scene.facade
+            - target.count
   building_name_paper:
-    plans:
-      - config/production_plan.json
-      - config/blender_plan.json
-      - config/combination_plan.json
-      - config/rooftop_sources.json
+    structure:
+      objects:
+        target: 楼名纸片及其文字
+        scene: 场景或机位
+        context: 干扰物、遮挡或成像条件
+      dimensions:
+        scene.building_count:
+          object: scene
+          role: nuisance
+          value_source: axes.building_count
+        target.count:
+          object: target
+          role: target
+          value_source: targets.counts
+        scene.building_position:
+          object: scene
+          role: nuisance
+          value_source: unknown
+        target.text:
+          object: target
+          role: target
+          value_source: unknown
+        target.view:
+          object: target
+          role: nuisance
+          value_source: axes.yaw
+    placement: 楼面 ID、楼顶贴放区域及坐标尺寸；用槽位关系区分新增纸、替换旧纸和保留其他纸。
     axes:
-      building: dynamic
-      building_count: [single, multi, unknown]
-      yaw: [frontal, oblique, unknown]
-      lighting: [normal, adjusted, unknown]
-      saturation: [normal, adjusted, unknown]
-      reflection: [none, present, unknown]
-      crop: [complete, cropped, unknown]
-    notes: 纸条有无和文字是训练目标；楼面、楼数、偏航、光照是干扰轴。
+      building_count: [single, multi]
+      yaw: [frontal, oblique]
+    crosses:
+      - id: building_text
+        purpose: 楼数、楼位和纸片惯用位置不能决定有无纸或文字。
+        pairs: 单楼和多楼内安排有／无纸；同一个楼位轮换文字，同一文字跨楼位与可辨视角。
+        check: 按样本清单 buildings 和最终纸框、四点、文字记录核对；逐纸计实例，逐条计有文本的 OCR 标注，同名两纸仍是两个实例。
+        structured:
+          completeness: partial
+          contrasts:
+          - hold:
+            - scene.building_count
+            vary:
+            - target.count
+            variation: single
+          - hold:
+            - scene.building_position
+            vary:
+            - target.text
+            variation: single
+          - hold:
+            - target.text
+            vary:
+            - scene.building_position
+            - target.view
+            variation: unresolved
+          constraints:
+          - kind: evidence_rule
+            rule: count_instances_and_ocr_entries_separately
+            source_field: check
+          evidence_links:
+          - kind: historical_observation
+            task: building_name_paper
+            cross_id: building_text
+          - kind: required_observation
+            dimensions:
+            - scene.building_count
+            - scene.building_position
+            - target.count
+            - target.text
+            - target.view
   sign:
-    plans:
-      - config/production_plan.json
+    structure:
+      objects:
+        target: 禁行牌具及可辨残段
+        scene: 场景或机位
+        context: 干扰物、遮挡或成像条件
+      dimensions:
+        scene.background:
+          object: scene
+          role: nuisance
+          value_source: unknown
+        target.presence:
+          object: target
+          role: target
+          value_source: targets.presence
+        context.hard_negative:
+          object: context
+          role: nuisance
+          value_source: unknown
+        target.view:
+          object: target
+          role: nuisance
+          value_source: axes.view
+        target.truncation:
+          object: target
+          role: nuisance
+          value_source: axes.truncation
+        context.tone:
+          object: context
+          role: nuisance
+          value_source: unknown
+    placement: 路口有效支撑区和观察位、坐标尺寸及允许裁切或遮挡范围；既有牌具须带可见标签。
     axes:
-      background: dynamic
-      view: [front, oblique, side, back, unknown]
-      distance: [near, far, unknown]
-      truncation: [none, partial, pole_only, unknown]
-      ordinary_pole: [no, yes, unknown]
-      occlusion: [none, present, unknown]
-      lighting: [normal, dark, adjusted, unknown]
-      saturation: [normal, low, adjusted, unknown]
-    notes: 有牌/无牌是目标/负例；视面、截断、普通立杆和遮挡是干扰轴。
+      view: [front, oblique, side, back]
+      truncation: [none, partial, pole_only]
+    crosses:
+      - id: fixture_background
+        purpose: 通用立杆或固定场地不能充当禁行牌具特征。
+        pairs: 同背景有牌和无牌；可依据杆与底座辨认的牌具裁切正例，对照形状接近的真实普通立杆硬负。
+        check: 按 actual.geometry.visible_kind、遮挡后框及已确认普通杆记录核对；可辨牌具保留框，普通杆独占画面时查完整空标签。
+        structured:
+          completeness: partial
+          contrasts:
+          - hold:
+            - scene.background
+            vary:
+            - target.presence
+            variation: single
+          unresolved:
+          - 硬负例与正例的对照关系尚未结构化，按 pairs 原文理解。
+          constraints:
+          - kind: evidence_rule
+            rule: recognizable_fixture_retains_box
+            source_field: check
+          evidence_links:
+          - kind: historical_observation
+            task: sign
+            cross_id: fixture_background
+          - kind: required_observation
+            dimensions:
+            - context.hard_negative
+            - scene.background
+            - target.presence
+      - id: view_tone
+        purpose: 不把单一正视模板或原始色调当作牌具本身。
+        pairs: 正视与斜视都用完整牌和可辨截断牌；保留各自的原图与降亮／降饱和版本作配对。
+        check: 用 actual.view、actual.geometry 和标签核对视面与截断联合格；tone 只说明处理，实际亮度与饱和度需另测。
+        structured:
+          completeness: partial
+          contrasts:
+          - hold:
+            - target.view
+            vary:
+            - target.truncation
+            - context.tone
+            variation: unresolved
+          - hold:
+            - target.truncation
+            vary:
+            - target.view
+            - context.tone
+            variation: unresolved
+          constraints:
+          - kind: evidence_rule
+            rule: tone_control_is_not_measured_appearance
+            source_field: check
+          evidence_links:
+          - kind: historical_observation
+            task: sign
+            cross_id: view_tone
+          - kind: required_observation
+            dimensions:
+            - context.tone
+            - target.truncation
+            - target.view
   waste_bin_state:
-    plans:
-      - config/render_plan.json
+    structure:
+      objects:
+        target: 桶及其盖体开闭状态
+        scene: 场景或机位
+        context: 干扰物、遮挡或成像条件
+      dimensions:
+        target.color:
+          object: target
+          role: nuisance
+          value_source: axes.color
+        scene.camera:
+          object: scene
+          role: nuisance
+          value_source: unknown
+        target.class:
+          object: target
+          role: target
+          value_source: targets.classes
+        target.position:
+          object: target
+          role: nuisance
+          value_source: axes.position
+        target.view:
+          object: target
+          role: nuisance
+          value_source: axes.view
+        context.neighbor_occlusion:
+          object: context
+          role: nuisance
+          value_source: axes.neighbor_occlusion
+    placement: 桶底可用支撑区域、桶组尺寸与邻桶遮挡，保留已有桶标签。可用的尺度证据用于细化布局，缺失时记录计划尺寸或其他近似依据。
     axes:
-      color: [blue, red, green, gray, not_applicable]
+      color: [blue, red, green, gray]
       position: dynamic
-      neighbor_occlusion: [none, present, unknown]
-      view: [normal, low, unknown]
-      lighting: [normal, adjusted, unknown]
-      saturation: [normal, adjusted, unknown]
-    notes: 开/闭是目标状态；颜色、桶位、数量、邻桶遮挡和视角是干扰轴。
+      view: [normal, low]
+      neighbor_occlusion: [none, present]
+    crosses:
+      - id: lid_color_position
+        purpose: 桶色、固定桶位或邻桶状态不能替代桶盖几何。
+        pairs: 每种桶色各配开／闭，同桶同机位只改变盖子；多桶画面固定机位交换开闭分配。
+        check: 用实际每桶 color／ID 与开闭标签交叉并核对位置，不能用图内存在某色及某类推断两者属于同一个桶。
+        structured:
+          completeness: partial
+          contrasts:
+          - hold:
+            - target.color
+            - scene.camera
+            vary:
+            - target.class
+            variation: single
+          - hold:
+            - scene.camera
+            vary:
+            - target.class
+            - target.position
+            variation: unresolved
+          constraints:
+          - kind: evidence_rule
+            rule: associate_color_and_state_per_bin
+            source_field: check
+          evidence_links:
+          - kind: historical_observation
+            task: waste_bin_state
+            cross_id: lid_color_position
+          - kind: required_observation
+            dimensions:
+            - scene.camera
+            - target.class
+            - target.color
+            - target.position
+      - id: view_occlusion
+        purpose: 低视角或邻桶遮挡不能直接提示开闭。
+        pairs: 同色开／闭分别配正常与低视角，无挡与局部邻挡优先成对。
+        check: 同一桶实例查盖体开闭证据、机位和实际邻挡区域；盖口不可判断时按标注规则记录。
+        structured:
+          completeness: partial
+          contrasts:
+          - hold:
+            - target.color
+            vary:
+            - target.class
+            - target.view
+            - context.neighbor_occlusion
+            variation: unresolved
+          constraints:
+          - kind: evidence_rule
+            rule: unreadable_state_is_unknown
+            source_field: check
+          evidence_links:
+          - kind: historical_observation
+            task: waste_bin_state
+            cross_id: view_occlusion
+          - kind: required_observation
+            dimensions:
+            - context.neighbor_occlusion
+            - target.class
+            - target.color
+            - target.view
   waste_sticker:
-    plans:
-      - config/production_plan.json
-      - config/blender_plan.json
-      - config/direct_real_plan.json
+    structure:
+      objects:
+        target: 物品贴纸图案
+        scene: 场景或机位
+        context: 干扰物、遮挡或成像条件
+      dimensions:
+        target.class:
+          object: target
+          role: target
+          value_source: targets.classes
+        scene.carrier:
+          object: scene
+          role: nuisance
+          value_source: axes.carrier
+        scene.background:
+          object: scene
+          role: nuisance
+          value_source: axes.background
+        target.position:
+          object: target
+          role: nuisance
+          value_source: axes.position
+        target.rotation:
+          object: target
+          role: nuisance
+          value_source: axes.rotation
+    placement: 贴纸可独立摆放，也可贴在合适的表面。贴桶的合成分支使用已确认的桶面可贴区及固有标志避让区，保留其他可辨物品贴。
     axes:
-      bin_color: [red, blue, green, gray, unknown]
+      carrier: [bin_face, other_surface, standalone]
+      background: dynamic
       position: dynamic
-      bin_state: [open, closed, unknown]
-      yaw: [frontal, oblique, unknown]
-      lighting: [normal, adjusted, unknown]
-      saturation: [normal, adjusted, unknown]
-      reflection: [none, present, unknown]
-      occlusion: [none, present, unknown]
-    notes: 24 类物品是目标；桶色、开闭、桶位和光照不得决定物品类别。
+      scale: dynamic
+      rotation: dynamic
+      view: [frontal, oblique]
+      lighting: [normal, dim]
+      occlusion: [none, partial]
+    crosses:
+      - id: carrier_position
+        purpose: 贴纸在不同载体和摆位下仍能凭图案识别。
+        pairs: 同一图案轮换桶面、背景、面内位置与旋转；同一桶面换图案。覆盖 1 至 4 个可见桶、不同贴纸大小、正斜视角、光照和部分遮挡，桶色按场景自然变化。
+        check: 逐贴核对 class_id、可见框和父来源，按可见贴纸数及负例分布核对图数，按 24 类分别核对有效实例数。桶体颜色保留下游归属和投放用途。
+        structured:
+          completeness: partial
+          contrasts:
+          - hold:
+            - target.class
+            vary:
+            - scene.carrier
+            - scene.background
+            - target.position
+            - target.rotation
+            variation: unresolved
+          - hold:
+            - scene.carrier
+            vary:
+            - target.class
+            variation: single
+          constraints:
+          - kind: evidence_rule
+            rule: verify_each_sticker_class_and_visible_box
+            source_field: check
+          evidence_links:
+          - kind: historical_observation
+            task: waste_sticker
+            cross_id: carrier_position
+          - kind: required_observation
+            dimensions:
+            - scene.background
+            - scene.carrier
+            - target.class
+            - target.position
+            - target.rotation
+      - id: white_background_counterexamples
+        purpose: 区分真实物品图案与白色道路标线、空白纸卡及相似条纹，保留白底真贴纸的召回。
+        pairs: 相同背景制作无贴与有贴对照，相同桶面制作空白卡与指定图案对照；成对派生留在同一 split，实拍父视频按集合隔离。正例保留全部可见贴纸，空负继承完整无目标证据。
+        check: 固定置信度下分别统计白线与空白卡每百图误检框数、带误检图比例及 24 类召回；旧 Test 仅作已知回归，新的挑战图不进入 Train。
   meter:
-    plans:
-      - config/render_plan.json
-      - config/production_plan.json
+    structure:
+      objects:
+        target: 表盘、针位及关键点
+        scene: 场景或机位
+        context: 干扰物、遮挡或成像条件
+      dimensions:
+        target.face_material:
+          object: target
+          role: nuisance
+          value_source: axes.face_material
+        target.needle:
+          object: target
+          role: target
+          value_source: unknown
+        target.mount_angle:
+          object: target
+          role: nuisance
+          value_source: unknown
+        scene.distance:
+          object: scene
+          role: nuisance
+          value_source: axes.distance
+        scene.incidence_angle:
+          object: scene
+          role: nuisance
+          value_source: unknown
+        scene.camera:
+          object: scene
+          role: nuisance
+          value_source: unknown
+        scene.placement:
+          object: scene
+          role: nuisance
+          value_source: axes.placement
+        context.capture_degradation:
+          object: context
+          role: nuisance
+          value_source: axes.degradation
+        context.reading_sampling:
+          object: context
+          role: nuisance
+          value_source: axes.reading_sampling
+        context.tone:
+          object: context
+          role: nuisance
+          value_source: axes.saturation
+        context.exposure:
+          object: context
+          role: nuisance
+          value_source: axes.exposure
+        context.light_relation:
+          object: context
+          role: nuisance
+          value_source: axes.light_relation
+        scene.background:
+          object: scene
+          role: nuisance
+          value_source: axes.background
+        target.presence:
+          object: target
+          role: target
+          value_source: targets.presence
+        context.hard_negative:
+          object: context
+          role: nuisance
+          value_source: unknown
+        context.glare:
+          object: context
+          role: nuisance
+          value_source: axes.glare
+    placement: 站房支撑位置或表盘替换区及坐标尺寸；针位、机位和反光依各自证据记录。
     axes:
       background: dynamic
       distance: dynamic
-      yaw: [frontal, oblique, unknown]
-      lighting: [normal, dark, bright, adjusted, unknown]
-      saturation: [normal, low, high, adjusted, unknown]
-      reflection: [none, present, unknown]
-      occlusion: [none, present, unknown]
-    notes: 表盘和 8 个关键点是目标；针位是目标关键点值，不放在组合轴。
+      view: [frontal, oblique]
+      glare: [none, present]
+      face_material: [white, colored]
+      reading_sampling: [grid_anchor, continuous]
+      placement: [fixed_contact, randomized]
+      degradation: [clean, soft_blur, jpeg, sensor_noise, blur_jpeg]
+      saturation: [native, low, very_low]
+      exposure: [dark, normal, bright]
+      light_relation: [foreground_darker, matched, foreground_brighter]
+    crosses:
+      - id: material_background_photometry
+        purpose: 白盘和彩盘不能与背景、饱和度或明暗关系绑定。
+        pairs: 同机位同双针同底图成对白盘和彩盘；独立轮换饱和度、整体曝光及前景相对背景亮度。
+        check: 从 parameters 和 photometry 联合统计三轴，逐点坐标随统一缩放平移；RGB 增强保留 alpha，逐点记录可见性。
+        structured:
+          completeness: partial
+          contrasts:
+          - hold: [target.needle, scene.camera, scene.background]
+            vary: [target.face_material]
+            variation: single
+          - hold: [target.needle, scene.camera]
+            vary: [scene.background]
+            variation: single
+          - hold: [target.needle, scene.camera, scene.background]
+            vary: [context.tone]
+            variation: single
+          - hold: [target.needle, scene.camera, scene.background]
+            vary: [context.exposure]
+            variation: single
+          - hold: [target.needle, scene.camera, scene.background]
+            vary: [context.light_relation]
+            variation: single
+          constraints:
+          - kind: evidence_rule
+            rule: preserve_alpha_and_transform_all_eight_points_together
+            source_field: check
+          evidence_links:
+          - kind: required_observation
+            task: meter
+            cross_id: material_background_photometry
+            dimensions: [target.face_material, scene.background, context.tone, scene.camera, target.needle]
+      - id: reading_view_light
+        purpose: 表针读数不能从机距、俯视程度或光色猜出。
+        pairs: 同一针位保持安装倾角，分别换机距与入射角；同机位换针位并独立轮换色调。
+        check: 用相机到盘心距离、表盘法向入射角及针位作联合表并核对 8 点标签；ground_angle_deg 只记录安装倾角。
+        structured:
+          completeness: partial
+          contrasts:
+          - hold:
+            - target.needle
+            - target.mount_angle
+            vary:
+            - scene.distance
+            - scene.incidence_angle
+            variation: unresolved
+          - hold:
+            - scene.camera
+            vary:
+            - target.needle
+            - context.tone
+            variation: unresolved
+          constraints:
+          - kind: evidence_rule
+            rule: mount_angle_is_not_view_angle
+            source_field: check
+          evidence_links:
+          - kind: historical_observation
+            task: meter
+            cross_id: reading_view_light
+          - kind: required_observation
+            dimensions:
+            - context.tone
+            - scene.camera
+            - scene.distance
+            - target.mount_angle
+            - target.needle
+            - scene.incidence_angle
+      - id: background_glare
+        purpose: 背景和局部高光不能决定是否有表或某个点是否可见。
+        pairs: 同背景有表／无表，另选相似圆形物作硬负；同读数保持机位配局部高光与无高光。
+        check: 核对框与各点可见性并回链 foreground_annotation；高光、读数和安装姿态都应有各自证据。
+        structured:
+          completeness: partial
+          contrasts:
+          - hold:
+            - scene.background
+            vary:
+            - target.presence
+            variation: single
+          - hold:
+            - target.needle
+            - scene.camera
+            vary:
+            - context.glare
+            variation: single
+          unresolved:
+          - 硬负例与正例的对照关系尚未结构化，按 pairs 原文理解。
+          constraints:
+          - kind: evidence_rule
+            rule: record_each_keypoint_visibility
+            source_field: check
+          evidence_links:
+          - kind: historical_observation
+            task: meter
+            cross_id: background_glare
+          - kind: required_observation
+            dimensions:
+            - context.glare
+            - context.hard_negative
+            - scene.background
+            - scene.camera
+            - target.needle
+            - target.presence

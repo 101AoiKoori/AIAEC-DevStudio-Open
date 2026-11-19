@@ -70,7 +70,8 @@ def validate_pairing(root, task, data, allocation=None, data_root=None, check_pa
                 errors.append('{}: composition_policy.{} 必须是非空字符串列表'.format(task, key))
         if composition.get('blender_priority') not in {'background_only', 'increased'}:
             errors.append('{}: composition_policy.blender_priority 无效'.format(task))
-        if allocation and isinstance(allocation.get('tasks', {}).get(task), dict):
+        if (allocation and isinstance(allocation.get('tasks', {}).get(task), dict)
+                and allocation['tasks'][task].get('source_mix_status') != 'historical_reference'):
             expected = allocation['tasks'][task].get('source_mix', {}).get('blender')
             actual = composition.get('blender_share_target', 0.30)
             if expected is not None and abs(float(actual) - float(expected)) > 1e-9:
@@ -109,8 +110,9 @@ def validate_pairing(root, task, data, allocation=None, data_root=None, check_pa
             roles = item.get('roles') or []
             if not isinstance(roles, list) or any(not isinstance(role, str) or role not in ROLES for role in roles):
                 errors.append('{}: {} 角色未登记: {}'.format(task, item_id, roles))
-            if 'empty_negative' in roles and (item.get('review') or {}).get('state') != 'confirmed_empty':
-                errors.append('{}: {} 只有 confirmed_empty 背景可作 empty_negative'.format(task, item_id))
+            if 'empty_negative' in roles and (item.get('review') or {}).get('state') not in (
+                    'confirmed_empty', 'candidate_empty', 'candidate_complete_negative'):
+                errors.append('{}: {} empty_negative 需记录空场判定'.format(task, item_id))
             is_planned = split.get('action') == 'to_capture'
             if is_planned:
                 placeholders.append((item_id, item))
@@ -195,7 +197,9 @@ def validate_pairing(root, task, data, allocation=None, data_root=None, check_pa
     return errors
 
 
-def validate_all(root=ROOT, data_root=None, check_paths=None):
+def validate_all(root=ROOT, data_root=None, check_paths=None, task=None):
+    if task is not None and task not in TASKS:
+        raise ValueError('未知数据任务: {}'.format(task))
     data_root = Path(data_root) if data_root else root
     if check_paths is None:
         check_paths = ((data_root / 'datasets/raw').is_dir()
@@ -203,13 +207,13 @@ def validate_all(root=ROOT, data_root=None, check_paths=None):
     allocation_path = root / ALLOCATION
     allocation = yaml.safe_load(allocation_path.read_text(encoding='utf-8')) if allocation_path.is_file() else None
     errors = []
-    for task in TASKS:
-        path = root / 'datasets/scripts' / task / 'config/source.yaml'
+    for selected_task in ([task] if task is not None else TASKS):
+        path = root / 'datasets/scripts' / selected_task / 'config/source.yaml'
         if not path.is_file():
-            errors.append('{}: source.yaml 不存在'.format(task))
+            errors.append('{}: source.yaml 不存在'.format(selected_task))
             continue
         data = yaml.safe_load(path.read_text(encoding='utf-8'))
-        errors.extend(validate_pairing(root, task, data, allocation, data_root, check_paths))
+        errors.extend(validate_pairing(root, selected_task, data, allocation, data_root, check_paths))
     return errors
 
 
@@ -219,11 +223,12 @@ def main():
     parser.add_argument('--data-root', help='数据/证据存在性检查根目录，默认同 --root；worktree 中可指向主检出')
     parser.add_argument('--json', action='store_true', help='输出 JSON')
     parser.add_argument('--check', action='store_true', help='检查（默认）')
+    parser.add_argument('--task', choices=TASKS, help='只检查指定数据任务；不指定则检查全部任务')
     args = parser.parse_args()
     root = Path(args.root).resolve() if args.root else ROOT
     data_root = Path(args.data_root).resolve() if args.data_root else root
     try:
-        errors = validate_all(root, data_root)
+        errors = validate_all(root, data_root, task=args.task)
         if not ((data_root / 'datasets/raw').is_dir() or (data_root / 'datasets/annotated').is_dir()):
             print('数据树未展开，跳过路径存在性检查（结构、ID 和 capture 关联仍检查）。')
         if args.json:

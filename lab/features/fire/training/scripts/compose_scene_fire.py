@@ -6,7 +6,7 @@ is retained; generated samples are train candidates, not independent tests.
 """
 
 if __name__ == "__main__":
-    raise SystemExit("Legacy dataset CLI is retired; use datasets/scripts/fire/. Production remains paused.")
+    raise SystemExit("Legacy dataset CLI is retired; use datasets/scripts/fire/.")
 
 import argparse
 import json
@@ -24,7 +24,7 @@ ROOT = Path.cwd().resolve()
 EXPORTS = ROOT / 'datasets/exports/fire'
 DEFAULT_SOURCE = EXPORTS / 'blender_candidates_160_20261110'
 BACKGROUND = ROOT / 'datasets/annotated/fire/real_background_candidates_20261110'
-ICON = ROOT / 'datasets/raw/fire/team_assets/image1.png'
+ICON = ROOT / 'Archive/Assets/working_sources/digital/fire/team_assets/image1.png'
 sys.path.insert(0, str(ROOT))
 from lab.training_common.production_guard import generation_guard
 from datasets.scripts.common.images import read_image

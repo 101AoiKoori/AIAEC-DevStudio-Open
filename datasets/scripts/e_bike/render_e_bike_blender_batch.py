@@ -121,7 +121,8 @@ def visible_scene_masks(scene, actors, path, full_dir):
 
 
 def validate(plan):
-    if plan.get('scene') not in planner.SCENES.values() or Path(bpy.data.filepath).resolve() != (ROOT / plan['scene']).resolve():
+    if (plan.get('scene_key') not in planner.SCENES or plan.get('scene') != planner.SCENES[plan['scene_key']]
+            or Path(bpy.data.filepath).resolve() != (ROOT / plan['scene']).resolve()):
         raise ValueError('open the exact scene declared by the plan')
     if plan.get('model_key') != 'e_bike' or plan.get('target_split') not in ('train', 'val', 'test'):
         raise ValueError('unexpected task or split')
@@ -183,6 +184,8 @@ def main():
     if out not in {sample_dir('e_bike').resolve(), split_dir('e_bike', plan['target_split']).resolve()}:
         raise ValueError('output must be the task sample or matching split')
     items = validate(plan)
+    from datasets.scripts.common.blender_workspace import ARENA, DETAILED, activate_scene
+    activate_scene({'S_indoor_detailed': DETAILED, 'S_master_candidate': ARENA}[plan['scene_key']])
     scene = bpy.context.scene
     camera = scene.objects.get('Vehicle camera')
     if camera is None:
@@ -193,7 +196,7 @@ def main():
     procedural = [path, ROOT / plan['scene'], planner.USE, planner.FOREGROUNDS,
                   ROOT/'datasets/scripts/e_bike/config/source.yaml', ROOT/'datasets/scripts/e_bike/config/dataset.yaml']
     code = [Path(__file__), Path(planner.__file__), ROOT / 'datasets/scripts/common/blender_standees.py',
-            ROOT / 'lab/training_common/production_guard.py']
+            ROOT / 'lab/training_common/production_guard.py', ROOT / 'datasets/scripts/common/blender_workspace.py']
     relout = out.relative_to(ROOT).as_posix()
     with generation_guard('e_bike.blender_batch:' + relout, sorted(media), [out],
                           {'plan': path.relative_to(ROOT).as_posix()}, procedural_inputs=procedural,

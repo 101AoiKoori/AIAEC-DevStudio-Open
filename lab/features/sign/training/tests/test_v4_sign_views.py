@@ -7,6 +7,12 @@ sign = importlib.util.module_from_spec(spec); spec.loader.exec_module(sign)
 
 
 class SignViewsTests(unittest.TestCase):
+    def test_oblique_confirmed_machine_evidence_is_supported(self):
+        rows=[{'source_image':'x','ground_truth':[{'class_id':0}],'matches':[[0,0,.9]]}]
+        reviews=[{'source_image':'x','gt_index':0,'view':'oblique',
+                  'review_status':'confirmed','review_evidence':'machine-manifest'}]
+        self.assertEqual(sign.reviewed_view_report(rows,reviews)['views']['oblique']['recall'],1)
+
     def test_back_and_unknown_group_denominators(self):
         rows = [{'source_image': 'x.png', 'ground_truth': [{'class_id': 0}, {'class_id': 0}], 'matches': [[0, 0, .8]]}]
         reviews = [{'source_image': 'x.png', 'gt_index': 0, 'view': 'back', 'review_status': 'confirmed', 'review_evidence': 'a'},

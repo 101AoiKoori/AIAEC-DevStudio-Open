@@ -57,7 +57,7 @@
       "class_names": null,
       "parent_sources": [
         {
-          "path": "datasets/raw/site_capture_20261112/videos/person_standees.mp4",
+          "path": "Archive/Assets/captures/site_capture_20261112/videos/person_standees.mp4",
           "role": "camera_source"
         },
         {
@@ -114,11 +114,11 @@
       "class_names": null,
       "parent_sources": [
         {
-          "path": "datasets/raw/person/teammate_submission_20261110/dataset/backgrounds/bg_00206_f01193.jpg",
+          "path": "datasets/assets/person/dataset/backgrounds/bg_00206_f01193.jpg",
           "role": "real_background"
         },
         {
-          "path": "datasets/raw/person/team_assets/非社区人员/F1.png",
+          "path": "Archive/Assets/working_sources/digital/person/team_assets/非社区人员/F1.png",
           "role": "target_source"
         },
         {
@@ -288,7 +288,7 @@
       "class_names": null,
       "parent_sources": [
         {
-          "path": "datasets/raw/site_capture_20261112/videos/person_standees.mp4",
+          "path": "Archive/Assets/captures/site_capture_20261112/videos/person_standees.mp4",
           "role": "camera_source"
         },
         {
@@ -403,7 +403,7 @@
       "class_names": null,
       "parent_sources": [
         {
-          "path": "datasets/raw/site_capture_20261112/videos/person_standees.mp4",
+          "path": "Archive/Assets/captures/site_capture_20261112/videos/person_standees.mp4",
           "role": "camera_source"
         },
         {

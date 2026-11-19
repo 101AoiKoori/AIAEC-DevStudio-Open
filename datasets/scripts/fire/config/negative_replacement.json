@@ -1,0 +1,20 @@
+{
+  "schema_version": 1,
+  "task": "fire",
+  "status": "authorized_empty_negative_replacement",
+  "purpose": "Replace only complete empty negatives; retain positive pixels and all split totals",
+  "preview_config": "datasets/scripts/fire/config/hard_negative_preview.json",
+  "source_scene": "datasets/assets/blender/aiaec_dataset.blend",
+  "source_snapshot": "datasets/annotated/fire/production_inputs/hard_negative_source.blend",
+  "render_output": "datasets/annotated/fire/hard_negative_replacement/rendered",
+  "real_review": "datasets/annotated/fire/hard_negative_review/replacement_real_review.jsonl",
+  "real_gains": [0.82, 1.04],
+  "replace_images": {"train": 450, "val": 30, "test": 30},
+  "train_types": {"red_signal_lamp": 150, "red_orange_bin": 150, "other_red_orange_object": 150},
+  "retire_train_branches": {"blender_render": 192, "blender_real_background_composite": 30, "real_background_composite": 228},
+  "retire_eval_branch": "real_background_composite",
+  "seed": 181870,
+  "samples": 8,
+  "eval_scope": "Each split reuses 15 reviewed frames from its own video parent. These are color-confounder diagnostic images, not independent captures. Real hard-negative coverage is red bins; Blender signal/cone coverage is train-only.",
+  "positive_distractor_recipe": "The 600 positive-with-distractor replacements remain pending; this operation changes negatives only."
+}

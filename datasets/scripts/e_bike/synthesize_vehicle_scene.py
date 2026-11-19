@@ -5,7 +5,7 @@ review candidates; output is not automatically verified ground truth.
 """
 
 if __name__ == "__main__":
-    raise SystemExit("Task helper is import-only; use the primary entry in datasets/scripts/e_bike/. Production remains paused.")
+    raise SystemExit("Task helper is import-only; use the primary entry in datasets/scripts/e_bike/.")
 
 import argparse
 import csv
@@ -33,9 +33,9 @@ from datasets.scripts.common.composite import alpha_place, visible_masks, trunca
 SELECTION = source_path('e_bike', 'ground_vehicle_selection')
 FIELD_SELECTION = ROOT / 'datasets/annotated/e_bike/field_eval_masks_20261110/selection_review_candidate.json'
 FIELD_BACKGROUND = ROOT / 'datasets/annotated/e_bike/video_review_20261110/images/source_003/frame_000015.jpg'
-FIELD_VIDEO = 'datasets/raw/e_bike/archive_assets_legacy/视频/单辆直立电动车_低视角环绕_005.mp4'
+FIELD_VIDEO = 'Archive/Assets/working_sources/legacy/e_bike/视频/单辆直立电动车_低视角环绕_005.mp4'
 CAMERA_SELECTION = ROOT / 'datasets/annotated/e_bike/vehicle_camera_eval_masks_20261110/selection_review_candidate.json'
-CAMERA_BACKGROUND = ROOT / 'datasets/raw/traffic_light/archive_assets_legacy/照片/小车摄像头实拍_近似平视_信号灯正面与道路_001.png'
+CAMERA_BACKGROUND = ROOT / 'Archive/Assets/working_sources/legacy/traffic_light/照片/小车摄像头实拍_近似平视_信号灯正面与道路_001.png'
 
 
 
@@ -104,7 +104,7 @@ def scenario(index):
     return 'empty', []
 
 
-def sources(selection=SELECTION, include_people=True):
+def sources(selection=SELECTION, include_people=True, working=None):
     people = load_people() if include_people else {}
     data = json.loads(selection.read_text(encoding='utf-8'))
     vehicles = {'upright': [], 'fallen': []}
@@ -114,7 +114,8 @@ def sources(selection=SELECTION, include_people=True):
                 continue
             if not scene.path_in_workspace(entry[key]).is_file():
                 raise ValueError(f'missing source: {entry[key]}')
-        vehicles[entry['class']].append((entry, scene.assets.load_rgba(scene.path_in_workspace(entry['path']))))
+        path = scene.path_in_workspace(entry['path'])
+        vehicles[entry['class']].append((entry, scene.assets.load_rgba(working.path(path) if working else path)))
     return people, vehicles
 
 

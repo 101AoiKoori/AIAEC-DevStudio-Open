@@ -9,8 +9,8 @@ ROOT=Path(__file__).resolve().parents[5]
 sys.path.insert(0,str(ROOT))
 from lab.training_common.production_guard import generation_guard
 OUT=ROOT/'datasets/annotated/fire/v4_facade_video_sequences_20261112'
-VIDEOS=(('scene_001','datasets/raw/site_archive_legacy/场景/三楼与场地视频/三栋楼正向平移_垃圾桶入画_001.mp4'),
-        ('scene_008','datasets/raw/site_archive_legacy/场景/三楼与场地视频/三栋楼正向横向扫描_008.mp4'))
+VIDEOS=(('scene_001','Archive/Assets/working_sources/legacy/site/场景/三楼与场地视频/三栋楼正向平移_垃圾桶入画_001.mp4'),
+        ('scene_008','Archive/Assets/working_sources/legacy/site/场景/三楼与场地视频/三栋楼正向横向扫描_008.mp4'))
 
 
 def main():

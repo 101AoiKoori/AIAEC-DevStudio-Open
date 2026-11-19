@@ -229,7 +229,7 @@ class BranchSampleTest(unittest.TestCase):
         self.assertIsNone(matrices["multi"]["presence"])
         self.assertFalse(matrices["multi"]["full_frame_checked"])
 
-    def test_negative_without_reviewer_fails(self):
+    def test_full_frame_negative_without_reviewer_passes(self):
         manifest = self.manifest()
         manifest["records"][0].update(
             {
@@ -238,7 +238,7 @@ class BranchSampleTest(unittest.TestCase):
             }
         )
         report = branch_sample.validate_sample(manifest, root=self.root)
-        self.assertIn("empty:negative_without_accepted_by", report["errors"])
+        self.assertEqual(report["errors"], [])
 
     def test_missing_source_branch_fails(self):
         manifest = self.manifest()
@@ -643,8 +643,9 @@ class BranchSampleTest(unittest.TestCase):
         self.assertEqual(layers["human_confirmed"]["box_instances"], 0)
         self.assertEqual(layers["auto_validated"]["box_instances"], 1)
         manifest = branch_sample.label_manifest_from_review(normalized)
-        self.assertEqual(manifest["records"][0]["label_state"], "partial")
+        self.assertEqual(manifest["records"][0]["label_state"], "complete")
         self.assertIsNone(manifest["records"][0]["review"]["box_accepted_by"])
+        self.assertEqual(manifest["records"][0]["review"]["box_acceptance"], "candidate")
 
         normalized["items"][0]["status_matrix"]["objects"][0]["box_accepted_by"] = "human"
         manifest = branch_sample.label_manifest_from_review(normalized)

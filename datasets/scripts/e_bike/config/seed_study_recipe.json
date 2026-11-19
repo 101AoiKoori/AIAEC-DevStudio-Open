@@ -1,0 +1,10 @@
+{
+  "purpose": "semantic_verifier_training_seed_stability",
+  "reference_experiment": "runs/e_bike/candidate_verifier_20261118",
+  "reference_seed": 42,
+  "new_seeds": [43, 44],
+  "epochs": 20,
+  "primary_confidence": 0.25,
+  "primary_nms_iou": 0.3,
+  "scope": "Same crop pixels, split and warmstart; only training seed changes. Old26 and layout32 remain exposed development diagnostics. Report every seed; do not select highest validation score as a release."
+}

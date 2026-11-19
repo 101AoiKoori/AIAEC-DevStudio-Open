@@ -27,7 +27,7 @@ def state(cls, count=2):
             'target': {'kind': 'sticker', 'class_id': cls, 'name': name} if name else {'kind': 'candidate_negative'},
             'labels': {'format': 'yolo_detection', 'class_id': cls},
             'augmentation': {'gain': .72, 'saturation': .65, 'variation': 'seeded_source_and_paper_placement'},
-            'sources': ['source/manifest.json'] + ([f'datasets/raw/waste_bin/toolkit/SourcePic/{name}.png'] if name else [])}
+            'sources': ['source/manifest.json'] + ([f'Archive/Assets/working_sources/digital/waste_sticker/toolkit/SourcePic/{name}.png'] if name else [])}
 
 
 def plan():

@@ -1,0 +1,14 @@
+{
+  "purpose": "controlled_research_data_ablation",
+  "seed": 42,
+  "old_inputs": "runs/e_bike/synthetic_short_inputs_20261118/manifest.json",
+  "focused_inputs": "runs/e_bike/focused_inputs_20261118/manifest.json",
+  "evaluation_snapshot": "runs/e_bike/focused_inputs_20261118/evaluation_snapshot.json",
+  "added_images_per_arm": 48,
+  "arms": ["control", "negatives", "crops", "synthetic"],
+  "epochs": 20,
+  "wall_seconds_per_arm": 600,
+  "initial_weights": "runs/e_bike/keypoint_control_20261118/training/weights/best.pt",
+  "classifier": "runs/e_bike/two_stage_20261118/classifier/weights/best.pt",
+  "scope": "Equal204 training slots and fixed20 epochs, same initialization/seed/batch/schedule; compare recorded actual optimizer updates. Control adds48 declared resamples, not independent images. Same known26 diagnostic and32 previously examined shared-source layout holdout; neither used as training data."
+}

@@ -101,7 +101,7 @@ class PersonProductionGuardTest(unittest.TestCase):
         (textures / 'manifest.json').write_text(json.dumps({'records': [
             {'artwork': relative, 'image': relative}]}), encoding='utf8')
         fake_bpy = types.ModuleType('bpy')
-        fake_bpy.data = types.SimpleNamespace(images=[])
+        fake_bpy.data = types.SimpleNamespace(images=[], filepath=str(self.fixture.image))
         fake_math = types.ModuleType('mathutils')
         fake_math.Vector = object
         path = ROOT / 'datasets/scripts/person/render_person_arena_v4.py'
@@ -161,12 +161,14 @@ class PersonProductionGuardTest(unittest.TestCase):
              mock.patch.object(renderer, 'split_dir', return_value=self.root/'datasets/exports/person/train'), \
              mock.patch.object(renderer, 'SCENE_SOURCE', self.fixture.image), \
              mock.patch.object(renderer, 'generation_guard', side_effect=render_guard), \
+             mock.patch.object(renderer, 'activate_scene') as activate, \
              mock.patch.object(renderer, '_produce', side_effect=produce) as wrapped, \
              mock.patch.object(sys, 'argv', argv):
             renderer.main()
             before = (render_output / 'done').stat().st_mtime_ns
             renderer.main()
         self.assertEqual(wrapped.call_count, 1)
+        activate.assert_called_once_with(renderer.DETAILED)
         self.assertEqual((render_output / 'done').stat().st_mtime_ns, before)
 
 

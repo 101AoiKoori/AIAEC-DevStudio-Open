@@ -1,6 +1,6 @@
 {
   "source_blend": "datasets/assets/blender/meter/blender_9011_pbr_v2_20261110/meter_9011_pbr.blend",
-  "source_face": "datasets/assets/blender/meter/blender_9011_reference/face_generated.png",
+  "source_face": "Archive/technical/revisions/meter/blender_sources_20261116/blender_9011_reference/face_generated.png",
   "image_size": [1254, 1254],
   "coordinate_system": "pixels, top left origin; temperature candidates near inner ends of long printed ticks; humidity candidates near outer ends",
   "status": "inconsistent tick-end semantics; development preview only, not production labels or physical meter truth; recalibration required",

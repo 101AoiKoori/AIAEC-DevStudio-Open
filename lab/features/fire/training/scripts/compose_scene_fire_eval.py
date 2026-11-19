@@ -5,7 +5,7 @@ outputs are intentionally not declared independent val/test sets.
 """
 
 if __name__ == "__main__":
-    raise SystemExit("Legacy dataset CLI is retired; use datasets/scripts/fire/. Production remains paused.")
+    raise SystemExit("Legacy dataset CLI is retired; use datasets/scripts/fire/.")
 
 import argparse
 import json
@@ -23,15 +23,15 @@ from lab.training_common.production_guard import generation_guard
 from datasets.scripts.common.paper import name_paper as _name_paper, paste
 
 BACKGROUND = ROOT / 'datasets/annotated/fire/real_review_candidates_20261110/images'
-FONT = ROOT / 'datasets/assets/blender/fire/blender_buildings_v13/NotoSansSC.ttf'
+FONT = ROOT / 'datasets/raw/building_name_paper/targets/digital/typeface/NotoSansSC.ttf'
 SOURCES = {
     'scene_track': {'image': '0026.png', 'source_group': 'three_buildings_road_003',
-                    'source_video': 'datasets/raw/site_archive_legacy/场景/三楼与场地视频/三栋楼_垃圾桶与路口_003.mp4',
+                    'source_video': 'Archive/Assets/working_sources/legacy/site/场景/三楼与场地视频/三栋楼_垃圾桶与路口_003.mp4',
                     'name_quad': [[336, 61], [492, 62], [493, 94], [337, 94]],
                     'fire_centers': [[340, 175], [435, 220], [353, 290], [475, 340]],
                     'paper_size': [36, 50]},
     'scene_tile': {'image': '0014.png', 'source_group': 'jinxiu_indoor_tile_001',
-                   'source_video': 'datasets/raw/fire/archive_assets_legacy/楼宇/锦绣大厦/视频/锦绣楼在室内地砖上的多面绕拍_001.mp4',
+                   'source_video': 'Archive/Assets/working_sources/legacy/fire/楼宇/锦绣大厦/视频/锦绣楼在室内地砖上的多面绕拍_001.mp4',
                    'name_quad': [[373, 148], [524, 139], [527, 169], [377, 180]],
                    'fire_centers': [[382, 236], [513, 244], [391, 310], [514, 351]],
                    'paper_size': [34, 48]},

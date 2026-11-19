@@ -48,7 +48,17 @@ python lab/training_common/portable_env/build.py --resolve --output win-cp312-cu
 
 ## 分发与运行
 
-任务包生成入口 `原根目录工具区的 build_training_packages.py` 已于 2026-11-15 删除，原先用它把两套已构建依赖组装为分发根目录 `portable_env/` 的流程已不可运行；现有 `portable_env/` 保留历史依赖产物。任务包与环境平级、共用一份依赖的结构仍是分发方式，但新的打包入口尚未确定。只分发一个任务时，复制该任务包和 `portable_env/` 即可。依赖中的原生库使 CUDA 包占用数 GB；省去解释器不会显著缩小 PyTorch 的 CUDA 库。
+V4 任务包使用[当前构建入口](../../../docs/TRAINING_WORKFLOW.md#v4-任务包构建与启动)，并与现有 `portable_env/` 放在同一层。只分发一个任务时，复制该任务包和 `portable_env/` 即可。依赖中的原生库使 CUDA 包占用数 GB。
+
+新构建的启动器分别检查根目录与可选 `cp314/` 的 manifest、启动脚本和依赖目录；某一环境缺失或损坏时报告原因并尝试其他匹配环境。仅有目录不证明依赖完整，仍需在目标机运行 `-Check`。已分发环境是快照，需更新启动器后才具备此行为。
+
+构建任务包使用现有共享环境，不会自动替换其中的启动器。可先从工作空间根目录只读检查它是否与源码一致：
+
+```powershell
+python lab/training_common/portable_env/sync_launcher.py
+```
+
+报告 `current`、`outdated` 或 `missing`，并列出两边的 SHA-256；任务包的计划和构建报告也在 `portable_launcher` 字段给出该状态，无法比较时记为 `unavailable`。比较只提供提示，不自动更新环境。确认要更新时运行 `python lab/training_common/portable_env/sync_launcher.py --update`，仅替换共享环境的 `run.ps1`，保留依赖、manifest 和其他文件。检查或更新其他分发目录时使用 `--bundle <portable_env目录>`。更新前后可在目标机运行 `-Check`；启动器字节一致不代表依赖已完成检查。
 
 ```text
 分发目录/

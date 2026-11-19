@@ -5,7 +5,7 @@ remain unknown until a separate review of the output pixels supports them.
 """
 
 if __name__ == "__main__":
-    raise SystemExit("Legacy dataset CLI is retired; use datasets/scripts/waste_bin_state or waste_sticker/. Production remains paused.")
+    raise SystemExit("Legacy dataset CLI is retired; use datasets/scripts/waste_bin_state or waste_sticker/.")
 
 import argparse
 import json
@@ -18,7 +18,7 @@ from compose_fire_bin_pilot import ROOT, TASKS, image, write_image
 
 BACKGROUND = ROOT / 'datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_004951.png'
 BIN_REVIEW = ROOT / 'datasets/annotated/waste_bin/v4_review_20261112/review_manifest.json'
-STICKER_DIR = ROOT / 'datasets/raw/waste_bin/toolkit/SourcePic'
+STICKER_DIR = ROOT / 'Archive/Assets/working_sources/digital/waste_sticker/toolkit/SourcePic'
 BIN_COLORS = ('gray', 'green', 'blue', 'red')
 # Hand-checked safe paper rectangles and conservative exclusion rectangles
 # for fixed bin category markings, both in 640x360 output pixels.

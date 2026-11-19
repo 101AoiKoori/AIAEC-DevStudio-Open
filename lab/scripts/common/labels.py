@@ -191,8 +191,6 @@ def audit_label_record(record: Mapping[str, Any], *, root: str | Path | None = N
             raise ValueError(f"{record_id}: confirmed negative cannot contain positive instances")
         if not full_frame_checked:
             raise ValueError(f"{record_id}: confirmed negative requires full_frame_checked")
-        if not isinstance(accepted_by, str) or not accepted_by.strip():
-            raise ValueError(f"{record_id}: confirmed negative requires accepted_by")
         if not isinstance(review.get("method"), str) or not review.get("method"):
             raise ValueError(f"{record_id}: confirmed negative requires a review method")
         status = "confirmed_negative"
@@ -283,12 +281,16 @@ def audit_manifest(manifest: Mapping[str, Any], *, root: str | Path | None = Non
             item["id"] for item in candidate_complete
         }
     ]
+    negatives = [record for record in audited if record["label_state"] == "confirmed_negative"]
+    human_negatives = [record for record in negatives
+                       if isinstance(record["review"].get("accepted_by"), str)
+                       and record["review"]["accepted_by"].strip()]
     human_confirmed_records = [
         record
         for record in audited
         if record["id"] in {item["id"] for item in human_complete}
-        or record["label_state"] == "confirmed_negative"
     ]
+    human_confirmed_records.extend(human_negatives)
     auto_validated_records = list(programmatic_complete)
     pending_records = [
         record

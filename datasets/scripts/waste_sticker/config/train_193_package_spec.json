@@ -1,0 +1,114 @@
+{
+  "model_key": "waste_sticker",
+  "dataset": {
+    "names": [
+      "塑料瓶",
+      "易拉罐",
+      "玻璃瓶",
+      "报纸",
+      "纸箱",
+      "旧衣服",
+      "剩饭",
+      "菜叶",
+      "苹果",
+      "茶渣",
+      "面包",
+      "鱼骨",
+      "纽扣电池",
+      "荧光灯",
+      "水银温度计",
+      "药片",
+      "油漆",
+      "废胶卷",
+      "烟头",
+      "用过纸巾",
+      "用过的一次性筷子",
+      "破陶瓷",
+      "贝壳",
+      "废弃眼镜"
+    ]
+  },
+  "notes": "192 real-photo composites plus one complete direct camera positive; two source photos and one direct capture parent; candidate train bundle only, no independent val/test.",
+  "batches": [
+    {
+      "id": "real_photo_composite",
+      "images": "datasets/exports/waste_sticker/train/images",
+      "labels": "datasets/exports/waste_sticker/train/labels",
+      "evidence": [
+        "datasets/exports/waste_sticker/train/manifest.json",
+        "datasets/exports/waste_sticker/train/classes.json"
+      ],
+      "source_kind": "camera_background_plus_digital_artwork",
+      "generation_method": "real_photo_composite",
+      "label_status": "inserted_visible_candidates_background_absence_recorded",
+      "dataset": {
+        "names": [
+          "塑料瓶",
+          "易拉罐",
+          "玻璃瓶",
+          "报纸",
+          "纸箱",
+          "旧衣服",
+          "剩饭",
+          "菜叶",
+          "苹果",
+          "茶渣",
+          "面包",
+          "鱼骨",
+          "纽扣电池",
+          "荧光灯",
+          "水银温度计",
+          "药片",
+          "油漆",
+          "废胶卷",
+          "烟头",
+          "用过纸巾",
+          "用过的一次性筷子",
+          "破陶瓷",
+          "贝壳",
+          "废弃眼镜"
+        ]
+      }
+    },
+    {
+      "id": "direct_real",
+      "images": "datasets/annotated/waste_bin/waste_sticker_direct_002016/images",
+      "labels": "datasets/annotated/waste_bin/waste_sticker_direct_002016/labels",
+      "evidence": [
+        "datasets/annotated/waste_bin/waste_sticker_direct_002016/manifest.json",
+        "datasets/annotated/common/review/shared_multitask_sticker_002016_sample_20261117.jsonl"
+      ],
+      "source_kind": "camera",
+      "generation_method": "direct_camera_frame",
+      "label_status": "complete_positive_machine_reviewed",
+      "dataset": {
+        "names": [
+          "塑料瓶",
+          "易拉罐",
+          "玻璃瓶",
+          "报纸",
+          "纸箱",
+          "旧衣服",
+          "剩饭",
+          "菜叶",
+          "苹果",
+          "茶渣",
+          "面包",
+          "鱼骨",
+          "纽扣电池",
+          "荧光灯",
+          "水银温度计",
+          "药片",
+          "油漆",
+          "废胶卷",
+          "烟头",
+          "用过纸巾",
+          "用过的一次性筷子",
+          "破陶瓷",
+          "贝壳",
+          "废弃眼镜"
+        ]
+      }
+    }
+  ]
+}

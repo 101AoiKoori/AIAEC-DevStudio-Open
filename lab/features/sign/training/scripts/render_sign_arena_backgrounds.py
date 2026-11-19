@@ -1,7 +1,7 @@
 """Render planned Blender arena background candidates, with no target label."""
 
 if __name__ == "__main__":
-    raise SystemExit("Legacy dataset CLI is retired; use datasets/scripts/sign/. Production remains paused.")
+    raise SystemExit("Legacy dataset CLI is retired; use datasets/scripts/sign/.")
 
 import argparse
 import json

@@ -1,0 +1,55 @@
+schema_version: 1
+task: fire
+status: first_round_recipe_materialized_ready_for_packaging
+purpose: 首轮同时学习指定图案与颜色相似硬负例，先训练一次，再依据实际问题补数据和微调。
+base_allocation: datasets/scripts/fire/config/full_dataset_plan.json
+base_scope: 来源、贴数和几何基础批次；不能据此声称硬负例方案已制作完成。
+train_images: 3000
+current_manifest: datasets/exports/fire/manifest.json
+negative_replacement: datasets/scripts/fire/config/negative_replacement.json
+groups_scope: 首轮配方已落地；实际数量及分集以current_manifest读取。
+training_preparation: datasets/scripts/fire/config/training_preparation.json
+groups:
+  ordinary_positive: 1800
+  positive_with_distractors: 600
+  hard_negative: 450
+  ordinary_negative: 150
+target_count_images:
+  zero: 600
+  single: 1200
+  multi: 1200
+hard_negative_images:
+  red_signal_lamp: 150
+  red_orange_bin: 150
+  other_red_orange_object: 150
+color_shape_policy:
+  target: 保留指定火焰图案的主要颜色和结构，仅作适度光照变化，颜色仍是有效识别线索。
+  distractors: 红橙黄相近色为重点，加入其他颜色的相同物体对照；相近颜色本身不能代替目标身份。
+  controls: 蓝桶、绿灯、灰锥桶等控制样本单独记录，不计入红橙硬负例配额。
+development_preview:
+  config: datasets/scripts/fire/config/hard_negative_preview.json
+  manifest: datasets/samples/fire/hard_negative_preview/manifest.json
+  review: datasets/annotated/fire/hard_negative_review/audit.json
+  real_visual_review: datasets/annotated/fire/hard_negative_review/real_visual_review.jsonl
+  scope: 开发小样保留；硬负替换、600张正例同框干扰及Val/Test小目标对照已落地。
+contrast_recipe:
+  - 同一底图生成仅有干扰物、火焰贴纸与干扰物同框的对照，原有火焰实例始终保留标签。
+  - 指定火焰图案跨楼面、位置、大小和光照；干扰物的位置与大小独立变化。
+  - 红灯涵盖圆形亮区、灯壳与过曝光晕；红橙桶涵盖整桶、局部桶身与桶面图标；其他干扰覆盖锥桶、红橙面板、相似图案及已有规则认可的非指定火焰图案。
+  - 干扰物出现在空负例和正例中，避免出现干扰物就固定对应零贴。
+supervision:
+  detector_classes: [fire_sticker]
+  hard_negative_label: 空 YOLO 标签仅表示当前输出范围确认没有指定贴纸。
+  positive_with_distractors_label: 只标指定贴纸；红灯、红桶等不是新增的 fire 类别。
+  distractor_metadata: 保留实际干扰类型、可见区域、父来源和 split，供后续定向补数据使用。
+sources:
+  strategy: 先用当前数据库和项目已有素材中可行的实拍、实拍合成及 Blender，实际复用数量如实记录。
+  parent_split: 沿用父照片、父视频和母工程分集；混合合成同时继承两个父来源。
+  shared_blender_mother: train
+  missing_material: 继续制作其余可行对照，记录实际缺项；不因没有独立新实拍或未测误报率停下全部制作。
+training:
+  config: lab/features/fire/training/config/fire_sticker_v4.yaml
+  baseline_runs: 1
+  validation_scope: 沿用常规训练分集；本轮不额外开展硬负例误报率验收或阈值搜索。
+  strategy: 正负样本使用同一套适度颜色和几何增强，保留可辨图案结构；沿用 AdamW 和已有 weight_decay，不新增特殊损失或模型结构。
+follow_up: 首轮之后根据实际误识别、漏识别及用户指定预算调整硬负例类型、比例或微调。

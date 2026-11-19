@@ -15,9 +15,11 @@ sys.path.insert(0, str(ROOT))
 from datasets.scripts.meter.render_meter_batch import KEYPOINTS, project
 from datasets.scripts.meter.render_meter_candidates import (landmark_ray_evidence, station_dial_masks, station_tone_compositor,
                                      station_pose_rays, station_pose_labels)
-from datasets.scripts.meter.meter_station_plan import validate_arena_declaration, allocated_arena_states
+from datasets.scripts.meter.meter_station_plan import (validate_arena_declaration, allocated_arena_states,
+                                                       restore_station_production_frame)
 
 from datasets.scripts.common.config import source_path
+from datasets.scripts.common import blender_workspace
 from datasets.scripts.common.paths import sample_dir, split_dir
 ARENA = source_path('meter', 'arena_source')
 STATION = source_path('meter', 'station_source')
@@ -94,16 +96,19 @@ def main():
             quotas = {s['id']: s['planned_count'] for s in parent_data['allocation']['strata']}
             if quotas.get('arena') != args.count:
                 ap.error('arena count differs from parent allocation')
-        sources = [ARENA.relative_to(ROOT).as_posix(), STATION.relative_to(ROOT).as_posix()]
+        sources = [ARENA.relative_to(ROOT).as_posix(), blender_workspace.source_ref(STATION, blender_workspace.STATION)]
         validate_arena_declaration(declaration, count=args.count, sources=sources, foreground=args.foreground)
         if Path(bpy.data.filepath).resolve() != ARENA.resolve():
             ap.error('loaded arena must match the declared arena source')
     elif args.production_plan:
         ap.error('preflight does not generate samples and does not accept a production plan')
+    restore_station_production_frame(bpy)
+    station_collections = blender_workspace.activate_scene(blender_workspace.ARENA, blender_workspace.STATION_ASSETS)
+    rebind_station_face(bpy, STATION_FACE)
     auxiliary = [out / 'masks'] + ([out / 'foreground'] if args.foreground else [])
     with guarded('render_meter_arena_v4', args, __file__, bpy.data.filepath,
                  extra_inputs=[STATION, STATION_FACE, ENDPOINTS, ROOT/'datasets/scripts/meter/config/dataset.yaml', ROOT/'datasets/scripts/meter/config/source.yaml'] + ([args.face_override] if args.face_override else []) + ([args.parent_allocation] if args.parent_allocation else []) + ([plan_path] if plan_path else []),
-                 code_dependencies=[Path(__file__).with_name('render_meter_batch.py'), Path(__file__).with_name('render_meter_candidates.py'), Path(__file__).with_name('power_meter_room.py'), Path(__file__).with_name('meter_station_plan.py')],
+                 code_dependencies=[Path(__file__).with_name('render_meter_batch.py'), Path(__file__).with_name('render_meter_candidates.py'), Path(__file__).with_name('power_meter_room.py'), Path(__file__).with_name('meter_station_plan.py'), ROOT/'datasets/scripts/common/blender_workspace.py'],
                  outputless=args.preflight, media_probe=lambda: blender_media(bpy), media_reload=lambda: reload_unpacked_media(bpy),
                  production_plan=declaration, sample_output_paths=[out / 'images'] if declaration else (),
                  auxiliary_output_paths=auxiliary if declaration else ()) as run:
@@ -121,12 +126,6 @@ def main():
         if args.foreground and not args.pose:
             ap.error('--foreground requires --pose')
         scene = bpy.context.scene
-        with bpy.data.libraries.load(str(STATION), link=False) as (src, dst):
-            needed = ['Power meter station prototype', 'Station 9011 dial assembly']
-            if not all(name in src.collections for name in needed):
-                raise ValueError('station collections missing')
-            dst.collections = needed
-        rebind_station_face(bpy, STATION_FACE)
         ensure_registered_blender_media(bpy, run)
         if args.face_override:
             derived = Path(args.face_override).resolve()
@@ -141,7 +140,7 @@ def main():
             if tuple(image.size) != (1254, 1254):
                 raise ValueError('derived face dimensions differ from calibration')
             nodes[0].image = image
-        for collection in dst.collections:
+        for collection in station_collections:
             scene.collection.children.link(collection)
         root = bpy.data.objects.new('Meter arena fitted assembly', None)
         scene.collection.objects.link(root)
@@ -223,7 +222,8 @@ def main():
         if args.foreground:
             (out / 'foreground').mkdir()
         manifest = {'status': 'running', 'requested_count': args.count, 'completed_count': 0,
-                    'arena': ARENA.relative_to(ROOT).as_posix(), 'station': STATION.relative_to(ROOT).as_posix(),
+                    'arena': ARENA.relative_to(ROOT).as_posix(),
+                    'station': blender_workspace.source_ref(STATION, blender_workspace.STATION),
                     'face_override': Path(args.face_override).resolve().relative_to(ROOT).as_posix() if args.face_override else None,
                     'parent_scene_relation': 'fitted synthetic scene; camera and metric dimensions not measured',
                     'camera': 'Vehicle camera', 'resolution': [640, 480], 'threads': 2,

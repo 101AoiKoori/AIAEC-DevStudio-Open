@@ -59,12 +59,12 @@ class PersonScenePlanTest(unittest.TestCase):
         self.assertEqual(len(result['labels']), 8)
         self.assertEqual(len({r['identity'] for r in result['objects']}), 8)
 
-    def test_rejects_unreviewed_background_and_missing_identity_evidence(self):
+    def test_unknown_background_is_a_candidate_but_identity_evidence_is_required(self):
         self.plan['actors'] = [actor('p', 80)]
-        bad = copy.deepcopy(self.plan)
-        bad['background_assessment']['person_scope'] = 'unknown'
-        with self.assertRaisesRegex(ValueError, 'background requires evidence'):
-            self.compose(bad)
+        candidate = copy.deepcopy(self.plan)
+        candidate['background_assessment']['person_scope'] = 'unknown'
+        result = self.compose(candidate)
+        self.assertEqual(len(result['labels']), 1)
         with self.assertRaisesRegex(ValueError, 'missing identity evidence mask'):
             compose_scene(self.background, self.plan, {'p': self.sprite}, {})
 

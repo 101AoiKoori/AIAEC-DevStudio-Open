@@ -52,6 +52,24 @@ class LayoutCheckTests(unittest.TestCase):
         self.assertEqual(code, 1)
         self.assertIn('datasets/raw/person/image.jpg', output)
 
+    def test_dataset_placeholders_allow_empty_directories_and_still_reject_data(self):
+        placeholders = ['datasets/samples/person/.gitkeep'] + [
+            f'datasets/exports/person/{split}/.gitkeep' for split in ('train', 'val', 'test')
+        ]
+        for path in placeholders:
+            self.write(path, '')
+        subprocess.run(['git', '-C', str(self.root), 'add', *placeholders], check=True)
+        code, output = self.run_check('--staged')
+        self.assertEqual(code, 0, output)
+        self.write('datasets/exports/person/train/image.png')
+        subprocess.run(['git', '-C', str(self.root), 'add', 'datasets/exports/person/train/image.png'], check=True)
+        code, output = self.run_check('--staged')
+        self.assertEqual(code, 1)
+        self.assertIn('image.png', output)
+        for path in ('tmp/.gitkeep', 'datasets/raw/person/.gitkeep',
+                     'datasets/samples/person/images/.gitkeep'):
+            self.assertEqual(checker.classify(path, set())[0], 'error')
+
     def test_missing_package_manifest_and_path_suggestion(self):
         self.write('ws/src/aec_new/src/aec_new/node.py')
         subprocess.run(['git', '-C', str(self.root), 'add', 'ws/src/aec_new/src/aec_new/node.py'], check=True)

@@ -26,17 +26,17 @@ import media_index_sqlite as index
 
 OUTPUT = ROOT / 'datasets/annotated/mixed_scene/v4_compositing_backgrounds_20261113'
 GROUPS = (
-    ('junction_003', 'datasets/raw/site_archive_legacy/场景/三楼与场地视频/三栋楼_垃圾桶与路口_003.mp4',
+    ('junction_003', 'Archive/Assets/working_sources/legacy/site/场景/三楼与场地视频/三栋楼_垃圾桶与路口_003.mp4',
      ((1, 13),), '三楼与路口平移', ('楼群', '垃圾桶', '车道线')),
-    ('junction_005', 'datasets/raw/site_archive_legacy/场景/三楼与场地视频/三栋楼_路口及垃圾桶_005.mp4',
+    ('junction_005', 'Archive/Assets/working_sources/legacy/site/场景/三楼与场地视频/三栋楼_路口及垃圾桶_005.mp4',
      ((1, 5), (10, 21.5)), '楼群沿路口转向', ('楼群', '车辆道具', '路口线')),
-    ('facades_009', 'datasets/raw/site_archive_legacy/场景/三楼与场地视频/三栋楼侧向扫描_009.mp4',
+    ('facades_009', 'Archive/Assets/working_sources/legacy/site/场景/三楼与场地视频/三栋楼侧向扫描_009.mp4',
      ((1, 15.5),), '楼群侧向扫描', ('楼群', '围挡', '场地边线')),
-    ('mixed_012', 'datasets/raw/e_bike/archive_assets_legacy/视频/人物立牌正背面_电动车直立_倒伏和遮挡_场地扫描_012.mp4',
+    ('mixed_012', 'Archive/Assets/working_sources/legacy/e_bike/视频/人物立牌正背面_电动车直立_倒伏和遮挡_场地扫描_012.mp4',
      ((6, 34), (47, 65), (78, 89)), '人物与电动车混合场地扫描', ('人物立牌', '直立与倒伏车', '禁行牌具', '车道线')),
-    ('parking_003', 'datasets/raw/e_bike/archive_assets_legacy/视频/场地多辆电动车_直立与倒伏混合_较低视角_003.mp4',
+    ('parking_003', 'Archive/Assets/working_sources/legacy/e_bike/视频/场地多辆电动车_直立与倒伏混合_较低视角_003.mp4',
      ((1, 12),), '低机位停车区横移', ('直立与倒伏车', '黑色围挡', '地面线')),
-    ('bins_004', 'datasets/raw/waste_bin/archive_assets_legacy/视频/四色桶较低视角_灰绿闭盖_红蓝开盖_004.mp4',
+    ('bins_004', 'Archive/Assets/working_sources/legacy/waste_bin/视频/四色桶较低视角_灰绿闭盖_红蓝开盖_004.mp4',
      ((1.25, 13),), '低机位四色桶绕扫', ('四色桶', '开闭盖', '地面线')),
 )
 PER_GROUP = 20

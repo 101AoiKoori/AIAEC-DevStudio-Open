@@ -5,7 +5,7 @@ development regression, not a training split or independent test.
 """
 
 if __name__ == "__main__":
-    raise SystemExit("Task helper is import-only; use the primary entry in datasets/scripts/sign/. Production remains paused.")
+    raise SystemExit("Task helper is import-only; use the primary entry in datasets/scripts/sign/.")
 
 import argparse
 import json
@@ -96,7 +96,7 @@ def _generate(output):
     try:
         back_sprite = repaired_back(output)
         for name, background_name, sprite_name, left, bottom, height in CASES:
-            background_path = ROOT / 'datasets/raw/car_real_capture_20261112' / background_name
+            background_path = ROOT / 'Archive/Assets/captures/car_real_capture_20261112' / background_name
             frame = base.read_image(background_path, cv2.IMREAD_COLOR)
             if frame.shape != (480, 640, 3):
                 raise ValueError('expected unscaled 640x480 car background')

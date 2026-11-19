@@ -6,7 +6,7 @@ Display characters are synthetic.
 """
 
 if __name__ == "__main__":
-    raise SystemExit("Legacy dataset CLI is retired; use datasets/scripts/meter/. Production remains paused.")
+    raise SystemExit("Legacy dataset CLI is retired; use datasets/scripts/meter/.")
 
 import argparse
 import json
@@ -284,7 +284,7 @@ def _legacy_main():
                         help='Angle of the display plane relative to ground, 60–70 degrees')
     args = parser.parse_args(sys.argv[sys.argv.index('--')+1:] if '--' in sys.argv else [])
     from meter_production_guard import guarded, blender_media, reload_unpacked_media
-    with guarded('build_power_meter_station_prototype', args, __file__, bpy.data.filepath, extra_inputs=[ENDPOINTS] + [ROOT / f'datasets/raw/site_capture_20261112/onboard_camera_images/vehicle_{i}.png' for i in ('0024','0100','0103','0104')], code_dependencies=[Path(__file__).with_name('render_meter_batch.py'), Path(__file__).with_name('power_meter_room.py')], media_probe=lambda: blender_media(bpy), media_reload=lambda: reload_unpacked_media(bpy)) as run:
+    with guarded('build_power_meter_station_prototype', args, __file__, bpy.data.filepath, extra_inputs=[ENDPOINTS] + [ROOT / f'Archive/Assets/captures/site_capture_20261112/onboard_camera_images/vehicle_{i}.png' for i in ('0024','0100','0103','0104')], code_dependencies=[Path(__file__).with_name('render_meter_batch.py'), Path(__file__).with_name('power_meter_room.py')], media_probe=lambda: blender_media(bpy), media_reload=lambda: reload_unpacked_media(bpy)) as run:
         if run.reused:
             return
         if not 60 <= args.ground_angle_deg <= 70:
@@ -332,7 +332,7 @@ def _legacy_main():
         bpy.ops.wm.save_as_mainfile(filepath=str(output / 'meter_9011_power_meter_station.blend'))
         report = {'status': 'editable visual prototype', 'source_blend': SOURCE.relative_to(ROOT).as_posix(),
                   'endpoint_config': ENDPOINTS.relative_to(ROOT).as_posix(),
-                  'source_photos': [f'datasets/raw/site_capture_20261112/onboard_camera_images/vehicle_{id}.png'
+                  'source_photos': [f'Archive/Assets/captures/site_capture_20261112/onboard_camera_images/vehicle_{id}.png'
                                     for id in ('0024', '0100', '0103', '0104')],
                   'unit_scale_basis': 'approximate proportions observed in car photos, not measured dimensions',
                   'dial_tilt': {'ground_angle_requested_deg': args.ground_angle_deg,

@@ -51,4 +51,15 @@ class NameRendererContracts(unittest.TestCase):
         self.assertNotEqual([s['planned_count'] for s in first['strata']],
                             [s['planned_count'] for s in second['strata']])
 
+    def test_detection_track_preserves_low_views_and_three_paper_cases(self):
+        request = entry.build_detection_plan(3, 20261118)
+        self.assertEqual(request['budget'], 54)
+        self.assertEqual({tuple(sorted(s['background']['buildings'])) for s in request['strata']},
+                         {('A',), ('B',), ('C',), ('A', 'B'), ('A', 'C'), ('B', 'C'), ('A', 'B', 'C')})
+        self.assertEqual(max(len(s['target']['texts']) for s in request['strata']), 3)
+        self.assertTrue(all(s['parameters']['pitch_degrees'] <= 0 for s in request['strata']))
+        self.assertTrue(all(not s['augmentation'].get('paper_glare') for s in request['strata']))
+        self.assertEqual({s['parameters']['camera_frame'] for s in request['strata']},
+                         {1, 47, 81, 98, 144, 178, 195, 241, 275})
+
 if __name__=='__main__': unittest.main()

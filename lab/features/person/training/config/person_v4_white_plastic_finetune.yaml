@@ -1,0 +1,45 @@
+schema_version: 3
+task_id: person
+model_key: person
+version: v4
+task: detect
+description: White plastic standee side and oblique-back fine-tuning
+data: datasets/exports/person/white_plastic_finetune/data.yaml
+model: training_packages/person/runs/person/v4_formal_20261116/training/weights/last_inference.pt
+output_root: runs/person
+class_names: [community, noncommunity]
+test_unavailable: true
+imgsz: 640
+epochs: 10
+batch: 8
+workers: 0
+device: '0'
+seed: 42
+training_policy:
+  mode: fixed_validation
+  save_period: 5
+evaluate_after_training: true
+optimizer: AdamW
+lr0: 0.00028
+lrf: 0.10
+weight_decay: 0.0005
+warmup_epochs: 0.25
+warmup_bias_lr: 0.00028
+cos_lr: true
+close_mosaic: 0
+amp: false
+deterministic: true
+diagnostic_conf: 0.25
+match_iou: 0.50
+nms_iou: 0.70
+augment:
+  degrees: 1.0
+  translate: 0.02
+  scale: 0.04
+  flipud: 0.0
+  fliplr: 0.0
+  mosaic: 0.0
+  mixup: 0.0
+  hsv_h: 0.0
+  hsv_s: 0.07
+  hsv_v: 0.08

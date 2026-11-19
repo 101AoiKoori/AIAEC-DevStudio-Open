@@ -31,8 +31,8 @@ classes:
   raw_media:
     parent: source_artifact
     abstract: false
-    description: 原始相机图片、视频、数字素材及其工作副本。
-    owner_prefixes: [datasets/raw/]
+    description: 原始相机图片、视频、数字素材及有清单溯源的任务目标和共享背景工作副本，含选用的渲染图和实拍裁片。
+    owner_prefixes: [datasets/raw/, Archive/Assets/captures/]
     authority: manifest
     versioning: manifest
     mutability: immutable
@@ -64,8 +64,8 @@ classes:
   candidate_source_asset:
     parent: source_artifact
     abstract: false
-    description: 只读候选素材目录，例如 datasets/assets/person。
-    owner_prefixes: [datasets/assets/person/]
+    description: 保留来源的团队交接包、旧工作副本、数字物料及参考素材。
+    owner_prefixes: [datasets/assets/person/, Archive/Assets/working_sources/]
     authority: manifest
     versioning: manifest
     mutability: immutable
@@ -160,6 +160,17 @@ classes:
     tracked: false
     lifecycle: [active, superseded]
     relations: [produces]
+  frame_environment:
+    parent: record_artifact
+    abstract: false
+    description: 逐图持久数据库；保存当前任务用途资格和机器证据修订，并引用原始标签与来源。
+    owner_prefixes: []
+    authority: mixed
+    versioning: frame_environment
+    mutability: versioned
+    tracked: false
+    lifecycle: [active, superseded]
+    relations: [documents]
   asset_registry:
     parent: record_artifact
     abstract: false
@@ -230,6 +241,17 @@ classes:
     parent: plan_artifact
     abstract: false
     description: 训练目标与组合轴的设计契约。
+    owner_prefixes: []
+    authority: git
+    versioning: git
+    mutability: versioned
+    tracked: true
+    lifecycle: [active, superseded]
+    relations: [documents]
+  design_observation_snapshot:
+    parent: plan_artifact
+    abstract: false
+    description: 组合轴设计附带的历史观察快照；不是实时生产状态或设计契约。
     owner_prefixes: []
     authority: git
     versioning: git
@@ -597,6 +619,7 @@ versioning_policies:
   git: 文本、代码、配置和文档由 Git 保存当前版本；不建版本命名目录，历史用提交。
   manifest: 数据/标注用清单记录来源、派生、用途和状态；当前集合只保留一套。
   registry: Blender 资产状态以 blender_source_registry.sqlite3 为权威。
+  frame_environment: 逐图数据库维护当前任务用途资格，资格与证据修订 ID 供选源、生成和历史回执引用。
   receipt: production_state.sqlite3 保存持久生产回执，不当可重建缓存清理。
   run: runs 内运行记录保持原位；内层 V3 runs 不移动、删除或覆盖。
   model: 模型权重按来源、训练数据版本、类别顺序和运行记录管理；大文件不入 Git。
@@ -618,6 +641,8 @@ artifacts:
     class: design_contract
   - path: config/combination_axes.yaml
     class: design_contract
+  - path: config/combination_axis_observations.yaml
+    class: design_observation_snapshot
   - path: config/full_train_allocation.yaml
     class: plan_draft
   - path: docs/FULL_TRAIN_PLAN_DESIGN.md
@@ -636,6 +661,8 @@ artifacts:
     class: media_index_cache
   - path: datasets/annotated/media_index/production_state.sqlite3
     class: production_receipt
+  - path: datasets/annotated/common/sources/frame_environment.sqlite3
+    class: frame_environment
   - path: datasets/CAR_REAL_CAPTURE_20261112.md
     class: capture_batch
   - path: datasets/SITE_CAPTURE_20261112.md

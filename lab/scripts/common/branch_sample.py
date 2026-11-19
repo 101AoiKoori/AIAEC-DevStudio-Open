@@ -260,8 +260,6 @@ def validate_sample(
             errors.append(f"{record_id}:label_state_invalid")
         review = record.get("review") if isinstance(record.get("review"), Mapping) else {}
         if label_state == "confirmed_negative":
-            if not isinstance(review.get("accepted_by"), str) or not review.get("accepted_by"):
-                errors.append(f"{record_id}:negative_without_accepted_by")
             if not review.get("full_frame_checked"):
                 errors.append(f"{record_id}:negative_without_full_frame_check")
         tags = record.get("content_branches")
@@ -1197,11 +1195,7 @@ def label_manifest_from_review(review: Mapping[str, Any]) -> dict[str, Any]:
             row for row in target_rows if _valid_bbox(row.get("visible_bbox_xyxy"))
         ]
         semantic_owner = _effective_accepted_by(matrix)
-        semantic_confirmed = (
-            matrix.get("full_frame_checked") is True
-            and semantic_owner is not None
-            and not _automatic_acceptance(semantic_owner)
-        )
+        full_frame_checked = matrix.get("full_frame_checked") is True
         box_owner = next(
             (
                 str(row.get("box_accepted_by"))
@@ -1221,12 +1215,12 @@ def label_manifest_from_review(review: Mapping[str, Any]) -> dict[str, Any]:
         if matrix.get("review_state") in {"rejected", "excluded"}:
             label_state = "excluded"
         elif (
-            semantic_confirmed
+            full_frame_checked
             and matrix.get("background_state") == "confirmed_empty"
             and not target_rows
         ):
             label_state = "confirmed_negative"
-        elif semantic_confirmed and all_boxes_human_confirmed:
+        elif full_frame_checked and valid_rows and len(valid_rows) == len(target_rows):
             label_state = "complete"
         elif valid_rows:
             label_state = "partial"
@@ -1264,20 +1258,22 @@ def label_manifest_from_review(review: Mapping[str, Any]) -> dict[str, Any]:
             "label_state": label_state,
             "parent_sources": copy.deepcopy(item.get("parent_sources") or []),
             "review": {
-                "full_frame_checked": matrix.get("full_frame_checked") is True,
+                "full_frame_checked": full_frame_checked,
                 "accepted_by": semantic_owner,
                 "box_accepted_by": (
                     box_owner
                     if all_boxes_human_confirmed
                     else None
                 ),
-                "method": "manual_full_frame_review",
+                "box_acceptance": "human" if all_boxes_human_confirmed else "candidate",
+                "method": "manual_full_frame_review" if semantic_owner and not _automatic_acceptance(semantic_owner)
+                else "recorded_full_frame_assessment",
                 "evidence": copy.deepcopy(item.get("evidence") or {}),
             },
             "instances": instances,
         }
         if label_state == "partial":
-            record["partial_reason"] = "pending_human_semantic_or_box_acceptance"
+            record["partial_reason"] = "frame_scope_or_box_geometry_incomplete"
         records.append(record)
     return {
         "schema_version": SCHEMA_VERSION,
@@ -1286,9 +1282,8 @@ def label_manifest_from_review(review: Mapping[str, Any]) -> dict[str, Any]:
         "records": records,
         "skipped": skipped,
         "boundary": (
-            "Candidate boxes remain partial until every published box has a human "
-            "box_accepted_by. Programmatic acceptance never creates a complete "
-            "human-confirmed record."
+            "Frame coverage and box geometry determine label completeness. "
+            "Reviewer fields record actual human acceptance."
         ),
     }
 

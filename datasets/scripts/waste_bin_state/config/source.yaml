@@ -1,50 +1,51 @@
 task: waste_bin_state
+target_working_manifest: datasets/annotated/common/sources/targets/waste_bin_state/target_sources_manifest.json
+background_pool_manifest: datasets/annotated/common/sources/background_pool_manifest.json
+direct_capture_manifests:
+- datasets/annotated/car_real_capture_20261112/direct_real_manifest.json
+- datasets/annotated/common/sources/archive_real_capture.json
 status: configured_inputs_consumed_by_canonical_entry
 databases:
   media_query: datasets/annotated/media_index/query_cache.sqlite3
   blender_registry: datasets/blender_source_registry.sqlite3
+  frame_environment: datasets/annotated/common/sources/frame_environment.sqlite3
 roots:
-- datasets/raw/waste_bin
-- datasets/raw/car_real_capture_20261112
-- datasets/assets/blender/waste_bin
+- Archive/Assets/working_sources/legacy/waste_bin
+- Archive/Assets/captures/waste_bin_state
+- Archive/Assets/captures/car_real_capture_20261112
+- datasets/assets/blender
 records:
 - datasets/annotated/waste_bin_state/v4_source_provenance_20261113.json
-selection: 查询现有数据库和清单，按任务、集合、角色及父来源选取；跨任务背景允许复用。
+selection: 先按任务用途读取当前资格，按父来源和既往接触编排本批 split。共享背景按接收任务的有效资格和实际落点使用。
 background_manifest: datasets/annotated/waste_bin/v4_grounded_backgrounds_20261112/backgrounds.json
-standalone_scene: datasets/assets/blender/waste_bin/blender_pbr_v2_20261110/waste_bin_pbr.blend
-render_input: datasets/samples/waste_bin_state
-arena_scene: datasets/assets/blender/shared/arena_4m2_pbr_20261112/arena_master_user_20261113.blend
-arena_bin_asset: datasets/assets/blender/waste_bin/blender_photo_markings_v4/waste_bin_photo_markings.blend
-asset_parent_scene: datasets/assets/blender/waste_bin/blender_pbr_v2_20261110/waste_bin_pbr.blend
+standalone_scene: datasets/assets/blender/aiaec_dataset.blend
+render_input: datasets/annotated/waste_bin_state/foreground
+arena_scene: datasets/assets/blender/aiaec_dataset.blend
+arena_bin_asset: datasets/assets/blender/aiaec_dataset.blend
+arena_bin_manifest: Archive/technical/revisions/waste_bin/blender_sources_20261116/blender_photo_markings_v4/manifest.json
+asset_parent_scene: datasets/assets/blender/aiaec_dataset.blend
 asset_parent_manifest_path: datasets/annotated/waste_bin/blender_pbr_v2_20261110/waste_bin_pbr.blend
 render_plan: datasets/scripts/waste_bin_state/config/render_plan.json
 production_plan: datasets/scripts/waste_bin_state/config/production_plan.json
+finetune_plan: datasets/scripts/waste_bin_state/config/reshoot_finetune_plan.json
+reshoot_manifest: datasets/annotated/waste_bin_state/reshoot/manifest.json
+reshoot_view_observations: datasets/annotated/waste_bin_state/reshoot/view_observations.json
+finetune_manifest: datasets/annotated/waste_bin_state/reshoot_finetune/manifest.json
+finetune_entry: datasets/scripts/waste_bin_state/build_reshoot_finetune.py
 current_selection:
-  scope: current_train_batch_only
-  background_ids:
-  - train_000163
-  - train_005751
-  - train_000091
-  - train_002188
-  - train_005277
-  - train_005996
-  - train_006236
-  - train_007045
-  - train_008185
-  - train_008485
-  excluded_background_ids:
-  - id: val_007795
-    reason: reserved_val
-  - id: test_011125
-    reason: reserved_test
-  - id: val_000433
-    reason: reserved_val
-  - id: test_008695
-    reason: reserved_test
-  render_scene: datasets/assets/blender/waste_bin/blender_pbr_v2_20261110/waste_bin_pbr.blend
-  render_manifest: datasets/samples/waste_bin_state/manifest.json
-  render_status: not_produced_production_paused
-  composition_plan_status: compile_after_actual_render_and_index_refresh
+  scope: current_train_database_eligible
+  qualified_pool:
+    database: frame_environment
+    role: composite_background
+    split: train
+    selection: all_current_eligible
+  render_scene: datasets/assets/blender/aiaec_dataset.blend
+  render_manifest: datasets/annotated/waste_bin_state/foreground/manifest.json
+  render_status: complete_candidates
+  composition_plan_status: real_priority_reshoot_finetune_published
+  published_manifest: datasets/exports/waste_bin_state/manifest.json
+  shared_ground_candidates: datasets/annotated/waste_bin_state/ground_reuse_manifest.json
+  pool_pilot_plan: datasets/scripts/waste_bin_state/config/pool_pilot_plan.json
 candidate_pool:
   inventory: datasets/annotated/waste_bin_state/v4_combined_source_gate_20261113.json
   samples: 5063
@@ -52,30 +53,43 @@ candidate_pool:
   supplemental:
     - {file: datasets/annotated/waste_bin_state/v4_source_gate_candidates_20261113.json, samples: 4713, purpose: production_candidate_source_queue_not_approved_export}
     - {file: datasets/annotated/waste_bin_state/v4_resume_source_gate_20261113.json, samples: 350}
-  blocking_review: bin mask and bin-level open/closed truth per frame; candidates are not approved exports and the composition plan still needs the rendered masks.
+  use: 历史候选来源，现行批次使用逐图库资格与已经渲染的整桶和状态掩膜。
 pairing:
   schema_version: 1
   status: draft
   composition_policy:
     target_source: blender_primary
     blender_priority: increased
-    blender_share_target: 0.40
+    blender_share_target: 0.76343
     target_components: [bin_model]
     background_components: [arena_scene]
-    note: 用户 2026-11-15 确认采用 20/40/40；桶模型可覆盖四色开闭
+    note: 本次已发布 train 3500 张的 Blender 实绩约 76.34%。后续按当批可放组合调配，按实际回执统计比例与父来源。
   policy:
     parent_classes: [task_real, background]
     split_unit: parent_group
     train_parent_cap: 0.8
-    val_test_mode: reserve_only
+    train_parent_cap_use: 按当批覆盖观察留源，合格底图按实际用途与父组归属参加编排。
+    val_test_mode: assigned_sources_with_split_specific_foregrounds
     derived_inherits_parent_split: true
     cross_task_duplicates: allowed_with_separate_labels
     same_source_splits: record_and_report
   task_real:
+    - id: bins_reshoot_20261118
+      class: task_real
+      kind: parent_photo_batch
+      paths: [datasets/raw/waste_bin_state/reshoot]
+      evidence:
+        - {manifest: datasets/annotated/waste_bin_state/reshoot/manifest.json}
+      capture_session: same_session
+      capture_session_id: bins_reshoot_20261118
+      labels: {status: complete, note: 真实四色桶补拍，整桶框，数量及盖态见补拍清单；机器视觉审查，非人工签收}
+      roles: [direct_target, target_foreground]
+      split: {primary: train, status: confirmed}
+      plan: datasets/scripts/waste_bin_state/config/reshoot_finetune_plan.json
     - id: tr_bin_001
       class: task_real
       kind: parent_video
-      paths: [datasets/raw/waste_bin/archive_assets_legacy/视频/四色桶_灰绿开盖_红蓝闭盖_001.mp4]
+      paths: [Archive/Assets/working_sources/legacy/waste_bin/视频/四色桶_灰绿开盖_红蓝闭盖_001.mp4]
       evidence:
         - {manifest: datasets/annotated/waste_bin/real_review_candidates_20261110/manifest.json}
       capture_session: unknown
@@ -86,7 +100,7 @@ pairing:
     - id: tr_bin_003
       class: task_real
       kind: parent_video
-      paths: [datasets/raw/waste_bin/archive_assets_legacy/视频/四色桶_灰绿闭盖_红蓝开盖_003.mp4]
+      paths: [Archive/Assets/working_sources/legacy/waste_bin/视频/四色桶_灰绿闭盖_红蓝开盖_003.mp4]
       evidence:
         - {manifest: datasets/annotated/waste_bin/real_review_candidates_20261110/manifest.json}
       capture_session: unknown
@@ -97,7 +111,7 @@ pairing:
     - id: tr_bin_005
       class: task_real
       kind: parent_video
-      paths: [datasets/raw/waste_bin/archive_assets_legacy/视频/灰桶关盖_多面与桶盖近景_005.mp4]
+      paths: [Archive/Assets/working_sources/legacy/waste_bin/视频/灰桶关盖_多面与桶盖近景_005.mp4]
       evidence:
         - {manifest: datasets/annotated/waste_bin/real_review_candidates_20261110/manifest.json}
       capture_session: unknown
@@ -108,7 +122,7 @@ pairing:
     - id: tr_bin_004
       class: task_real
       kind: parent_video
-      paths: [datasets/raw/waste_bin/archive_assets_legacy/视频/四色桶较低视角_灰绿闭盖_红蓝开盖_004.mp4]
+      paths: [Archive/Assets/working_sources/legacy/waste_bin/视频/四色桶较低视角_灰绿闭盖_红蓝开盖_004.mp4]
       evidence:
         - {manifest: datasets/annotated/waste_bin/real_review_candidates_20261110/manifest.json}
       capture_session: unknown
@@ -119,7 +133,7 @@ pairing:
     - id: tr_bin_006
       class: task_real
       kind: parent_video
-      paths: [datasets/raw/waste_bin/archive_assets_legacy/视频/灰桶开盖_多面及桶内近景_006.mp4]
+      paths: [Archive/Assets/working_sources/legacy/waste_bin/视频/灰桶开盖_多面及桶内近景_006.mp4]
       evidence:
         - {manifest: datasets/annotated/waste_bin/real_review_candidates_20261110/manifest.json}
       capture_session: unknown
@@ -130,7 +144,7 @@ pairing:
     - id: tr_bin_007
       class: task_real
       kind: parent_video
-      paths: [datasets/raw/waste_bin/archive_assets_legacy/视频/浅色地面四色桶_灰绿闭盖_红蓝开盖_007.mp4]
+      paths: [Archive/Assets/working_sources/legacy/waste_bin/视频/浅色地面四色桶_灰绿闭盖_红蓝开盖_007.mp4]
       evidence:
         - {manifest: datasets/annotated/waste_bin/real_review_candidates_20261110/manifest.json}
       capture_session: unknown
@@ -141,7 +155,7 @@ pairing:
     - id: tr_user_photos
       class: task_real
       kind: parent_photo_batch
-      paths: [datasets/raw/waste_bin]
+      paths: [Archive/Assets/captures/waste_bin_state/reference]
       evidence:
         - {manifest: datasets/annotated/waste_bin/bin_reference_geometry_manifest.jsonl}
       capture_session: unknown
@@ -152,7 +166,7 @@ pairing:
     - id: tr_motion_video
       class: task_real
       kind: parent_video
-      paths: [datasets/raw/waste_bin/运动方式.mp4]
+      paths: [Archive/Assets/captures/waste_bin_state/reference/运动方式.mp4]
       evidence:
         - {manifest: datasets/annotated/waste_bin/real_review_candidates_20261110/manifest.json}
       capture_session: unknown
@@ -164,80 +178,92 @@ pairing:
     - id: bg_full_scene
       class: background
       kind: parent_video
-      paths: [datasets/raw/site_capture_20261112/videos/full_scene.mp4]
+      paths: [Archive/Assets/captures/site_capture_20261112/videos/full_scene.mp4]
       evidence:
         - {manifest: datasets/annotated/waste_bin/v4_grounded_backgrounds_20261112/backgrounds.json}
-      review: {state: candidate_empty, method: contact_sheet, accepted_by: null, note: 14 帧审后背景，10 train + 2 val + 2 test；未确认空场，不得作空负例}
-      labels: {status: unknown}
-      roles: [composite_background]
+      review: {state: contains_target, method: per_frame_visual_review, accepted_by: null, note: 池中 31 帧现有 25 完整空负、3 完整有桶、3 部分有桶；各帧当前资格以逐图库为准}
+      labels: {status: partial, evidence: datasets/annotated/common/review/bin_pool_car_fullscene_20261117/review.jsonl}
+      roles: [composite_background, direct_target]
       split: {primary: train, status: proposed, same_source_allowed_in: [val, test], action: to_review}
+      plan: null
+    - id: bg_empty_scene_001
+      class: background
+      kind: parent_video
+      paths: [Archive/Assets/working_sources/legacy/site/场景/综合视频/空场与场景物料_001.mp4]
+      evidence:
+        - {manifest: datasets/annotated/common/review/bin_pool_185_199_20261117/batch_absent.jsonl}
+        - {manifest: datasets/annotated/common/review/bin_pool_185_199_20261117/batch_black_bin_complete_v2.jsonl}
+      review: {state: contains_target, method: per_frame_visual_review, accepted_by: null, note: 池中 6 帧为 4 完整空负、2 黑色开盖桶完整正例；与其他任务复用该父视频按已知接触记录}
+      labels: {status: complete}
+      roles: [composite_background, direct_target]
+      split: {primary: train, status: proposed}
       plan: null
     - id: bg_site_003
       class: background
       kind: parent_video
-      paths: [datasets/raw/site_archive_legacy/场景/三楼与场地视频/三栋楼_垃圾桶与路口_003.mp4]
+      paths: [Archive/Assets/working_sources/legacy/site/场景/三楼与场地视频/三栋楼_垃圾桶与路口_003.mp4]
       evidence:
         - {manifest: datasets/annotated/mixed_scene/v4_compositing_backgrounds_20261113/manifest.json}
-      review: {state: candidate_empty, method: contact_sheet, accepted_by: null}
-      labels: {status: unknown}
-      roles: [composite_background]
+      review: {state: contains_target, method: per_frame_visual_review, accepted_by: null, note: 池中 21 帧为 7 完整空负、11 完整有桶、3 部分有桶；合成落点仍逐帧判断}
+      labels: {status: partial, evidence: datasets/annotated/common/review/bin_pool_site003_005_20261117/review.jsonl}
+      roles: [composite_background, direct_target]
       split: {primary: val, status: proposed}
       plan: null
     - id: bg_site_005
       class: background
       kind: parent_video
-      paths: [datasets/raw/site_archive_legacy/场景/三楼与场地视频/三栋楼_路口及垃圾桶_005.mp4]
+      paths: [Archive/Assets/working_sources/legacy/site/场景/三楼与场地视频/三栋楼_路口及垃圾桶_005.mp4]
       evidence:
         - {manifest: datasets/annotated/mixed_scene/v4_compositing_backgrounds_20261113/manifest.json}
-      review: {state: candidate_empty, method: contact_sheet, accepted_by: null}
-      labels: {status: unknown}
-      roles: [composite_background]
+      review: {state: contains_target, method: per_frame_visual_review, accepted_by: null, note: 池中 21 帧为 18 完整空负、1 完整有桶、2 部分有桶；合成落点仍逐帧判断}
+      labels: {status: partial, evidence: datasets/annotated/common/review/bin_pool_site003_005_20261117/review.jsonl}
+      roles: [composite_background, direct_target]
       split: {primary: val, status: proposed}
       plan: null
     - id: bg_site_009
       class: background
       kind: parent_video
-      paths: [datasets/raw/site_archive_legacy/场景/三楼与场地视频/三栋楼侧向扫描_009.mp4]
+      paths: [Archive/Assets/working_sources/legacy/site/场景/三楼与场地视频/三栋楼侧向扫描_009.mp4]
       evidence:
         - {manifest: datasets/annotated/mixed_scene/v4_compositing_backgrounds_20261113/manifest.json}
-      review: {state: candidate_empty, method: contact_sheet, accepted_by: null}
-      labels: {status: unknown}
-      roles: [composite_background]
+      review: {state: confirmed_empty, method: per_frame_visual_review, accepted_by: null, note: 池中 21 帧全部完整无桶，test 空负已入逐图库；四桶合成落点另判}
+      labels: {status: complete, evidence: datasets/annotated/common/review/bin_pool_095_115_20261117/review.jsonl}
+      roles: [composite_background, empty_negative]
       split: {primary: test, status: proposed}
       plan: null
     - id: bg_site_012
       class: background
       kind: parent_video
-      paths: [datasets/raw/e_bike/archive_assets_legacy/视频/人物立牌正背面_电动车直立_倒伏和遮挡_场地扫描_012.mp4]
+      paths: [Archive/Assets/working_sources/legacy/e_bike/视频/人物立牌正背面_电动车直立_倒伏和遮挡_场地扫描_012.mp4]
       evidence:
         - {manifest: datasets/annotated/mixed_scene/v4_compositing_backgrounds_20261113/manifest.json}
-      review: {state: candidate_empty, method: contact_sheet, accepted_by: null}
-      labels: {status: unknown}
-      roles: [composite_background]
+      review: {state: contains_target, method: per_frame_visual_review, accepted_by: null, note: 池中 20 帧为 11 完整空负、9 黑色开盖桶完整正例；颜色是属性，空间与遮挡资格另判}
+      labels: {status: complete, evidence: [datasets/annotated/common/review/bin_pool_site012_20261117/batch_absent.jsonl, datasets/annotated/common/review/bin_pool_site012_20261117/batch_black_bin_complete_v2.jsonl]}
+      roles: [composite_background, direct_target]
       split: {primary: test, status: proposed}
       plan: null
     - id: bg_ebike_003
       class: background
       kind: parent_video
-      paths: [datasets/raw/e_bike/archive_assets_legacy/视频/场地多辆电动车_直立与倒伏混合_较低视角_003.mp4]
+      paths: [Archive/Assets/working_sources/legacy/e_bike/视频/场地多辆电动车_直立与倒伏混合_较低视角_003.mp4]
       evidence:
         - {manifest: datasets/annotated/mixed_scene/v4_compositing_backgrounds_20261113/manifest.json}
-      review: {state: candidate_empty, method: contact_sheet, accepted_by: null}
-      labels: {status: unknown}
-      roles: [composite_background]
+      review: {state: confirmed_empty, method: per_frame_visual_review, accepted_by: null, note: 池中 20 帧全部完整无桶，test 空负及其中可放底图以逐图库当前记录为准}
+      labels: {status: complete, evidence: datasets/annotated/common/review/pool_quota_pilot_20261117/review.jsonl}
+      roles: [composite_background, empty_negative]
       split: {primary: test, status: proposed}
       plan: null
   data_sources: []
   blender:
     - id: bl_waste_bin_pbr
       kind: blender_scene
-      path: datasets/assets/blender/waste_bin/blender_pbr_v2_20261110/waste_bin_pbr.blend
+      path: datasets/assets/blender/aiaec_dataset.blend
       role: target_scene
       priority: primary
       split: {primary: shared, status: confirmed, same_source_note: 四色桶目标/背景；与垃圾贴纸场景同谱系}
     - id: bl_arena_master
       kind: blender_scene
-      path: datasets/assets/blender/shared/arena_4m2_pbr_20261112/arena_master_user_20261113.blend
+      path: datasets/assets/blender/aiaec_dataset.blend
       role: background_scene
       priority: primary
       split: {primary: shared, status: confirmed, same_source_note: 多任务共享母场景}

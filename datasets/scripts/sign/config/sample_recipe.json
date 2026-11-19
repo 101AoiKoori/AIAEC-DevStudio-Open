@@ -1,0 +1,136 @@
+{
+  "seed": 1919,
+  "tones": [
+    "normal",
+    "dark",
+    "low_saturation",
+    "dark_low_saturation"
+  ],
+  "masks": [
+    "train_20.png",
+    "train_14.png",
+    "train_8.png",
+    "train_0.png"
+  ],
+  "backgrounds": [
+    {
+      "image": "datasets/raw/shared/backgrounds/rendered/aiaec_eight_routes_indoor_20261117/e_bike_f079.png",
+      "kind": "blender",
+      "ground_rectangle": [
+        70,
+        350,
+        570,
+        478
+      ],
+      "layouts": [
+        [
+          "far_full",
+          100,
+          460,
+          370
+        ],
+        [
+          "near_full",
+          360,
+          320,
+          465
+        ],
+        [
+          "top_clipped",
+          620,
+          320,
+          465
+        ],
+        [
+          "pole_only",
+          1300,
+          320,
+          465
+        ]
+      ],
+      "evidence": "原图复核：近处灰色路面；限制脚点和底座完整处于所列路面范围，避开右墙。"
+    },
+    {
+      "image": "datasets/annotated/mixed_scene/v4_compositing_backgrounds_20261113/images/junction_005_007.jpg",
+      "kind": "video",
+      "ground_rectangle": [
+        350,
+        350,
+        639,
+        475
+      ],
+      "layouts": [
+        [
+          "far_full",
+          100,
+          500,
+          400
+        ],
+        [
+          "near_full",
+          360,
+          500,
+          460
+        ],
+        [
+          "top_clipped",
+          620,
+          480,
+          460
+        ]
+      ],
+      "evidence": "原图复核：4:3 裁取路面，去掉上下补黑边；底座位于楼宇右侧近处路面，省略超大杆段布局。",
+      "crop_xyxy": [
+        80,
+        0,
+        560,
+        360
+      ]
+    },
+    {
+      "image": "Archive/Assets/captures/site_capture_20261112/onboard_camera_images/vehicle_0010.png",
+      "kind": "photo",
+      "ground_rectangle": [
+        40,
+        385,
+        610,
+        465
+      ],
+      "layouts": [
+        [
+          "far_full",
+          100,
+          280,
+          390
+        ],
+        [
+          "near_full",
+          360,
+          280,
+          450
+        ],
+        [
+          "top_clipped",
+          620,
+          300,
+          455
+        ],
+        [
+          "pole_only",
+          1300,
+          320,
+          455
+        ]
+      ],
+      "evidence": "原图复核：信号灯前方可见道路；左右信号灯支杆为普通杆干扰，无禁行牌具。",
+      "negative_context": "traffic_light_support_poles",
+      "negative_evidence": "原图中可见信号灯及其支杆，属于信号灯支架而非禁行牌具；沿用完整无牌具证据。"
+    }
+  ],
+  "limits": [
+    "同一物理牌具和视频的四个真实视面，背面复用现有描边修复。",
+    "放大为图像合成近景；未声称重建实车相机投影。",
+    "普通杆对照来自现有信号灯支架，不声称已覆盖所有独立普通杆实物。",
+    "没有新增独立验证或测试采集。"
+  ]
+}

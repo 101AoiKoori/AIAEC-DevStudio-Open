@@ -6,7 +6,7 @@ Callers must connect source records and a production guard before production.
 """
 
 if __name__ == "__main__":
-    raise SystemExit("Task helper is import-only; use the primary entry in datasets/scripts/person/. Production remains paused.")
+    raise SystemExit("Task helper is import-only; use the primary entry in datasets/scripts/person/.")
 
 import math
 
@@ -91,6 +91,7 @@ def _foreground(image, identity_mask, actor):
     projected = planar_warp(image, **angles)
     sprite = cv2.resize(projected, tuple(size), interpolation=cv2.INTER_LINEAR)
     evidence = None
+    upper = None
     if identity_mask is not None:
         if (not isinstance(identity_mask, np.ndarray) or identity_mask.shape != image.shape[:2] or
                 identity_mask.dtype != np.uint8):
@@ -105,7 +106,19 @@ def _foreground(image, identity_mask, actor):
         evidence = marker[:, :, 0] > 127
         if not np.any(evidence):
             raise ValueError('identity evidence vanished during transformation')
-    return sprite, evidence
+    if actor.get('min_upper_visible') is not None:
+        # This is the upper quarter of the source foreground, not a face detector.
+        # It also covers faces near either side of irregular artwork.
+        marker = np.zeros_like(image)
+        upper_end = max(1, round(image.shape[0] * 0.25))
+        marker[:upper_end, :, 0] = image[:upper_end, :, 3]
+        marker[:, :, 3] = image[:, :, 3]
+        marker = planar_warp(marker, **angles)
+        marker = cv2.resize(marker, tuple(size), interpolation=cv2.INTER_LINEAR)
+        upper = marker[:, :, 0] > 127
+        if not np.any(upper):
+            raise ValueError('upper foreground evidence vanished during transformation')
+    return sprite, evidence, upper
 
 
 def compose_scene(background, plan, foregrounds, identity_masks):
@@ -126,12 +139,13 @@ def compose_scene(background, plan, foregrounds, identity_masks):
         raise ValueError('scene plan must be an object')
     _text(plan.get('background_source'), 'background source')
     assessment = plan.get('background_assessment')
-    if (not isinstance(assessment, dict) or assessment.get('person_scope') not in ('confirmed_empty', 'complete_existing') or
+    if (not isinstance(assessment, dict) or
+            assessment.get('person_scope') not in ('candidate_empty', 'confirmed_empty', 'complete_existing', 'unknown') or
             not isinstance(assessment.get('evidence'), str) or not assessment['evidence'].strip()):
         raise ValueError('background requires evidence of complete person supervision')
     height, width = background.shape[:2]
     existing = assessment.get('existing_people', [])
-    if not isinstance(existing, list) or (assessment['person_scope'] == 'confirmed_empty' and existing):
+    if not isinstance(existing, list) or (assessment['person_scope'] not in ('complete_existing', 'unknown') and existing):
         raise ValueError('background person declarations conflict with their scope')
     if assessment['person_scope'] == 'complete_existing' and not existing:
         raise ValueError('complete_existing requires existing people')
@@ -166,7 +180,7 @@ def compose_scene(background, plan, foregrounds, identity_masks):
     if not isinstance(foregrounds, dict) or not isinstance(identity_masks, dict):
         raise ValueError('foreground and identity masks must be mappings')
     canvas = background.copy()
-    masks, markers, records, ids, identities = [], [], [], {}, set()
+    masks, markers, upper_markers, records, ids, identities = [], [], [], [], {}, set()
     for actor in actors:
         if not isinstance(actor, dict):
             raise ValueError('actor must be an object')
@@ -213,20 +227,25 @@ def compose_scene(background, plan, foregrounds, identity_masks):
                 raise ValueError('back and side people must not have a target category')
         elif category not in ('upright', 'fallen'):
             raise ValueError('vehicle category must be upright or fallen')
-        sprite, marker = _foreground(foregrounds[actor_id], identity_masks.get(actor_id) if front else None, actor)
+        sprite, marker, upper = _foreground(foregrounds[actor_id], identity_masks.get(actor_id) if front else None, actor)
         if contact > sprite.shape[1]:
             raise ValueError('contact width exceeds foreground width')
         mask = alpha_place(canvas, sprite, x, y)
         if any(np.any(mask[b[1]:b[3], b[0]:b[2]]) for b in background_boxes):
             raise ValueError('foreground overlaps a protected background object')
         marker_canvas = np.zeros((height, width), dtype=bool)
+        upper_canvas = np.zeros((height, width), dtype=bool)
         if marker is not None:
             left, top = round(x-sprite.shape[1]/2), round(y-sprite.shape[0])
             marker_canvas[top:top+sprite.shape[0], left:left+sprite.shape[1]] = marker & (sprite[:, :, 3] > 127)
             if not marker_canvas.any():
                 raise ValueError('identity evidence is not visible in the foreground')
+        if upper is not None:
+            left, top = round(x-sprite.shape[1]/2), round(y-sprite.shape[0])
+            upper_canvas[top:top+sprite.shape[0], left:left+sprite.shape[1]] = upper & (sprite[:, :, 3] > 127)
         masks.append(mask)
         markers.append(marker_canvas)
+        upper_markers.append(upper_canvas)
         records.append({'id': actor_id, 'kind': kind, 'category': category, 'view': view,
                         'identity': identity, 'source': source, 'foot_xy': [x, y],
                         'contact_width': contact, 'size_wh': list(actor['size_wh']),
@@ -247,6 +266,21 @@ def compose_scene(background, plan, foregrounds, identity_masks):
             evidence_visible = int((markers[i] & visible[i]).sum()) / int(markers[i].sum())
             if evidence_visible < actor['min_identity_visible']:
                 raise ValueError('identity evidence is obscured beyond the declared threshold')
+            upper_min = actor.get('min_upper_visible')
+            if upper_min is not None:
+                upper_visible = int((upper_markers[i] & visible[i]).sum()) / int(upper_markers[i].sum())
+                if upper_visible < upper_min:
+                    raise ValueError('upper foreground is obscured beyond the declared threshold')
+                record['upper_visible_fraction'] = upper_visible
+                record['upper_visibility_basis'] = 'top quarter of source foreground; geometric approximation'
+            occlusion_range = actor.get('occlusion_fraction_range')
+            if occlusion_range is not None:
+                occlusion = 1.0 - record['visible_fraction']
+                # Fully unoccluded people remain valid. Real occlusion is bounded.
+                if occlusion > 1e-9 and not occlusion_range[0] <= occlusion <= occlusion_range[1]:
+                    raise ValueError('person occlusion outside the declared range')
+                record['occlusion_fraction'] = occlusion
+                record['occlusion_fraction_range'] = list(occlusion_range)
             record['identity_evidence'] = actor['identity_evidence']
             record['identity_visible_fraction'] = evidence_visible
             record['min_identity_visible'] = actor['min_identity_visible']

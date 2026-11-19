@@ -12,7 +12,7 @@ import sys
 import bpy
 
 ROOT = Path(__file__).resolve().parents[5]
-PHOTO = ROOT / 'datasets/raw/waste_bin/archive_assets_legacy/照片/四色桶正面_闭盖_分类标志_001.jpg'
+PHOTO = ROOT / 'Archive/Assets/working_sources/legacy/waste_bin/照片/四色桶正面_闭盖_分类标志_001.jpg'
 SOURCE = ROOT / 'datasets/assets/blender/waste_bin/blender_pbr_v2_20261110/waste_bin_pbr.blend'
 # Image coordinates are top-left origin. The existing geometric border is retained.
 RECTANGLES = {'red': (704, 335, 829, 522), 'green': (1182, 384, 1302, 572)}

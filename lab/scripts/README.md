@@ -8,14 +8,16 @@
 | `media/` | 媒体索引、SQLite 查询缓存、视频抽帧、合成背景收集和站点背景特征更新 | [`media/`](media/) |
 | `blender/` | Blender MCP 桥接与源资产登记库查询/登记 | [`blender/`](blender/) |
 | `data/` | 数据源门控、候选打包、现场采集评估和站点适配 | [`data/`](data/) |
-| `audit/` | 生产入口静态审计、Markdown 链接与章节锚点检查、受管写入/转发/未分类路径检查 | [`audit/`](audit/) |
+| `audit/` | 生产入口静态审计、受管写入/转发/未分类路径检查 | [`audit/`](audit/) |
 | `common/` | 跨任务人工辅助标注、来源审查、掩膜质量与 Blender 机位规划 | [`common/`](common/) |
 
 所有脚本从工作空间根目录执行，不是正式 ROS 运行依赖，也不能被部署包导入。正式推理核心仍在 `ws/src/aec_vision/`，任务数据生成入口仍在 `datasets/scripts/<任务>/`，训练实验仍在 `lab/features/<任务>/`。各分类的具体入口以目录内脚本和 `--help` 为准。
 
-文档一致性检查运行 `python lab/scripts/audit/documentation.py`。它只读取活动 Markdown，检查工作空间内文件链接和 Markdown 章节锚点；不访问网络，也不替代生成器、需求源或数据语义审查。当前链接与锚点均由 pre-commit 检查。
+文档一致性检查运行 `python .agents/skills/workspace-doc-governance/scripts/documentation.py`。它只读取活动 Markdown，检查工作空间内文件链接和 Markdown 章节锚点；不访问网络，也不替代生成器、需求源或数据语义审查。设置 `AIAEC_FULL_CHECKS=1` 时 pre-commit 运行此检查。
 
 现场标注清单的派生计数用 `python lab/scripts/data/evaluate_field_capture.py audit-labels --labels <当前标签JSON...> --review-summary <汇总JSON>` 核对。默认只读；确认当前标签文件是目标输入后可加 `--write` 重算记录、图片、框和状态分布。工具会拒绝重复图像—任务记录、非法框、正例无框、负例带框和未知状态，并在汇总中保留原复核子集字段。
+
+火焰和禁行牌的计划及当前图签对账使用 `python -B lab/scripts/contracts/state_coverage.py --actual --json`，同时返回计划分配和当前清单读取结果。实际框数来自标签文件，楼宇归属、视面与截断来自相应实际记录；未记录的值保持未知。加 `--source-status` 可同时查看逐图库存。
 
 ## common/
 
@@ -45,8 +47,8 @@
 
 ### 背景池
 
-- `background discover` 只读 `datasets/annotated/media_index/query_cache.sqlite3`，按路径片段和媒体类型发现图片；返回的每一项固定从 `review_state: unknown` 开始。缓存发现不证明画面无目标、父组、split 或近重复状态。
-- `background summarize` 读取现有 review 计划的 `plan.json/selection.json/metrics.jsonl`，再按 `datasets/scripts/<任务>/config/source.yaml` 的 `pairing` 查找父组和 split 预留。只有 `verdict: ready`、`no_unlabelled_target` 且存在明确 `accepted_by` 时才写 `confirmed_empty`；没有人工确认的 ready 只写 `candidate_empty`，无审查或几何失败写 `unknown`，有未标目标证据写 `contains_target`，其余排除写 `rejected`。
+- `background discover` 只读媒体查询缓存，按路径片段和媒体类型发现图片。返回的 `review_state: unknown` 表示此命令未关联逐图入库判定，实际用途回查任务记录。
+- `background summarize` 汇总已有 `plan.json/selection.json/metrics.jsonl` 和配对声明。该旧命令只有在 `ready`、`no_unlabelled_target` 且填有 `accepted_by` 时才输出 `confirmed_empty`，自动通过输出 `candidate_empty`。此处枚举描述旧报告的行为，当前生产从入库记录查询所需证据。[背景图入库与复用](../../docs/DATASET_DESIGN.md#背景图入库与复用)
 - 输出默认位于 `datasets/annotated/common/review/<任务>/<批次>/background_pool.json`，记录来源计划、选择、度量、父组、近重复组、split 状态和代码摘要。
 
 示例：
@@ -58,7 +60,7 @@
 
 ### 完整标签与掩膜
 
-- `labels audit` 读取显式标注清单，检查类别顺序、可见框、可选的完整框/可见掩膜、部分可见证据和来源清单，并从可见框重建 YOLO 标签。`label_state: unknown` 即使标签为空也保持 unknown；`partial` 保留已审可见实例但不会升级为完整；只有 `confirmed_negative`、全帧已检查、记录明确人工 `accepted_by` 且带审查方法时才允许空标签作为负例。
+- `labels audit` 读取显式标注清单，检查类别顺序、可见框、完整框或掩膜以及来源，并按可见框重建 YOLO 标签。`confirmed_negative` 的空标签需要无任务实例、全帧检查和记录明确的审查方法。部分或未知标签仍按原范围记录。
 - `masks audit` 复用 `datasets/scripts/common/review/masks.py` 的孔洞、贴边和多组件指标，再检查 visible 是否属于 full、隐藏区域是否由遮挡层解释、可见比例和地面接触点。默认叠加图同时绘制 full、visible、遮挡层、地面多边形和触点。
 - 报告默认写入 `datasets/annotated/common/review/<任务>/<批次>/`；模型标签不是自动追加到正式数据集。
 
@@ -83,12 +85,12 @@
 | `objects[].visible_bbox_xyxy` | 只覆盖图中可见像素 |
 | `objects[].full_bbox_xyxy` | 有完整实体依据时填写；没有就保持空 |
 | `background_state` | `confirmed_empty` / `contains_target` / `unknown` |
-| `accepted_by` | 人工语义确认人；空值只表示 pending |
+| `accepted_by` | 记录实际的人工语义确认人 |
 | `objects[].box_accepted_by` | 单独确认可见框的人工；程序化值只进入自动验证层 |
 | `review_state` | 默认 `pending`；`rejected/excluded` 只在有实际失败证据时填写 |
 | `notes` | 缺标、遮挡层、截断、疑点与证据 |
 
-所有审查和接受摘要分别报告 `source/available`、`annotated`、`candidate`、`auto_validated`、`human_confirmed`、`training_admitted` 与 `pending`。人工语义确认和人工框确认分列；程序化 Blender 结果不得填入人工层。
+全流程标注盘点报告 `source_available`、`annotated`、`candidate`、`auto_validated`、`human_confirmed`、`training_admitted` 与 `pending`。人工语义与框的确认范围分别记录，程序化结果保留机器来源。
 
 示例：
 
@@ -115,7 +117,7 @@
 
 当前标签审计 `annotated=5`：4 条完整候选正例、1 条确认负例、10 个候选可见实例、0 条 unknown、0 条 partial，全部为 `pass_candidate`。人工语义接受覆盖 5 个审查项、16 个任务目标；人工框确认仍为 0。3 条正例框来自 `Codex visual review`，Blender 原始预览的 3 个框与掩膜来自 `programmatic_blender_generator`，合计 4 帧/10 框属于自动验证，框 pending 为 10，`training_admitted=0`。车辆遮挡裁片掩膜检查为 `review`：孔洞比例 0.03315 超过默认 0.02，且没有地面多边形；该证据说明现成裁片不能直接视为通过。机位计划无错误，前视/斜视/侧视为 3/1/1，相机尺度箱为 4/1；参考画面配准尚未声明，所以整体仍为 `review`。
 
-空框或 `unknown` 不是负例；确认全图无任务目标时需填写 `background_state: confirmed_empty`、`full_frame_checked: true`、`accepted_by` 和备注。联系表使用 `panels`，不能写成 `objects1,1` 等非法键。语义已确认但框未人工确认的记录仍为 pending/partial，不得写成 rejected。
+该批人工审查表用 `background_state: confirmed_empty`、`full_frame_checked: true`、实际签署人和备注记录全图无目标结论。联系表使用 `panels`。人工框确认按实际状态记录，机器标签可按用途和证据使用。
 
 背景池 b5 汇总为 `candidate_empty=5`、`rejected=5`、`unknown=9`、`confirmed_empty=0`；媒体发现额外返回 20 个 `unknown` 图片候选，仅用于后续全帧审查。
 

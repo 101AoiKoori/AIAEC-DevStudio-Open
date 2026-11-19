@@ -437,6 +437,19 @@ class TargetSpecScanTest(unittest.TestCase):
         self.assertEqual(report.below_scale, [])
         self.assertEqual(report.reason_codes, ["unlabelled_target_suspected"])
 
+    def test_below_scale_hit_records_back_side_proposal_without_clearing_a_partial_match(self):
+        report = emptiness.scan_unlabelled_targets(
+            standee_frame(back=True),
+            boxes=[],
+            templates_bgr=[BACK_PATCH],
+            params=EXACT_MATCH_PARAMS,
+            spec={**STANDEE_SPEC, "min_height_fraction": 0.4, "below_min_scale": "suspect"},
+        )
+        self.assertFalse(report.clean)
+        self.assertEqual(report.hard_negatives, [])
+        self.assertEqual(len(report.suspects), 1)
+        self.assertEqual(report.suspects[0]["side_observation"]["side"], "back")
+
     def test_back_side_policy_suspect_keeps_the_candidate(self):
         report = emptiness.scan_unlabelled_targets(
             standee_frame(back=True),

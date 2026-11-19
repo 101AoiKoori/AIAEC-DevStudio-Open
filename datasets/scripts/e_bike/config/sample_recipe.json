@@ -1,0 +1,340 @@
+{
+  "seed": 20261118,
+  "backgrounds": [
+    {
+      "match": {
+        "record_id": "fdd0401206074c4fbc87d570d854a487d5ff0b8b06a630981909ba19a50564f8"
+      },
+      "layout": {
+        "max_vehicles": 2,
+        "mirror_positions": false,
+        "clear": [
+          [
+            95,
+            360,
+            65
+          ],
+          [
+            210,
+            445,
+            145
+          ]
+        ],
+        "near": [
+          190,
+          440,
+          155
+        ],
+        "occlusion": [
+          160,
+          410,
+          95
+        ],
+        "queue": [
+          [
+            60,
+            320,
+            36
+          ],
+          [
+            80,
+            333,
+            40
+          ],
+          [
+            103,
+            347,
+            46
+          ],
+          [
+            128,
+            365,
+            54
+          ],
+          [
+            153,
+            385,
+            64
+          ],
+          [
+            180,
+            408,
+            78
+          ],
+          [
+            211,
+            432,
+            94
+          ],
+          [
+            245,
+            458,
+            112
+          ]
+        ]
+      }
+    },
+    {
+      "match": {
+        "record_id": "2d1c77dad8e25390aec6252e2af557c71c78bbfb053a2552da30be292fb2e3d3"
+      },
+      "layout": {
+        "max_vehicles": 2,
+        "mirror_positions": false,
+        "clear": [
+          [
+            420,
+            345,
+            70
+          ],
+          [
+            530,
+            445,
+            145
+          ]
+        ],
+        "near": [
+          490,
+          440,
+          155
+        ],
+        "occlusion": [
+          480,
+          410,
+          95
+        ]
+      }
+    },
+    {
+      "match": {
+        "scene": "Arena",
+        "route": "e_bike",
+        "render_frame": 1
+      }
+    },
+    {
+      "match": {
+        "scene": "Arena Detailed",
+        "route": "e_bike",
+        "render_frame": 37
+      },
+      "layout": {
+        "max_vehicles": 8,
+        "mirror_positions": true,
+        "queue": [
+          [
+            250,
+            315,
+            36
+          ],
+          [
+            275,
+            329,
+            40
+          ],
+          [
+            300,
+            344,
+            46
+          ],
+          [
+            325,
+            361,
+            54
+          ],
+          [
+            350,
+            382,
+            64
+          ],
+          [
+            375,
+            406,
+            78
+          ],
+          [
+            400,
+            431,
+            94
+          ],
+          [
+            425,
+            458,
+            112
+          ]
+        ]
+      }
+    }
+  ],
+  "paired_layouts": {
+    "mixed_clear": 4,
+    "mixed_dense": 4,
+    "upright_over_upright": 4,
+    "upright_over_fallen": 4,
+    "fallen_over_upright": 4,
+    "fallen_over_fallen": 4,
+    "single_upright": 2,
+    "single_fallen": 2,
+    "mixed_queue": 4,
+    "queue_all_upright": 2,
+    "queue_all_fallen": 2,
+    "queue_3_u1_f2": 4,
+    "queue_3_u2_f1": 4,
+    "queue_5_u2_f3": 4,
+    "queue_5_u3_f2": 4,
+    "queue_7_u3_f4": 4,
+    "queue_7_u4_f3": 4,
+    "queue_single_upright": 4,
+    "queue_single_fallen": 4
+  },
+  "empty_images": 4,
+  "near_sizes": [
+    145,
+    155,
+    165
+  ],
+  "fallen_width_multiplier": 1.15,
+  "minimum_effective_occlusion": 0.05,
+  "maximum_attempts_per_pair": 1200,
+  "scale_basis": "Approximate reference fit per background: distant upright height 55-70 px, near height 145-165 px, fallen width 1.15x corresponding depth scale. Real backgrounds use saved contact masks and task-local layout. Not physical calibration.",
+  "direct_frame_record_ids": [
+    "87dbc3adaab35be49edd68ed2983d8a4be2637f60e83d47c9954d7623c520ab1",
+    "ef597948b44c806ec184eb6edb6e27cc86c284e15d7168cb4f25b9bec961ca50",
+    "653ebd5d501e99f14e743508d3411a3e6e2e5a878cb41ffdad6f09d8eba4e268",
+    "45f288c44947a7375c8a9c874469ef8d3b163b00a094d9d8e473259632b24652",
+    "8abf5069ab1e9c9c97e12f75239310e060910ac3707d4f649cfba26374fc191d",
+    "f1090b2d39169c25960bcc1e649867b41db26d54af2ff223ee2f6b0c3408d04e",
+    "e0404cc7b8c7d6ade054dbccce4b3768a1b7c785247a3b68093055b15acaeb47",
+    "ef47ffadaa83d607d3c949cee999c6b8392bf151ca9a055f2a0e85c2fa7f0dfe",
+    "49f29d0655dc6471d8843407d541fbdd5f7f578a25f40d0f5b568a47cf787263",
+    "2555b3d39f8acc2b0e35472267dd0d3d4e454cb8fb7fe7e7243bcc5000784ed9",
+    "ef158533ee35644387016a0e7bd0f3e4b982488e61192e28a1f969fa8e7875fe",
+    "e439ab30787221b163f25dae6bf414c4fb80d47959be8ee66d9c042b4244929f",
+    "e15d3a445a4f4dc8f297b13ba8ad25e820cb2f725f3c5e9842984aab227837c1",
+    "b45a28c1e167032739492c3dcc938bd79ae4f63cbc7202d7069cbcbc4976089d",
+    "8390321d2f5a43692bd24164eb0822c2e351db441c0ecbb9c492959bc0e1e438",
+    "6ff2f7c3dc5b0f80f6bf61bd978cd567bcc089d8f6d14dc163ef99a2ea87b862",
+    "71843222a2fdbe6146fcd6ce7e271e295e43034e68cbe42e61543da79b905708",
+    "493208e08e64277c33bef9e844fea74e0ee65f84f57def7d9be74eb98990035e",
+    "95cfa78e4b567a9748a35cfd7654a4959256181b8f3bea1cfffc56109327ec52",
+    "81fa26e30bc9823006e62077e0de5ab85a123b85da408feb73ce5f4e479b1b5a",
+    "105911c61476fc9fd8ff261feec175977d9e53363bae88d473098b78a010aefe"
+  ],
+  "direct_mirrors": true,
+  "partial_frame_record_ids": [],
+  "queue_variants": {
+    "queue_3_u1_f2": {
+      "slots": [
+        0,
+        4,
+        7
+      ],
+      "classes": [
+        "upright",
+        "fallen",
+        "fallen"
+      ]
+    },
+    "queue_3_u2_f1": {
+      "slots": [
+        0,
+        4,
+        7
+      ],
+      "classes": [
+        "upright",
+        "upright",
+        "fallen"
+      ]
+    },
+    "queue_5_u2_f3": {
+      "slots": [
+        0,
+        2,
+        4,
+        6,
+        7
+      ],
+      "classes": [
+        "upright",
+        "upright",
+        "fallen",
+        "fallen",
+        "fallen"
+      ]
+    },
+    "queue_5_u3_f2": {
+      "slots": [
+        0,
+        2,
+        4,
+        6,
+        7
+      ],
+      "classes": [
+        "upright",
+        "upright",
+        "upright",
+        "fallen",
+        "fallen"
+      ]
+    },
+    "queue_7_u3_f4": {
+      "slots": [
+        0,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "classes": [
+        "upright",
+        "upright",
+        "upright",
+        "fallen",
+        "fallen",
+        "fallen",
+        "fallen"
+      ]
+    },
+    "queue_7_u4_f3": {
+      "slots": [
+        0,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "classes": [
+        "upright",
+        "upright",
+        "upright",
+        "upright",
+        "fallen",
+        "fallen",
+        "fallen"
+      ]
+    },
+    "queue_single_upright": {
+      "slots": [
+        7
+      ],
+      "classes": [
+        "upright"
+      ]
+    },
+    "queue_single_fallen": {
+      "slots": [
+        7
+      ],
+      "classes": [
+        "fallen"
+      ]
+    }
+  },
+  "experiment_focus": "Synthetic-only follow-up on camera and idealized Blender floors: fixed ground slots with 1/3/5/7 vehicles, posture-count swaps, original/mirrored source views; retain 8-vehicle and four occlusion controls. Existing direct frames unchanged."
+}

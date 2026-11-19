@@ -24,10 +24,12 @@ from datasets.scripts.waste_bin_state.render_blender_waste_bin import (GEOMETRY_
 
 ROOT = Path(__file__).resolve().parents[3]
 from datasets.scripts.common.config import source_path, load_task_config
-from datasets.scripts.common.paths import sample_dir, split_dir
+from datasets.scripts.common import blender_workspace
+from datasets.scripts.common.paths import bin_state_arena_render_dir
 SOURCE = source_path('waste_bin_state', 'arena_bin_asset')
 ARENA = source_path('waste_bin_state', 'arena_scene')
-EXPORT = sample_dir('waste_bin_state')
+BIN_SOURCE = blender_workspace.source_ref(SOURCE, blender_workspace.BIN_PHOTO)
+EXPORT = bin_state_arena_render_dir()
 QUANTITY_SCHEDULE = (4, 3, 2, 1, 0, 4, 3, 2, 4, 3, 2, 4, 3, 4, 2, 4, 3, 4, 1, 4)
 
 
@@ -97,7 +99,7 @@ def _generate(asset_objects, run, media):
         ap.error('load the workspace scene specified by --scene; count 1..20 and samples 1..8')
     if args.offset < 0 or not 20 <= args.max_seconds <= 360:
         ap.error('offset must be nonnegative; max-seconds must be 20..360')
-    jobs = arena_planned_jobs(run.plan, arena.relative_to(ROOT).as_posix(), SOURCE.relative_to(ROOT).as_posix())
+    jobs = arena_planned_jobs(run.plan, arena.relative_to(ROOT).as_posix(), BIN_SOURCE)
     if len(jobs) != args.count:
         raise ValueError('count must equal the planned budget')
     scene = bpy.context.scene
@@ -147,15 +149,15 @@ def _generate(asset_objects, run, media):
               'min_visibility': .70, 'min_visible_pixels': 24,
               'resolution': [640, 480], 'render_device': 'OPTIX', 'devices': devices, 'cycles_samples': args.samples,
               'wall_seconds_limit': args.max_seconds, 'scene_file': arena.relative_to(ROOT).as_posix(),
-              'bin_source': SOURCE.relative_to(ROOT).as_posix(),
+              'bin_source': BIN_SOURCE,
               'source_model_units': '1 unit approximately 10 cm per asset construction; arena units interpreted as metres',
               'scale_fitted': .1, 'layout_fitted_m': [0, 1.0, 0], 'camera_fitted_not_measured': True,
               'source_camera': original_camera,
               'camera_changes': 'plan specifies position and aim; lens and sensor width retained',
               'camera_fitted_aim': list(fitted_aim),
-              'reference_only': ['datasets/raw/car_real_capture_20261112/P12_TL2.png', 'frame_000181',
-                                 'datasets/raw/car_real_capture_20261112/P02_PS1.png', 'datasets/raw/car_real_capture_20261112/P04_PS2.png',
-                                 'datasets/raw/car_real_capture_20261112/P05_NOENTRY.png'],
+              'reference_only': ['Archive/Assets/captures/car_real_capture_20261112/P12_TL2.png', 'frame_000181',
+                                 'Archive/Assets/captures/car_real_capture_20261112/P02_PS1.png', 'Archive/Assets/captures/car_real_capture_20261112/P04_PS2.png',
+                                 'Archive/Assets/captures/car_real_capture_20261112/P05_NOENTRY.png'],
               'lineage': 'one synthetic arena and one four-bin asset; real diagnostics were referenced only, not composited; not independent capture',
               'split': run.plan['target_split'], 'hinge_clearance': clearance, 'samples': []}
     def save():
@@ -234,7 +236,7 @@ def _generate(asset_objects, run, media):
                                       'saturation': tone.inputs['Saturation'].default_value,
                                       'render_seed': args.seed + index, 'candidate_label': label_path,
                                       'scene': arena.relative_to(ROOT).as_posix(),
-                                      'bin_source': SOURCE.relative_to(ROOT).as_posix(),
+                                      'bin_source': BIN_SOURCE,
                                       'media_inputs': [p.relative_to(ROOT).as_posix() for p in media]})
             report['elapsed_seconds'] = time.monotonic() - start
             save()
@@ -254,30 +256,21 @@ def _guard_inputs():
     """Declare the scene, its file images, and the bin asset's photo source."""
     if not bpy.app.background:
         raise ValueError('asset dependency discovery requires background Blender')
-    if bpy.data.is_dirty:
-        raise ValueError('loaded Blender scene has unsaved changes; use a saved workspace copy')
     scene = Path(bpy.data.filepath).resolve()
-    asset_manifest = SOURCE.parent / 'manifest.json'
-    asset = json.loads(asset_manifest.read_text(encoding='utf8'))
     _, config = load_task_config('waste_bin_state')
+    asset_manifest = source_path('waste_bin_state', 'arena_bin_manifest')
+    asset = json.loads(asset_manifest.read_text(encoding='utf8'))
     if asset['source_scene'] != config['asset_parent_manifest_path']:
         raise ValueError('bin asset manifest parent differs from the configured registry alias')
     procedural = {scene, SOURCE, asset_manifest, source_path('waste_bin_state', 'asset_parent_scene')}
     media = {ROOT / asset['photo']}
-    existing_images = {image.as_pointer() for image in bpy.data.images}
-    with bpy.data.libraries.load(str(SOURCE), link=False) as (src, dst):
-        dst.objects = [n for n in src.objects if n == 'Measured height scale' or
-                       any(n.startswith(name + ' ') for name in BIN_NAMES)]
-    asset_objects = list(dst.objects)
+    asset_collection, = blender_workspace.activate_scene(blender_workspace.ARENA, (blender_workspace.BIN_PHOTO,))
+    asset_objects = list(asset_collection.all_objects)
     for image in bpy.data.images:
         if image.source == 'FILE' and not image.packed_file:
             if not image.filepath:
                 raise ValueError('scene image has no source path: ' + image.name)
-            if image.as_pointer() in existing_images:
-                path = Path(bpy.path.abspath(image.filepath, library=image.library)).resolve()
-            else:
-                path = Path(bpy.path.abspath(image.filepath, start=str(SOURCE.parent),
-                                             library=image.library)).resolve()
+            path = Path(bpy.path.abspath(image.filepath, library=image.library)).resolve()
             if path.is_file():
                 media.add(path)
             else:
@@ -298,7 +291,7 @@ def main():
     args, _ = parser.parse_known_args(sys.argv[sys.argv.index('--') + 1:] if '--' in sys.argv else [])
     out = (ROOT / args.out).resolve()
     if out != EXPORT.resolve():
-        parser.error('arena render output must be datasets/samples/waste_bin_state')
+        parser.error(f'arena render output must be {EXPORT.relative_to(ROOT).as_posix()}')
     plan_path = (ROOT / args.plan).resolve()
     if not plan_path.is_relative_to(ROOT) or not plan_path.is_file():
         raise ValueError('plan must be an existing workspace file')
@@ -310,14 +303,15 @@ def main():
         raise ValueError('load the workspace arena declared by --scene')
     media, procedural, asset_objects = _guard_inputs()
     code = [Path(__file__).resolve(), ROOT / 'datasets/scripts/common/blender_masks.py', ROOT / 'datasets/scripts/waste_bin_state/render_blender_waste_bin.py',
-            ROOT / 'datasets/scripts/waste_bin_state/bin_render_contract.py']
+            ROOT / 'datasets/scripts/waste_bin_state/bin_render_contract.py',
+            ROOT / 'datasets/scripts/common/blender_workspace.py']
     with generation_guard('waste_bin.render_arena:' + str(out.relative_to(ROOT)),
                           media, [out], {'argv': sys.argv[sys.argv.index('--') + 1:],
                                          'blender_version': bpy.app.version_string},
                           code_paths=code, procedural_inputs=[*procedural, plan_path, ROOT/'datasets/scripts/waste_bin_state/config/source.yaml', ROOT/'datasets/scripts/waste_bin_state/config/dataset.yaml'], root=ROOT,
                           production_plan=declaration, sample_output_paths=[out / 'images'],
                           auxiliary_output_paths=[out / 'masks']) as run:
-        jobs = arena_planned_jobs(run.plan, arena.relative_to(ROOT).as_posix(), SOURCE.relative_to(ROOT).as_posix())
+        jobs = arena_planned_jobs(run.plan, arena.relative_to(ROOT).as_posix(), BIN_SOURCE)
         if len(jobs) != args.count:
             raise ValueError('count must equal the planned budget')
         if run.reused:

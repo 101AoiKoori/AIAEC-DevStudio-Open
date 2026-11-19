@@ -9,15 +9,17 @@ PACKAGE_ROOT = HERE.parents[2]
 PACKAGED = (PACKAGE_ROOT / 'scripts/common/engine').is_dir()
 ROOT = PACKAGE_ROOT if PACKAGED else HERE.parents[5]
 sys.path.insert(0, str(ROOT / 'scripts/common' if PACKAGED else ROOT / 'lab/training_common'))
+sys.path.insert(0, str(HERE.parent))
 from engine.cli import main as engine_main
 from engine.config import resolve
+from sign_report import write_sign_report
 
 DEFAULT_CONFIG = 'config/train.yaml' if PACKAGED else 'lab/features/sign/training/config/sign_v4.yaml'
-VIEWS = ('front', 'side', 'back', 'unknown')
+VIEWS = ('front', 'oblique', 'side', 'back', 'unknown')
 
 
 def reviewed_view_report(rows, reviews):
-    """Stratify recorded matched/missed fixture boxes by manually reviewed view."""
+    """Stratify fixture boxes using confirmed machine or human view evidence."""
     images = {}
     for row in rows:
         if row['source_image'] in images:
@@ -51,6 +53,18 @@ def reviewed_view_report(rows, reviews):
 
 def main(argv=None):
     argv = list(sys.argv[1:] if argv is None else argv)
+    if argv and argv[0] == 'sign-report':
+        parser=argparse.ArgumentParser(description=write_sign_report.__doc__)
+        parser.add_argument('--root',type=Path,default=ROOT)
+        parser.add_argument('--evaluation',required=True)
+        parser.add_argument('--dataset-manifest',required=True)
+        args=parser.parse_args(argv[1:])
+        try:
+            root=args.root.resolve()
+            path=write_sign_report(resolve(root,args.evaluation),resolve(root,args.dataset_manifest),root=root)
+            print(path.name+' ready');return 0
+        except (OSError,ValueError,KeyError,IndexError,TypeError) as error:
+            print(f'ERROR: {type(error).__name__}: {error}',file=sys.stderr);return 1
     if argv and argv[0] == 'view-report':
         parser = argparse.ArgumentParser(description=reviewed_view_report.__doc__)
         parser.add_argument('--root', type=Path, default=ROOT)

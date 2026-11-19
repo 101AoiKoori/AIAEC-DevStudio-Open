@@ -1,9 +1,9 @@
 task: person
-status: canonical_entry_sources_connected_production_paused
+status: canonical_entry_sources_connected
 allocation: {required: true, engine: datasets/scripts/common/bayesian.py, weights: per_plan_design_assumptions}
 goal: 识别正面可辨的社区和非社区人物，电动车直立或倒伏遮挡时仍识别可辨人物。
 exclude_as_positive: [侧面, 背面, 不可辨身份]
-states: [单人, 多人, 人物互挡, 无车遮挡, 直立车遮挡, 倒伏车遮挡, 空场, 轻度偏航, 明暗, 饱和度]
+states: [空场, 单人, 多人, 仅白背, 正背同框, 人物互挡, 无车遮挡, 直立车遮挡, 倒伏车遮挡, 可辨偏航, 明暗, 饱和度]
 train_target_images: 3000
 source_mix_initial: {direct_real: 0.30, real_background_composite: 0.40, blender_background: 0.30}
 source_config: config/source.yaml
@@ -18,5 +18,5 @@ target_spec:
   reference_labelled_heights_px: [117, 120, 122]
   reference_frame_height_px: 360
   back_side: hard_negative
-  below_min_scale: not_a_target
-  note: 正面可辨且不小于最小尺度的人偶才是正例；背面白背作硬负例单独标注；远处小于最小尺度的立牌既不作正例也不作空街负例，也不阻止所在帧作为背景。
+  below_min_scale: filter_in_field_inference
+  note: 训练按正面及类别是否可辨标可见框。仅白背且无可辨正面时使用空标签。0.30 按有效画高衡量遮挡前的完整合成立牌，0.28 是现场过滤待标定的尺度参考。

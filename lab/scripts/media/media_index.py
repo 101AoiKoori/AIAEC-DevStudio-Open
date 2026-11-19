@@ -74,9 +74,25 @@ VIDEOS = {'.mp4', '.mov', '.avi', '.mkv', '.m4v', '.webm', '.mpeg', '.mpg',
 SKIP_DIRS = {'.git', '.venv', 'venv', '__pycache__', 'node_modules', 'site-packages',
              'portable_env', 'weights', 'checkpoints', 'bundles',
              'build', 'devel', 'install'}
+DIRECT_CAPTURE_MANIFESTS = {'direct_real_manifest.json', 'archive_real_capture.json',
+                            'target_sources_manifest.json', 'background_pool_manifest.json'}
+DIRECT_CAPTURE_FIELDS = ('point', 'waypoint_label', 'segment', 'frame_index', 'timestamp_seconds',
+                         'frame_time_basis', 'evidence', 'capture_identity', 'duplicate_of',
+                         'aliases', 'sampled_coverage', 'scene_observation', 'source_blend')
+DIRECT_CAPTURE_FILTERS = {
+    'annotation_task': 'match an exact task in a source record',
+    'capture_identity': 'match the shared identity of a capture and its task copies',
+    'point': 'match an exact capture point',
+    'parent_video': 'match a workspace-relative parent video',
+    'parent_scene': 'match a workspace-relative Blender source scene',
+    'annotation_label': 'match an exact class name in the task annotation',
+    'annotation_use': 'match an exact use in the task annotation',
+    'annotation_state': 'match an exact completeness state in the task annotation',
+}
 MANIFEST_NAMES = {'manifest.json', 'manifest.jsonl', 'workspace_sources.json',
                   'local_index.json', 'inventory.json', 'sources.json', 'samples.jsonl',
-                  'source_inventory.csv', 'photo_review.csv', 'inventory.csv', 'assets.json'}
+                  'source_inventory.csv', 'photo_review.csv', 'inventory.csv', 'assets.json',
+                  'background_dispatch.json'} | DIRECT_CAPTURE_MANIFESTS
 MANIFEST_HINTS = ('manifest', 'inventory', 'provenance', 'source', 'handoff',
                   'migration', 'lineage', 'metadata', 'relation', 'selection',
                   'audit', 'label', 'annotation', 'sample', 'distribution', 'evaluation')
@@ -100,6 +116,9 @@ EVIDENCE_KEYS = ('source_image', 'source_video', 'parent_image', 'parent_video',
                  'label_state', 'review_status', 'review_state', 'status', 'image_size',
                  'original_path', 'historical_path', 'source_assets', 'source_records',
                  'label_review_status', 'content_review', 'relation_to_video', 'parent_ids',
+                 'state', 'review_batch', 'review_verdict', 'review_reason_codes', 'review_evidence',
+                 'ground_polygon_640x360', 'foot_xy_640x360', 'source_image_size',
+                 'human_accepted', 'accepted_by', 'parent_link_basis', 'parent_link_verified_by',
                  'source_frame', 'source_fps', 'seconds_approx', 'capture_session',
                  'independence', 'annotations_status', 'labels', 'tasks', 'role', 'device',
                  'reuse_relations', 'reused_assets', 'shared_assets', 'shared_sources',
@@ -258,7 +277,63 @@ def structured_claims(records, include_references=False):
     return result
 
 
+def direct_capture_matches(record, filters):
+    claims = record['claims']
+    if record.get('relation') != 'describes' or not claims.get('capture_id'):
+        return False
+
+    def equals(value, requested):
+        return isinstance(value, str) and value.casefold() == requested.casefold()
+
+    def values(observation, key):
+        value = observation.get(key)
+        return value if isinstance(value, list) else ()
+
+    if 'point' in filters and not equals(claims.get('point'), filters['point']):
+        return False
+    if 'capture_identity' in filters and not equals(
+            claims.get('capture_identity') or claims.get('capture_id'), filters['capture_identity']):
+        return False
+    if 'parent_video' in filters:
+        parent = claims.get('parent_video') or claims.get('source_video')
+        if not isinstance(parent, str) or path_key(parent) != path_key(filters['parent_video']):
+            return False
+    if 'parent_scene' in filters:
+        parent = claims.get('source_blend') or claims.get('mother_scene')
+        if not isinstance(parent, str) or path_key(parent) != path_key(filters['parent_scene']):
+            return False
+    task, label, use, state = (filters.get(key) for key in (
+        'annotation_task', 'annotation_label', 'annotation_use', 'annotation_state'))
+    if not any((task, label, use, state)):
+        return True
+
+    observations = claims.get('tasks')
+    if not isinstance(observations, dict):
+        return False
+    for name, observation in observations.items():
+        if not isinstance(observation, dict) or (task and not equals(name, task)):
+            continue
+        observed_state = observation.get('state')
+        if state and not equals(observed_state, state):
+            continue
+        if use and not any(equals(value, use) for value in values(observation, 'uses')):
+            continue
+        if label:
+            instances = observation.get('instances')
+            # Existing label vocabularies can list classes absent from the image.
+            names = ([item.get('class_name') for item in instances if isinstance(item, dict)]
+                     if isinstance(instances, list) else values(observation, 'class_names'))
+            if observed_state == 'complete_negative' or not any(equals(value, label) for value in names):
+                continue
+        return True
+    return False
+
+
 def claim_matches(evidence, args):
+    direct_filters = {key: getattr(args, key) for key in DIRECT_CAPTURE_FILTERS
+                      if getattr(args, key, None)}
+    if direct_filters and not any(direct_capture_matches(record, direct_filters) for record in evidence):
+        return False
     exact_fields = {'background_view', 'background_placement_plane',
                     'background_target_presence', 'background_use',
                     'background_review_state'}
@@ -678,6 +753,9 @@ def manifest_evidence(directory: Path, root_only: bool, dependencies=None):
                                                              'batch_context': context, 'claims': {}})
                         continue
                     claims = {key: row[key] for key in EVIDENCE_KEYS if row.get(key) is not None}
+                    if low in DIRECT_CAPTURE_MANIFESTS and row.get('id'):
+                        claims['capture_id'] = row['id']
+                        claims.update({key: row[key] for key in DIRECT_CAPTURE_FIELDS if row.get(key) is not None})
                     if not claims:
                         continue
                     record = {'manifest': relative(manifest), 'record_index': index,
@@ -1280,6 +1358,7 @@ def query_locked(args):
                     'observed_content', 'review_flag', 'background_view',
                     'background_placement_plane', 'background_target_presence',
                     'background_use', 'background_review_state', 'observed_task', 'region_role', 'region_task', 'ground_patch_use')) or
+                any(getattr(args, field, None) for field in DIRECT_CAPTURE_FILTERS) or
                 args.split or args.evaluation_scope)
     matching = defaultdict(list)
     matching_keys = defaultdict(set)
@@ -1500,6 +1579,8 @@ def main(argv=None):
         action.add_argument('--ground-patch-use', help='filter the exact use status of a visible ground patch')
         action.add_argument('--split', help='filter explicitly recorded split claims')
         action.add_argument('--evaluation-scope', help='filter explicit evaluation scope claims')
+        for option, help_text in DIRECT_CAPTURE_FILTERS.items():
+            action.add_argument('--' + option.replace('_', '-'), help=help_text)
     args = parser.parse_args(argv)
     if args.command in ('query', 'evidence', 'batches') and args.limit < 0:
         parser.error('--limit must be nonnegative')

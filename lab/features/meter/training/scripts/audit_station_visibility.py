@@ -17,7 +17,7 @@ ROOT = Path(__file__).resolve().parents[5]
 sys.path.insert(0, str(ROOT))
 from lab.training_common.production_guard import generation_guard
 from meter_production_guard import blender_media
-SOURCE = ROOT / 'datasets/assets/blender/batch_scenes/meter/station_v4_room_context_grounded_20261112/preview_scene.blend'
+SOURCE = ROOT / 'Archive/technical/datasets/meter/station_v4_room_context_grounded_20261112/preview_scene.blend'
 OWNER = ROOT / 'datasets/exports/meter'
 
 

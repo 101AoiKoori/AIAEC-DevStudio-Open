@@ -1,7 +1,7 @@
 """Pure helpers for Blender fire-scene scheduling and visible-instance labels."""
 
 if __name__ == "__main__":
-    raise SystemExit("Task helper is import-only; use the primary entry in datasets/scripts/fire/. Production remains paused.")
+    raise SystemExit("Task helper is import-only; use the primary entry in datasets/scripts/fire/.")
 
 import math
 from pathlib import Path
@@ -84,7 +84,8 @@ def explicit_scenario(target):
     if not isinstance(counts, dict) or set(counts) != set(active) or any(
             type(counts[key]) is not int or not 0 <= counts[key] <= 5 for key in active):
         raise ValueError('each active building needs a fire count from 0 to 5')
-    if target['view'] not in ('near_frontal', 'oblique_left', 'oblique_right'):
+    if target['view'] not in ('near_frontal', 'oblique_left', 'oblique_right',
+                               *(f'orange_peel_{i:02d}' for i in range(9))):
         raise ValueError('unsupported camera view')
     if target['placement'] not in ('all', 'left', 'right', 'upper', 'lower',
                                    'c_supported_left', 'c_supported_right'):

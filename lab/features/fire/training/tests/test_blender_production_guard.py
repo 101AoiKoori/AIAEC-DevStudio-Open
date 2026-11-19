@@ -66,7 +66,7 @@ class BlenderProductionGuardTests(unittest.TestCase):
         main = entry('build_blender_buildings.py', {'ROOT': self.root, 'parse_args': lambda: args,
                      'generation_guard': self.guard, '_produce': self.produce})
         self.assert_protected(main)
-        self.assertIn(self.root / 'datasets/raw/fire/team_assets/image1.png', self.inputs[0][1])
+        self.assertIn(self.root / 'Archive/Assets/working_sources/digital/fire/team_assets/image1.png', self.inputs[0][1])
 
     def test_renderer_guard_precedes_production(self):
         scene = self.root / 'source.blend'
@@ -77,7 +77,7 @@ class BlenderProductionGuardTests(unittest.TestCase):
                      'read_production_declaration': lambda *_: (self.root / 'plan.json', {'strata': []}),
                      'plan_production': lambda *_: {'planned_total': 2, 'strata': []},
                      'output_partition': lambda *_: 'train',
-                     'configured_fire_artwork': lambda: self.root/'datasets/raw/fire/team_assets/image1.png',
+                     'configured_fire_artwork': lambda: self.root/'Archive/Assets/working_sources/digital/fire/team_assets/image1.png',
                      'scene_external_media': lambda: set(), 'scene_external_libraries': lambda: set(),
                      'generation_guard': self.guard, '_produce': self.produce})
         self.assert_protected(main)

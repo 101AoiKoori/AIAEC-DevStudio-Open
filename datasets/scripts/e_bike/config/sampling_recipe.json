@@ -1,0 +1,14 @@
+{
+  "purpose": "paired_real_parent_resampling_followup",
+  "seed": 42,
+  "old_inputs": "runs/e_bike/synthetic_short_inputs_20261118/manifest.json",
+  "focused_inputs": "runs/e_bike/focused_inputs_20261118/manifest.json",
+  "evaluation_snapshot": "runs/e_bike/focused_inputs_20261118/evaluation_snapshot.json",
+  "added_images_per_arm": 48,
+  "arms": ["real_parent"],
+  "epochs": 20,
+  "wall_seconds_per_arm": 600,
+  "initial_weights": "runs/e_bike/keypoint_control_20261118/training/weights/best.pt",
+  "classifier": "runs/e_bike/two_stage_20261118/classifier/weights/best.pt",
+  "scope": "Follow-up designed after four-arm ablation. Replace the same48 crop slots with their exact original training parent frames, preserving repeats and order.204 slots,20 epochs, same optimizer schedule. Existing26/32 diagnostics only. Whole frames differ in context, scale and potentially annotated instance count."
+}

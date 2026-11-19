@@ -15,7 +15,7 @@ from PIL import Image, ImageStat
 
 ROOT = Path(__file__).resolve().parents[3]
 TABLE = ROOT / 'datasets/annotated/site_capture_20261112/photo_review.csv'
-RAW = ROOT / 'datasets/raw/site_capture_20261112/onboard_camera_images'
+RAW = ROOT / 'Archive/Assets/captures/site_capture_20261112/onboard_camera_images'
 SEMANTIC_DEFAULTS = {
     'background_view': 'unknown',
     'background_placement_plane': 'unknown',

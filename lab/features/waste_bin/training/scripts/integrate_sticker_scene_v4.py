@@ -18,9 +18,9 @@ SOURCE = 'datasets/annotated/waste_sticker_v4_handoff_20261113/staged_master_wit
 CONFIG = 'lab/features/waste_bin/training/config/waste_sticker_v4_reviewed_master.yaml'
 DISTRIBUTION = 'datasets/annotated/waste_sticker_v4_handoff_20261113/distribution_master_candidate.json'
 PRIOR = 'datasets/exports/waste_bin/waste_sticker_v4_reviewed_two_bin_20261113'
-PRIOR_VIDEO = 'datasets/raw/site_capture_20261112/videos/full_scene.mp4'
-CLASSES = 'datasets/raw/waste_bin/toolkit/configs/classes.yaml'
-ARTWORK_DIR = 'datasets/raw/waste_bin/toolkit/SourcePic'
+PRIOR_VIDEO = 'Archive/Assets/captures/site_capture_20261112/videos/full_scene.mp4'
+CLASSES = 'Archive/Assets/working_sources/digital/waste_sticker/toolkit/configs/classes.yaml'
+ARTWORK_DIR = 'Archive/Assets/working_sources/digital/waste_sticker/toolkit/SourcePic'
 CACHE_DIR = 'datasets/exports/waste_bin/.cache/assets'
 SPLITS = ('train', 'val', 'test')
 

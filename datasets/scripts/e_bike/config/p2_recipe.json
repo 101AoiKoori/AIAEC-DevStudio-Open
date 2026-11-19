@@ -1,0 +1,29 @@
+{
+  "purpose": "P2_P3_fine_resolution_detector_control",
+  "inputs": "runs/e_bike/synthetic_short_inputs_20261118/manifest.json",
+  "evaluation_inputs": "runs/e_bike/candidate_verifier_20261118/evaluation_snapshot.json",
+  "common_backbone": "runs/e_bike/keypoint_control_20261118/training/weights/best.pt",
+  "semantic_classifier": "runs/e_bike/candidate_verifier_20261118/classifier/weights/last.pt",
+  "architectures": {
+    "P3": "yolov8n.yaml",
+    "P2": "yolov8n-p2.yaml"
+  },
+  "initialization": "Only common backbone modules0-9 copied; both necks and detection heads are new. Common inherited backbone is historically exposed.",
+  "seed": 42,
+  "fit_real_images": 4,
+  "fit_synthetic_images": 4,
+  "fit_epochs": 60,
+  "fit_lr": 0.001,
+  "full_epochs": 40,
+  "full_lr": 0.0003,
+  "batch": 4,
+  "nominal_batch": 4,
+  "imgsz": 640,
+  "fit_wall_seconds_per_arm": 600,
+  "full_wall_seconds_per_arm": 1200,
+  "primary_confidence": 0.25,
+  "primary_nms_iou": 0.3,
+  "scope": "8-image training-fit diagnostic, then156train/old26val and32 exposed layout diagnostics if capacity is usable. Same backbone and epochs/batches; architecture compute differs. Not independent-source validation or deployment.",
+  "fit_repeats": 8,
+  "fit_budget_note": "Follow-up after60epochs x2batches gave weak absolute confidence: same8 images repeated to64 slots,60epochs x16batches. No new image or independent sample."
+}

@@ -25,6 +25,8 @@ from datasets.scripts.common.names import CHARS, SUFFIX, make_name  # noqa: E402
 from lab.training_common.production_guard import generation_guard  # noqa: E402
 from datasets.scripts.common.bayesian import plan_production  # noqa: E402
 from datasets.scripts.common.config import source_path, load_task_config
+from datasets.scripts.common.working_inputs import CODE as WORKING_INPUTS_CODE, WorkingInputs
+from datasets.scripts.common.frame_environment import image_digest, query_frames
 from datasets.scripts.common.paths import sample_dir, split_dir
 
 CONSTRAINTS = {'route_context': 'building_facade', 'traffic_signal_injection': 'none',
@@ -119,6 +121,58 @@ def existing_annotation(item, size):
             'text': item['text'], 'evidence': item['evidence'], 'generated_text': None}
 
 
+def source_review_role(candidate, papers):
+    if papers:
+        return 'composite_background'
+    return 'direct_target' if candidate['existing_papers'] else 'empty_negative'
+
+
+def bind_source_review(candidate, papers, split, *, record_id=None):
+    """Bind an existing plan candidate to one stored task and use decision."""
+    role = source_review_role(candidate, papers)
+    database = ROOT / load_task_config('building_name_paper')[1]['databases']['frame_environment']
+    rows = query_frames(task='building_name_paper', role=role, split=split,
+                        record_id=record_id, database=database)
+    matches = [row for row in rows if candidate['image'] in row['paths']]
+    if len(matches) != 1:
+        raise ValueError('name-paper source lacks one current eligible role record: ' + candidate['image'])
+    row = matches[0]
+    label = row['label']
+    source_boxes = sorted(tuple(p['box_xyxy']) for p in candidate['existing_papers'])
+    recorded_boxes = sorted(tuple(p.get('xyxy') or p.get('box_xyxy')) for p in label['instances'])
+    if (not row['current'] or row['status'] != 'eligible' or
+            row['image_size'] != candidate['image_size'] or
+            row['source_group'] != candidate['source_group'] or
+            row['parent_video'] != candidate['parent_source'] or
+            label['completeness'] != 'complete' or source_boxes != recorded_boxes or
+            image_digest(candidate['image']) != row['content_sha256']):
+        raise ValueError('name-paper plan disagrees with stored labels or source identity: ' + candidate['image'])
+    if role == 'composite_background':
+        regions = [{k: region[k] for k in ('slot_id', 'building_id', 'quad_xy', 'replacement_of')
+                    if k in region} for region in row['geometry'].get('regions', [])]
+        planned = [{k: region[k] for k in ('slot_id', 'building_id', 'quad_xy', 'replacement_of')
+                    if k in region} for region in candidate['regions']]
+        if (regions != planned or
+                (source_boxes and row['scope']['kind'] != 'replace_all_labelled_instances')):
+            raise ValueError('name-paper placement or replacement differs from stored review')
+    elif row['scope']['kind'] != 'frame':
+        raise ValueError('direct name-paper source lacks full-frame labels')
+    return {'role': role, 'frame_id': row['frame_id'], 'record_id': row['record_id'],
+            'evidence_ids': [item['evidence_id'] for item in row['evidence']]}
+
+
+def current_environment_sources(request):
+    """Check that each saved review revision is still eligible for this exact plan."""
+    for state in request['strata']:
+        papers = state['target']['papers']
+        for candidate in state['background']['candidates']:
+            saved = candidate['source_review']
+            current = bind_source_review(candidate, papers, request['target_split'],
+                                         record_id=saved['record_id'])
+            if current != saved:
+                raise ValueError('name-paper plan review revision changed: ' + candidate['image'])
+
+
 def validate_request(request, root=None):
     """Validate executable states before the allocator or any output operation."""
     root = ROOT if root is None else Path(root).resolve()
@@ -170,8 +224,17 @@ def validate_request(request, root=None):
         seen = set()
         for candidate in candidates:
             if set(candidate) != {'image', 'source_group', 'parent_source', 'generation_method',
-                                 'image_size', 'coverage', 'coverage_evidence', 'existing_papers', 'regions'}:
+                                 'image_size', 'coverage', 'coverage_evidence', 'existing_papers', 'regions',
+                                 'source_review'}:
                 raise ValueError('unsupported background fields')
+            review = candidate['source_review']
+            if (not isinstance(review, dict) or set(review) != {'role', 'frame_id', 'record_id', 'evidence_ids'} or
+                    review['role'] != source_review_role(candidate, papers) or
+                    any(not isinstance(review[key], str) or not review[key]
+                        for key in ('frame_id', 'record_id')) or
+                    not isinstance(review['evidence_ids'], list) or not review['evidence_ids'] or
+                    any(not isinstance(value, str) or not value for value in review['evidence_ids'])):
+                raise ValueError('background requires a stored task-role review revision')
             _path(candidate['image'], root)
             parent = _path(candidate['parent_source'], root)
             if not any(parent.is_relative_to(allowed) for allowed in parent_roots):
@@ -234,7 +297,7 @@ def choose_background(candidates, rng):
     return rng.choice(sorted(groups[group], key=lambda value: value['image']))
 
 
-def compose_one(image, candidate, papers):
+def compose_one(image, candidate, papers, *, font_path=None):
     """Return BGR image and separate detection/OCR records; no files are written."""
     height, width = image.shape[:2]
     if [width, height] != candidate['image_size']:
@@ -245,7 +308,8 @@ def compose_one(image, candidate, papers):
                if item['building_id'] not in replaced]
     for item in papers:
         region = regions[item['slot_id']]
-        box = paste(image, name_paper(item['text']), region['quad_xy'])
+        paper = _name_paper(item['text'], font_path) if font_path else name_paper(item['text'])
+        box = paste(image, paper, region['quad_xy'])
         records.append({'building_id': region['building_id'], 'box_xyxy': box,
                         'quad_xy': region['quad_xy'], 'detection_status': 'generated_candidate',
                         'ocr_status': 'generated_string', 'text': item['text'], 'generated_text': item['text'],
@@ -253,8 +317,8 @@ def compose_one(image, candidate, papers):
     return image, records
 
 
-def _check_font_text(request):
-    font = ImageFont.truetype(str(FONT), 98)
+def _check_font_text(request, font_path=None):
+    font = ImageFont.truetype(str(font_path or FONT), 98)
     for state in request['strata']:
         for item in state['target']['papers']:
             box = font.getbbox(item['text'])
@@ -330,7 +394,7 @@ def augment_scene(image, papers, rng):
                    'sampling': 'uniform_scale_1.02_1.12_crop_inside_frame_outward_corner_jitter_0.003_gain_0.85_1.15_bias_-10_10; kernel_0_0_3; reject clipped known paper'}
 
 
-def _generate(output, run):
+def _generate(output, run, working=None):
     if output.exists() and any(output.iterdir()):
         raise ValueError('output already exists')
     (output / 'images').mkdir(parents=True)
@@ -344,7 +408,10 @@ def _generate(output, run):
             targets = state['target']['papers']
             if state['augmentation']['mode'] == 'scene_bounded_v1':
                 targets = [{'slot_id': p['slot_id'], 'text': make_name(rng.randrange(len(CHARS)*len(CHARS)*len(SUFFIX)))} for p in targets]
-            image, papers = compose_one(read_image(ROOT / candidate['image']), candidate, targets)
+            frame = (working.path(candidate['image'], role='background' if targets else 'target')
+                     if working else ROOT / candidate['image'])
+            font_path = working.path(FONT) if working else FONT
+            image, papers = compose_one(read_image(frame), candidate, targets, font_path=font_path)
             actual_augmentation = {'mode': 'none'}
             if state['augmentation']['mode'] == 'scene_bounded_v1':
                 image, actual_augmentation = augment_scene(image, papers, rng)
@@ -357,7 +424,10 @@ def _generate(output, run):
                 raise ValueError('image encoding failed')
             encoded.tofile(str(image_path))
             label_path.write_text(''.join(yolo_row(p['box_xyxy'], width, height) + '\n' for p in papers), encoding='utf8')
-            actual = {'source_image': candidate['image'], 'source_group': candidate['source_group'],
+            actual = {'source_image': candidate['image'], 'working_background': frame.relative_to(ROOT).as_posix(),
+                      'source_review': candidate['source_review'],
+                      'working_font': font_path.relative_to(ROOT).as_posix() if targets else None,
+                      'source_group': candidate['source_group'],
                       'parent_source': candidate['parent_source'],
                       'background_generation_method': candidate['generation_method'],
                       'generation_method': ('real_scene_plus_generated_name_paper' if state['target']['papers']
@@ -389,29 +459,38 @@ def main():
     if not plan_path.is_file():
         raise ValueError('plan does not exist')
     request = validate_request(json.loads(plan_path.read_text(encoding='utf8')))
+    current_environment_sources(request)
     if output == split_dir('building_name_paper', 'train') and any(
             c['coverage'] != 'complete_candidate' for s in request['strata'] for c in s['background']['candidates']):
         raise ValueError('current training plan excludes backgrounds without complete detection labels')
     source_evidence = current_detection_sources(request) if output == split_dir('building_name_paper', 'train') else []
-    _check_font_text(request)
     planned = plan_production(request, ROOT)
     media = sorted({_path(c[key]) for s in request['strata'] for c in s['background']['candidates']
                     for key in ('image', 'parent_source')})
-    code = [Path(__file__), ROOT / 'lab/training_common/bayesian_allocation.py', ROOT / 'datasets/scripts/common/bayesian.py',
+    working = WorkingInputs('building_name_paper',
+                            backgrounds=[c['image'] for s in request['strata'] if s['target']['papers']
+                                         for c in s['background']['candidates']],
+                            targets=[FONT, *(c['image'] for s in request['strata'] if not s['target']['papers']
+                                             for c in s['background']['candidates'])],
+                            split=request['target_split'])
+    _check_font_text(request, working.path(FONT))
+    code = [Path(__file__), WORKING_INPUTS_CODE, ROOT / 'datasets/scripts/common/frame_environment.py',
+            ROOT / 'lab/training_common/bayesian_allocation.py', ROOT / 'datasets/scripts/common/bayesian.py',
             ROOT / 'datasets/scripts/common/paper.py', ROOT / 'datasets/scripts/common/perspective.py',
             ROOT / 'datasets/scripts/common/images.py', ROOT / 'datasets/scripts/common/annotations.py',
             ROOT / 'datasets/scripts/common/names.py', ROOT / 'datasets/scripts/common/config.py',
             ROOT / 'datasets/scripts/common/paths.py', Path(__file__).with_name('package_real_candidates.py'),
             Path(__file__).with_name('plan_rooftop_batch.py')]
     configs = [ROOT/'datasets/scripts/building_name_paper/config'/name for name in ('dataset.yaml', 'source.yaml')]
+    procedural = {plan_path, FONT, working.path(FONT), *configs, *source_evidence, *working.evidence}
     with generation_guard('building_name.compose_rooftop:' + args.output,
-                          [*media, plan_path, FONT, *configs], [output], {}, code_paths=code,
-                          procedural_inputs=[plan_path, FONT, *configs, *source_evidence], root=ROOT, production_plan=request,
+                          sorted(set(media) | working.media | procedural), [output], {}, code_paths=code,
+                          procedural_inputs=sorted(procedural), root=ROOT, production_plan=request,
                           sample_output_paths=[output / 'images']) as run:
         if run.plan != planned:
             raise ValueError('guard plan differs from requested allocation')
         if not run.reused:
-            _generate(output, run)
+            _generate(output, run, working=working)
     print(json.dumps({'planned': planned['planned_total'], 'output': args.output}, ensure_ascii=False))
 
 

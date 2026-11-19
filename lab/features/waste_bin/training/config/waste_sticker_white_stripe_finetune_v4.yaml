@@ -1,0 +1,82 @@
+schema_version: 3
+task_id: waste_bin
+model_key: waste_sticker
+version: v4
+task: detect
+data: datasets/annotated/waste_bin/waste_sticker_recall_preserving/data.yaml
+model: training_packages/waste_sticker/waste_sticker_best_Val_Test/best.pt
+output_root: runs/waste_sticker
+description: 从远程原始 best 重新初始化；完整旧 Train 回放、真实白色干扰和全类小尺寸正负纸对照；冻结前10层保留骨干。
+imgsz: 960
+epochs: 10
+batch: 1
+workers: 0
+patience: 0
+seed: 42
+device: '0'
+optimizer: AdamW
+lr0: 2.0e-05
+lrf: 0.08
+momentum: 0.9
+weight_decay: 0.0005
+warmup_epochs: 1
+cos_lr: true
+close_mosaic: 0
+amp: false
+deterministic: true
+max_det: 160
+diagnostic_conf: 0.25
+match_iou: 0.5
+nms_iou: 0.7
+preview_limit: 48
+training_policy:
+  mode: fixed_validation
+  save_period: 5
+evaluate_after_training: true
+augment:
+  degrees: 0.0
+  translate: 0.0
+  scale: 0.0
+  shear: 0.0
+  perspective: 0.0
+  flipud: 0.0
+  fliplr: 0.0
+  mosaic: 0.0
+  mixup: 0.0
+  copy_paste: 0.0
+  hsv_h: 0.005
+  hsv_s: 0.08
+  hsv_v: 0.1
+source_notes:
+- 原 Test 已用于发现误检；新挑战沿用留出实拍父组，均按已知来源受控诊断解释。
+- 训练正负对照同 split；原始 24 类、全部既有正例标签保留；机器生成与来源证据不冒充人工确认。
+- 本轮不使用上一轮微调权重；完整回放旧Train，Reshoot单一采集会话全部Train。
+- 学习率降低至0.00002；冻结前10层；warmup_bias_lr=0，防止预热偏置学习率默认0.1破坏已有分类。
+- 同一已知Test只用于完成后回归；Val新增24类小尺寸对照；不按Test选择轮次或参数。
+class_names:
+- 塑料瓶
+- 易拉罐
+- 玻璃瓶
+- 报纸
+- 纸箱
+- 旧衣服
+- 剩饭
+- 菜叶
+- 苹果
+- 茶渣
+- 面包
+- 鱼骨
+- 纽扣电池
+- 荧光灯
+- 水银温度计
+- 药片
+- 油漆
+- 废胶卷
+- 烟头
+- 用过纸巾
+- 用过的一次性筷子
+- 破陶瓷
+- 贝壳
+- 废弃眼镜
+freeze: 10
+warmup_bias_lr: 0.0

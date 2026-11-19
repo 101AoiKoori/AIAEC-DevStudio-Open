@@ -9,15 +9,15 @@ Read this reference when reconciling documents with labels, review records, sour
 | Directory or task role | `config/workspace_layout.yaml`; generated root README table and `docs/DATASET_DESIGN.md` layout block | That data exists, is labelled, or has been accepted |
 | Perception requirement | `config/perception_tasks.json`; generated task READMEs and task matrix sections | Implementation, data, test, or field validation |
 | Task inputs, parent groups, split reservation, exclusion | `datasets/scripts/<task>/config/source.yaml`, especially `pairing` | Completed labels or an executed plan; `plan_alignment: stale` remains pending |
-| Task plan, budget, and branches | `datasets/scripts/<task>/config/*.json`, as named by the task and its generator | Produced images, label truth, or model quality |
+| Task plan, budget, and branches | The task configuration plan referenced by `source.yaml`; `config/task_targets.yaml#tasks.<task>.plans` alone registers plans for global coverage. `combination_axes.yaml` does not maintain a second plan list. Generation-time inputs remain snapshots referenced by the batch manifest. `legacy_*_plan` references retain historical recipes outside active coverage. | Produced images, label truth, or model quality |
 | Batch source and item observations | The batch's existing JSON/JSONL/CSV manifest and its referenced evidence | Human acceptance unless the record names the reviewer and scope |
-| Automatic parent-frame review | `datasets/scripts/common/review/`, task `review_plan.json`, tracked task `review_selection.json`, and recomputable observations under `datasets/annotated/common/review/` | Manual acceptance. An empty `accepted_by` is not approval; an automatic `ready` is not complete label truth |
+| Current image attributes and task-use eligibility | `datasets/annotated/common/sources/frame_environment.sqlite3` holds current frame identity, task scope, label coverage, geometry, roles, splits and evidence revisions. Original source manifests, label records and review metrics support the stored conclusions. The media cache indexes supported fields and the source ledger summarizes parent-group declarations. | Eligibility for another task, role, or split outside the recorded scope. Check whether each producer has connected to the database before reporting usable counts |
 | Human semantic review | The current `manual_review.json`, plus a tracked acceptance record under `datasets/scripts/<task>/config/` when the workflow provides one | Detector box, mask, raw-render, or training eligibility unless the acceptance record explicitly covers that layer |
 | Explicit detector labels | Current task annotation JSON/JSONL and label-audit reports; check class order, visible boxes, negative evidence, and review owner | That every unlisted target was absent, or that candidate boxes are human truth |
 | Production reuse and prior execution | `datasets/annotated/media_index/production_state.sqlite3` | Semantic correctness or current file freshness; receipts retain historical inputs and outputs |
 | Media observation search | `datasets/annotated/media_index/query_cache.sqlite3` | Authority over original manifests or Blender lifecycle. It is a rebuildable snapshot |
 | Blender asset lifecycle and reviewed relations | `datasets/blender_source_registry.sqlite3` via `lab/scripts/blender/blender_source_registry.py` | That a binary currently exists; verify files on disk when needed. Original manifests remain generation-time evidence |
-| Finished sample or dataset | The current `datasets/samples/<task>/` or `datasets/exports/<task>/` path and its manifest | Label truth, independence, or model performance |
+| Finished sample or dataset | The current `datasets/samples/<task>/` or `datasets/exports/<task>/` path and its manifest. The task may route to an existing current sample manifest through `source.yaml#sample_manifest`; actual counts stay in that manifest. | Label truth, independence, model performance, or an unrecorded production quota |
 
 ## Annotation state layers
 
@@ -32,10 +32,10 @@ Treat these as independent layers with independent counts and explicit units:
 | `human_confirmed` | A named reviewer accepted the stated semantic scope, and separately any box, keypoint, mask, or other geometric scope | Any unstated scope or training admission |
 | `training_admitted` | The current owning workflow admitted the record to a named training input or split | Model quality, independent capture, or later permission for another purpose |
 
-- `pending` is the unresolved state between or within these layers. An empty `accepted_by`, unreviewed candidate, non-admitted record, or absent evidence of failure remains pending. Use `rejected` or `excluded` only when a record contains a concrete failed check, explicit reviewer decision, or other owning evidence of failure.
+- Record `pending` against the specific field and intended use that still need evidence. An empty `accepted_by` describes human confirmation. Use existing machine observations, task rules, geometry, and labels to resolve fields needed for the current batch. Write back supported machine decisions with their scope and evidence. Use `rejected` or `excluded` for documented failures.
 - Programmatic checks and templates populate `auto_validated` only. Never use them to populate `human_confirmed`, and never turn missing human work into `rejected`, `excluded`, zero annotations, or an empty candidate set.
 - Human semantic confirmation and box/keypoint/mask confirmation are separate facts. Record the reviewer and covered scope; semantic acceptance does not confirm coordinates or masks, and geometric acceptance does not prove the intended object semantics.
-- Every annotation or review summary lists all six layer counts and the pending count. Do not abbreviate the report to one “complete labels” total or describe `human_confirmed: 0` as if no annotation records exist.
+- For a full annotation inventory, give the six layer counts and the pending count. For a specific question, give the relevant measure and unit. A zero human-confirmation count can coexist with machine annotations.
 
 ## Status discipline
 
@@ -53,6 +53,7 @@ Run from the workspace root:
 python lab/scripts/contracts/workspace_layout.py check
 python lab/scripts/contracts/workspace_ontology.py --check
 python lab/scripts/contracts/source_pairing.py --check
+python -B lab/scripts/contracts/state_coverage.py --actual --json
 python lab/scripts/media/media_index_sqlite.py status
 python lab/scripts/blender/blender_source_registry.py list
 ```

@@ -8,7 +8,7 @@ ROOT = Path(__file__).resolve().parents[5]
 sys.path.insert(0, str(ROOT / 'ws/src/aec_vision/src'))
 from aec_vision.meter_auto import analyze_meter
 
-SAMPLE = ROOT / 'datasets/raw/meter/pdf/page15-005.jpg'
+SAMPLE = ROOT / 'Archive/Assets/working_sources/reference/meter/pdf/page15-005.jpg'
 RANGES = {'temperature': {'minimum': -30, 'maximum': 50, 'direction': 'clockwise'},
           'humidity': {'minimum': 0, 'maximum': 100, 'direction': 'clockwise'}}
 

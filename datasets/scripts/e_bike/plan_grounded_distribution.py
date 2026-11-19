@@ -5,9 +5,6 @@ planned production guard and grounded generator. Priors and weights are design
 assumptions, not measured occurrence rates or model performance.
 """
 
-if __name__ == "__main__":
-    raise SystemExit("Task helper is import-only; use the primary entry in datasets/scripts/e_bike/. Production remains paused.")
-
 import argparse
 import json
 import random
@@ -17,81 +14,178 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[3]
 sys.path.insert(0, str(ROOT))
 from datasets.scripts.common.bayesian import allocate  # noqa: E402
+from datasets.scripts.common.config import load_task_config  # noqa: E402
+from datasets.scripts.common.design_context import design_context  # noqa: E402
 from datasets.scripts.e_bike import compose_v4_grounded_train as grounded
 
 TONES = ('original', 'mild', 'moderate')
 TONE_WEIGHTS = (5, 3, 2)
 
 
-def make_plan(backgrounds, vehicles, budget, seed):
-    """Allocate posture/background strata, then sample each exact state once."""
-    if type(budget) is not int or not 8 <= budget <= 5000:
-        raise ValueError('budget must be an integer between 8 and 5000')
+def make_plan(backgrounds, vehicles, budget, seed, per_parent_group_cap=None):
+    """Compile the feasible subset from current role decisions and saved contacts."""
+    if type(budget) is not int or not 1 <= budget <= 5000:
+        raise ValueError('budget must be an integer between 1 and 5000')
     if type(seed) is not int or not 0 <= seed < 2**64:
         raise ValueError('seed must be an unsigned 64-bit integer')
+    if per_parent_group_cap is not None and (
+            type(per_parent_group_cap) is not int or per_parent_group_cap < 1):
+        raise ValueError('per_parent_group_cap must be a positive integer or None')
     by_id = {row['id']: row for row in backgrounds}
-    if set(by_id) != set(grounded.ZONES) or any(
-            row.get('task_state') != 'candidate_complete_negative' for row in backgrounds):
-        raise ValueError('expected the four declared candidate backgrounds')
-    if any(not vehicles.get(category) for category in ('upright', 'fallen')):
-        raise ValueError('both posture source pools must be nonempty')
+    if set(by_id) != set(grounded.ZONES):
+        raise ValueError('background set differs from fitted ground zones')
+    empty = [row for row in backgrounds if 'empty_negative' in row.get('_frame_reviews', {})]
+    composite = [row for row in backgrounds if 'composite_background' in row.get('_frame_reviews', {})]
+    if not empty and not composite:
+        raise ValueError('no current e-bike role eligibility is recorded')
+    available_postures = [category for category in ('upright', 'fallen') if vehicles.get(category)]
+    missing_postures = [category for category in ('upright', 'fallen') if not vehicles.get(category)]
+    if any(not isinstance(entry, tuple) or len(entry) != 2 for pool in vehicles.values() for entry in pool):
+        raise ValueError('vehicle pools must include the actual source sprites for contact validation')
+    # Each empty background/tone pair is used once; positive states are sampled
+    # with distinct layouts and are bounded by the explicitly requested budget.
+    empty_slots = [(row, tone) for row in empty for tone in TONES]
+    requested_empty = min(len(empty_slots), round(budget * .30))
+    positive_budget = budget - requested_empty if composite and available_postures else 0
+    empty_budget = min(len(empty_slots), budget - positive_budget)
     abstract = []
-    for bg_id in sorted(by_id):
-        for category in ('upright', 'fallen'):
+    for bg_id in sorted(row['id'] for row in composite):
+        for category in available_postures:
             abstract.append({'id': bg_id + '_' + category, 'failure_event': 'miss_' + category,
-                             'min_count': 1, 'max_count': budget, 'prior': {'alpha': 1, 'beta': 1},
+                             'min_count': 0, 'max_count': positive_budget, 'prior': {'alpha': 1, 'beta': 1},
                              'exposure_weight': 1, 'failure_cost': 1.5 if category == 'fallen' else 1,
                              'conditions': ['background:' + bg_id, 'posture:' + category]})
-    request = {'schema_version': 1, 'model_key': 'e_bike', 'target_split': 'train',
-               'purpose': 'Allocate candidate coverage by recorded background and posture.',
-               'budget': budget, 'uncertainty_weight': 0,
-               'independence_basis': 'Backgrounds share one video; posture pools share source videos.',
-               'strata': abstract}
-    allocation = allocate(request, ROOT)
+    request = ({'schema_version': 1, 'model_key': 'e_bike', 'target_split': 'train',
+                'purpose': 'Allocate feasible composite coverage by recorded background and posture.',
+                'budget': positive_budget, 'uncertainty_weight': 0,
+                'independence_basis': 'Parent capture groups are counted by source video.',
+                'strata': abstract} if positive_budget else None)
+    allocation = allocate(request, ROOT) if request else None
     parent = random.Random(seed)
     states, seen, seeds = [], set(), set()
-    for allocated, definition in zip(allocation['strata'], abstract):
-        bg_id, category = definition['id'].rsplit('_', 1)
-        bg, zone = by_id[bg_id], grounded.ZONES[bg_id]
-        for _ in range(allocated['planned_count']):
-            for attempt in range(100):
-                sample_seed = parent.getrandbits(64)
-                if sample_seed in seeds:
-                    continue
-                rng = random.Random(sample_seed)
-                entry = rng.choice(vehicles[category])
-                x = rng.randint(*zone['x'])
-                y = rng.randint(*zone['y'])
-                size = rng.choice((65, 75, 85, 95))
-                yaw = rng.choice((-6, -3, 0, 3, 6))
-                pitch = rng.choice((-2, 0, 2))
-                roll = rng.choice((-1, 0, 1))
-                exposure = rng.choice((.95, 1., 1.05))
-                tone = rng.choices(TONES, weights=TONE_WEIGHTS, k=1)[0]
-                gain, saturation = grounded.TONES[tone]
-                actor = {'foot_x': x, 'foot_y': y, 'size_px': size, 'yaw': yaw,
-                         'pitch': pitch, 'roll': roll, 'relative_exposure': exposure}
-                signature = (bg_id, category, entry['path'], x, y, size, yaw, pitch, roll, exposure, tone)
-                if signature in seen:
-                    continue
-                seen.add(signature)
-                seeds.add(sample_seed)
-                break
-            else:
-                raise ValueError('could not sample a distinct feasible state within 100 attempts')
-            used = {bg['image'], bg['parent_image'], bg['source_video']}
+    parent_counts = {}
+    placement_shortfalls = []
+
+    def parent_at_cap(bg):
+        return (per_parent_group_cap is not None
+                and parent_counts.get(bg['source_video'], 0) >= per_parent_group_cap)
+
+    def add_state(bg, category, entry, actor, tone, sample_seed):
+        if parent_at_cap(bg):
+            return False
+        gain, saturation = grounded.TONES[tone]
+        role = 'composite_background' if category else 'empty_negative'
+        used = {bg['image'], bg['parent_image'], bg['source_video']}
+        if entry:
             used.update(entry[key] for key in ('path', 'source_frame', 'source_video', 'source_image') if key in entry)
-            states.append({'id': f'state_{len(states)+1:06d}', 'failure_event': 'miss_' + category,
-                           'min_count': 1, 'max_count': 1, 'prior': {'alpha': 1, 'beta': 1},
-                           'exposure_weight': 1, 'failure_cost': 1, 'conditions': [],
-                           'background': {'id': bg_id, 'image': bg['image']},
-                           'target': {'vehicles': [{'class': category, 'source': entry['path']}]},
-                           'labels': grounded.GROUND_LABELS, 'augmentation': {'tone': tone},
-                           'parameters': {'actors': [actor], 'value_gain': gain, 'saturation_gain': saturation,
-                                          'sample_seed': sample_seed}, 'sources': sorted(used)})
+        state = {'id': f'state_{len(states)+1:06d}',
+                 'failure_event': 'miss_' + category if category else 'false_positive_empty',
+                 'min_count': 1, 'max_count': 1,
+                 'prior': {'alpha': 1, 'beta': 1 if category else 3},
+                 'exposure_weight': 1, 'failure_cost': 1,
+                 'conditions': [],
+                 'background': {'id': bg['id'], 'image': bg['image'],
+                                **grounded.background_review_reference(bg['_frame_reviews'][role])},
+                 'target': {'vehicles': [{'class': category, 'source': entry['path']}] if category else []},
+                 'labels': grounded.GROUND_LABELS, 'augmentation': {'tone': tone},
+                 'parameters': {'actors': [actor] if actor else [], 'value_gain': gain,
+                                'saturation_gain': saturation, **({'sample_seed': sample_seed} if actor else {})},
+                 'sources': sorted(used)}
+        states.append(state)
+        parent_counts[bg['source_video']] = parent_counts.get(bg['source_video'], 0) + 1
+        return True
+
+    empty_index = 0
+
+    def fill_empty(target):
+        nonlocal empty_index
+        start = len(states)
+        while len(states) - start < target and empty_index < len(empty_slots):
+            bg, tone = empty_slots[empty_index]
+            empty_index += 1
+            add_state(bg, None, None, None, tone, None)
+
+    fill_empty(empty_budget)
+    failed_strata = set()
+
+    def add_positive(bg_id, category):
+        bg = by_id[bg_id]
+        if parent_at_cap(bg) or (bg_id, category) in failed_strata:
+            return False
+        for attempt in range(500):
+            sample_seed = parent.getrandbits(64)
+            if sample_seed in seeds:
+                continue
+            rng = random.Random(sample_seed)
+            entry, _ = rng.choice(vehicles[category])
+            x = rng.randint(40, 600)
+            y = rng.randint(320, 465)
+            size = rng.choice((65, 75, 85, 95))
+            yaw = rng.choice((-6, -3, 0, 3, 6))
+            pitch = rng.choice((-2, 0, 2))
+            roll = rng.choice((-1, 0, 1))
+            exposure = rng.choice((.95, 1., 1.05))
+            tone = rng.choices(TONES, weights=TONE_WEIGHTS, k=1)[0]
+            actor = {'foot_x': x, 'foot_y': y, 'size_px': size, 'yaw': yaw,
+                     'pitch': pitch, 'roll': roll, 'relative_exposure': exposure}
+            signature = (bg_id, category, entry['path'], x, y, size, yaw, pitch, roll, exposure, tone)
+            if signature in seen:
+                continue
+            # Check real sprite contact, visibility and image boundaries.
+            gain, saturation = grounded.TONES[tone]
+            trial = {'background': {'id': bg_id},
+                     'target': {'vehicles': [{'class': category, 'source': entry['path']}]},
+                     'parameters': {'actors': [actor], 'value_gain': gain, 'saturation_gain': saturation},
+                     'augmentation': {'tone': tone}}
+            try:
+                grounded.render_ground_state(trial, backgrounds, vehicles)
+            except ValueError:
+                continue
+            seen.add(signature)
+            seeds.add(sample_seed)
+            return add_state(bg, category, entry, actor, tone, sample_seed)
+        failed_strata.add((bg_id, category))
+        placement_shortfalls.append({'background_id': bg_id, 'posture': category,
+                                     'attempts': 500,
+                                     'reason': 'no placement found within saved-contact trials'})
+        return False
+
+    for allocated, definition in zip(allocation['strata'], abstract) if allocation else []:
+        bg_id, category = definition['id'].rsplit('_', 1)
+        for _ in range(allocated['planned_count']):
+            if not add_positive(bg_id, category):
+                break
+    # Reallocate unfilled budget to other feasible states, with the same bounded
+    # placement check and parent limit. Each pass must add a state or stop.
+    before_reallocation = len(states)
+    while len(states) < budget:
+        before_pass = len(states)
+        for definition in abstract:
+            if len(states) >= budget:
+                break
+            bg_id, category = definition['id'].rsplit('_', 1)
+            add_positive(bg_id, category)
+        if len(states) == before_pass:
+            break
+    fill_empty(budget - len(states))
+    if not states:
+        raise ValueError('no e-bike states fit the current parent and role limits')
+    evidence = {'requested_budget': budget, 'executable_budget': len(states),
+                'remaining_shortfall': budget - len(states),
+                'qualified_composite_frames': len(composite), 'qualified_empty_frames': len(empty),
+                'qualified_composite_parent_groups': len({row['source_video'] for row in composite}),
+                'four_zone_target_met': len(composite) == len(grounded.ZONES),
+                'required_composite_zones': len(grounded.ZONES),
+                'missing_composite_zones': sorted(set(grounded.ZONES) - {row['id'] for row in composite}),
+                'planned_by_parent_group': parent_counts,
+                'per_parent_group_cap': per_parent_group_cap,
+                'placement_shortfalls': placement_shortfalls,
+                'missing_postures': missing_postures,
+                'reallocated_states': len(states) - before_reallocation,
+                'qualification_basis': 'current frame_environment role decision and saved contact mask'}
     sampling = {'root_seed': seed, 'generator': 'Python random.Random; per-sample 64-bit seeds',
                 'source_selection': 'uniform among available views in each posture pool; no independent-source claim',
-                'positions': 'uniform integer x/y within each fitted ground zone',
+                'positions': 'sample integer x/y, accept only actual sprite contacts in the saved mask',
                 'sizes_px': [65, 75, 85, 95], 'yaw_degrees': [-6, -3, 0, 3, 6],
                 'pitch_degrees': [-2, 0, 2], 'roll_degrees': [-1, 0, 1],
                 'relative_exposure': [.95, 1., 1.05], 'tone_weights': dict(zip(TONES, TONE_WEIGHTS)),
@@ -99,10 +193,11 @@ def make_plan(backgrounds, vehicles, budget, seed):
                 'abstract_request': request, 'abstract_result': allocation,
                 'source_pool_sizes': {key: len(value) for key, value in vehicles.items()}}
     return {'schema_version': 1, 'model_key': 'e_bike', 'target_split': 'train',
-            'purpose': 'Seeded multi-view, single-vehicle real-background candidates; background and labels remain candidates.',
-            'budget': budget, 'uncertainty_weight': 0,
-            'independence_basis': 'Recorded parent videos may recur; sources and derivatives are not independent captures.',
-            'constraints': grounded.GROUND_CONSTRAINTS, 'sampling': sampling, 'strata': states}
+            'purpose': 'Current executable grounded subset; the requested budget and missing zones remain explicit.',
+            'budget': len(states), 'uncertainty_weight': 0,
+            'independence_basis': 'Count frames by parent video; derivatives are not independent captures.',
+            'constraints': grounded.GROUND_CONSTRAINTS, 'sampling': sampling,
+            'allocation_evidence': evidence, 'design_context': design_context('e_bike'), 'strata': states}
 
 
 def main():
@@ -110,29 +205,27 @@ def main():
     parser.add_argument('--output', required=True, help='New workspace-relative plan JSON')
     parser.add_argument('--budget', required=True, type=int)
     parser.add_argument('--seed', required=True, type=int)
+    parser.add_argument('--per-parent-group-cap', type=int, default=None,
+                        help='Optional explicit maximum planned images per parent video (default: no cap).')
     args = parser.parse_args()
     output = (ROOT / args.output).resolve()
     parent = ROOT / 'datasets/scripts/e_bike/config/plans'
     if not output.is_relative_to(parent) or output == parent or output.suffix != '.json':
         parser.error('plan must be a new JSON under the e-bike plans directory')
     backgrounds = json.loads(grounded.BACKGROUND.read_text(encoding='utf-8'))['backgrounds']
-    raw = json.loads(grounded.bike.SELECTION.read_text(encoding='utf-8'))
-    entries = raw['vehicles'] if 'vehicles' in raw else raw['records']
-    vehicles = {'upright': [], 'fallen': []}
-    for item in entries:
-        category = item.get('class')
-        if category not in vehicles:
-            continue
-        paths = [item[key] for key in ('path', 'source_frame', 'source_video', 'source_image') if key in item]
-        if paths and all((ROOT / value).is_file() for value in paths):
-            vehicles[category].append(item)
-    plan = make_plan(backgrounds, vehicles, args.budget, args.seed)
+    _, source_config = load_task_config('e_bike')
+    backgrounds = grounded.bind_background_reviews(backgrounds, 'train', source_config)
+    _, vehicles = grounded.bike.sources(selection=grounded.bike.SELECTION, include_people=False)
+    plan = make_plan(backgrounds, vehicles, args.budget, args.seed, args.per_parent_group_cap)
+    parent.mkdir(parents=True, exist_ok=True)
     with output.open('x', encoding='utf-8') as stream:
         json.dump(plan, stream, ensure_ascii=False, indent=2)
         stream.write('\n')
-    print(json.dumps({'output': output.relative_to(ROOT).as_posix(), 'budget': args.budget,
+    print(json.dumps({'output': output.relative_to(ROOT).as_posix(), 'budget': plan['budget'],
+                      'allocation_evidence': plan['allocation_evidence'],
                       'source_pool_sizes': plan['sampling']['source_pool_sizes'],
-                      'strata': {row['id']: row['planned_count'] for row in plan['sampling']['abstract_result']['strata']}},
+                      'strata': ({row['id']: row['planned_count'] for row in plan['sampling']['abstract_result']['strata']}
+                                 if plan['sampling']['abstract_result'] else {})},
                      ensure_ascii=False))
 
 

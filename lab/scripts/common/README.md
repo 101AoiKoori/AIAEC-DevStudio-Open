@@ -20,4 +20,4 @@
 
 `sample validate` 重跑时默认合并已有 `manual_review.json`：同 ID 项保留人工字段，只补模板缺项，并加入新项。`sample rebuild-review-template` 才允许替换模板，且已有内容先备份。
 
-本轮真实 person 小样的可重建验证与人工审查包位置记录在 [`../README.md`](../README.md#本轮-person-小样验证)。机位校验不连接 Blender；若后续需要核对当前打开场景或渲染单帧，再按 `blender-mcp-dsh` 的连接三步执行，产物与正式数据批次分开。
+本轮真实 person 小样的可重建验证与人工审查包位置记录在 [`../README.md`](../README.md#本轮-person-小样验证)。机位校验不连接 Blender；核对当前打开场景或渲染单帧时使用可用的 Blender MCP，预览产物与正式数据批次分开。

@@ -192,6 +192,49 @@ class SurfaceContractTests(unittest.TestCase):
             self.assertFalse((root/'out/labels/train').exists())
             run.record_sample.assert_called_once()
 
+    def test_database_surface_crop_outputs_val_and_retains_reviewed_sticker(self):
+        plan, geometry = surface_sample()
+        plan['target_split'] = 'val'
+        plan['constraints'] = entry.COMPLETE_SURFACE_CONSTRAINTS
+        state = plan['strata'][0]
+        state['labels']['status'] = plan['constraints']['labels']
+        params = state['parameters']
+        params.pop('record_index')
+        photo = params['photo']
+        params['placements'] = params['placements'][:1]
+        state['target']['placements'] = params['placements']
+        state['sources'] = state['sources'][:2]
+        state['background'] = {'kind': 'blender_render', 'image': photo, 'record_id': 'current-review'}
+        roles = {photo: {
+            'record_id': 'current-review', 'split': 'val', 'background_kind': 'blender_render',
+            'geometry': {'coordinate_size': [200, 120],
+                         'bins': [{**geometry[0]['bins'][0], 'geometry_quality': 'approximate_visual'}]},
+            'label': {'scope': {'kind': 'crop', 'crop_xyxy': [5, 10, 175, 110]}, 'presence': 'present',
+                      'instances': [{'object_id': 'existing-1', 'class_id': 12, 'xyxy': [3, 20, 9, 39]}]},
+        }}
+        run = SimpleNamespace(plan=plan, record_sample=mock.Mock())
+        background = np.full((120, 200, 3), 30, dtype=np.uint8)
+        icons = [(np.full((6, 6, 3), 100, np.uint8), np.ones((6, 6), np.float32)) for _ in NAMES]
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            with mock.patch.object(entry, 'ROOT', root), mock.patch.object(entry.base, 'read_image', return_value=background):
+                entry._produce_surface(root/'out', run, NAMES, None, icons, 123, None, True, roles)
+                state['background']['record_id'] = 'stale-review'
+                with self.assertRaisesRegex(ValueError, 'surface declarations'):
+                    entry.validate_surface_plan(plan, NAMES, None, None, background_roles=roles)
+            report = json.loads((root/'out/manifest.json').read_text(encoding='utf8'))
+            row, = report['records']
+            self.assertEqual(row['id'], 'val_000000')
+            self.assertEqual(row['generation_method'], 'blender_background_composite')
+            self.assertEqual(row['actual']['output_size'], [170, 100])
+            retained, = row['actual']['retained_background_instances']
+            self.assertEqual(retained['object_id'], 'existing-1')
+            self.assertEqual(retained['output_box_xyxy'], [0, 10, 4, 29])
+            label = root/row['label_candidate']
+            self.assertEqual(label.parent.name, 'labels')
+            self.assertEqual([line.split()[0] for line in label.read_text().splitlines()], ['12', '0'])
+            self.assertEqual(sum(report['counts_by_class'].values()), 2)
+
 
 if __name__ == '__main__':
     unittest.main()

@@ -39,6 +39,7 @@ FILTER_FIELDS = {
     'ground_patch_use': ('visible_ground_patches',),
     'split': ('split',),
     'evaluation_scope': ('evaluation_scope', 'conclusion_scope', 'test_kind'),
+    **dict.fromkeys(core.DIRECT_CAPTURE_FILTERS, ('capture_id',)),
 }
 EXACT_FILTERS = {'background_view', 'background_placement_plane',
                  'background_target_presence', 'background_use',
@@ -404,8 +405,13 @@ def sync(args):
 
 def matching_entries(db, args, only_path=None):
     filters = [(key, getattr(args, key)) for key in FILTER_FIELDS
-               if key not in ('region_role', 'region_task') and getattr(args, key)]
+               if key not in ('region_role', 'region_task') and key not in core.DIRECT_CAPTURE_FILTERS
+               and getattr(args, key)]
     clauses, params = [], []
+    if any(getattr(args, key, None) for key in core.DIRECT_CAPTURE_FILTERS):
+        # Only direct capture rows can match. Match nested task, label and use
+        # together in core.claim_matches to preserve the JSON CLI semantics.
+        clauses.append("SELECT entry_id FROM terms WHERE field='capture_id'")
     for key, value in filters:
         fields = FILTER_FIELDS[key]
         if key == 'observed_task':
@@ -716,6 +722,20 @@ def task_input_records(db, task, *, kind='plan', split=None, role=None, plan_key
                 if state['stratum']['id'] not in item['state_ids']:
                     item['state_ids'].append(state['stratum']['id'])
         result.extend(inputs[key] for key in sorted(inputs))
+        if not plan_key and split in (None, 'unassigned') and role in (None, 'annotation_reference'):
+            keys = ('direct_capture_manifests', 'target_working_manifest', 'background_pool_manifest')
+            declared = {key: config['source_config'][key] for key in keys if key in config['source_config']}
+            direct_inputs = {}
+            for pointer, value in core.task_declared_paths(declared):
+                if path and path_key(value) != path_key(path):
+                    continue
+                item = direct_inputs.setdefault(value, {
+                    'kind': 'input', 'task': task, 'split': None, 'plan_key': None, 'plan_path': None,
+                    'source_config': partition + '/config/source.yaml',
+                    'path': value, 'role': 'annotation_reference', 'status': 'declared_input',
+                    'present': core.inside(value).is_file(), 'reference_fields': [], 'state_ids': []})
+                item['reference_fields'].append(pointer)
+            result.extend(direct_inputs[value] for value in sorted(direct_inputs))
     return result
 
 
@@ -806,7 +826,7 @@ def main(argv=None):
     task_inputs.add_argument('--limit', type=int, default=20, help='maximum records; 0 returns all')
     for action in (find, evidence):
         for option in FILTER_FIELDS:
-            action.add_argument('--' + option.replace('_', '-'))
+            action.add_argument('--' + option.replace('_', '-'), help=core.DIRECT_CAPTURE_FILTERS.get(option))
         for option in NUMERIC_FILTERS:
             action.add_argument('--' + option.replace('_', '-'), type=float)
     args = parser.parse_args(argv)

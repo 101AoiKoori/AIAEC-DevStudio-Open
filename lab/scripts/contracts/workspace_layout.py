@@ -82,6 +82,10 @@ def validate_contract(data):
     _string_list(markers, 'datasets.materialized_if_any')
     for marker in markers:
         _relative(marker, 'datasets.materialized_if_any')
+    target_subdirs = _string_list(datasets.get('task_target_subdirs', []), 'datasets.task_target_subdirs')
+    _require(len(set(target_subdirs)) == len(target_subdirs) and all(
+        re.fullmatch(r'[a-z][a-z0-9_]*', name) for name in target_subdirs),
+        'datasets.task_target_subdirs 必须是互异的英文目录名')
     shared = datasets.get('shared')
     _require(isinstance(shared, list), 'datasets.shared 必须是列表')
     shared_paths = set()
@@ -227,6 +231,31 @@ def _data_present(root, contract):
     return not markers or any(_exists(root, marker, 'dir') for marker in markers)
 
 
+def _raw_working_tree(root, datasets, task):
+    """Reject loose capture batches, legacy bundles and files in raw's role roots."""
+    roles = datasets.get('task_target_subdirs', [])
+    if not roles or not _exists(root, 'datasets/raw', 'dir'):
+        return []
+    tasks = [task] if task else datasets['tasks']
+    allowed = {'datasets/raw': {*datasets['tasks'], 'shared'},
+               'datasets/raw/shared': {'backgrounds'},
+               'datasets/raw/shared/backgrounds': {'camera', 'rendered'}}
+    for name in tasks:
+        prefix = f'datasets/raw/{name}'
+        allowed[prefix] = {'targets'}
+        allowed[prefix + '/targets'] = set(roles)
+        camera = prefix + '/targets/camera'
+        if _exists(root, camera, 'dir'):
+            batches = {p.name for p in resolve_path(root, camera).iterdir() if p.is_dir() and not p.is_symlink()}
+            allowed[camera] = batches
+            for batch in batches:
+                allowed[f'{camera}/{batch}'] = {'photos', 'frames', 'cutouts'}
+    return [_item('error', child.relative_to(root).as_posix(), 'raw 工作副本目录有未声明条目')
+            for relative, names in allowed.items() if _exists(root, relative, 'dir')
+            for child in resolve_path(root, relative).iterdir()
+            if child.name not in names or not child.is_dir() or child.is_symlink()]
+
+
 def _check_datasets(root, contract, task):
     items = []
     tasks = contract['datasets']['tasks']
@@ -234,6 +263,7 @@ def _check_datasets(root, contract, task):
         raise ValueError('数据任务未在契约中定义: {}'.format(task))
     if not _data_present(root, contract):
         return [_item('info', 'datasets', '本地数据树未展开，跳过数据集结构检查')]
+    items.extend(_raw_working_tree(root, contract['datasets'], task))
     for entry in contract['datasets']['shared']:
         if entry.get('required') and not _exists(root, entry['path'], 'dir'):
             items.append(_item('error', entry['path'], '必需共享目录缺失'))
@@ -244,6 +274,10 @@ def _check_datasets(root, contract, task):
     for task_id, spec in tasks.items():
         if task is not None and task_id != task:
             continue
+        for name in contract['datasets'].get('task_target_subdirs', []):
+            relative = f'datasets/raw/{task_id}/targets/{name}'
+            if not _exists(root, relative, 'dir'):
+                items.append(_item('error', relative, '任务目标源目录缺失'))
         prefix = spec['scripts']
         if not _exists(root, prefix, 'dir'):
             items.append(_item('error', prefix, '任务脚本目录缺失'))
@@ -368,6 +402,8 @@ def scaffold(root, contract, tasks, include_shared=False, dry_run=False):
     missing_files = []
     for task in tasks:
         spec = selected[task]
+        targets.extend(f'datasets/raw/{task}/targets/{name}'
+                       for name in contract['datasets'].get('task_target_subdirs', []))
         targets.append(spec['scripts'])
         targets.append(spec['scripts'] + '/config')
         if spec.get('annotation_roots_owned', True):

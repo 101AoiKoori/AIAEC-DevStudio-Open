@@ -1,7 +1,7 @@
 """Meter-specific input declarations for the shared production receipt guard."""
 
 if __name__ == "__main__":
-    raise SystemExit("Task helper is import-only; use the primary entry in datasets/scripts/meter/. Production remains paused.")
+    raise SystemExit("Task helper is import-only; use the primary entry in datasets/scripts/meter/.")
 
 from contextlib import contextmanager
 from array import array
@@ -13,6 +13,7 @@ ROOT = Path(__file__).resolve().parents[3]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 from lab.training_common.production_guard import generation_guard
+from datasets.scripts.common.blender_workspace import WORKSPACE_BLEND
 
 
 def _config_references(path, raw):
@@ -21,13 +22,15 @@ def _config_references(path, raw):
     found = []
     def visit(obj):
         if isinstance(obj, dict):
-            for v in obj.values():
-                visit(v)
+            for key, value in obj.items():
+                if key != 'output':
+                    visit(value)
         elif isinstance(obj, list):
             for v in obj:
                 visit(v)
         elif isinstance(obj, str) and obj.startswith(('datasets/', 'lab/', 'config/')):
-            target = ROOT / obj
+            workspace_ref = WORKSPACE_BLEND.relative_to(ROOT).as_posix()
+            target = ROOT / (workspace_ref if obj.startswith(workspace_ref + '#') else obj)
             if not target.is_file():
                 raise ValueError('referenced workspace input missing: ' + obj)
             found.append(target)
@@ -92,7 +95,8 @@ def rebind_station_face(bpy, face_path):
         raise ValueError('expected one packed station face')
     if bytes(images[0].packed_file.data) != face_path.read_bytes():
         raise ValueError('packed station face differs from its current workspace source')
-    images[0].filepath = str(face_path)
+    if Path(bpy.path.abspath(images[0].filepath)).resolve() != face_path:
+        images[0].filepath = str(face_path)
 
 
 def ensure_registered_blender_media(bpy, run):

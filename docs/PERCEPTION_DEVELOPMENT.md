@@ -24,9 +24,9 @@ ws/src/aec_vision/models/                          # 所有正式识别模型文
 
 训练和推理配置分开。当前车牌正式 CNN 是混合数据微调权重，双 OCR 仲裁以它为主；部署和冲突处置见[比赛双 OCR 决策](research/PLATE_DUAL_OCR.md#本次比赛双-ocr-决策)。训练数据、权重和本地运行输出不提交 Git。训练按需进行，传统视觉方法不需要训练。类别、输入尺寸、预处理、依赖、模型格式和推理参数应明确记录，并在正式配置中以部署包可访问的路径引用；模型单独传到小车。
 
-按用户确定的短路径约定，正式识别模型统一直接放 `ws/src/aec_vision/models/`，不增加 `plate/` 等任务层或其他模型子目录。单文件权重采用可区分任务的文件名，例如 `plate_detector_best.pt`、`plate_ocr_best.pt`；当前 PaddleOCR v4 必需的 `inference.json`、`inference.pdiparams`、`inference.yml` 也直接放在该目录，配置的 `model_dir` 为 `models`。以后引入同名多文件模型时，须先解决加载器及文件名冲突，不得覆盖现有文件。训练研究权重仍在根目录 `models/weights/<任务>/`。
+正式识别模型直接放在 `ws/src/aec_vision/models/`。单文件权重用任务名区分，例如 `plate_detector_best.pt`、`plate_ocr_best.pt`。PaddleOCR v4 的 `inference.json`、`inference.pdiparams`、`inference.yml` 位于同目录，`model_dir` 为 `models`。新增多文件模型时先为加载器配置独立文件名。训练研究权重放在根目录 `models/weights/<任务>/`。
 
-识别训练以合成数据为主，同时纳入直接实拍，实拍应占相当比例；缺少标签的当前实拍按任务重建标注，本轮已有标签按实际状态使用；合成包括实拍或数字图片的图像处理合成、Blender 渲染及渲染图与实拍混合。数据记录来源与生成方式；按已确认方案复用同源素材时，评估注明复用范围；实拍增强、实拍拟合渲染及实拍场景合成分开报告，详见[数据集设计](DATASET_DESIGN.md)。九个模型包（八个数据任务模型加车牌省赛模型；红绿灯使用 HSV/ROI，热异常不设 YOLO 包）的独立训练入口与配置位于各任务 training 区域，共用引擎在 `lab/training_common/`；模型包与识别任务、数据任务的口径见[编号与计数口径](ID_AND_COUNT_POLICY.md)；训练、V1/V2 试验归档、V3 分发及结果回传见[训练流程](TRAINING_WORKFLOW.md)。`training_packages/` 现只保留 `portable_env/`，任务包副本已清理；该目录不是工作空间代码、配置或数据的依赖。V4 的八项数据任务、车牌沿用省赛模型的决定和待决设计见[八项任务数据集设计草案](DATASET_DESIGN.md#v4-八项任务数据集设计讨论草案2026-11-13)；批量生产暂停，恢复边界见[数据制作细则](DATASET_PRODUCTION.md#任务分工与阶段边界)。
+V4 八项数据任务以合成为主，纳入任务标签完整的实拍。来源和生成方式随样本登记，评估注明同源复用范围。八项数据任务和车牌的模型训练入口在各任务 `training/`，共用引擎在 `lab/training_common/`。红绿灯使用 HSV/ROI，热异常走红外处理。数据制作见[数据集设计](DATASET_DESIGN.md#v4-八项任务数据集设计)和[当前生产进度](DATASET_PRODUCTION.md#当前生产进度)。`training_packages/` 保存便携环境和可重建分发副本，构建和回传见[训练包构建与启动](TRAINING_WORKFLOW.md#v4-任务包构建与启动)。
 
 比赛运行时的任务开关、候选路线和 waypoint 使用部署包内的独立配置，避免运行时依赖文档配置。具体见 [任务开关与路线配置](TASK_SWITCHES_AND_ROUTES.md)。
 

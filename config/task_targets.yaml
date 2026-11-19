@@ -1,7 +1,13 @@
-# 八任务训练目标声明（不是组合轴）。
-# 训练目标是模型要学习的类别、关键点、OCR 或计数；组合轴是用于排除/
-# 平衡与目标无关噪声的干扰因素，见 config/combination_axes.yaml。
-# 修改后运行：python lab/scripts/contracts/state_coverage.py --write
+# classes、keypoints、ocr 和 needle_axes 声明学习目标。
+# counts、presence、negatives 保留 v1 读取方式，声明画面覆盖与负例类型。
+# annotation 声明当前画面的标注资格；样本来源与配额查各任务计划。
+# source_inputs 描述入库角色所需的目标证据。局部前景可来自任务标签不齐的帧。
+# direct_target 用于完整实拍正例。经证实的整帧负例使用 empty_negative。
+# 完整标签覆盖声明的画面范围内符合本任务识别定义的实例与使用的标签层。
+# 任务目录用于发现候选。主体和目标有无均凭画面判断。
+# 排除以接收任务目标为主体的常规合成底图。范围内非主体目标随合成保留标签，域外远物可留作背景。
+# plans 是全局覆盖统计的唯一计划登记；引用任务 source.yaml 当前入口，不复制配额。
+# plan_usage 用于标注只服务前景或小样的参考计划。
 version: 1
 tasks:
   person:
@@ -9,63 +15,132 @@ tasks:
       - config/production_plan.json
     classes: [community, noncommunity]
     counts: [empty, single, multi]
-    negatives: []
-    notes: 目标是人物类别与检测框；电动车直立/倒伏只是遮挡干扰，不是人物目标类别。
+    generation:
+      person_counts: [2, 3, 4, 5, 6]
+    negatives: [empty, white_back]
+    source_inputs:
+      direct_target: 全帧可辨正面立牌的类别和可见框完整，至少一个正例。
+      target_foreground: 已确认社区／非社区身份的原图裁片或正面立牌纹理，含可见轮廓及放置依据。
+      hard_negative: 已确认白背区域；整图作纯负例需确认没有其他可辨正面。
+    annotation: 只给现行 PERSON-TARGET-SCOPE 范围内、正面身份仍可辨的立牌写两类可见框。白背为硬负，不写框或忽略区域；纯侧背、薄边及身份不可判者按任务范围处理。放置尺寸与遮挡后框高分别记录。
+    notes: 覆盖纯空、单人、多人、仅白背及正背同框。合成编译器仍读取 2 至 6 人控制列表；直接实拍为来源，街区与跨帧去重由下游汇总。
   e_bike:
     plans:
-      - config/production_plan.json
-      - config/direct_real_plan.json
+      - config/sample_plan.json
+    plan_usage:
+      config/sample_plan.json: sample
+    # 旧直拍计划与人物 test 共用保留父视频，存档供追溯。
     classes: [upright, fallen]
     counts: [empty, single, multi]
     negatives: [empty]
-    notes: 目标是电动车及直立/倒伏类别；街道/停车区、视面、截断和遮挡属于干扰轴。
+    source_inputs:
+      direct_target: 全帧至少一辆任务范围内的目标车，范围内各车的可见框及直立／倒伏类别齐全。
+      target_foreground: 逐车掩膜、姿态和接地点；真实视面另用于视面对照。整帧其余车辆标签缺失时仍可用已确认裁片。
+    annotation: 标出任务范围内各车的可见车体及直立或倒伏。范围内车辆姿态不可判时保留存在和可见框证据，状态记未知。
+    notes: 零／单／多车是画面覆盖；停车区总车数和倒伏数从合格实例按现场覆盖汇总。
   fire:
     plans:
-      - config/production_plan.json
+      - config/full_train_plan.json
+      - config/full_val_plan.json
+      - config/full_test_plan.json
+      - config/reshoot_compact_finetune_plan.json
+    plan_usage:
+      config/reshoot_compact_finetune_plan.json: fine_tune
     classes: [fire_sticker]
     counts: [zero, single, multi]
     negatives: [zero]
-    notes: 目标是指定火焰贴纸；真实火焰/烟雾不是正例，属于干扰轴或负例。
+    source_inputs:
+      direct_target: 全帧至少一张在任务识别范围内可辨的指定贴纸，同范围内各实例标签完整。逐楼报数另需楼面覆盖及归属。
+      target_texture: 唯一指定火焰图案和物料尺寸，用于实拍立面贴图及 Blender。
+      hard_negative: 已确认范围内无指定贴纸的红灯／橙色灯、红橙垃圾桶、锥桶、红橙面板、其他相似图案或真实火焰／烟雾；颜色相似不构成正例。
+    annotation: 标出指定火焰贴纸的可辨实例；区域覆盖不全或已有标注被抑制，不能据空文件判断零贴。
+    notes: 零／单／多贴是覆盖；同框干扰物与指定贴纸分别记录，干扰物也可出现在有贴正例中。首轮同时学习硬负例与正例，后续按实际失败补数据和微调，不以未测误报率作为制作或首轮训练的普遍前置条件。按实际归属分楼计数。
   building_name_paper:
     plans:
-      - config/production_plan.json
-      - config/blender_plan.json
-      - config/combination_plan.json
-      - config/rooftop_sources.json
+      - config/full_train_plan.json
+      - config/full_val_plan.json
+      - config/full_test_plan.json
+      - config/video_finetune_plan.json
+    plan_usage:
+      config/video_finetune_plan.json: fine_tune
     classes: [paper]
     ocr: text
     counts: [zero, single, multi]
     negatives: [zero]
-    notes: 目标是纸条检测与可辨文字；楼面、楼数、偏航、光照是干扰轴。
+    source_inputs:
+      direct_target: 至少一张纸片且检测框完整；OCR 层另取图中可读且全文已知的逐纸记录。
+      target_texture: 已知全文的纸面图案、合规字体或程序生成文本，保留与可定位纸片的对应。
+    annotation: 纸片能定位就保留检测标签；文字不可读时 OCR 记未知；排版和透视合成保留正常文字方向。
+    notes: 纸片有无、纸片实例数和已标注的文字条目数独立统计；同名多纸逐纸计数。
   sign:
     plans:
-      - config/production_plan.json
+      - config/full_train_plan.json
+      - config/full_val_plan.json
+      - config/full_test_plan.json
     classes: [sign_fixture]
     presence: [placed, absent]
     negatives: [absent, ordinary_pole]
-    notes: 目标是牌具整体（含截断可辨部分）；无牌/普通立杆是负例或干扰。
+    source_inputs:
+      direct_target: 全帧至少一件可辨牌具，完整牌或可辨残段的可见框齐全。
+      target_foreground: 有真实视面证据的牌具裁片及掩膜，保留杆、底座和可辨残段证据。
+      hard_negative: 普通立杆实物可确认，且输出范围内无牌具。
+    annotation: 整体与仍可辨的局部牌具按可见范围标框；仅有一般形状、身份不可判的残段保留未知。确认普通立杆且无牌具的画面可做硬负。
+    notes: absent 和 ordinary_pole 描述场景；唯一类别为 sign_fixture。
   waste_bin_state:
     plans:
       - config/render_plan.json
+      - config/reshoot_finetune_plan.json
+    plan_usage:
+      config/render_plan.json: source_render
+      config/reshoot_finetune_plan.json: fine_tune
     classes: [open, closed]
     counts: [empty, single, multi]
     negatives: [empty]
-    notes: 目标是桶体与开闭状态；颜色、桶位、邻桶遮挡是干扰轴。
+    source_inputs:
+      direct_target: 全帧至少一个任务范围内可识别的桶。主体桶及同画面内其他符合范围的桶均需可见框和开闭状态，另存桶色与逐桶身份。远处非主体且不属于识别范围的桶可保留为背景。
+      target_foreground: 有逐桶颜色、开闭和掩膜的实拍或渲染前景，保留桶底接地及盖口几何。
+    annotation: 对任务范围内的桶逐个定位，依据可见盖板或桶口判开闭。远处非主体且已知在范围外的桶可选记 ignore。范围内的桶盖被遮挡或过渡态不可判时保留实例，状态记未知。
+    notes: 空／单／多桶按任务范围内可识别的桶计数。主体为桶的画面按直接目标素材使用，不进入桶开闭常规合成底图池。非主体的范围内桶带完整标签可随底图合成，域外物体按实际占位核对。空负例由画面证据确认。
   waste_sticker:
     plans:
-      - config/production_plan.json
-      - config/blender_plan.json
-      - config/direct_real_plan.json
+      - config/full_train_plan.json
+      - config/full_val_plan.json
+      - config/full_test_plan.json
+      - config/recall_preserving_finetune_plan.json
+    plan_usage:
+      config/recall_preserving_finetune_plan.json: fine_tune
     classes: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23]
-    counts: [single, multi]
-    notes: 目标是 24 类物品贴纸；桶色、开闭、桶位、光照是干扰轴。
+    counts: [empty, single, multi]
+    presence: [present, absent]
+    negatives: [empty]
+    source_inputs:
+      direct_target: 至少一张任务范围内的指定物品贴，且全帧范围内各目标的检测框和类别完整。可使用桶面、其他表面或独立摆放的贴纸实拍。
+      target_texture: 24 张固定物品图案及类别索引，可用于合格的实拍表面或 Blender 载体。
+      hard_negative: 整帧有证据确认无任务范围内物品贴，覆盖有桶无贴、固有分类图标、白色道路标线、空白纸卡和相似条纹。模型预测只用于排序，不作为空负真值。
+    annotation: 按可辨图案标检测框和类别。联合投放评估时另记可确认的桶归属；类别或归属不可判时各记未知。
+    notes: 贴桶正例每图 1–4 个可见桶，按标签完整的贴纸分 0 至 4 个计图，每桶至多一贴，按 24 类逐贴计有效实例。硬负例可含 0–4 桶；空白卡不新增类别，真白底贴纸仍完整标注。桶色作为场景变化和下游桶类属性。现场下游按位置关联桶与贴纸，再按桶类与物品集合判定投放。
   meter:
     plans:
-      - config/render_plan.json
-      - config/production_plan.json
+      - config/sample_plan.json
+      - config/full_train_render_plan.json
+      - config/full_val_render_plan.json
+      - config/full_test_render_plan.json
+      - config/full_train_plan.json
+      - config/full_val_plan.json
+      - config/full_test_plan.json
+    plan_usage:
+      config/sample_plan.json: sample
+      config/full_train_render_plan.json: source_render
+      config/full_val_render_plan.json: source_render
+      config/full_test_render_plan.json: source_render
     classes: [meter_dial]
     keypoints: 8
     needle_axes: [temperature, humidity]
     presence: [single, absent]
     negatives: [absent]
-    notes: 目标是表盘定位与 8 个关键点；反光、距离、视角是干扰轴。
+    source_inputs:
+      direct_target: 目标表盘框和入口可消费的八点真值及可见性齐全。
+      target_foreground: 有坐标映射、点位和掩膜的双针表盘图或渲染，保留温湿针位记录。
+      hard_negative: 确认无目标表盘的相似外形物体。
+    annotation: 可辨表盘及八点分别判定；遮挡或高光下逐点记录可见性，未知点按 Pose 入口的监督资格选择用途。
+    notes: 温针和湿针各含轴心、针尖和量程两端，针位为目标取值；物理读数由刻度映射得到。

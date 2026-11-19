@@ -15,12 +15,16 @@ def main():
     parser.add_argument('--root', type=Path, required=True)
     parser.add_argument('--config', required=True)
     parser.add_argument('--run-name')
+    parser.add_argument('--resume')
+    parser.add_argument('--attempt')
+    parser.add_argument('--controller-wall-seconds', type=float)
     parser.add_argument('--run-dir')
     parser.add_argument('--weights')
     args = parser.parse_args()
     root = args.root.resolve(); config = load_config(root, args.config)
     if args.mode == 'train':
-        train_run(root, config, args.run_name)
+        train_run(root, config, args.run_name, args.resume, attempt=args.attempt,
+                  controller_wall_seconds=args.controller_wall_seconds)
     else:
         if not args.weights or not args.run_dir:
             parser.error('thresholds requires --weights and --run-dir')

@@ -6,7 +6,7 @@ truth is saved separately and never written as an empty training label.
 """
 
 if __name__ == "__main__":
-    raise SystemExit("Legacy dataset CLI is retired; use datasets/scripts/waste_bin_state or waste_sticker/. Production remains paused.")
+    raise SystemExit("Legacy dataset CLI is retired; use datasets/scripts/waste_bin_state or waste_sticker/.")
 
 import argparse
 import itertools
@@ -41,7 +41,7 @@ def guard_sources(quantity_paths, source_manifest):
     names = [item['name'] for item in classes['items']]
     procedural = {base.CLASSES, ROOT / 'config/perception_tasks.json', source_manifest}
     procedural.update(base.CACHE / (name + '.npz') for name in names)
-    media = {ROOT / 'datasets/raw/waste_bin/toolkit/SourcePic' / (name + '.png') for name in names}
+    media = {ROOT / 'Archive/Assets/working_sources/digital/waste_sticker/toolkit/SourcePic' / (name + '.png') for name in names}
     for index, path in enumerate(quantity_paths):
         manifest = path / 'manifest.json'
         procedural.add(manifest)

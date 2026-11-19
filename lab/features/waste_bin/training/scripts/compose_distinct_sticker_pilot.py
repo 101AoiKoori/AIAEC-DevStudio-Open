@@ -5,7 +5,7 @@ the actual output size. Both parent images are exposed development material.
 """
 
 if __name__ == "__main__":
-    raise SystemExit("Legacy dataset CLI is retired; use datasets/scripts/waste_bin_state or waste_sticker/. Production remains paused.")
+    raise SystemExit("Legacy dataset CLI is retired; use datasets/scripts/waste_bin_state or waste_sticker/.")
 
 import argparse
 import json
@@ -20,7 +20,7 @@ from compose_real_bin_sticker_pairs import BACKGROUND, BIN_REVIEW, FIXED_MARKING
 EXPORTS = ROOT / 'datasets/exports/waste_bin'
 ASSET_REVIEW = ROOT / 'datasets/annotated/waste_bin/v4_real_asset_review_20261112/review_manifest.json'
 ASSET_FRAME = ROOT / 'datasets/annotated/waste_bin/v4_real_asset_review_20261112/images/0004.png'
-ICONS = ROOT / 'datasets/raw/waste_bin/toolkit/SourcePic'
+ICONS = ROOT / 'Archive/Assets/working_sources/digital/waste_sticker/toolkit/SourcePic'
 ASSET_PAPERS = [[164, 242, 178, 256], [285, 220, 299, 234],
                 [354, 155, 374, 175], [453, 140, 473, 160]]
 ASSET_FIXED = [[150, 179, 200, 241], [274, 159, 315, 219],
@@ -83,7 +83,7 @@ def _generate(output):
         (output/folder).mkdir(parents=True)
     report = {'status': 'running', 'purpose': 'small output-pixel readability study; development regression only',
               'parent_reviews': [BIN_REVIEW.relative_to(ROOT).as_posix(), ASSET_REVIEW.relative_to(ROOT).as_posix()],
-              'scale_reference': 'datasets/raw/car_real_capture_20261112/P22_TRASH.png',
+              'scale_reference': 'Archive/Assets/captures/car_real_capture_20261112/P22_TRASH.png',
               'asset_root': ICONS.relative_to(ROOT).as_posix(),
               'asset_license': 'redistribution status not established',
               'reuse': 'same 20261112 bin appearances, two exposed parents and five source icons; not independent scenes',

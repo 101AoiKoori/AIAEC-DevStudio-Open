@@ -17,7 +17,7 @@ import numpy as np
 import composite_bin_real_scene as core
 
 ROOT = Path(__file__).resolve().parents[5]
-PHOTO = ROOT / 'datasets/raw/waste_bin/archive_assets_legacy/照片/四色桶正面_闭盖_分类标志_001.jpg'
+PHOTO = ROOT / 'Archive/Assets/working_sources/legacy/waste_bin/照片/四色桶正面_闭盖_分类标志_001.jpg'
 # Rectangles in a 960×540 resizing of the source image, estimated from the
 # visible bin extents; subsequent manual review is needed for exact bounds.
 BINS = [
@@ -109,7 +109,7 @@ def _generate():
 def _guard_inputs():
     config = core.yaml.safe_load(core.CLASSES.read_text(encoding='utf8'))
     media = [PHOTO] + [core.CACHE / (item['name'] + '.npz') for item in config['items']]
-    media += [ROOT / 'datasets/raw/waste_bin/toolkit/SourcePic' / (item['name'] + '.png')
+    media += [ROOT / 'Archive/Assets/working_sources/digital/waste_sticker/toolkit/SourcePic' / (item['name'] + '.png')
               for item in config['items']]
     return media, [core.CLASSES, ROOT / 'config/perception_tasks.json']
 

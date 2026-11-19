@@ -1,5 +1,5 @@
 {
-  "source_face": "datasets/assets/blender/meter/blender_9011_reference/face_generated.png",
+  "source_face": "Archive/technical/revisions/meter/blender_sources_20261116/blender_9011_reference/face_generated.png",
   "reference_review": "datasets/annotated/meter/v4_generated_endpoints_review_20261112/review_manifest.json",
   "image_size": [1254, 1254],
   "coordinate_system": "top-left texture pixels, midpoint of the outer printed stroke end",

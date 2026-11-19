@@ -5,7 +5,7 @@ coverage is incomplete, and no final test or model-selection claim is made.
 """
 
 if __name__ == "__main__":
-    raise SystemExit("Legacy dataset CLI is retired; use datasets/scripts/sign/. Production remains paused.")
+    raise SystemExit("Legacy dataset CLI is retired; use datasets/scripts/sign/.")
 
 import json
 import shutil

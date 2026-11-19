@@ -1,13 +1,11 @@
 """Review-gated fixed-threshold strata and staged provenance contracts."""
 import csv
-import importlib.util
 import json
 from pathlib import Path
 import shutil
 import sys
 import tempfile
 import unittest
-from unittest import mock
 
 from PIL import Image
 import yaml
@@ -388,36 +386,14 @@ class StagedProvenance(unittest.TestCase):
         self.assertEqual(sample['reviewed_strata']['difficulty'], 'hard')
         self.assertEqual(sample['reviewed_strata']['image_domain'], 'direct_real_native_clarity')
 
-    def test_actual_built_package_uses_its_evidence_map(self):
-        spec = importlib.util.spec_from_file_location('v4_package_fixture', Path(__file__).with_name('test_package_builder.py'))
-        fixture = importlib.util.module_from_spec(spec)
-        spec.loader.exec_module(fixture)
-        root = self.root / 'workspace'; root.mkdir()
-        builder_fixture = fixture.PackageBuilderTest('runTest')
-        builder_fixture.setUp()
-        self.addCleanup(builder_fixture.doCleanups)
-        builder_fixture.v4_fixture(root)
-        queue = {'samples': [], 'near_duplicate_pairs': [], 'exposed_images': [], 'inputs': [],
-                 'canonical_models': {'person': {'names': ['community', 'noncommunity']}}}
-        with mock.patch.object(fixture.v4_source_gate, 'build_queue', return_value=queue), \
-                mock.patch.object(fixture.builder, '_verify_v4_staged', return_value={'status': 'fixture_mock'}), \
-                mock.patch.object(fixture.builder, '_verify_v4_launcher', return_value={'status': 'fixture_mock'}), \
-                mock.patch.object(fixture.builder, 'ROOT', root), \
-                mock.patch.object(fixture.builder, 'DEST', root / 'packages'):
-            fixture.builder.build_v4('person', 'input/manifest.json')
-        package = root / 'packages/person'
-        self.assertFalse((package / 'input/review.txt').exists())
-        config = yaml.safe_load((package / 'config/train.yaml').read_text(encoding='utf8'))
-        run = package / 'runs/person/evidence'; run.mkdir(parents=True)
-        stage_dataset(package, config, run)
-        samples = json.loads((run / 'data/samples.json').read_text(encoding='utf8'))
-        self.assertTrue(all(row['reviewed_strata']['supervision'] == 'complete' for row in samples))
-        evidence = package / 'dataset/source_records/evidence_map.json'
-        mapping = json.loads(evidence.read_text(encoding='utf8'))
-        mapping['input/review.txt'] = '../outside.txt'
-        evidence.write_text(json.dumps(mapping), encoding='utf8')
+    def test_evidence_map_cannot_reference_files_outside_packaged_evidence(self):
+        evidence = self.root / 'dataset/source_records'
+        evidence.mkdir()
+        (evidence / 'evidence_map.json').write_text(
+            json.dumps({'review/source.json': 'review/source.json', 'review/task.json': 'review/task.json'}),
+            encoding='utf8')
         with self.assertRaisesRegex(ValueError, 'complete reviewed supervision'):
-            stage_dataset(package, config, package / 'runs/person/bad_evidence')
+            stage_dataset(self.root, self.config, self.root / 'runs/person/bad_evidence')
 
 
 if __name__ == '__main__':

@@ -24,6 +24,10 @@ TASK_ORDER = ['person', 'e_bike', 'fire', 'building_name_paper', 'sign',
 ALLOWED_NEGATIVES = {'empty', 'no_paper', 'no_sign', 'ordinary_pole', 'absent'}
 
 
+def source_share(value):
+    return f'{value * 100:.2f}'.rstrip('0').rstrip('.') + '%'
+
+
 def load_targets(path=TARGETS):
     with open(path, encoding='utf-8') as stream:
         data = yaml.safe_load(stream)
@@ -56,6 +60,7 @@ def _target_images(root, task):
 
 def _allowed_targets(spec):
     allowed = {str(value) for value in spec.get('classes', [])}
+    allowed |= {str(value) for value in spec.get('presence', [])}
     allowed |= {str(value) for value in spec.get('negatives', [])}
     allowed |= ALLOWED_NEGATIVES
     return allowed
@@ -76,11 +81,12 @@ def validate(allocation, targets, root=ROOT):
             raise ValueError('{} source_mix 必须是非负数'.format(task))
         if abs(sum(mix.values()) - 1.0) > 1e-9:
             raise ValueError('{} source_mix 之和必须为 1'.format(task))
+        mix_status = spec.get('source_mix_status', 'design_reference')
+        if mix_status not in {'design_reference', 'historical_reference'}:
+            raise ValueError('{} source_mix_status 无效'.format(task))
         cap = spec.get('blender_cap')
         if not isinstance(cap, (int, float)) or cap < 0 or cap > 1:
             raise ValueError('{} blender_cap 必须在 [0,1]'.format(task))
-        if mix['blender'] > cap:
-            raise ValueError('{} Blender 比例 {} 超过上限 {}'.format(task, mix['blender'], cap))
         allowed = _allowed_targets(targets[task])
         groups = spec.get('groups')
         if groups is not None:
@@ -112,22 +118,41 @@ def validate(allocation, targets, root=ROOT):
             if not isinstance(grid, dict):
                 raise ValueError('{} 缺少 groups 或 grid'.format(task))
             count = grid.get('class_count')
-            colors = grid.get('colors')
-            per = grid.get('per_class_color')
-            if not isinstance(count, int) or count <= 0:
-                raise ValueError('{} grid.class_count 无效'.format(task))
-            if not isinstance(colors, list) or not colors or len(set(colors)) != len(colors):
-                raise ValueError('{} grid.colors 无效'.format(task))
+            per = grid.get('per_class')
+            if type(count) is not int or count <= 0 or count != len(targets[task].get('classes', [])):
+                raise ValueError('{} grid.class_count 与 task_targets 中的类别数不一致'.format(task))
             if not isinstance(per, int) or per <= 0:
-                raise ValueError('{} grid.per_class_color 无效'.format(task))
-            grid_total = count * len(colors) * per
+                raise ValueError('{} grid.per_class 无效'.format(task))
+            grid_total = count * per
             if grid_total != total:
                 raise ValueError('{} grid 合计 {} 不等于 total {}'.format(task, grid_total, total))
             result[task] = {'total': total, 'grid': grid, 'mode': 'grid'}
         result[task]['source_mix'] = mix
+        result[task]['source_mix_status'] = mix_status
         result[task]['blender_cap'] = cap
         result[task]['notes'] = spec.get('notes', '')
+        result[task]['startup_batch'] = spec.get('startup_batch', '')
         result[task]['target_spec'] = targets[task]
+        split_design = spec.get('split_design')
+        if split_design is not None:
+            splits = split_design['splits']
+            branches = ('direct_real','real_background_composite','blender_background_composite','empty_negative')
+            if set(splits) != {'train','val','test'} or splits['train']['total'] != total:
+                raise ValueError(f'{task} split_design 与 train 总额不一致')
+            if sum(row['total'] for row in splits.values()) != split_design['total']:
+                raise ValueError(f'{task} split_design 三集合之和不一致')
+            for split,row in splits.items():
+                if any(type(row.get(key)) is not int or row[key]<0 for key in branches):
+                    raise ValueError(f'{task}/{split} 分支配额必须为非负整数')
+                if sum(row[key] for key in branches) != row['total']:
+                    raise ValueError(f'{task}/{split} 分支配额之和不一致')
+            for axis,values in split_design['synthetic_positive_distributions'].items():
+                if any(v<0 for v in values.values()) or abs(sum(values.values())-1)>1e-9:
+                    raise ValueError(f'{task}/{axis} 分布必须归一化')
+            groups = [set(row['indices']) for row in split_design['direct_record_groups'].values()]
+            if any(a & b for i,a in enumerate(groups) for b in groups[i+1:]):
+                raise ValueError(f'{task} 原生实拍不可跨集合重复')
+            result[task]['split_design'] = split_design
     return result
 
 
@@ -135,7 +160,11 @@ def _plan_stats(root, task, targets):
     budget = 0
     capacity = 0
     plans = 0
-    for relative in targets[task]['plans']:
+    spec = targets[task]
+    source_only = spec.get('plan_usage', {})
+    for relative in spec['plans']:
+        if relative in source_only:
+            continue
         path = root / 'datasets/scripts' / task / relative
         plan = json.loads(path.read_text(encoding='utf-8'))
         if plan.get('target_split') != 'train':
@@ -165,6 +194,7 @@ def _target_summary(spec):
 
 
 def render_design(allocation, validated, targets, root=ROOT):
+    parent_reference = allocation.get('allocation_policy', {}).get('parent_share_reference', 0.8)
     lines = [
         '# 八任务全量 train 计划设计（草案）',
         '',
@@ -175,9 +205,9 @@ def render_design(allocation, validated, targets, root=ROOT):
         '- 训练目标（类别、关键点、OCR、计数）与组合轴（光照、视角、遮挡、背景等噪声）分开；目标见 `config/task_targets.yaml`，轴见 `config/combination_axes.yaml`。',
         '- 对象分类：本文件是 GeneratedDoc，由 PlanDraft `config/full_train_allocation.yaml` 生成；PlanDraft 不是 ProductionPlan，不被生产守卫消费。编译后的 `datasets/scripts/<任务>/config/production_plan.json` 才是 ProductionPlan。',
         '- 组配额只安排已声明的可行组合；不要求每个组合都有独立实拍对应证据。',
-        '- 来源组成按各任务 `source_mix`：person/e_bike/sign 为 30/40/30；fire/building_name_paper/waste_bin_state 为 20/40/40；waste_sticker/meter 为 10/40/50。Blender 上限按任务声明；份额是设计基准，不是实测分布。',
-        '- 每个来源域在 train 最多使用其合格父组的 80%，其余留给 val/test 与后续补量；编译前须核对来源容量和父组上限。',
-        '- 本草案不启动生产、训练或验证；编译成可执行计划前需用户确认。',
+        '- 来源组成和 Blender 参考份额读取 `source_mix` 和 `blender_cap`；标为历史参考的比例不规定现行编批。按可用直接实拍和可行合成编批，实际份额按批次清单记录。',
+        '- {:.0%} 参考份额用于提示父组集中度。编批时分配已合格的库存。同源 val/test 记录诊断范围，独立实拍评估另核物理父组与场次。底图容量和成图配额分别计数。'.format(parent_reference),
+        '- 由各任务现用计划入口编制具体状态。生成、训练和评估各自使用对应入口。',
         '',
         '## 总览',
         '',
@@ -189,12 +219,13 @@ def render_design(allocation, validated, targets, root=ROOT):
         stats = _plan_stats(root, task, targets)
         mix = item['source_mix']
         new_capacity = max(0, item['total'] - stats['capacity'])
-        lines.append('| {} | {} | {} | {} | {} | {:.0%} | {:.0%} | {:.0%} |'.format(
-            task, item['total'], stats['budget'], stats['capacity'], new_capacity,
-            mix['direct_real'], mix['real_composite'], mix['blender']))
+        shares = (['按实际编批'] * 3 if item['source_mix_status'] == 'historical_reference' else
+                  [source_share(mix[key]) for key in ('direct_real', 'real_composite', 'blender')])
+        lines.append('| {} | {} | {} | {} | {} | {} | {} | {} |'.format(
+            task, item['total'], stats['budget'], stats['capacity'], new_capacity, *shares))
     lines.extend([
         '',
-        '预算、计划容量和需要新增容量均以最终训练图片张数计；计划容量是现有计划 strata 的 `max_count` 之和，不是父源容量。渲染状态、组合状态和父组数分别见各任务计划与 `docs/PARENT_SOURCE_CAPACITY.md`。',
+        '预算、计划容量和需要新增容量均以最终训练图片张数计。计划容量为数据集用途的 train 计划 strata 的 `max_count` 之和，源渲染和小样另见组合轴覆盖表。父组数见各任务计划与 `docs/PARENT_SOURCE_CAPACITY.md`。',
         '',
         '## 分任务设计',
         '',
@@ -210,13 +241,38 @@ def render_design(allocation, validated, targets, root=ROOT):
             '- 全量目标：{} 张；现有 train 计划预算 {} 张；现有计划容量 {} 张；需要新增容量 {} 张。'.format(
                 item['total'], stats['budget'], stats['capacity'],
                 max(0, item['total'] - stats['capacity'])),
-            '- 来源组成：直接实拍 {:.0%}、实拍背景合成 {:.0%}、Blender {:.0%}；Blender 上限 {:.0%}。'.format(
-                item['source_mix']['direct_real'], item['source_mix']['real_composite'],
-                item['source_mix']['blender'], item['blender_cap']),
         ])
+        if item['source_mix_status'] == 'historical_reference':
+            lines.append('- 来源组成按当批可用的直接实拍目标和合成确定；旧的直接实拍 {:.0%}、实拍合成 {:.0%}、Blender {:.0%} 及 Blender {:.0%} 提示线仅供历史参考，不约束现行编批。'.format(
+                item['source_mix']['direct_real'], item['source_mix']['real_composite'],
+                item['source_mix']['blender'], item['blender_cap']))
+        else:
+            lines.append('- 来源组成参考为直接实拍 {}、实拍背景合成 {}、Blender {}，Blender 份额提示线为 {:.0%}。'.format(
+                source_share(item['source_mix']['direct_real']), source_share(item['source_mix']['real_composite']),
+                source_share(item['source_mix']['blender']), item['blender_cap']))
+        if item['startup_batch']:
+            lines.append('- ' + item['startup_batch'])
         if item['notes']:
             lines.append('- 设计说明：{}'.format(item['notes']))
         lines.append('')
+        if item.get('split_design'):
+            design=item['split_design']
+            caption=('**三集合配额（当前工作集已生成）**' if design.get('status')=='executed_current_working_dataset'
+                     else '**三集合配额（设计，尚未生成）**')
+            lines.extend([caption,'',
+                '| 集合 | 总数 | 原生实拍 | 实拍底板合成 | Blender 底板合成 | 无表负例 |',
+                '| --- | ---: | ---: | ---: | ---: | ---: |'])
+            for split,row in design['splits'].items():
+                lines.append('| {} | {} | {} | {} | {} | {} |'.format(split,row['total'],row['direct_real'],row['real_background_composite'],row['blender_background_composite'],row['empty_negative']))
+            lines.extend(['',design['scale_basis'],'',design['distribution_scope'],''])
+            for axis,values in design['synthetic_positive_distributions'].items():
+                lines.append('- {}：{}'.format(axis,'、'.join(f'{key} {value:.0%}' for key,value in values.items())))
+            lines.extend(['','**来源和评估范围**',''])
+            for key,value in design['background_policy'].items():
+                lines.append(f'- {key}：{value}')
+            lines.extend(['','**后续编批项**',''])
+            lines.extend('- '+gap for gap in design['resource_gaps'])
+            lines.extend(['',design['execution_boundary'],''])
         if item['mode'] == 'groups':
             lines.extend([
                 '| 组 | 目标 | 组合轴 | 配额 |',
@@ -231,18 +287,17 @@ def render_design(allocation, validated, targets, root=ROOT):
             grid = item['grid']
             lines.append('| 组 | 配额 |')
             lines.append('| --- | ---: |')
-            lines.append('| class 0–{} × colors {} × 每格 {} | {} |'.format(
-                grid['class_count'] - 1, ', '.join(str(value) for value in grid['colors']),
-                grid['per_class_color'], item['total']))
+            lines.append('| {} 类 × 每类 {} 张 | {} |'.format(
+                grid['class_count'], grid['per_class'], item['total']))
         lines.append('')
     lines.extend([
-        '## 编译到可执行计划的前置条件',
+        '## 编制可执行批次',
         '',
-        '1. 核对各任务 `source.yaml`、清单和实际文件，确认组配额能由合格父来源承载；不足时调整受影响组。',
-        '2. 按父组分配 80% 上限，保留 val/test 与后续补量；同一母场景/原件只计一个父组。',
+        '1. 查询已有资格的共享底图、Blender 或实拍来源，纳入当批可行状态并分配预算。定向补判仍缺证据的用途。',
+        '2. 在计划中分配 split 并记录父组用途和已知接触。同一母场景或拍摄原件按实际谱系计数。合格底图可承载多个有效布局，按最终图签计产量。',
         '3. 把组配额展开为 `production_plan.json` 的 strata，写清背景、目标、标签、增强、参数、来源和上下限。',
-        '4. 编译后运行 `python lab/scripts/contracts/state_coverage.py --write` 与 `--check`，确认目标/轴覆盖和容量缺口。',
-        '5. 本草案与当前首批计划分开；首批执行和扩量顺序按 `docs/DATASET_PRODUCTION.md`，不因草案跳过首批。',
+        '4. 按出图清单登记来源、覆盖和未补容量，按实际状态调整当批份额。设计或参考计划变更后同步组合轴覆盖文档。',
+        '5. 当前可运行的批次见 [生产进度](DATASET_PRODUCTION.md#当前生产进度)。',
     ])
     return '\n'.join(lines) + '\n'
 
@@ -272,6 +327,7 @@ def main():
                 task: {
                     'total': validated[task]['total'],
                     'source_mix': validated[task]['source_mix'],
+                    'source_mix_status': validated[task]['source_mix_status'],
                     'blender_cap': validated[task]['blender_cap'],
                     'current': _plan_stats(root, task, targets),
                     'new_capacity': max(0, validated[task]['total'] - _plan_stats(root, task, targets)['capacity']),

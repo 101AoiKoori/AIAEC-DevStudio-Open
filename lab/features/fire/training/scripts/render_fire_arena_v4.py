@@ -6,7 +6,7 @@ name labels are exported. Fire labels remain candidates until reviewed.
 """
 
 if __name__ == "__main__":
-    raise SystemExit("Legacy dataset CLI is retired; use datasets/scripts/fire/. Production remains paused.")
+    raise SystemExit("Legacy dataset CLI is retired; use datasets/scripts/fire/.")
 
 import argparse
 import json
@@ -29,7 +29,7 @@ from fire_blender_labels import (fire_label_suppression, fire_scale_suppression,
 
 MASTER = ROOT / 'datasets/assets/blender/shared/arena_4m2_pbr_20261112/arena_master_user_20261113.blend'
 BUILDINGS = ROOT / 'datasets/assets/blender/fire/blender_buildings_v13/three_buildings.blend'
-FONT = ROOT / 'datasets/assets/blender/fire/blender_buildings_v13/NotoSansSC.ttf'
+FONT = ROOT / 'datasets/raw/building_name_paper/targets/digital/typeface/NotoSansSC.ttf'
 
 
 def parse_args():
@@ -236,7 +236,7 @@ def main():
     args, output = parse_args()
     procedural = {MASTER, BUILDINGS, FONT} | fire.scene_external_libraries()
     media = fire.scene_external_media()
-    media.add(ROOT / 'datasets/raw/fire/team_assets/image1.png')
+    media.add(ROOT / 'Archive/Assets/working_sources/digital/fire/team_assets/image1.png')
     with generation_guard(
         'fire.render_fire_arena_v4:' + output.relative_to(ROOT).as_posix(),
         sorted(media | procedural), [output],

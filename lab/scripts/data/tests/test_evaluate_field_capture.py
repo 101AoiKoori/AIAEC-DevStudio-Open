@@ -11,7 +11,7 @@ subject = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(subject)
 
 
-class LabelSummaryAuditTests(unittest.TestCase):
+class EvaluateFieldCaptureTests(unittest.TestCase):
     def setUp(self):
         self.tmp = tempfile.TemporaryDirectory()
         self.addCleanup(self.tmp.cleanup)
@@ -88,6 +88,76 @@ class LabelSummaryAuditTests(unittest.TestCase):
         labels = self.write("datasets/annotated/labels.json", records)
         with self.assertRaisesRegex(ValueError, "重复记录"):
             subject.audit_label_files([labels])
+
+    def test_source_images_accepts_moved_capture_and_legacy_raw(self):
+        archived = "Archive/Assets/captures/site_capture/onboard_camera_images/vehicle_0001.png"
+        legacy = "datasets/raw/legacy.png"
+        frame = "datasets/annotated/site_capture/extract_v1/frame.jpg"
+        for image in (archived, legacy, frame):
+            self.write(image, {})
+        batch = self.root / "datasets/annotated/site_capture"
+        (batch / "source_inventory.csv").write_text(
+            f"media_type,current_path\nimage,{archived}\nimage,{legacy}\n", encoding="utf-8",
+        )
+        (batch / "extract_v1/frames.csv").write_text(
+            "frame,source_video\nframe.jpg,videos/full_scene.mp4\n", encoding="utf-8",
+        )
+        self.assertEqual(subject.source_images(batch), {
+            archived: "vehicle_camera", legacy: "vehicle_camera", frame: "full_scene",
+        })
+
+    def test_selected_images_accepts_capture_and_rejects_unrelated_archive_and_absolute_paths(self):
+        archived = "Archive/Assets/captures/car_real_capture/P02_PS1.png"
+        original = "Archive/Assets/CarRealPicture/P02_PS1.png"
+        raw = "datasets/raw/source.png"
+        annotated = "datasets/annotated/batch/frame.jpg"
+        unrelated = "Archive/Assets/working_sources/reference/other.png"
+        selected = (archived, original, raw, annotated)
+        for image in (*selected, unrelated):
+            self.write(image, {})
+        path = "datasets/annotated/selection.json"
+        manifest = {"batch_id": "waypoints", "items": [{"path": item} for item in selected]}
+        self.assertEqual(subject.selected_images(self.write(path, manifest)), {
+            image: "waypoints" for image in selected
+        })
+        for item in (unrelated, str(self.root / archived)):
+            with self.subTest(item=item), self.assertRaises(ValueError):
+                subject.selected_images(self.write(path, {"batch_id": "waypoints", "items": [{"path": item}]}))
+
+    def test_score_reuses_frozen_result_only_for_verified_file_copy(self):
+        archived = "Archive/Assets/captures/car_real_capture/P02_PS1.png"
+        original = "Archive/Assets/CarRealPicture/P02_PS1.png"
+        image = self.write(archived, {})
+        self.write(original, {})
+        copy = {"path": archived, "original_path": original, "generation_method": "file_copy"}
+        declarations = self.write(subject.SOURCE_COPY_MANIFEST, copy)
+        self.write("runs/frozen/prediction_summary.json", {
+            "models": {"person": {"status": "complete", "class_names": ["community"]}},
+        })
+        self.write("runs/frozen/predictions/person.jsonl", {
+            "image": original, "source": "waypoints", "shape_hw": [100, 100], "boxes": [],
+        })
+        labels = self.write("datasets/annotated/current.json", [{
+            "model_key": "person", "image": archived, "review_status": "visual_negative", "boxes": [],
+        }])
+        run = self.root / "runs/frozen"
+        out = self.root / "runs/report"
+        self.assertEqual(subject.score(run, [labels], out, .25), 0)
+        (matched,) = subject.read_json(out / "per_image.json")
+        self.assertEqual(matched["image"], archived)
+        self.assertEqual(matched["prediction_image"], original)
+        self.assertEqual(matched["prediction_match"]["manifest"], subject.SOURCE_COPY_MANIFEST)
+
+        declarations.write_text(
+            json.dumps({**copy, "generation_method": "lossless_format_conversion"}) + "\n",
+            encoding="utf-8",
+        )
+        with self.assertRaisesRegex(ValueError, "缺少唯一的冻结推理结果"):
+            subject.score(run, [labels], self.root / "runs/converted", .25)
+        declarations.write_text(json.dumps(copy) + "\n", encoding="utf-8")
+        image.write_bytes(b"different file content")
+        with self.assertRaisesRegex(ValueError, "缺少唯一的冻结推理结果"):
+            subject.score(run, [labels], self.root / "runs/mismatched", .25)
 
 
 if __name__ == "__main__":

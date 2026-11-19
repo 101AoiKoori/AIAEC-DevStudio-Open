@@ -1,0 +1,6247 @@
+{
+  "schema_version": 1,
+  "model_key": "fire_sticker",
+  "target_split": "test",
+  "purpose": "Current fire collection after empty hard-negative substitution; positives retained",
+  "budget": 300,
+  "uncertainty_weight": 0.5,
+  "independence_basis": "development sample; preserve source splits and historical contact",
+  "constraints": {
+    "supervision": "complete_visible_targets_in_output",
+    "building_counts": "scoped_to_covered_visible_surfaces"
+  },
+  "strata": [
+    {
+      "id": "direct_real_05eefb00de67",
+      "failure_event": "sticker_miss_or_false_positive",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [
+        "direct_real",
+        "building:C",
+        "count:1",
+        "tone:as_captured"
+      ],
+      "background": {
+        "image": "Archive/Assets/working_sources/legacy/fire/楼宇/晨光大厦/照片/正面_楼名纸条和1张火焰贴_001.jpg",
+        "parent_group": "Archive/Assets/楼宇/晨光大厦/照片/正面_楼名纸条和1张火焰贴_001.jpg",
+        "record_id": "3b5c76e12d5b9b2eb00c35f5472c39a2380202e1e80bc27c91235b6d2e7030d9"
+      },
+      "target": {
+        "building": "C",
+        "count": 1
+      },
+      "labels": {
+        "class_id": 0,
+        "scope": "entire_output"
+      },
+      "augmentation": {
+        "tone": "as_captured",
+        "max_image_side": 720,
+        "sticker_size": {
+          "reference": "facade_height",
+          "height_fraction": {
+            "A": [
+              0.1,
+              0.14
+            ],
+            "B": [
+              0.09,
+              0.13
+            ],
+            "C": [
+              0.1,
+              0.14
+            ]
+          },
+          "sampling": "independent_uniform_per_instance",
+          "anchor_jitter_fraction": 0.055,
+          "placement_attempts": 96
+        },
+        "wall_projection": {
+          "method": "per_wall_homography",
+          "margin_source_px": 3.0,
+          "blender_offset_m": 0.00015
+        }
+      },
+      "sources": [
+        "Archive/Assets/working_sources/legacy/fire/楼宇/晨光大厦/照片/正面_楼名纸条和1张火焰贴_001.jpg"
+      ],
+      "parameters": {
+        "seed": 431,
+        "record_id": "3b5c76e12d5b9b2eb00c35f5472c39a2380202e1e80bc27c91235b6d2e7030d9",
+        "frame_id": "05eefb00de6751c4284e4d252d8f08ef39e3bd73d65f6fdb893cb9d03a9bb112",
+        "source_sha256": "db3187ad2cc88e59e7bf8f85bce804460cf2e85573cbb406857fb42c7ebae6b6",
+        "source_split": "test"
+      }
+    },
+    {
+      "id": "direct_real_1555f50c316e",
+      "failure_event": "sticker_miss_or_false_positive",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [
+        "direct_real",
+        "building:B",
+        "count:0",
+        "tone:as_captured"
+      ],
+      "background": {
+        "image": "Archive/Assets/working_sources/legacy/fire/楼宇/锦绣大厦/照片/远距离斜视_格栅和窗格_001.jpg",
+        "parent_group": "Archive/Assets/楼宇/锦绣大厦/照片/远距离斜视_格栅和窗格_001.jpg",
+        "record_id": "48b788fd9227dc7fe57e6b1397694894a1b1cbbfd084fadf14bf60108de7f332"
+      },
+      "target": {
+        "building": "B",
+        "count": 0
+      },
+      "labels": {
+        "class_id": 0,
+        "scope": "entire_output"
+      },
+      "augmentation": {
+        "tone": "as_captured",
+        "max_image_side": 720,
+        "sticker_size": {
+          "reference": "facade_height",
+          "height_fraction": {
+            "A": [
+              0.1,
+              0.14
+            ],
+            "B": [
+              0.09,
+              0.13
+            ],
+            "C": [
+              0.1,
+              0.14
+            ]
+          },
+          "sampling": "independent_uniform_per_instance",
+          "anchor_jitter_fraction": 0.055,
+          "placement_attempts": 96
+        },
+        "wall_projection": {
+          "method": "per_wall_homography",
+          "margin_source_px": 3.0,
+          "blender_offset_m": 0.00015
+        }
+      },
+      "sources": [
+        "Archive/Assets/working_sources/legacy/fire/楼宇/锦绣大厦/照片/远距离斜视_格栅和窗格_001.jpg"
+      ],
+      "parameters": {
+        "seed": 431,
+        "record_id": "48b788fd9227dc7fe57e6b1397694894a1b1cbbfd084fadf14bf60108de7f332",
+        "frame_id": "1555f50c316e9c679cdb9f69e4521a2be12cdd3a293c11c560ed39a5f6cb5f55",
+        "source_sha256": "1341f3579684695c419f003055e5c0834f94c835427d76a96ae7127dd69f7224",
+        "source_split": "test"
+      }
+    },
+    {
+      "id": "direct_real_221ab6cd5892",
+      "failure_event": "sticker_miss_or_false_positive",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [
+        "direct_real",
+        "building:C",
+        "count:0",
+        "tone:as_captured"
+      ],
+      "background": {
+        "image": "Archive/Assets/working_sources/legacy/fire/楼宇/晨光大厦/照片/斜视_L形墙面与窗口_019.jpg",
+        "parent_group": "Archive/Assets/楼宇/晨光大厦/照片/斜视_L形墙面与窗口_019.jpg",
+        "record_id": "4519381ac52aa683fab2fb46f2b3cccd42a98813a6dc21a4e9880bcf25dbf4fb"
+      },
+      "target": {
+        "building": "C",
+        "count": 0
+      },
+      "labels": {
+        "class_id": 0,
+        "scope": "entire_output"
+      },
+      "augmentation": {
+        "tone": "as_captured",
+        "max_image_side": 720,
+        "sticker_size": {
+          "reference": "facade_height",
+          "height_fraction": {
+            "A": [
+              0.1,
+              0.14
+            ],
+            "B": [
+              0.09,
+              0.13
+            ],
+            "C": [
+              0.1,
+              0.14
+            ]
+          },
+          "sampling": "independent_uniform_per_instance",
+          "anchor_jitter_fraction": 0.055,
+          "placement_attempts": 96
+        },
+        "wall_projection": {
+          "method": "per_wall_homography",
+          "margin_source_px": 3.0,
+          "blender_offset_m": 0.00015
+        }
+      },
+      "sources": [
+        "Archive/Assets/working_sources/legacy/fire/楼宇/晨光大厦/照片/斜视_L形墙面与窗口_019.jpg"
+      ],
+      "parameters": {
+        "seed": 431,
+        "record_id": "4519381ac52aa683fab2fb46f2b3cccd42a98813a6dc21a4e9880bcf25dbf4fb",
+        "frame_id": "221ab6cd5892a9997f9da4527ffffde329be29d1df7831daa2d402393e53ebc9",
+        "source_sha256": "3f0ff2af5bcdb61484fcccb91e69290425bdf789835c3e2e7cf9ee5de1a2a9a5",
+        "source_split": "test"
+      }
+    },
+    {
+      "id": "direct_real_53d21dc0d427",
+      "failure_event": "sticker_miss_or_false_positive",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [
+        "direct_real",
+        "building:A",
+        "count:0",
+        "tone:as_captured"
+      ],
+      "background": {
+        "image": "Archive/Assets/working_sources/legacy/fire/楼宇/开心大厦/照片/远距离斜视_楼体与地面_022.jpg",
+        "parent_group": "Archive/Assets/楼宇/开心大厦/照片/远距离斜视_楼体与地面_022.jpg",
+        "record_id": "850426148ffd617f125247f36dd143dc5269f01aad7739e04e1169f174b59891"
+      },
+      "target": {
+        "building": "A",
+        "count": 0
+      },
+      "labels": {
+        "class_id": 0,
+        "scope": "entire_output"
+      },
+      "augmentation": {
+        "tone": "as_captured",
+        "max_image_side": 720,
+        "sticker_size": {
+          "reference": "facade_height",
+          "height_fraction": {
+            "A": [
+              0.1,
+              0.14
+            ],
+            "B": [
+              0.09,
+              0.13
+            ],
+            "C": [
+              0.1,
+              0.14
+            ]
+          },
+          "sampling": "independent_uniform_per_instance",
+          "anchor_jitter_fraction": 0.055,
+          "placement_attempts": 96
+        },
+        "wall_projection": {
+          "method": "per_wall_homography",
+          "margin_source_px": 3.0,
+          "blender_offset_m": 0.00015
+        }
+      },
+      "sources": [
+        "Archive/Assets/working_sources/legacy/fire/楼宇/开心大厦/照片/远距离斜视_楼体与地面_022.jpg"
+      ],
+      "parameters": {
+        "seed": 431,
+        "record_id": "850426148ffd617f125247f36dd143dc5269f01aad7739e04e1169f174b59891",
+        "frame_id": "53d21dc0d4270ceaed9a0bfbccfa6c7e7c60e8546925da4a328444c29b6943c3",
+        "source_sha256": "c4845dff454c5a5b414d3aa94ca8092778d54a4e53105f80df0d6584e49c3786",
+        "source_split": "test"
+      }
+    },
+    {
+      "id": "direct_real_69a98204b1fd",
+      "failure_event": "sticker_miss_or_false_positive",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [
+        "direct_real",
+        "building:A",
+        "count:0",
+        "tone:as_captured"
+      ],
+      "background": {
+        "image": "Archive/Assets/working_sources/legacy/fire/楼宇/开心大厦/照片/正面远景_楼体整体_025.jpg",
+        "parent_group": "Archive/Assets/楼宇/开心大厦/照片/正面远景_楼体整体_025.jpg",
+        "record_id": "235c54d7532a7f81f5df166e3e02e2ae1845f66026d3e5f45274c494f5e5bdff"
+      },
+      "target": {
+        "building": "A",
+        "count": 0
+      },
+      "labels": {
+        "class_id": 0,
+        "scope": "entire_output"
+      },
+      "augmentation": {
+        "tone": "as_captured",
+        "max_image_side": 720,
+        "sticker_size": {
+          "reference": "facade_height",
+          "height_fraction": {
+            "A": [
+              0.1,
+              0.14
+            ],
+            "B": [
+              0.09,
+              0.13
+            ],
+            "C": [
+              0.1,
+              0.14
+            ]
+          },
+          "sampling": "independent_uniform_per_instance",
+          "anchor_jitter_fraction": 0.055,
+          "placement_attempts": 96
+        },
+        "wall_projection": {
+          "method": "per_wall_homography",
+          "margin_source_px": 3.0,
+          "blender_offset_m": 0.00015
+        }
+      },
+      "sources": [
+        "Archive/Assets/working_sources/legacy/fire/楼宇/开心大厦/照片/正面远景_楼体整体_025.jpg"
+      ],
+      "parameters": {
+        "seed": 431,
+        "record_id": "235c54d7532a7f81f5df166e3e02e2ae1845f66026d3e5f45274c494f5e5bdff",
+        "frame_id": "69a98204b1fd165b6e62aff827248fa2145e430739acfc04530e847819bf8bb0",
+        "source_sha256": "26df9914f4e6d290e7180ecd846ff17ebe5b7fd222f68c9cbf5f45398ba8ffe1",
+        "source_split": "test"
+      }
+    },
+    {
+      "id": "direct_real_717d4260a578",
+      "failure_event": "sticker_miss_or_false_positive",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [
+        "direct_real",
+        "building:B",
+        "count:0",
+        "tone:as_captured"
+      ],
+      "background": {
+        "image": "Archive/Assets/working_sources/legacy/fire/楼宇/锦绣大厦/照片/远距离斜视_格栅和窗格_003.jpg",
+        "parent_group": "Archive/Assets/楼宇/锦绣大厦/照片/远距离斜视_格栅和窗格_003.jpg",
+        "record_id": "3f782f2eb02d23e64bf8bc3111a3d48d78b08450795dd004c1e8e73fbb93e608"
+      },
+      "target": {
+        "building": "B",
+        "count": 0
+      },
+      "labels": {
+        "class_id": 0,
+        "scope": "entire_output"
+      },
+      "augmentation": {
+        "tone": "as_captured",
+        "max_image_side": 720,
+        "sticker_size": {
+          "reference": "facade_height",
+          "height_fraction": {
+            "A": [
+              0.1,
+              0.14
+            ],
+            "B": [
+              0.09,
+              0.13
+            ],
+            "C": [
+              0.1,
+              0.14
+            ]
+          },
+          "sampling": "independent_uniform_per_instance",
+          "anchor_jitter_fraction": 0.055,
+          "placement_attempts": 96
+        },
+        "wall_projection": {
+          "method": "per_wall_homography",
+          "margin_source_px": 3.0,
+          "blender_offset_m": 0.00015
+        }
+      },
+      "sources": [
+        "Archive/Assets/working_sources/legacy/fire/楼宇/锦绣大厦/照片/远距离斜视_格栅和窗格_003.jpg"
+      ],
+      "parameters": {
+        "seed": 431,
+        "record_id": "3f782f2eb02d23e64bf8bc3111a3d48d78b08450795dd004c1e8e73fbb93e608",
+        "frame_id": "717d4260a578c0859f7867047fd1b1de0492939d93a729e5d38139bc350fbfdb",
+        "source_sha256": "fe8d39e4e3eb7bce463801f32d13462740e29b46581d761683b40dbabac08b37",
+        "source_split": "test"
+      }
+    },
+    {
+      "id": "direct_real_9b69db70078b",
+      "failure_event": "sticker_miss_or_false_positive",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [
+        "direct_real",
+        "building:B",
+        "count:0",
+        "tone:as_captured"
+      ],
+      "background": {
+        "image": "Archive/Assets/working_sources/legacy/fire/楼宇/锦绣大厦/照片/正面中远景_竖格栅与窗格_015.jpg",
+        "parent_group": "Archive/Assets/楼宇/锦绣大厦/照片/正面中远景_竖格栅与窗格_015.jpg",
+        "record_id": "0a41484f6998a13461bc0e02312954953e6147c5f02d7f003d8c4267307571bb"
+      },
+      "target": {
+        "building": "B",
+        "count": 0
+      },
+      "labels": {
+        "class_id": 0,
+        "scope": "entire_output"
+      },
+      "augmentation": {
+        "tone": "as_captured",
+        "max_image_side": 720,
+        "sticker_size": {
+          "reference": "facade_height",
+          "height_fraction": {
+            "A": [
+              0.1,
+              0.14
+            ],
+            "B": [
+              0.09,
+              0.13
+            ],
+            "C": [
+              0.1,
+              0.14
+            ]
+          },
+          "sampling": "independent_uniform_per_instance",
+          "anchor_jitter_fraction": 0.055,
+          "placement_attempts": 96
+        },
+        "wall_projection": {
+          "method": "per_wall_homography",
+          "margin_source_px": 3.0,
+          "blender_offset_m": 0.00015
+        }
+      },
+      "sources": [
+        "Archive/Assets/working_sources/legacy/fire/楼宇/锦绣大厦/照片/正面中远景_竖格栅与窗格_015.jpg"
+      ],
+      "parameters": {
+        "seed": 431,
+        "record_id": "0a41484f6998a13461bc0e02312954953e6147c5f02d7f003d8c4267307571bb",
+        "frame_id": "9b69db70078b4727bf7f3410370845730a78fc060910ec4047ceb14315c1abe3",
+        "source_sha256": "5c010fb40df61300f89db5fa4cd50bf32665dbafdb362c1c246d9481959f2b62",
+        "source_split": "test"
+      }
+    },
+    {
+      "id": "real_background_composite_1555f50c316e_0_dim",
+      "failure_event": "sticker_miss_or_false_positive",
+      "min_count": 8,
+      "max_count": 8,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [
+        "real_background_composite",
+        "building:B",
+        "count:0",
+        "tone:dim"
+      ],
+      "background": {
+        "image": "Archive/Assets/working_sources/legacy/fire/楼宇/锦绣大厦/照片/远距离斜视_格栅和窗格_001.jpg",
+        "parent_group": "Archive/Assets/楼宇/锦绣大厦/照片/远距离斜视_格栅和窗格_001.jpg",
+        "record_id": "0d5a71db0d0219d69e4072ee67d3db156395cc3501b4fbb6c3d480e79b2ae360"
+      },
+      "target": {
+        "building": "B",
+        "count": 0
+      },
+      "labels": {
+        "class_id": 0,
+        "scope": "entire_output"
+      },
+      "augmentation": {
+        "tone": "dim",
+        "max_image_side": 720,
+        "sticker_size": {
+          "reference": "facade_height",
+          "height_fraction": {
+            "A": [
+              0.1,
+              0.14
+            ],
+            "B": [
+              0.09,
+              0.13
+            ],
+            "C": [
+              0.1,
+              0.14
+            ]
+          },
+          "sampling": "independent_uniform_per_instance",
+          "anchor_jitter_fraction": 0.055,
+          "placement_attempts": 96
+        },
+        "wall_projection": {
+          "method": "per_wall_homography",
+          "margin_source_px": 3.0,
+          "blender_offset_m": 0.00015
+        }
+      },
+      "sources": [
+        "Archive/Assets/working_sources/legacy/fire/楼宇/锦绣大厦/照片/远距离斜视_格栅和窗格_001.jpg"
+      ],
+      "parameters": {
+        "seed": 431,
+        "record_id": "0d5a71db0d0219d69e4072ee67d3db156395cc3501b4fbb6c3d480e79b2ae360",
+        "frame_id": "1555f50c316e9c679cdb9f69e4521a2be12cdd3a293c11c560ed39a5f6cb5f55",
+        "source_sha256": "1341f3579684695c419f003055e5c0834f94c835427d76a96ae7127dd69f7224",
+        "source_split": "test"
+      }
+    },
+    {
+      "id": "real_background_composite_1555f50c316e_1_normal",
+      "failure_event": "sticker_miss_or_false_positive",
+      "min_count": 12,
+      "max_count": 12,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [
+        "real_background_composite",
+        "building:B",
+        "count:1",
+        "tone:normal"
+      ],
+      "background": {
+        "image": "Archive/Assets/working_sources/legacy/fire/楼宇/锦绣大厦/照片/远距离斜视_格栅和窗格_001.jpg",
+        "parent_group": "Archive/Assets/楼宇/锦绣大厦/照片/远距离斜视_格栅和窗格_001.jpg",
+        "record_id": "0d5a71db0d0219d69e4072ee67d3db156395cc3501b4fbb6c3d480e79b2ae360"
+      },
+      "target": {
+        "building": "B",
+        "count": 1
+      },
+      "labels": {
+        "class_id": 0,
+        "scope": "entire_output"
+      },
+      "augmentation": {
+        "tone": "normal",
+        "max_image_side": 720,
+        "sticker_size": {
+          "reference": "facade_height",
+          "height_fraction": {
+            "A": [
+              0.1,
+              0.14
+            ],
+            "B": [
+              0.09,
+              0.13
+            ],
+            "C": [
+              0.1,
+              0.14
+            ]
+          },
+          "sampling": "independent_uniform_per_instance",
+          "anchor_jitter_fraction": 0.055,
+          "placement_attempts": 96
+        },
+        "wall_projection": {
+          "method": "per_wall_homography",
+          "margin_source_px": 3.0,
+          "blender_offset_m": 0.00015
+        }
+      },
+      "sources": [
+        "Archive/Assets/working_sources/legacy/fire/楼宇/锦绣大厦/照片/远距离斜视_格栅和窗格_001.jpg",
+        "Archive/Assets/working_sources/digital/fire/team_assets/image1.png"
+      ],
+      "parameters": {
+        "seed": 431,
+        "record_id": "0d5a71db0d0219d69e4072ee67d3db156395cc3501b4fbb6c3d480e79b2ae360",
+        "frame_id": "1555f50c316e9c679cdb9f69e4521a2be12cdd3a293c11c560ed39a5f6cb5f55",
+        "source_sha256": "1341f3579684695c419f003055e5c0834f94c835427d76a96ae7127dd69f7224",
+        "source_split": "test"
+      }
+    },
+    {
+      "id": "real_background_composite_1555f50c316e_1_dim",
+      "failure_event": "sticker_miss_or_false_positive",
+      "min_count": 12,
+      "max_count": 12,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [
+        "real_background_composite",
+        "building:B",
+        "count:1",
+        "tone:dim"
+      ],
+      "background": {
+        "image": "Archive/Assets/working_sources/legacy/fire/楼宇/锦绣大厦/照片/远距离斜视_格栅和窗格_001.jpg",
+        "parent_group": "Archive/Assets/楼宇/锦绣大厦/照片/远距离斜视_格栅和窗格_001.jpg",
+        "record_id": "0d5a71db0d0219d69e4072ee67d3db156395cc3501b4fbb6c3d480e79b2ae360"
+      },
+      "target": {
+        "building": "B",
+        "count": 1
+      },
+      "labels": {
+        "class_id": 0,
+        "scope": "entire_output"
+      },
+      "augmentation": {
+        "tone": "dim",
+        "max_image_side": 720,
+        "sticker_size": {
+          "reference": "facade_height",
+          "height_fraction": {
+            "A": [
+              0.1,
+              0.14
+            ],
+            "B": [
+              0.09,
+              0.13
+            ],
+            "C": [
+              0.1,
+              0.14
+            ]
+          },
+          "sampling": "independent_uniform_per_instance",
+          "anchor_jitter_fraction": 0.055,
+          "placement_attempts": 96
+        },
+        "wall_projection": {
+          "method": "per_wall_homography",
+          "margin_source_px": 3.0,
+          "blender_offset_m": 0.00015
+        }
+      },
+      "sources": [
+        "Archive/Assets/working_sources/legacy/fire/楼宇/锦绣大厦/照片/远距离斜视_格栅和窗格_001.jpg",
+        "Archive/Assets/working_sources/digital/fire/team_assets/image1.png"
+      ],
+      "parameters": {
+        "seed": 431,
+        "record_id": "0d5a71db0d0219d69e4072ee67d3db156395cc3501b4fbb6c3d480e79b2ae360",
+        "frame_id": "1555f50c316e9c679cdb9f69e4521a2be12cdd3a293c11c560ed39a5f6cb5f55",
+        "source_sha256": "1341f3579684695c419f003055e5c0834f94c835427d76a96ae7127dd69f7224",
+        "source_split": "test"
+      }
+    },
+    {
+      "id": "real_background_composite_1555f50c316e_3_normal",
+      "failure_event": "sticker_miss_or_false_positive",
+      "min_count": 12,
+      "max_count": 12,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [
+        "real_background_composite",
+        "building:B",
+        "count:3",
+        "tone:normal"
+      ],
+      "background": {
+        "image": "Archive/Assets/working_sources/legacy/fire/楼宇/锦绣大厦/照片/远距离斜视_格栅和窗格_001.jpg",
+        "parent_group": "Archive/Assets/楼宇/锦绣大厦/照片/远距离斜视_格栅和窗格_001.jpg",
+        "record_id": "0d5a71db0d0219d69e4072ee67d3db156395cc3501b4fbb6c3d480e79b2ae360"
+      },
+      "target": {
+        "building": "B",
+        "count": 3
+      },
+      "labels": {
+        "class_id": 0,
+        "scope": "entire_output"
+      },
+      "augmentation": {
+        "tone": "normal",
+        "max_image_side": 720,
+        "sticker_size": {
+          "reference": "facade_height",
+          "height_fraction": {
+            "A": [
+              0.1,
+              0.14
+            ],
+            "B": [
+              0.09,
+              0.13
+            ],
+            "C": [
+              0.1,
+              0.14
+            ]
+          },
+          "sampling": "independent_uniform_per_instance",
+          "anchor_jitter_fraction": 0.055,
+          "placement_attempts": 96
+        },
+        "wall_projection": {
+          "method": "per_wall_homography",
+          "margin_source_px": 3.0,
+          "blender_offset_m": 0.00015
+        }
+      },
+      "sources": [
+        "Archive/Assets/working_sources/legacy/fire/楼宇/锦绣大厦/照片/远距离斜视_格栅和窗格_001.jpg",
+        "Archive/Assets/working_sources/digital/fire/team_assets/image1.png"
+      ],
+      "parameters": {
+        "seed": 431,
+        "record_id": "0d5a71db0d0219d69e4072ee67d3db156395cc3501b4fbb6c3d480e79b2ae360",
+        "frame_id": "1555f50c316e9c679cdb9f69e4521a2be12cdd3a293c11c560ed39a5f6cb5f55",
+        "source_sha256": "1341f3579684695c419f003055e5c0834f94c835427d76a96ae7127dd69f7224",
+        "source_split": "test"
+      }
+    },
+    {
+      "id": "real_background_composite_1555f50c316e_3_dim",
+      "failure_event": "sticker_miss_or_false_positive",
+      "min_count": 12,
+      "max_count": 12,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [
+        "real_background_composite",
+        "building:B",
+        "count:3",
+        "tone:dim"
+      ],
+      "background": {
+        "image": "Archive/Assets/working_sources/legacy/fire/楼宇/锦绣大厦/照片/远距离斜视_格栅和窗格_001.jpg",
+        "parent_group": "Archive/Assets/楼宇/锦绣大厦/照片/远距离斜视_格栅和窗格_001.jpg",
+        "record_id": "0d5a71db0d0219d69e4072ee67d3db156395cc3501b4fbb6c3d480e79b2ae360"
+      },
+      "target": {
+        "building": "B",
+        "count": 3
+      },
+      "labels": {
+        "class_id": 0,
+        "scope": "entire_output"
+      },
+      "augmentation": {
+        "tone": "dim",
+        "max_image_side": 720,
+        "sticker_size": {
+          "reference": "facade_height",
+          "height_fraction": {
+            "A": [
+              0.1,
+              0.14
+            ],
+            "B": [
+              0.09,
+              0.13
+            ],
+            "C": [
+              0.1,
+              0.14
+            ]
+          },
+          "sampling": "independent_uniform_per_instance",
+          "anchor_jitter_fraction": 0.055,
+          "placement_attempts": 96
+        },
+        "wall_projection": {
+          "method": "per_wall_homography",
+          "margin_source_px": 3.0,
+          "blender_offset_m": 0.00015
+        }
+      },
+      "sources": [
+        "Archive/Assets/working_sources/legacy/fire/楼宇/锦绣大厦/照片/远距离斜视_格栅和窗格_001.jpg",
+        "Archive/Assets/working_sources/digital/fire/team_assets/image1.png"
+      ],
+      "parameters": {
+        "seed": 431,
+        "record_id": "0d5a71db0d0219d69e4072ee67d3db156395cc3501b4fbb6c3d480e79b2ae360",
+        "frame_id": "1555f50c316e9c679cdb9f69e4521a2be12cdd3a293c11c560ed39a5f6cb5f55",
+        "source_sha256": "1341f3579684695c419f003055e5c0834f94c835427d76a96ae7127dd69f7224",
+        "source_split": "test"
+      }
+    },
+    {
+      "id": "real_background_composite_221ab6cd5892_0_dim",
+      "failure_event": "sticker_miss_or_false_positive",
+      "min_count": 8,
+      "max_count": 8,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [
+        "real_background_composite",
+        "building:C",
+        "count:0",
+        "tone:dim"
+      ],
+      "background": {
+        "image": "Archive/Assets/working_sources/legacy/fire/楼宇/晨光大厦/照片/斜视_L形墙面与窗口_019.jpg",
+        "parent_group": "Archive/Assets/楼宇/晨光大厦/照片/斜视_L形墙面与窗口_019.jpg",
+        "record_id": "8ac33edcd7ebbfc59df2a6e2d478c43ddd0820dbd517cf2e64b132eb0486af81"
+      },
+      "target": {
+        "building": "C",
+        "count": 0
+      },
+      "labels": {
+        "class_id": 0,
+        "scope": "entire_output"
+      },
+      "augmentation": {
+        "tone": "dim",
+        "max_image_side": 720,
+        "sticker_size": {
+          "reference": "facade_height",
+          "height_fraction": {
+            "A": [
+              0.1,
+              0.14
+            ],
+            "B": [
+              0.09,
+              0.13
+            ],
+            "C": [
+              0.1,
+              0.14
+            ]
+          },
+          "sampling": "independent_uniform_per_instance",
+          "anchor_jitter_fraction": 0.055,
+          "placement_attempts": 96
+        },
+        "wall_projection": {
+          "method": "per_wall_homography",
+          "margin_source_px": 3.0,
+          "blender_offset_m": 0.00015
+        }
+      },
+      "sources": [
+        "Archive/Assets/working_sources/legacy/fire/楼宇/晨光大厦/照片/斜视_L形墙面与窗口_019.jpg"
+      ],
+      "parameters": {
+        "seed": 431,
+        "record_id": "8ac33edcd7ebbfc59df2a6e2d478c43ddd0820dbd517cf2e64b132eb0486af81",
+        "frame_id": "221ab6cd5892a9997f9da4527ffffde329be29d1df7831daa2d402393e53ebc9",
+        "source_sha256": "3f0ff2af5bcdb61484fcccb91e69290425bdf789835c3e2e7cf9ee5de1a2a9a5",
+        "source_split": "test"
+      }
+    },
+    {
+      "id": "real_background_composite_221ab6cd5892_1_normal",
+      "failure_event": "sticker_miss_or_false_positive",
+      "min_count": 13,
+      "max_count": 13,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [
+        "real_background_composite",
+        "building:C",
+        "count:1",
+        "tone:normal"
+      ],
+      "background": {
+        "image": "Archive/Assets/working_sources/legacy/fire/楼宇/晨光大厦/照片/斜视_L形墙面与窗口_019.jpg",
+        "parent_group": "Archive/Assets/楼宇/晨光大厦/照片/斜视_L形墙面与窗口_019.jpg",
+        "record_id": "8ac33edcd7ebbfc59df2a6e2d478c43ddd0820dbd517cf2e64b132eb0486af81"
+      },
+      "target": {
+        "building": "C",
+        "count": 1
+      },
+      "labels": {
+        "class_id": 0,
+        "scope": "entire_output"
+      },
+      "augmentation": {
+        "tone": "normal",
+        "max_image_side": 720,
+        "sticker_size": {
+          "reference": "facade_height",
+          "height_fraction": {
+            "A": [
+              0.1,
+              0.14
+            ],
+            "B": [
+              0.09,
+              0.13
+            ],
+            "C": [
+              0.1,
+              0.14
+            ]
+          },
+          "sampling": "independent_uniform_per_instance",
+          "anchor_jitter_fraction": 0.055,
+          "placement_attempts": 96
+        },
+        "wall_projection": {
+          "method": "per_wall_homography",
+          "margin_source_px": 3.0,
+          "blender_offset_m": 0.00015
+        }
+      },
+      "sources": [
+        "Archive/Assets/working_sources/legacy/fire/楼宇/晨光大厦/照片/斜视_L形墙面与窗口_019.jpg",
+        "Archive/Assets/working_sources/digital/fire/team_assets/image1.png"
+      ],
+      "parameters": {
+        "seed": 431,
+        "record_id": "8ac33edcd7ebbfc59df2a6e2d478c43ddd0820dbd517cf2e64b132eb0486af81",
+        "frame_id": "221ab6cd5892a9997f9da4527ffffde329be29d1df7831daa2d402393e53ebc9",
+        "source_sha256": "3f0ff2af5bcdb61484fcccb91e69290425bdf789835c3e2e7cf9ee5de1a2a9a5",
+        "source_split": "test"
+      }
+    },
+    {
+      "id": "real_background_composite_221ab6cd5892_1_dim",
+      "failure_event": "sticker_miss_or_false_positive",
+      "min_count": 12,
+      "max_count": 12,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [
+        "real_background_composite",
+        "building:C",
+        "count:1",
+        "tone:dim"
+      ],
+      "background": {
+        "image": "Archive/Assets/working_sources/legacy/fire/楼宇/晨光大厦/照片/斜视_L形墙面与窗口_019.jpg",
+        "parent_group": "Archive/Assets/楼宇/晨光大厦/照片/斜视_L形墙面与窗口_019.jpg",
+        "record_id": "8ac33edcd7ebbfc59df2a6e2d478c43ddd0820dbd517cf2e64b132eb0486af81"
+      },
+      "target": {
+        "building": "C",
+        "count": 1
+      },
+      "labels": {
+        "class_id": 0,
+        "scope": "entire_output"
+      },
+      "augmentation": {
+        "tone": "dim",
+        "max_image_side": 720,
+        "sticker_size": {
+          "reference": "facade_height",
+          "height_fraction": {
+            "A": [
+              0.1,
+              0.14
+            ],
+            "B": [
+              0.09,
+              0.13
+            ],
+            "C": [
+              0.1,
+              0.14
+            ]
+          },
+          "sampling": "independent_uniform_per_instance",
+          "anchor_jitter_fraction": 0.055,
+          "placement_attempts": 96
+        },
+        "wall_projection": {
+          "method": "per_wall_homography",
+          "margin_source_px": 3.0,
+          "blender_offset_m": 0.00015
+        }
+      },
+      "sources": [
+        "Archive/Assets/working_sources/legacy/fire/楼宇/晨光大厦/照片/斜视_L形墙面与窗口_019.jpg",
+        "Archive/Assets/working_sources/digital/fire/team_assets/image1.png"
+      ],
+      "parameters": {
+        "seed": 431,
+        "record_id": "8ac33edcd7ebbfc59df2a6e2d478c43ddd0820dbd517cf2e64b132eb0486af81",
+        "frame_id": "221ab6cd5892a9997f9da4527ffffde329be29d1df7831daa2d402393e53ebc9",
+        "source_sha256": "3f0ff2af5bcdb61484fcccb91e69290425bdf789835c3e2e7cf9ee5de1a2a9a5",
+        "source_split": "test"
+      }
+    },
+    {
+      "id": "real_background_composite_221ab6cd5892_3_normal",
+      "failure_event": "sticker_miss_or_false_positive",
+      "min_count": 12,
+      "max_count": 12,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [
+        "real_background_composite",
+        "building:C",
+        "count:3",
+        "tone:normal"
+      ],
+      "background": {
+        "image": "Archive/Assets/working_sources/legacy/fire/楼宇/晨光大厦/照片/斜视_L形墙面与窗口_019.jpg",
+        "parent_group": "Archive/Assets/楼宇/晨光大厦/照片/斜视_L形墙面与窗口_019.jpg",
+        "record_id": "8ac33edcd7ebbfc59df2a6e2d478c43ddd0820dbd517cf2e64b132eb0486af81"
+      },
+      "target": {
+        "building": "C",
+        "count": 3
+      },
+      "labels": {
+        "class_id": 0,
+        "scope": "entire_output"
+      },
+      "augmentation": {
+        "tone": "normal",
+        "max_image_side": 720,
+        "sticker_size": {
+          "reference": "facade_height",
+          "height_fraction": {
+            "A": [
+              0.1,
+              0.14
+            ],
+            "B": [
+              0.09,
+              0.13
+            ],
+            "C": [
+              0.1,
+              0.14
+            ]
+          },
+          "sampling": "independent_uniform_per_instance",
+          "anchor_jitter_fraction": 0.055,
+          "placement_attempts": 96
+        },
+        "wall_projection": {
+          "method": "per_wall_homography",
+          "margin_source_px": 3.0,
+          "blender_offset_m": 0.00015
+        }
+      },
+      "sources": [
+        "Archive/Assets/working_sources/legacy/fire/楼宇/晨光大厦/照片/斜视_L形墙面与窗口_019.jpg",
+        "Archive/Assets/working_sources/digital/fire/team_assets/image1.png"
+      ],
+      "parameters": {
+        "seed": 431,
+        "record_id": "8ac33edcd7ebbfc59df2a6e2d478c43ddd0820dbd517cf2e64b132eb0486af81",
+        "frame_id": "221ab6cd5892a9997f9da4527ffffde329be29d1df7831daa2d402393e53ebc9",
+        "source_sha256": "3f0ff2af5bcdb61484fcccb91e69290425bdf789835c3e2e7cf9ee5de1a2a9a5",
+        "source_split": "test"
+      }
+    },
+    {
+      "id": "real_background_composite_221ab6cd5892_3_dim",
+      "failure_event": "sticker_miss_or_false_positive",
+      "min_count": 12,
+      "max_count": 12,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [
+        "real_background_composite",
+        "building:C",
+        "count:3",
+        "tone:dim"
+      ],
+      "background": {
+        "image": "Archive/Assets/working_sources/legacy/fire/楼宇/晨光大厦/照片/斜视_L形墙面与窗口_019.jpg",
+        "parent_group": "Archive/Assets/楼宇/晨光大厦/照片/斜视_L形墙面与窗口_019.jpg",
+        "record_id": "8ac33edcd7ebbfc59df2a6e2d478c43ddd0820dbd517cf2e64b132eb0486af81"
+      },
+      "target": {
+        "building": "C",
+        "count": 3
+      },
+      "labels": {
+        "class_id": 0,
+        "scope": "entire_output"
+      },
+      "augmentation": {
+        "tone": "dim",
+        "max_image_side": 720,
+        "sticker_size": {
+          "reference": "facade_height",
+          "height_fraction": {
+            "A": [
+              0.1,
+              0.14
+            ],
+            "B": [
+              0.09,
+              0.13
+            ],
+            "C": [
+              0.1,
+              0.14
+            ]
+          },
+          "sampling": "independent_uniform_per_instance",
+          "anchor_jitter_fraction": 0.055,
+          "placement_attempts": 96
+        },
+        "wall_projection": {
+          "method": "per_wall_homography",
+          "margin_source_px": 3.0,
+          "blender_offset_m": 0.00015
+        }
+      },
+      "sources": [
+        "Archive/Assets/working_sources/legacy/fire/楼宇/晨光大厦/照片/斜视_L形墙面与窗口_019.jpg",
+        "Archive/Assets/working_sources/digital/fire/team_assets/image1.png"
+      ],
+      "parameters": {
+        "seed": 431,
+        "record_id": "8ac33edcd7ebbfc59df2a6e2d478c43ddd0820dbd517cf2e64b132eb0486af81",
+        "frame_id": "221ab6cd5892a9997f9da4527ffffde329be29d1df7831daa2d402393e53ebc9",
+        "source_sha256": "3f0ff2af5bcdb61484fcccb91e69290425bdf789835c3e2e7cf9ee5de1a2a9a5",
+        "source_split": "test"
+      }
+    },
+    {
+      "id": "real_background_composite_69a98204b1fd_0_dim",
+      "failure_event": "sticker_miss_or_false_positive",
+      "min_count": 8,
+      "max_count": 8,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [
+        "real_background_composite",
+        "building:A",
+        "count:0",
+        "tone:dim"
+      ],
+      "background": {
+        "image": "Archive/Assets/working_sources/legacy/fire/楼宇/开心大厦/照片/正面远景_楼体整体_025.jpg",
+        "parent_group": "Archive/Assets/楼宇/开心大厦/照片/正面远景_楼体整体_025.jpg",
+        "record_id": "279995e80468690aed53f6188b54d6c2c9b23f5a4ba6bf63c80d13c947134924"
+      },
+      "target": {
+        "building": "A",
+        "count": 0
+      },
+      "labels": {
+        "class_id": 0,
+        "scope": "entire_output"
+      },
+      "augmentation": {
+        "tone": "dim",
+        "max_image_side": 720,
+        "sticker_size": {
+          "reference": "facade_height",
+          "height_fraction": {
+            "A": [
+              0.1,
+              0.14
+            ],
+            "B": [
+              0.09,
+              0.13
+            ],
+            "C": [
+              0.1,
+              0.14
+            ]
+          },
+          "sampling": "independent_uniform_per_instance",
+          "anchor_jitter_fraction": 0.055,
+          "placement_attempts": 96
+        },
+        "wall_projection": {
+          "method": "per_wall_homography",
+          "margin_source_px": 3.0,
+          "blender_offset_m": 0.00015
+        }
+      },
+      "sources": [
+        "Archive/Assets/working_sources/legacy/fire/楼宇/开心大厦/照片/正面远景_楼体整体_025.jpg"
+      ],
+      "parameters": {
+        "seed": 431,
+        "record_id": "279995e80468690aed53f6188b54d6c2c9b23f5a4ba6bf63c80d13c947134924",
+        "frame_id": "69a98204b1fd165b6e62aff827248fa2145e430739acfc04530e847819bf8bb0",
+        "source_sha256": "26df9914f4e6d290e7180ecd846ff17ebe5b7fd222f68c9cbf5f45398ba8ffe1",
+        "source_split": "test"
+      }
+    },
+    {
+      "id": "real_background_composite_69a98204b1fd_1_normal",
+      "failure_event": "sticker_miss_or_false_positive",
+      "min_count": 13,
+      "max_count": 13,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [
+        "real_background_composite",
+        "building:A",
+        "count:1",
+        "tone:normal"
+      ],
+      "background": {
+        "image": "Archive/Assets/working_sources/legacy/fire/楼宇/开心大厦/照片/正面远景_楼体整体_025.jpg",
+        "parent_group": "Archive/Assets/楼宇/开心大厦/照片/正面远景_楼体整体_025.jpg",
+        "record_id": "279995e80468690aed53f6188b54d6c2c9b23f5a4ba6bf63c80d13c947134924"
+      },
+      "target": {
+        "building": "A",
+        "count": 1
+      },
+      "labels": {
+        "class_id": 0,
+        "scope": "entire_output"
+      },
+      "augmentation": {
+        "tone": "normal",
+        "max_image_side": 720,
+        "sticker_size": {
+          "reference": "facade_height",
+          "height_fraction": {
+            "A": [
+              0.1,
+              0.14
+            ],
+            "B": [
+              0.09,
+              0.13
+            ],
+            "C": [
+              0.1,
+              0.14
+            ]
+          },
+          "sampling": "independent_uniform_per_instance",
+          "anchor_jitter_fraction": 0.055,
+          "placement_attempts": 96
+        },
+        "wall_projection": {
+          "method": "per_wall_homography",
+          "margin_source_px": 3.0,
+          "blender_offset_m": 0.00015
+        }
+      },
+      "sources": [
+        "Archive/Assets/working_sources/legacy/fire/楼宇/开心大厦/照片/正面远景_楼体整体_025.jpg",
+        "Archive/Assets/working_sources/digital/fire/team_assets/image1.png"
+      ],
+      "parameters": {
+        "seed": 431,
+        "record_id": "279995e80468690aed53f6188b54d6c2c9b23f5a4ba6bf63c80d13c947134924",
+        "frame_id": "69a98204b1fd165b6e62aff827248fa2145e430739acfc04530e847819bf8bb0",
+        "source_sha256": "26df9914f4e6d290e7180ecd846ff17ebe5b7fd222f68c9cbf5f45398ba8ffe1",
+        "source_split": "test"
+      }
+    },
+    {
+      "id": "real_background_composite_69a98204b1fd_1_dim",
+      "failure_event": "sticker_miss_or_false_positive",
+      "min_count": 12,
+      "max_count": 12,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [
+        "real_background_composite",
+        "building:A",
+        "count:1",
+        "tone:dim"
+      ],
+      "background": {
+        "image": "Archive/Assets/working_sources/legacy/fire/楼宇/开心大厦/照片/正面远景_楼体整体_025.jpg",
+        "parent_group": "Archive/Assets/楼宇/开心大厦/照片/正面远景_楼体整体_025.jpg",
+        "record_id": "279995e80468690aed53f6188b54d6c2c9b23f5a4ba6bf63c80d13c947134924"
+      },
+      "target": {
+        "building": "A",
+        "count": 1
+      },
+      "labels": {
+        "class_id": 0,
+        "scope": "entire_output"
+      },
+      "augmentation": {
+        "tone": "dim",
+        "max_image_side": 720,
+        "sticker_size": {
+          "reference": "facade_height",
+          "height_fraction": {
+            "A": [
+              0.1,
+              0.14
+            ],
+            "B": [
+              0.09,
+              0.13
+            ],
+            "C": [
+              0.1,
+              0.14
+            ]
+          },
+          "sampling": "independent_uniform_per_instance",
+          "anchor_jitter_fraction": 0.055,
+          "placement_attempts": 96
+        },
+        "wall_projection": {
+          "method": "per_wall_homography",
+          "margin_source_px": 3.0,
+          "blender_offset_m": 0.00015
+        }
+      },
+      "sources": [
+        "Archive/Assets/working_sources/legacy/fire/楼宇/开心大厦/照片/正面远景_楼体整体_025.jpg",
+        "Archive/Assets/working_sources/digital/fire/team_assets/image1.png"
+      ],
+      "parameters": {
+        "seed": 431,
+        "record_id": "279995e80468690aed53f6188b54d6c2c9b23f5a4ba6bf63c80d13c947134924",
+        "frame_id": "69a98204b1fd165b6e62aff827248fa2145e430739acfc04530e847819bf8bb0",
+        "source_sha256": "26df9914f4e6d290e7180ecd846ff17ebe5b7fd222f68c9cbf5f45398ba8ffe1",
+        "source_split": "test"
+      }
+    },
+    {
+      "id": "real_background_composite_69a98204b1fd_3_normal",
+      "failure_event": "sticker_miss_or_false_positive",
+      "min_count": 14,
+      "max_count": 14,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [
+        "real_background_composite",
+        "building:A",
+        "count:3",
+        "tone:normal"
+      ],
+      "background": {
+        "image": "Archive/Assets/working_sources/legacy/fire/楼宇/开心大厦/照片/正面远景_楼体整体_025.jpg",
+        "parent_group": "Archive/Assets/楼宇/开心大厦/照片/正面远景_楼体整体_025.jpg",
+        "record_id": "279995e80468690aed53f6188b54d6c2c9b23f5a4ba6bf63c80d13c947134924"
+      },
+      "target": {
+        "building": "A",
+        "count": 3
+      },
+      "labels": {
+        "class_id": 0,
+        "scope": "entire_output"
+      },
+      "augmentation": {
+        "tone": "normal",
+        "max_image_side": 720,
+        "sticker_size": {
+          "reference": "facade_height",
+          "height_fraction": {
+            "A": [
+              0.1,
+              0.14
+            ],
+            "B": [
+              0.09,
+              0.13
+            ],
+            "C": [
+              0.1,
+              0.14
+            ]
+          },
+          "sampling": "independent_uniform_per_instance",
+          "anchor_jitter_fraction": 0.055,
+          "placement_attempts": 96
+        },
+        "wall_projection": {
+          "method": "per_wall_homography",
+          "margin_source_px": 3.0,
+          "blender_offset_m": 0.00015
+        }
+      },
+      "sources": [
+        "Archive/Assets/working_sources/legacy/fire/楼宇/开心大厦/照片/正面远景_楼体整体_025.jpg",
+        "Archive/Assets/working_sources/digital/fire/team_assets/image1.png"
+      ],
+      "parameters": {
+        "seed": 431,
+        "record_id": "279995e80468690aed53f6188b54d6c2c9b23f5a4ba6bf63c80d13c947134924",
+        "frame_id": "69a98204b1fd165b6e62aff827248fa2145e430739acfc04530e847819bf8bb0",
+        "source_sha256": "26df9914f4e6d290e7180ecd846ff17ebe5b7fd222f68c9cbf5f45398ba8ffe1",
+        "source_split": "test"
+      }
+    },
+    {
+      "id": "real_background_composite_69a98204b1fd_3_dim",
+      "failure_event": "sticker_miss_or_false_positive",
+      "min_count": 13,
+      "max_count": 13,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [
+        "real_background_composite",
+        "building:A",
+        "count:3",
+        "tone:dim"
+      ],
+      "background": {
+        "image": "Archive/Assets/working_sources/legacy/fire/楼宇/开心大厦/照片/正面远景_楼体整体_025.jpg",
+        "parent_group": "Archive/Assets/楼宇/开心大厦/照片/正面远景_楼体整体_025.jpg",
+        "record_id": "279995e80468690aed53f6188b54d6c2c9b23f5a4ba6bf63c80d13c947134924"
+      },
+      "target": {
+        "building": "A",
+        "count": 3
+      },
+      "labels": {
+        "class_id": 0,
+        "scope": "entire_output"
+      },
+      "augmentation": {
+        "tone": "dim",
+        "max_image_side": 720,
+        "sticker_size": {
+          "reference": "facade_height",
+          "height_fraction": {
+            "A": [
+              0.1,
+              0.14
+            ],
+            "B": [
+              0.09,
+              0.13
+            ],
+            "C": [
+              0.1,
+              0.14
+            ]
+          },
+          "sampling": "independent_uniform_per_instance",
+          "anchor_jitter_fraction": 0.055,
+          "placement_attempts": 96
+        },
+        "wall_projection": {
+          "method": "per_wall_homography",
+          "margin_source_px": 3.0,
+          "blender_offset_m": 0.00015
+        }
+      },
+      "sources": [
+        "Archive/Assets/working_sources/legacy/fire/楼宇/开心大厦/照片/正面远景_楼体整体_025.jpg",
+        "Archive/Assets/working_sources/digital/fire/team_assets/image1.png"
+      ],
+      "parameters": {
+        "seed": 431,
+        "record_id": "279995e80468690aed53f6188b54d6c2c9b23f5a4ba6bf63c80d13c947134924",
+        "frame_id": "69a98204b1fd165b6e62aff827248fa2145e430739acfc04530e847819bf8bb0",
+        "source_sha256": "26df9914f4e6d290e7180ecd846ff17ebe5b7fd222f68c9cbf5f45398ba8ffe1",
+        "source_split": "test"
+      }
+    },
+    {
+      "id": "hard_negative_000001",
+      "failure_event": "color_shortcut",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [
+        "red_orange_bin",
+        "zero_designated_stickers"
+      ],
+      "background": {
+        "parent_group": "Archive/Assets/垃圾桶/视频/浅色地面四色桶_灰绿闭盖_红蓝开盖_007.mp4"
+      },
+      "target": {
+        "count": 0,
+        "building": null,
+        "distractor": "red_orange_bin"
+      },
+      "labels": {
+        "class_id": 0,
+        "scope": "entire_output"
+      },
+      "augmentation": {
+        "applied_stage": "source_gain",
+        "gain": 0.82
+      },
+      "sources": [
+        "datasets/raw/fire/targets/camera/bin_video_007/frames/frame_000092.jpg"
+      ],
+      "parameters": {
+        "sample_seed": 181870,
+        "source_digest": "0d9f198024bc2f2015418f7bf6178b338a990122d682ed9344db095333055445"
+      }
+    },
+    {
+      "id": "hard_negative_000002",
+      "failure_event": "color_shortcut",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [
+        "red_orange_bin",
+        "zero_designated_stickers"
+      ],
+      "background": {
+        "parent_group": "Archive/Assets/垃圾桶/视频/浅色地面四色桶_灰绿闭盖_红蓝开盖_007.mp4"
+      },
+      "target": {
+        "count": 0,
+        "building": null,
+        "distractor": "red_orange_bin"
+      },
+      "labels": {
+        "class_id": 0,
+        "scope": "entire_output"
+      },
+      "augmentation": {
+        "applied_stage": "source_gain",
+        "gain": 1.04
+      },
+      "sources": [
+        "datasets/raw/fire/targets/camera/bin_video_007/frames/frame_000092.jpg"
+      ],
+      "parameters": {
+        "sample_seed": 181871,
+        "source_digest": "0d9f198024bc2f2015418f7bf6178b338a990122d682ed9344db095333055445"
+      }
+    },
+    {
+      "id": "hard_negative_000003",
+      "failure_event": "color_shortcut",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [
+        "red_orange_bin",
+        "zero_designated_stickers"
+      ],
+      "background": {
+        "parent_group": "Archive/Assets/垃圾桶/视频/浅色地面四色桶_灰绿闭盖_红蓝开盖_007.mp4"
+      },
+      "target": {
+        "count": 0,
+        "building": null,
+        "distractor": "red_orange_bin"
+      },
+      "labels": {
+        "class_id": 0,
+        "scope": "entire_output"
+      },
+      "augmentation": {
+        "applied_stage": "source_gain",
+        "gain": 0.82
+      },
+      "sources": [
+        "datasets/raw/fire/targets/camera/bin_video_007/frames/frame_000308.jpg"
+      ],
+      "parameters": {
+        "sample_seed": 181872,
+        "source_digest": "a74a564a2c794ae5acdff47f84274397b3a7d43920deaadfdbc9882429202d1e"
+      }
+    },
+    {
+      "id": "hard_negative_000004",
+      "failure_event": "color_shortcut",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [
+        "red_orange_bin",
+        "zero_designated_stickers"
+      ],
+      "background": {
+        "parent_group": "Archive/Assets/垃圾桶/视频/浅色地面四色桶_灰绿闭盖_红蓝开盖_007.mp4"
+      },
+      "target": {
+        "count": 0,
+        "building": null,
+        "distractor": "red_orange_bin"
+      },
+      "labels": {
+        "class_id": 0,
+        "scope": "entire_output"
+      },
+      "augmentation": {
+        "applied_stage": "source_gain",
+        "gain": 1.04
+      },
+      "sources": [
+        "datasets/raw/fire/targets/camera/bin_video_007/frames/frame_000308.jpg"
+      ],
+      "parameters": {
+        "sample_seed": 181873,
+        "source_digest": "a74a564a2c794ae5acdff47f84274397b3a7d43920deaadfdbc9882429202d1e"
+      }
+    },
+    {
+      "id": "hard_negative_000005",
+      "failure_event": "color_shortcut",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [
+        "red_orange_bin",
+        "zero_designated_stickers"
+      ],
+      "background": {
+        "parent_group": "Archive/Assets/垃圾桶/视频/浅色地面四色桶_灰绿闭盖_红蓝开盖_007.mp4"
+      },
+      "target": {
+        "count": 0,
+        "building": null,
+        "distractor": "red_orange_bin"
+      },
+      "labels": {
+        "class_id": 0,
+        "scope": "entire_output"
+      },
+      "augmentation": {
+        "applied_stage": "source_gain",
+        "gain": 0.82
+      },
+      "sources": [
+        "datasets/raw/fire/targets/camera/bin_video_007/frames/frame_000265.jpg"
+      ],
+      "parameters": {
+        "sample_seed": 181874,
+        "source_digest": "1a786a7bb2b24c5ed69dceaf92f1775ef20200f39c69ea77a43ec47741a40aa1"
+      }
+    },
+    {
+      "id": "hard_negative_000006",
+      "failure_event": "color_shortcut",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [
+        "red_orange_bin",
+        "zero_designated_stickers"
+      ],
+      "background": {
+        "parent_group": "Archive/Assets/垃圾桶/视频/浅色地面四色桶_灰绿闭盖_红蓝开盖_007.mp4"
+      },
+      "target": {
+        "count": 0,
+        "building": null,
+        "distractor": "red_orange_bin"
+      },
+      "labels": {
+        "class_id": 0,
+        "scope": "entire_output"
+      },
+      "augmentation": {
+        "applied_stage": "source_gain",
+        "gain": 1.04
+      },
+      "sources": [
+        "datasets/raw/fire/targets/camera/bin_video_007/frames/frame_000265.jpg"
+      ],
+      "parameters": {
+        "sample_seed": 181875,
+        "source_digest": "1a786a7bb2b24c5ed69dceaf92f1775ef20200f39c69ea77a43ec47741a40aa1"
+      }
+    },
+    {
+      "id": "hard_negative_000007",
+      "failure_event": "color_shortcut",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [
+        "red_orange_bin",
+        "zero_designated_stickers"
+      ],
+      "background": {
+        "parent_group": "Archive/Assets/垃圾桶/视频/浅色地面四色桶_灰绿闭盖_红蓝开盖_007.mp4"
+      },
+      "target": {
+        "count": 0,
+        "building": null,
+        "distractor": "red_orange_bin"
+      },
+      "labels": {
+        "class_id": 0,
+        "scope": "entire_output"
+      },
+      "augmentation": {
+        "applied_stage": "source_gain",
+        "gain": 0.82
+      },
+      "sources": [
+        "datasets/raw/fire/targets/camera/bin_video_007/frames/frame_000243.jpg"
+      ],
+      "parameters": {
+        "sample_seed": 181876,
+        "source_digest": "3cab54de772516913cbd78580be4690c45c6647312aae9117a35d2052968e11c"
+      }
+    },
+    {
+      "id": "hard_negative_000008",
+      "failure_event": "color_shortcut",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [
+        "red_orange_bin",
+        "zero_designated_stickers"
+      ],
+      "background": {
+        "parent_group": "Archive/Assets/垃圾桶/视频/浅色地面四色桶_灰绿闭盖_红蓝开盖_007.mp4"
+      },
+      "target": {
+        "count": 0,
+        "building": null,
+        "distractor": "red_orange_bin"
+      },
+      "labels": {
+        "class_id": 0,
+        "scope": "entire_output"
+      },
+      "augmentation": {
+        "applied_stage": "source_gain",
+        "gain": 1.04
+      },
+      "sources": [
+        "datasets/raw/fire/targets/camera/bin_video_007/frames/frame_000243.jpg"
+      ],
+      "parameters": {
+        "sample_seed": 181877,
+        "source_digest": "3cab54de772516913cbd78580be4690c45c6647312aae9117a35d2052968e11c"
+      }
+    },
+    {
+      "id": "hard_negative_000009",
+      "failure_event": "color_shortcut",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [
+        "red_orange_bin",
+        "zero_designated_stickers"
+      ],
+      "background": {
+        "parent_group": "Archive/Assets/垃圾桶/视频/浅色地面四色桶_灰绿闭盖_红蓝开盖_007.mp4"
+      },
+      "target": {
+        "count": 0,
+        "building": null,
+        "distractor": "red_orange_bin"
+      },
+      "labels": {
+        "class_id": 0,
+        "scope": "entire_output"
+      },
+      "augmentation": {
+        "applied_stage": "source_gain",
+        "gain": 0.82
+      },
+      "sources": [
+        "datasets/raw/fire/targets/camera/bin_video_007/frames/frame_000049.jpg"
+      ],
+      "parameters": {
+        "sample_seed": 181878,
+        "source_digest": "a00dcd7034701eaf9ba33a111160685ae436a38b33547990a1a331bd530fb91a"
+      }
+    },
+    {
+      "id": "hard_negative_000010",
+      "failure_event": "color_shortcut",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [
+        "red_orange_bin",
+        "zero_designated_stickers"
+      ],
+      "background": {
+        "parent_group": "Archive/Assets/垃圾桶/视频/浅色地面四色桶_灰绿闭盖_红蓝开盖_007.mp4"
+      },
+      "target": {
+        "count": 0,
+        "building": null,
+        "distractor": "red_orange_bin"
+      },
+      "labels": {
+        "class_id": 0,
+        "scope": "entire_output"
+      },
+      "augmentation": {
+        "applied_stage": "source_gain",
+        "gain": 1.04
+      },
+      "sources": [
+        "datasets/raw/fire/targets/camera/bin_video_007/frames/frame_000049.jpg"
+      ],
+      "parameters": {
+        "sample_seed": 181879,
+        "source_digest": "a00dcd7034701eaf9ba33a111160685ae436a38b33547990a1a331bd530fb91a"
+      }
+    },
+    {
+      "id": "hard_negative_000011",
+      "failure_event": "color_shortcut",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [
+        "red_orange_bin",
+        "zero_designated_stickers"
+      ],
+      "background": {
+        "parent_group": "Archive/Assets/垃圾桶/视频/浅色地面四色桶_灰绿闭盖_红蓝开盖_007.mp4"
+      },
+      "target": {
+        "count": 0,
+        "building": null,
+        "distractor": "red_orange_bin"
+      },
+      "labels": {
+        "class_id": 0,
+        "scope": "entire_output"
+      },
+      "augmentation": {
+        "applied_stage": "source_gain",
+        "gain": 0.82
+      },
+      "sources": [
+        "datasets/raw/fire/targets/camera/bin_video_007/frames/frame_000028.jpg"
+      ],
+      "parameters": {
+        "sample_seed": 181880,
+        "source_digest": "b28992e87f5e675630f822f879d090bd287879b01da7a2cce4e8c37c9eedc1bf"
+      }
+    },
+    {
+      "id": "hard_negative_000012",
+      "failure_event": "color_shortcut",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [
+        "red_orange_bin",
+        "zero_designated_stickers"
+      ],
+      "background": {
+        "parent_group": "Archive/Assets/垃圾桶/视频/浅色地面四色桶_灰绿闭盖_红蓝开盖_007.mp4"
+      },
+      "target": {
+        "count": 0,
+        "building": null,
+        "distractor": "red_orange_bin"
+      },
+      "labels": {
+        "class_id": 0,
+        "scope": "entire_output"
+      },
+      "augmentation": {
+        "applied_stage": "source_gain",
+        "gain": 1.04
+      },
+      "sources": [
+        "datasets/raw/fire/targets/camera/bin_video_007/frames/frame_000028.jpg"
+      ],
+      "parameters": {
+        "sample_seed": 181881,
+        "source_digest": "b28992e87f5e675630f822f879d090bd287879b01da7a2cce4e8c37c9eedc1bf"
+      }
+    },
+    {
+      "id": "hard_negative_000013",
+      "failure_event": "color_shortcut",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [
+        "red_orange_bin",
+        "zero_designated_stickers"
+      ],
+      "background": {
+        "parent_group": "Archive/Assets/垃圾桶/视频/浅色地面四色桶_灰绿闭盖_红蓝开盖_007.mp4"
+      },
+      "target": {
+        "count": 0,
+        "building": null,
+        "distractor": "red_orange_bin"
+      },
+      "labels": {
+        "class_id": 0,
+        "scope": "entire_output"
+      },
+      "augmentation": {
+        "applied_stage": "source_gain",
+        "gain": 0.82
+      },
+      "sources": [
+        "datasets/raw/fire/targets/camera/bin_video_007/frames/frame_000071.jpg"
+      ],
+      "parameters": {
+        "sample_seed": 181882,
+        "source_digest": "b71b1ff21906a78937e0956e9de1bf4abd176f8fc7632755b519db0b37bfc624"
+      }
+    },
+    {
+      "id": "hard_negative_000014",
+      "failure_event": "color_shortcut",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [
+        "red_orange_bin",
+        "zero_designated_stickers"
+      ],
+      "background": {
+        "parent_group": "Archive/Assets/垃圾桶/视频/浅色地面四色桶_灰绿闭盖_红蓝开盖_007.mp4"
+      },
+      "target": {
+        "count": 0,
+        "building": null,
+        "distractor": "red_orange_bin"
+      },
+      "labels": {
+        "class_id": 0,
+        "scope": "entire_output"
+      },
+      "augmentation": {
+        "applied_stage": "source_gain",
+        "gain": 1.04
+      },
+      "sources": [
+        "datasets/raw/fire/targets/camera/bin_video_007/frames/frame_000071.jpg"
+      ],
+      "parameters": {
+        "sample_seed": 181883,
+        "source_digest": "b71b1ff21906a78937e0956e9de1bf4abd176f8fc7632755b519db0b37bfc624"
+      }
+    },
+    {
+      "id": "hard_negative_000015",
+      "failure_event": "color_shortcut",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [
+        "red_orange_bin",
+        "zero_designated_stickers"
+      ],
+      "background": {
+        "parent_group": "Archive/Assets/垃圾桶/视频/浅色地面四色桶_灰绿闭盖_红蓝开盖_007.mp4"
+      },
+      "target": {
+        "count": 0,
+        "building": null,
+        "distractor": "red_orange_bin"
+      },
+      "labels": {
+        "class_id": 0,
+        "scope": "entire_output"
+      },
+      "augmentation": {
+        "applied_stage": "source_gain",
+        "gain": 0.82
+      },
+      "sources": [
+        "datasets/raw/fire/targets/camera/bin_video_007/frames/frame_000330.jpg"
+      ],
+      "parameters": {
+        "sample_seed": 181884,
+        "source_digest": "cb654611795c88e95554a7ff8f6c2c0c6c428a2f2923e44eba9fef6548835505"
+      }
+    },
+    {
+      "id": "hard_negative_000016",
+      "failure_event": "color_shortcut",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [
+        "red_orange_bin",
+        "zero_designated_stickers"
+      ],
+      "background": {
+        "parent_group": "Archive/Assets/垃圾桶/视频/浅色地面四色桶_灰绿闭盖_红蓝开盖_007.mp4"
+      },
+      "target": {
+        "count": 0,
+        "building": null,
+        "distractor": "red_orange_bin"
+      },
+      "labels": {
+        "class_id": 0,
+        "scope": "entire_output"
+      },
+      "augmentation": {
+        "applied_stage": "source_gain",
+        "gain": 1.04
+      },
+      "sources": [
+        "datasets/raw/fire/targets/camera/bin_video_007/frames/frame_000330.jpg"
+      ],
+      "parameters": {
+        "sample_seed": 181885,
+        "source_digest": "cb654611795c88e95554a7ff8f6c2c0c6c428a2f2923e44eba9fef6548835505"
+      }
+    },
+    {
+      "id": "hard_negative_000017",
+      "failure_event": "color_shortcut",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [
+        "red_orange_bin",
+        "zero_designated_stickers"
+      ],
+      "background": {
+        "parent_group": "Archive/Assets/垃圾桶/视频/浅色地面四色桶_灰绿闭盖_红蓝开盖_007.mp4"
+      },
+      "target": {
+        "count": 0,
+        "building": null,
+        "distractor": "red_orange_bin"
+      },
+      "labels": {
+        "class_id": 0,
+        "scope": "entire_output"
+      },
+      "augmentation": {
+        "applied_stage": "source_gain",
+        "gain": 0.82
+      },
+      "sources": [
+        "datasets/raw/fire/targets/camera/bin_video_007/frames/frame_000135.jpg"
+      ],
+      "parameters": {
+        "sample_seed": 181886,
+        "source_digest": "c95530c7875b9361389266b7ad6b90cfd82b172d69b4d1682f10c20aeaef4422"
+      }
+    },
+    {
+      "id": "hard_negative_000018",
+      "failure_event": "color_shortcut",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [
+        "red_orange_bin",
+        "zero_designated_stickers"
+      ],
+      "background": {
+        "parent_group": "Archive/Assets/垃圾桶/视频/浅色地面四色桶_灰绿闭盖_红蓝开盖_007.mp4"
+      },
+      "target": {
+        "count": 0,
+        "building": null,
+        "distractor": "red_orange_bin"
+      },
+      "labels": {
+        "class_id": 0,
+        "scope": "entire_output"
+      },
+      "augmentation": {
+        "applied_stage": "source_gain",
+        "gain": 1.04
+      },
+      "sources": [
+        "datasets/raw/fire/targets/camera/bin_video_007/frames/frame_000135.jpg"
+      ],
+      "parameters": {
+        "sample_seed": 181887,
+        "source_digest": "c95530c7875b9361389266b7ad6b90cfd82b172d69b4d1682f10c20aeaef4422"
+      }
+    },
+    {
+      "id": "hard_negative_000019",
+      "failure_event": "color_shortcut",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [
+        "red_orange_bin",
+        "zero_designated_stickers"
+      ],
+      "background": {
+        "parent_group": "Archive/Assets/垃圾桶/视频/浅色地面四色桶_灰绿闭盖_红蓝开盖_007.mp4"
+      },
+      "target": {
+        "count": 0,
+        "building": null,
+        "distractor": "red_orange_bin"
+      },
+      "labels": {
+        "class_id": 0,
+        "scope": "entire_output"
+      },
+      "augmentation": {
+        "applied_stage": "source_gain",
+        "gain": 0.82
+      },
+      "sources": [
+        "datasets/raw/fire/targets/camera/bin_video_007/frames/frame_000114.jpg"
+      ],
+      "parameters": {
+        "sample_seed": 181888,
+        "source_digest": "a7d292b59d2de4981320be9532c2b0057908dbc7c06225472113b536f40901a4"
+      }
+    },
+    {
+      "id": "hard_negative_000020",
+      "failure_event": "color_shortcut",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [
+        "red_orange_bin",
+        "zero_designated_stickers"
+      ],
+      "background": {
+        "parent_group": "Archive/Assets/垃圾桶/视频/浅色地面四色桶_灰绿闭盖_红蓝开盖_007.mp4"
+      },
+      "target": {
+        "count": 0,
+        "building": null,
+        "distractor": "red_orange_bin"
+      },
+      "labels": {
+        "class_id": 0,
+        "scope": "entire_output"
+      },
+      "augmentation": {
+        "applied_stage": "source_gain",
+        "gain": 1.04
+      },
+      "sources": [
+        "datasets/raw/fire/targets/camera/bin_video_007/frames/frame_000114.jpg"
+      ],
+      "parameters": {
+        "sample_seed": 181889,
+        "source_digest": "a7d292b59d2de4981320be9532c2b0057908dbc7c06225472113b536f40901a4"
+      }
+    },
+    {
+      "id": "hard_negative_000021",
+      "failure_event": "color_shortcut",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [
+        "red_orange_bin",
+        "zero_designated_stickers"
+      ],
+      "background": {
+        "parent_group": "Archive/Assets/垃圾桶/视频/浅色地面四色桶_灰绿闭盖_红蓝开盖_007.mp4"
+      },
+      "target": {
+        "count": 0,
+        "building": null,
+        "distractor": "red_orange_bin"
+      },
+      "labels": {
+        "class_id": 0,
+        "scope": "entire_output"
+      },
+      "augmentation": {
+        "applied_stage": "source_gain",
+        "gain": 0.82
+      },
+      "sources": [
+        "datasets/raw/fire/targets/camera/bin_video_007/frames/frame_000179.jpg"
+      ],
+      "parameters": {
+        "sample_seed": 181890,
+        "source_digest": "6bf5057e90a5cd1877f2e3b8c4803dc57182d0182c2ab9e9d2a58203cf30c7a7"
+      }
+    },
+    {
+      "id": "hard_negative_000022",
+      "failure_event": "color_shortcut",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [
+        "red_orange_bin",
+        "zero_designated_stickers"
+      ],
+      "background": {
+        "parent_group": "Archive/Assets/垃圾桶/视频/浅色地面四色桶_灰绿闭盖_红蓝开盖_007.mp4"
+      },
+      "target": {
+        "count": 0,
+        "building": null,
+        "distractor": "red_orange_bin"
+      },
+      "labels": {
+        "class_id": 0,
+        "scope": "entire_output"
+      },
+      "augmentation": {
+        "applied_stage": "source_gain",
+        "gain": 1.04
+      },
+      "sources": [
+        "datasets/raw/fire/targets/camera/bin_video_007/frames/frame_000179.jpg"
+      ],
+      "parameters": {
+        "sample_seed": 181891,
+        "source_digest": "6bf5057e90a5cd1877f2e3b8c4803dc57182d0182c2ab9e9d2a58203cf30c7a7"
+      }
+    },
+    {
+      "id": "hard_negative_000023",
+      "failure_event": "color_shortcut",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [
+        "red_orange_bin",
+        "zero_designated_stickers"
+      ],
+      "background": {
+        "parent_group": "Archive/Assets/垃圾桶/视频/浅色地面四色桶_灰绿闭盖_红蓝开盖_007.mp4"
+      },
+      "target": {
+        "count": 0,
+        "building": null,
+        "distractor": "red_orange_bin"
+      },
+      "labels": {
+        "class_id": 0,
+        "scope": "entire_output"
+      },
+      "augmentation": {
+        "applied_stage": "source_gain",
+        "gain": 0.82
+      },
+      "sources": [
+        "datasets/raw/fire/targets/camera/bin_video_007/frames/frame_000157.jpg"
+      ],
+      "parameters": {
+        "sample_seed": 181892,
+        "source_digest": "17cd0938afbb2f0cbe21c338f41592b413c7a1288c7b24ec4a9fb05898171459"
+      }
+    },
+    {
+      "id": "hard_negative_000024",
+      "failure_event": "color_shortcut",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [
+        "red_orange_bin",
+        "zero_designated_stickers"
+      ],
+      "background": {
+        "parent_group": "Archive/Assets/垃圾桶/视频/浅色地面四色桶_灰绿闭盖_红蓝开盖_007.mp4"
+      },
+      "target": {
+        "count": 0,
+        "building": null,
+        "distractor": "red_orange_bin"
+      },
+      "labels": {
+        "class_id": 0,
+        "scope": "entire_output"
+      },
+      "augmentation": {
+        "applied_stage": "source_gain",
+        "gain": 1.04
+      },
+      "sources": [
+        "datasets/raw/fire/targets/camera/bin_video_007/frames/frame_000157.jpg"
+      ],
+      "parameters": {
+        "sample_seed": 181893,
+        "source_digest": "17cd0938afbb2f0cbe21c338f41592b413c7a1288c7b24ec4a9fb05898171459"
+      }
+    },
+    {
+      "id": "hard_negative_000025",
+      "failure_event": "color_shortcut",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [
+        "red_orange_bin",
+        "zero_designated_stickers"
+      ],
+      "background": {
+        "parent_group": "Archive/Assets/垃圾桶/视频/浅色地面四色桶_灰绿闭盖_红蓝开盖_007.mp4"
+      },
+      "target": {
+        "count": 0,
+        "building": null,
+        "distractor": "red_orange_bin"
+      },
+      "labels": {
+        "class_id": 0,
+        "scope": "entire_output"
+      },
+      "augmentation": {
+        "applied_stage": "source_gain",
+        "gain": 0.82
+      },
+      "sources": [
+        "datasets/raw/fire/targets/camera/bin_video_007/frames/frame_000200.jpg"
+      ],
+      "parameters": {
+        "sample_seed": 181894,
+        "source_digest": "246d2d90c1359e5e85196df18c9d23580dd66b3ff34c334e96e2b90f04ae8c50"
+      }
+    },
+    {
+      "id": "hard_negative_000026",
+      "failure_event": "color_shortcut",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [
+        "red_orange_bin",
+        "zero_designated_stickers"
+      ],
+      "background": {
+        "parent_group": "Archive/Assets/垃圾桶/视频/浅色地面四色桶_灰绿闭盖_红蓝开盖_007.mp4"
+      },
+      "target": {
+        "count": 0,
+        "building": null,
+        "distractor": "red_orange_bin"
+      },
+      "labels": {
+        "class_id": 0,
+        "scope": "entire_output"
+      },
+      "augmentation": {
+        "applied_stage": "source_gain",
+        "gain": 1.04
+      },
+      "sources": [
+        "datasets/raw/fire/targets/camera/bin_video_007/frames/frame_000200.jpg"
+      ],
+      "parameters": {
+        "sample_seed": 181895,
+        "source_digest": "246d2d90c1359e5e85196df18c9d23580dd66b3ff34c334e96e2b90f04ae8c50"
+      }
+    },
+    {
+      "id": "hard_negative_000027",
+      "failure_event": "color_shortcut",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [
+        "red_orange_bin",
+        "zero_designated_stickers"
+      ],
+      "background": {
+        "parent_group": "Archive/Assets/垃圾桶/视频/浅色地面四色桶_灰绿闭盖_红蓝开盖_007.mp4"
+      },
+      "target": {
+        "count": 0,
+        "building": null,
+        "distractor": "red_orange_bin"
+      },
+      "labels": {
+        "class_id": 0,
+        "scope": "entire_output"
+      },
+      "augmentation": {
+        "applied_stage": "source_gain",
+        "gain": 0.82
+      },
+      "sources": [
+        "datasets/raw/fire/targets/camera/bin_video_007/frames/frame_000222.jpg"
+      ],
+      "parameters": {
+        "sample_seed": 181896,
+        "source_digest": "a333ac353391bc893311b55412e52d4861c4964a407fc075c0ebf8ae8db24821"
+      }
+    },
+    {
+      "id": "hard_negative_000028",
+      "failure_event": "color_shortcut",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [
+        "red_orange_bin",
+        "zero_designated_stickers"
+      ],
+      "background": {
+        "parent_group": "Archive/Assets/垃圾桶/视频/浅色地面四色桶_灰绿闭盖_红蓝开盖_007.mp4"
+      },
+      "target": {
+        "count": 0,
+        "building": null,
+        "distractor": "red_orange_bin"
+      },
+      "labels": {
+        "class_id": 0,
+        "scope": "entire_output"
+      },
+      "augmentation": {
+        "applied_stage": "source_gain",
+        "gain": 1.04
+      },
+      "sources": [
+        "datasets/raw/fire/targets/camera/bin_video_007/frames/frame_000222.jpg"
+      ],
+      "parameters": {
+        "sample_seed": 181897,
+        "source_digest": "a333ac353391bc893311b55412e52d4861c4964a407fc075c0ebf8ae8db24821"
+      }
+    },
+    {
+      "id": "hard_negative_000029",
+      "failure_event": "color_shortcut",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [
+        "red_orange_bin",
+        "zero_designated_stickers"
+      ],
+      "background": {
+        "parent_group": "Archive/Assets/垃圾桶/视频/浅色地面四色桶_灰绿闭盖_红蓝开盖_007.mp4"
+      },
+      "target": {
+        "count": 0,
+        "building": null,
+        "distractor": "red_orange_bin"
+      },
+      "labels": {
+        "class_id": 0,
+        "scope": "entire_output"
+      },
+      "augmentation": {
+        "applied_stage": "source_gain",
+        "gain": 0.82
+      },
+      "sources": [
+        "datasets/raw/fire/targets/camera/bin_video_007/frames/frame_000286.jpg"
+      ],
+      "parameters": {
+        "sample_seed": 181898,
+        "source_digest": "2535edee2b2662226e4969934da06bfab9eae24ef7bee8a1be7e8c6a37558a42"
+      }
+    },
+    {
+      "id": "hard_negative_000030",
+      "failure_event": "color_shortcut",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [
+        "red_orange_bin",
+        "zero_designated_stickers"
+      ],
+      "background": {
+        "parent_group": "Archive/Assets/垃圾桶/视频/浅色地面四色桶_灰绿闭盖_红蓝开盖_007.mp4"
+      },
+      "target": {
+        "count": 0,
+        "building": null,
+        "distractor": "red_orange_bin"
+      },
+      "labels": {
+        "class_id": 0,
+        "scope": "entire_output"
+      },
+      "augmentation": {
+        "applied_stage": "source_gain",
+        "gain": 1.04
+      },
+      "sources": [
+        "datasets/raw/fire/targets/camera/bin_video_007/frames/frame_000286.jpg"
+      ],
+      "parameters": {
+        "sample_seed": 181899,
+        "source_digest": "2535edee2b2662226e4969934da06bfab9eae24ef7bee8a1be7e8c6a37558a42"
+      }
+    },
+    {
+      "id": "small_sticker_000001",
+      "failure_event": "color_shortcut",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [
+        "unknown_context",
+        "designated_stickers:1"
+      ],
+      "background": {
+        "parent_group": "Archive/Assets/楼宇/锦绣大厦/照片/远距离斜视_格栅和窗格_001.jpg"
+      },
+      "target": {
+        "count": 1,
+        "building": "B",
+        "distractor": null
+      },
+      "labels": {
+        "class_id": 0,
+        "scope": "entire_output"
+      },
+      "augmentation": {
+        "applied_stage": "source_gain",
+        "gain": 1
+      },
+      "sources": [
+        "Archive/Assets/working_sources/legacy/fire/楼宇/锦绣大厦/照片/远距离斜视_格栅和窗格_001.jpg"
+      ],
+      "parameters": {
+        "sample_seed": 252410,
+        "source_digest": "1341f3579684695c419f003055e5c0834f94c835427d76a96ae7127dd69f7224"
+      }
+    },
+    {
+      "id": "small_sticker_000002",
+      "failure_event": "color_shortcut",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [
+        "unknown_context",
+        "designated_stickers:1"
+      ],
+      "background": {
+        "parent_group": "Archive/Assets/楼宇/锦绣大厦/照片/远距离斜视_格栅和窗格_001.jpg"
+      },
+      "target": {
+        "count": 1,
+        "building": "B",
+        "distractor": null
+      },
+      "labels": {
+        "class_id": 0,
+        "scope": "entire_output"
+      },
+      "augmentation": {
+        "applied_stage": "source_gain",
+        "gain": 1
+      },
+      "sources": [
+        "Archive/Assets/working_sources/legacy/fire/楼宇/锦绣大厦/照片/远距离斜视_格栅和窗格_001.jpg"
+      ],
+      "parameters": {
+        "sample_seed": 252411,
+        "source_digest": "1341f3579684695c419f003055e5c0834f94c835427d76a96ae7127dd69f7224"
+      }
+    },
+    {
+      "id": "small_sticker_000003",
+      "failure_event": "color_shortcut",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [
+        "unknown_context",
+        "designated_stickers:1"
+      ],
+      "background": {
+        "parent_group": "Archive/Assets/楼宇/晨光大厦/照片/斜视_L形墙面与窗口_019.jpg"
+      },
+      "target": {
+        "count": 1,
+        "building": "C",
+        "distractor": null
+      },
+      "labels": {
+        "class_id": 0,
+        "scope": "entire_output"
+      },
+      "augmentation": {
+        "applied_stage": "source_gain",
+        "gain": 1
+      },
+      "sources": [
+        "Archive/Assets/working_sources/legacy/fire/楼宇/晨光大厦/照片/斜视_L形墙面与窗口_019.jpg"
+      ],
+      "parameters": {
+        "sample_seed": 252412,
+        "source_digest": "3f0ff2af5bcdb61484fcccb91e69290425bdf789835c3e2e7cf9ee5de1a2a9a5"
+      }
+    },
+    {
+      "id": "small_sticker_000004",
+      "failure_event": "color_shortcut",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [
+        "unknown_context",
+        "designated_stickers:1"
+      ],
+      "background": {
+        "parent_group": "Archive/Assets/楼宇/晨光大厦/照片/斜视_L形墙面与窗口_019.jpg"
+      },
+      "target": {
+        "count": 1,
+        "building": "C",
+        "distractor": null
+      },
+      "labels": {
+        "class_id": 0,
+        "scope": "entire_output"
+      },
+      "augmentation": {
+        "applied_stage": "source_gain",
+        "gain": 1
+      },
+      "sources": [
+        "Archive/Assets/working_sources/legacy/fire/楼宇/晨光大厦/照片/斜视_L形墙面与窗口_019.jpg"
+      ],
+      "parameters": {
+        "sample_seed": 252413,
+        "source_digest": "3f0ff2af5bcdb61484fcccb91e69290425bdf789835c3e2e7cf9ee5de1a2a9a5"
+      }
+    },
+    {
+      "id": "small_sticker_000005",
+      "failure_event": "color_shortcut",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [
+        "unknown_context",
+        "designated_stickers:1"
+      ],
+      "background": {
+        "parent_group": "Archive/Assets/楼宇/开心大厦/照片/正面远景_楼体整体_025.jpg"
+      },
+      "target": {
+        "count": 1,
+        "building": "A",
+        "distractor": null
+      },
+      "labels": {
+        "class_id": 0,
+        "scope": "entire_output"
+      },
+      "augmentation": {
+        "applied_stage": "source_gain",
+        "gain": 1
+      },
+      "sources": [
+        "Archive/Assets/working_sources/legacy/fire/楼宇/开心大厦/照片/正面远景_楼体整体_025.jpg"
+      ],
+      "parameters": {
+        "sample_seed": 252414,
+        "source_digest": "26df9914f4e6d290e7180ecd846ff17ebe5b7fd222f68c9cbf5f45398ba8ffe1"
+      }
+    },
+    {
+      "id": "small_sticker_000006",
+      "failure_event": "color_shortcut",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [
+        "unknown_context",
+        "designated_stickers:1"
+      ],
+      "background": {
+        "parent_group": "Archive/Assets/楼宇/开心大厦/照片/正面远景_楼体整体_025.jpg"
+      },
+      "target": {
+        "count": 1,
+        "building": "A",
+        "distractor": null
+      },
+      "labels": {
+        "class_id": 0,
+        "scope": "entire_output"
+      },
+      "augmentation": {
+        "applied_stage": "source_gain",
+        "gain": 1
+      },
+      "sources": [
+        "Archive/Assets/working_sources/legacy/fire/楼宇/开心大厦/照片/正面远景_楼体整体_025.jpg"
+      ],
+      "parameters": {
+        "sample_seed": 252415,
+        "source_digest": "26df9914f4e6d290e7180ecd846ff17ebe5b7fd222f68c9cbf5f45398ba8ffe1"
+      }
+    },
+    {
+      "id": "small_sticker_000007",
+      "failure_event": "color_shortcut",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [
+        "unknown_context",
+        "designated_stickers:1"
+      ],
+      "background": {
+        "parent_group": "Archive/Assets/楼宇/锦绣大厦/照片/远距离斜视_格栅和窗格_001.jpg"
+      },
+      "target": {
+        "count": 1,
+        "building": "B",
+        "distractor": null
+      },
+      "labels": {
+        "class_id": 0,
+        "scope": "entire_output"
+      },
+      "augmentation": {
+        "applied_stage": "source_gain",
+        "gain": 1
+      },
+      "sources": [
+        "Archive/Assets/working_sources/legacy/fire/楼宇/锦绣大厦/照片/远距离斜视_格栅和窗格_001.jpg"
+      ],
+      "parameters": {
+        "sample_seed": 252416,
+        "source_digest": "1341f3579684695c419f003055e5c0834f94c835427d76a96ae7127dd69f7224"
+      }
+    },
+    {
+      "id": "small_sticker_000008",
+      "failure_event": "color_shortcut",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [
+        "unknown_context",
+        "designated_stickers:1"
+      ],
+      "background": {
+        "parent_group": "Archive/Assets/楼宇/锦绣大厦/照片/远距离斜视_格栅和窗格_001.jpg"
+      },
+      "target": {
+        "count": 1,
+        "building": "B",
+        "distractor": null
+      },
+      "labels": {
+        "class_id": 0,
+        "scope": "entire_output"
+      },
+      "augmentation": {
+        "applied_stage": "source_gain",
+        "gain": 1
+      },
+      "sources": [
+        "Archive/Assets/working_sources/legacy/fire/楼宇/锦绣大厦/照片/远距离斜视_格栅和窗格_001.jpg"
+      ],
+      "parameters": {
+        "sample_seed": 252417,
+        "source_digest": "1341f3579684695c419f003055e5c0834f94c835427d76a96ae7127dd69f7224"
+      }
+    },
+    {
+      "id": "small_sticker_000009",
+      "failure_event": "color_shortcut",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [
+        "unknown_context",
+        "designated_stickers:1"
+      ],
+      "background": {
+        "parent_group": "Archive/Assets/楼宇/晨光大厦/照片/斜视_L形墙面与窗口_019.jpg"
+      },
+      "target": {
+        "count": 1,
+        "building": "C",
+        "distractor": null
+      },
+      "labels": {
+        "class_id": 0,
+        "scope": "entire_output"
+      },
+      "augmentation": {
+        "applied_stage": "source_gain",
+        "gain": 1
+      },
+      "sources": [
+        "Archive/Assets/working_sources/legacy/fire/楼宇/晨光大厦/照片/斜视_L形墙面与窗口_019.jpg"
+      ],
+      "parameters": {
+        "sample_seed": 252418,
+        "source_digest": "3f0ff2af5bcdb61484fcccb91e69290425bdf789835c3e2e7cf9ee5de1a2a9a5"
+      }
+    },
+    {
+      "id": "small_sticker_000010",
+      "failure_event": "color_shortcut",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [
+        "unknown_context",
+        "designated_stickers:1"
+      ],
+      "background": {
+        "parent_group": "Archive/Assets/楼宇/晨光大厦/照片/斜视_L形墙面与窗口_019.jpg"
+      },
+      "target": {
+        "count": 1,
+        "building": "C",
+        "distractor": null
+      },
+      "labels": {
+        "class_id": 0,
+        "scope": "entire_output"
+      },
+      "augmentation": {
+        "applied_stage": "source_gain",
+        "gain": 1
+      },
+      "sources": [
+        "Archive/Assets/working_sources/legacy/fire/楼宇/晨光大厦/照片/斜视_L形墙面与窗口_019.jpg"
+      ],
+      "parameters": {
+        "sample_seed": 252419,
+        "source_digest": "3f0ff2af5bcdb61484fcccb91e69290425bdf789835c3e2e7cf9ee5de1a2a9a5"
+      }
+    },
+    {
+      "id": "small_sticker_000011",
+      "failure_event": "color_shortcut",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [
+        "unknown_context",
+        "designated_stickers:1"
+      ],
+      "background": {
+        "parent_group": "Archive/Assets/楼宇/开心大厦/照片/正面远景_楼体整体_025.jpg"
+      },
+      "target": {
+        "count": 1,
+        "building": "A",
+        "distractor": null
+      },
+      "labels": {
+        "class_id": 0,
+        "scope": "entire_output"
+      },
+      "augmentation": {
+        "applied_stage": "source_gain",
+        "gain": 1
+      },
+      "sources": [
+        "Archive/Assets/working_sources/legacy/fire/楼宇/开心大厦/照片/正面远景_楼体整体_025.jpg"
+      ],
+      "parameters": {
+        "sample_seed": 252420,
+        "source_digest": "26df9914f4e6d290e7180ecd846ff17ebe5b7fd222f68c9cbf5f45398ba8ffe1"
+      }
+    },
+    {
+      "id": "small_sticker_000012",
+      "failure_event": "color_shortcut",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [
+        "unknown_context",
+        "designated_stickers:1"
+      ],
+      "background": {
+        "parent_group": "Archive/Assets/楼宇/开心大厦/照片/正面远景_楼体整体_025.jpg"
+      },
+      "target": {
+        "count": 1,
+        "building": "A",
+        "distractor": null
+      },
+      "labels": {
+        "class_id": 0,
+        "scope": "entire_output"
+      },
+      "augmentation": {
+        "applied_stage": "source_gain",
+        "gain": 1
+      },
+      "sources": [
+        "Archive/Assets/working_sources/legacy/fire/楼宇/开心大厦/照片/正面远景_楼体整体_025.jpg"
+      ],
+      "parameters": {
+        "sample_seed": 252421,
+        "source_digest": "26df9914f4e6d290e7180ecd846ff17ebe5b7fd222f68c9cbf5f45398ba8ffe1"
+      }
+    },
+    {
+      "id": "small_sticker_000013",
+      "failure_event": "color_shortcut",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [
+        "unknown_context",
+        "designated_stickers:1"
+      ],
+      "background": {
+        "parent_group": "Archive/Assets/楼宇/锦绣大厦/照片/远距离斜视_格栅和窗格_001.jpg"
+      },
+      "target": {
+        "count": 1,
+        "building": "B",
+        "distractor": null
+      },
+      "labels": {
+        "class_id": 0,
+        "scope": "entire_output"
+      },
+      "augmentation": {
+        "applied_stage": "source_gain",
+        "gain": 1
+      },
+      "sources": [
+        "Archive/Assets/working_sources/legacy/fire/楼宇/锦绣大厦/照片/远距离斜视_格栅和窗格_001.jpg"
+      ],
+      "parameters": {
+        "sample_seed": 252422,
+        "source_digest": "1341f3579684695c419f003055e5c0834f94c835427d76a96ae7127dd69f7224"
+      }
+    },
+    {
+      "id": "small_sticker_000014",
+      "failure_event": "color_shortcut",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [
+        "unknown_context",
+        "designated_stickers:1"
+      ],
+      "background": {
+        "parent_group": "Archive/Assets/楼宇/锦绣大厦/照片/远距离斜视_格栅和窗格_001.jpg"
+      },
+      "target": {
+        "count": 1,
+        "building": "B",
+        "distractor": null
+      },
+      "labels": {
+        "class_id": 0,
+        "scope": "entire_output"
+      },
+      "augmentation": {
+        "applied_stage": "source_gain",
+        "gain": 1
+      },
+      "sources": [
+        "Archive/Assets/working_sources/legacy/fire/楼宇/锦绣大厦/照片/远距离斜视_格栅和窗格_001.jpg"
+      ],
+      "parameters": {
+        "sample_seed": 252423,
+        "source_digest": "1341f3579684695c419f003055e5c0834f94c835427d76a96ae7127dd69f7224"
+      }
+    },
+    {
+      "id": "small_sticker_000015",
+      "failure_event": "color_shortcut",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [
+        "unknown_context",
+        "designated_stickers:1"
+      ],
+      "background": {
+        "parent_group": "Archive/Assets/楼宇/晨光大厦/照片/斜视_L形墙面与窗口_019.jpg"
+      },
+      "target": {
+        "count": 1,
+        "building": "C",
+        "distractor": null
+      },
+      "labels": {
+        "class_id": 0,
+        "scope": "entire_output"
+      },
+      "augmentation": {
+        "applied_stage": "source_gain",
+        "gain": 1
+      },
+      "sources": [
+        "Archive/Assets/working_sources/legacy/fire/楼宇/晨光大厦/照片/斜视_L形墙面与窗口_019.jpg"
+      ],
+      "parameters": {
+        "sample_seed": 252424,
+        "source_digest": "3f0ff2af5bcdb61484fcccb91e69290425bdf789835c3e2e7cf9ee5de1a2a9a5"
+      }
+    },
+    {
+      "id": "small_sticker_000016",
+      "failure_event": "color_shortcut",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [
+        "unknown_context",
+        "designated_stickers:3"
+      ],
+      "background": {
+        "parent_group": "Archive/Assets/楼宇/锦绣大厦/照片/远距离斜视_格栅和窗格_001.jpg"
+      },
+      "target": {
+        "count": 3,
+        "building": "B",
+        "distractor": null
+      },
+      "labels": {
+        "class_id": 0,
+        "scope": "entire_output"
+      },
+      "augmentation": {
+        "applied_stage": "source_gain",
+        "gain": 1
+      },
+      "sources": [
+        "Archive/Assets/working_sources/legacy/fire/楼宇/锦绣大厦/照片/远距离斜视_格栅和窗格_001.jpg"
+      ],
+      "parameters": {
+        "sample_seed": 252425,
+        "source_digest": "1341f3579684695c419f003055e5c0834f94c835427d76a96ae7127dd69f7224"
+      }
+    },
+    {
+      "id": "small_sticker_000017",
+      "failure_event": "color_shortcut",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [
+        "unknown_context",
+        "designated_stickers:3"
+      ],
+      "background": {
+        "parent_group": "Archive/Assets/楼宇/锦绣大厦/照片/远距离斜视_格栅和窗格_001.jpg"
+      },
+      "target": {
+        "count": 3,
+        "building": "B",
+        "distractor": null
+      },
+      "labels": {
+        "class_id": 0,
+        "scope": "entire_output"
+      },
+      "augmentation": {
+        "applied_stage": "source_gain",
+        "gain": 1
+      },
+      "sources": [
+        "Archive/Assets/working_sources/legacy/fire/楼宇/锦绣大厦/照片/远距离斜视_格栅和窗格_001.jpg"
+      ],
+      "parameters": {
+        "sample_seed": 252426,
+        "source_digest": "1341f3579684695c419f003055e5c0834f94c835427d76a96ae7127dd69f7224"
+      }
+    },
+    {
+      "id": "small_sticker_000018",
+      "failure_event": "color_shortcut",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [
+        "unknown_context",
+        "designated_stickers:3"
+      ],
+      "background": {
+        "parent_group": "Archive/Assets/楼宇/晨光大厦/照片/斜视_L形墙面与窗口_019.jpg"
+      },
+      "target": {
+        "count": 3,
+        "building": "C",
+        "distractor": null
+      },
+      "labels": {
+        "class_id": 0,
+        "scope": "entire_output"
+      },
+      "augmentation": {
+        "applied_stage": "source_gain",
+        "gain": 1
+      },
+      "sources": [
+        "Archive/Assets/working_sources/legacy/fire/楼宇/晨光大厦/照片/斜视_L形墙面与窗口_019.jpg"
+      ],
+      "parameters": {
+        "sample_seed": 252427,
+        "source_digest": "3f0ff2af5bcdb61484fcccb91e69290425bdf789835c3e2e7cf9ee5de1a2a9a5"
+      }
+    },
+    {
+      "id": "small_sticker_000019",
+      "failure_event": "color_shortcut",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [
+        "unknown_context",
+        "designated_stickers:3"
+      ],
+      "background": {
+        "parent_group": "Archive/Assets/楼宇/晨光大厦/照片/斜视_L形墙面与窗口_019.jpg"
+      },
+      "target": {
+        "count": 3,
+        "building": "C",
+        "distractor": null
+      },
+      "labels": {
+        "class_id": 0,
+        "scope": "entire_output"
+      },
+      "augmentation": {
+        "applied_stage": "source_gain",
+        "gain": 1
+      },
+      "sources": [
+        "Archive/Assets/working_sources/legacy/fire/楼宇/晨光大厦/照片/斜视_L形墙面与窗口_019.jpg"
+      ],
+      "parameters": {
+        "sample_seed": 252428,
+        "source_digest": "3f0ff2af5bcdb61484fcccb91e69290425bdf789835c3e2e7cf9ee5de1a2a9a5"
+      }
+    },
+    {
+      "id": "small_sticker_000020",
+      "failure_event": "color_shortcut",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [
+        "unknown_context",
+        "designated_stickers:3"
+      ],
+      "background": {
+        "parent_group": "Archive/Assets/楼宇/开心大厦/照片/正面远景_楼体整体_025.jpg"
+      },
+      "target": {
+        "count": 3,
+        "building": "A",
+        "distractor": null
+      },
+      "labels": {
+        "class_id": 0,
+        "scope": "entire_output"
+      },
+      "augmentation": {
+        "applied_stage": "source_gain",
+        "gain": 1
+      },
+      "sources": [
+        "Archive/Assets/working_sources/legacy/fire/楼宇/开心大厦/照片/正面远景_楼体整体_025.jpg"
+      ],
+      "parameters": {
+        "sample_seed": 252429,
+        "source_digest": "26df9914f4e6d290e7180ecd846ff17ebe5b7fd222f68c9cbf5f45398ba8ffe1"
+      }
+    },
+    {
+      "id": "small_sticker_000021",
+      "failure_event": "color_shortcut",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [
+        "unknown_context",
+        "designated_stickers:3"
+      ],
+      "background": {
+        "parent_group": "Archive/Assets/楼宇/开心大厦/照片/正面远景_楼体整体_025.jpg"
+      },
+      "target": {
+        "count": 3,
+        "building": "A",
+        "distractor": null
+      },
+      "labels": {
+        "class_id": 0,
+        "scope": "entire_output"
+      },
+      "augmentation": {
+        "applied_stage": "source_gain",
+        "gain": 1
+      },
+      "sources": [
+        "Archive/Assets/working_sources/legacy/fire/楼宇/开心大厦/照片/正面远景_楼体整体_025.jpg"
+      ],
+      "parameters": {
+        "sample_seed": 252430,
+        "source_digest": "26df9914f4e6d290e7180ecd846ff17ebe5b7fd222f68c9cbf5f45398ba8ffe1"
+      }
+    },
+    {
+      "id": "small_sticker_000022",
+      "failure_event": "color_shortcut",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [
+        "unknown_context",
+        "designated_stickers:3"
+      ],
+      "background": {
+        "parent_group": "Archive/Assets/楼宇/锦绣大厦/照片/远距离斜视_格栅和窗格_001.jpg"
+      },
+      "target": {
+        "count": 3,
+        "building": "B",
+        "distractor": null
+      },
+      "labels": {
+        "class_id": 0,
+        "scope": "entire_output"
+      },
+      "augmentation": {
+        "applied_stage": "source_gain",
+        "gain": 1
+      },
+      "sources": [
+        "Archive/Assets/working_sources/legacy/fire/楼宇/锦绣大厦/照片/远距离斜视_格栅和窗格_001.jpg"
+      ],
+      "parameters": {
+        "sample_seed": 252431,
+        "source_digest": "1341f3579684695c419f003055e5c0834f94c835427d76a96ae7127dd69f7224"
+      }
+    },
+    {
+      "id": "small_sticker_000023",
+      "failure_event": "color_shortcut",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [
+        "unknown_context",
+        "designated_stickers:3"
+      ],
+      "background": {
+        "parent_group": "Archive/Assets/楼宇/锦绣大厦/照片/远距离斜视_格栅和窗格_001.jpg"
+      },
+      "target": {
+        "count": 3,
+        "building": "B",
+        "distractor": null
+      },
+      "labels": {
+        "class_id": 0,
+        "scope": "entire_output"
+      },
+      "augmentation": {
+        "applied_stage": "source_gain",
+        "gain": 1
+      },
+      "sources": [
+        "Archive/Assets/working_sources/legacy/fire/楼宇/锦绣大厦/照片/远距离斜视_格栅和窗格_001.jpg"
+      ],
+      "parameters": {
+        "sample_seed": 252432,
+        "source_digest": "1341f3579684695c419f003055e5c0834f94c835427d76a96ae7127dd69f7224"
+      }
+    },
+    {
+      "id": "small_sticker_000024",
+      "failure_event": "color_shortcut",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [
+        "unknown_context",
+        "designated_stickers:3"
+      ],
+      "background": {
+        "parent_group": "Archive/Assets/楼宇/晨光大厦/照片/斜视_L形墙面与窗口_019.jpg"
+      },
+      "target": {
+        "count": 3,
+        "building": "C",
+        "distractor": null
+      },
+      "labels": {
+        "class_id": 0,
+        "scope": "entire_output"
+      },
+      "augmentation": {
+        "applied_stage": "source_gain",
+        "gain": 1
+      },
+      "sources": [
+        "Archive/Assets/working_sources/legacy/fire/楼宇/晨光大厦/照片/斜视_L形墙面与窗口_019.jpg"
+      ],
+      "parameters": {
+        "sample_seed": 252433,
+        "source_digest": "3f0ff2af5bcdb61484fcccb91e69290425bdf789835c3e2e7cf9ee5de1a2a9a5"
+      }
+    },
+    {
+      "id": "small_sticker_000025",
+      "failure_event": "color_shortcut",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [
+        "unknown_context",
+        "designated_stickers:3"
+      ],
+      "background": {
+        "parent_group": "Archive/Assets/楼宇/晨光大厦/照片/斜视_L形墙面与窗口_019.jpg"
+      },
+      "target": {
+        "count": 3,
+        "building": "C",
+        "distractor": null
+      },
+      "labels": {
+        "class_id": 0,
+        "scope": "entire_output"
+      },
+      "augmentation": {
+        "applied_stage": "source_gain",
+        "gain": 1
+      },
+      "sources": [
+        "Archive/Assets/working_sources/legacy/fire/楼宇/晨光大厦/照片/斜视_L形墙面与窗口_019.jpg"
+      ],
+      "parameters": {
+        "sample_seed": 252434,
+        "source_digest": "3f0ff2af5bcdb61484fcccb91e69290425bdf789835c3e2e7cf9ee5de1a2a9a5"
+      }
+    },
+    {
+      "id": "small_sticker_000026",
+      "failure_event": "color_shortcut",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [
+        "unknown_context",
+        "designated_stickers:1"
+      ],
+      "background": {
+        "parent_group": "Archive/Assets/楼宇/锦绣大厦/照片/远距离斜视_格栅和窗格_001.jpg"
+      },
+      "target": {
+        "count": 1,
+        "building": "B",
+        "distractor": null
+      },
+      "labels": {
+        "class_id": 0,
+        "scope": "entire_output"
+      },
+      "augmentation": {
+        "applied_stage": "source_gain",
+        "gain": 1
+      },
+      "sources": [
+        "Archive/Assets/working_sources/legacy/fire/楼宇/锦绣大厦/照片/远距离斜视_格栅和窗格_001.jpg"
+      ],
+      "parameters": {
+        "sample_seed": 252435,
+        "source_digest": "1341f3579684695c419f003055e5c0834f94c835427d76a96ae7127dd69f7224"
+      }
+    },
+    {
+      "id": "small_sticker_000027",
+      "failure_event": "color_shortcut",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [
+        "unknown_context",
+        "designated_stickers:1"
+      ],
+      "background": {
+        "parent_group": "Archive/Assets/楼宇/锦绣大厦/照片/远距离斜视_格栅和窗格_001.jpg"
+      },
+      "target": {
+        "count": 1,
+        "building": "B",
+        "distractor": null
+      },
+      "labels": {
+        "class_id": 0,
+        "scope": "entire_output"
+      },
+      "augmentation": {
+        "applied_stage": "source_gain",
+        "gain": 1
+      },
+      "sources": [
+        "Archive/Assets/working_sources/legacy/fire/楼宇/锦绣大厦/照片/远距离斜视_格栅和窗格_001.jpg"
+      ],
+      "parameters": {
+        "sample_seed": 252436,
+        "source_digest": "1341f3579684695c419f003055e5c0834f94c835427d76a96ae7127dd69f7224"
+      }
+    },
+    {
+      "id": "small_sticker_000028",
+      "failure_event": "color_shortcut",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [
+        "unknown_context",
+        "designated_stickers:1"
+      ],
+      "background": {
+        "parent_group": "Archive/Assets/楼宇/晨光大厦/照片/斜视_L形墙面与窗口_019.jpg"
+      },
+      "target": {
+        "count": 1,
+        "building": "C",
+        "distractor": null
+      },
+      "labels": {
+        "class_id": 0,
+        "scope": "entire_output"
+      },
+      "augmentation": {
+        "applied_stage": "source_gain",
+        "gain": 1
+      },
+      "sources": [
+        "Archive/Assets/working_sources/legacy/fire/楼宇/晨光大厦/照片/斜视_L形墙面与窗口_019.jpg"
+      ],
+      "parameters": {
+        "sample_seed": 252437,
+        "source_digest": "3f0ff2af5bcdb61484fcccb91e69290425bdf789835c3e2e7cf9ee5de1a2a9a5"
+      }
+    },
+    {
+      "id": "small_sticker_000029",
+      "failure_event": "color_shortcut",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [
+        "unknown_context",
+        "designated_stickers:1"
+      ],
+      "background": {
+        "parent_group": "Archive/Assets/楼宇/晨光大厦/照片/斜视_L形墙面与窗口_019.jpg"
+      },
+      "target": {
+        "count": 1,
+        "building": "C",
+        "distractor": null
+      },
+      "labels": {
+        "class_id": 0,
+        "scope": "entire_output"
+      },
+      "augmentation": {
+        "applied_stage": "source_gain",
+        "gain": 1
+      },
+      "sources": [
+        "Archive/Assets/working_sources/legacy/fire/楼宇/晨光大厦/照片/斜视_L形墙面与窗口_019.jpg"
+      ],
+      "parameters": {
+        "sample_seed": 252438,
+        "source_digest": "3f0ff2af5bcdb61484fcccb91e69290425bdf789835c3e2e7cf9ee5de1a2a9a5"
+      }
+    },
+    {
+      "id": "small_sticker_000030",
+      "failure_event": "color_shortcut",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [
+        "unknown_context",
+        "designated_stickers:1"
+      ],
+      "background": {
+        "parent_group": "Archive/Assets/楼宇/开心大厦/照片/正面远景_楼体整体_025.jpg"
+      },
+      "target": {
+        "count": 1,
+        "building": "A",
+        "distractor": null
+      },
+      "labels": {
+        "class_id": 0,
+        "scope": "entire_output"
+      },
+      "augmentation": {
+        "applied_stage": "source_gain",
+        "gain": 1
+      },
+      "sources": [
+        "Archive/Assets/working_sources/legacy/fire/楼宇/开心大厦/照片/正面远景_楼体整体_025.jpg"
+      ],
+      "parameters": {
+        "sample_seed": 252439,
+        "source_digest": "26df9914f4e6d290e7180ecd846ff17ebe5b7fd222f68c9cbf5f45398ba8ffe1"
+      }
+    },
+    {
+      "id": "small_sticker_000031",
+      "failure_event": "color_shortcut",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [
+        "unknown_context",
+        "designated_stickers:1"
+      ],
+      "background": {
+        "parent_group": "Archive/Assets/楼宇/开心大厦/照片/正面远景_楼体整体_025.jpg"
+      },
+      "target": {
+        "count": 1,
+        "building": "A",
+        "distractor": null
+      },
+      "labels": {
+        "class_id": 0,
+        "scope": "entire_output"
+      },
+      "augmentation": {
+        "applied_stage": "source_gain",
+        "gain": 1
+      },
+      "sources": [
+        "Archive/Assets/working_sources/legacy/fire/楼宇/开心大厦/照片/正面远景_楼体整体_025.jpg"
+      ],
+      "parameters": {
+        "sample_seed": 252440,
+        "source_digest": "26df9914f4e6d290e7180ecd846ff17ebe5b7fd222f68c9cbf5f45398ba8ffe1"
+      }
+    },
+    {
+      "id": "small_sticker_000032",
+      "failure_event": "color_shortcut",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [
+        "unknown_context",
+        "designated_stickers:1"
+      ],
+      "background": {
+        "parent_group": "Archive/Assets/楼宇/锦绣大厦/照片/远距离斜视_格栅和窗格_001.jpg"
+      },
+      "target": {
+        "count": 1,
+        "building": "B",
+        "distractor": null
+      },
+      "labels": {
+        "class_id": 0,
+        "scope": "entire_output"
+      },
+      "augmentation": {
+        "applied_stage": "source_gain",
+        "gain": 1
+      },
+      "sources": [
+        "Archive/Assets/working_sources/legacy/fire/楼宇/锦绣大厦/照片/远距离斜视_格栅和窗格_001.jpg"
+      ],
+      "parameters": {
+        "sample_seed": 252441,
+        "source_digest": "1341f3579684695c419f003055e5c0834f94c835427d76a96ae7127dd69f7224"
+      }
+    },
+    {
+      "id": "small_sticker_000033",
+      "failure_event": "color_shortcut",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [
+        "unknown_context",
+        "designated_stickers:1"
+      ],
+      "background": {
+        "parent_group": "Archive/Assets/楼宇/锦绣大厦/照片/远距离斜视_格栅和窗格_001.jpg"
+      },
+      "target": {
+        "count": 1,
+        "building": "B",
+        "distractor": null
+      },
+      "labels": {
+        "class_id": 0,
+        "scope": "entire_output"
+      },
+      "augmentation": {
+        "applied_stage": "source_gain",
+        "gain": 1
+      },
+      "sources": [
+        "Archive/Assets/working_sources/legacy/fire/楼宇/锦绣大厦/照片/远距离斜视_格栅和窗格_001.jpg"
+      ],
+      "parameters": {
+        "sample_seed": 252442,
+        "source_digest": "1341f3579684695c419f003055e5c0834f94c835427d76a96ae7127dd69f7224"
+      }
+    },
+    {
+      "id": "small_sticker_000034",
+      "failure_event": "color_shortcut",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [
+        "unknown_context",
+        "designated_stickers:1"
+      ],
+      "background": {
+        "parent_group": "Archive/Assets/楼宇/晨光大厦/照片/斜视_L形墙面与窗口_019.jpg"
+      },
+      "target": {
+        "count": 1,
+        "building": "C",
+        "distractor": null
+      },
+      "labels": {
+        "class_id": 0,
+        "scope": "entire_output"
+      },
+      "augmentation": {
+        "applied_stage": "source_gain",
+        "gain": 1
+      },
+      "sources": [
+        "Archive/Assets/working_sources/legacy/fire/楼宇/晨光大厦/照片/斜视_L形墙面与窗口_019.jpg"
+      ],
+      "parameters": {
+        "sample_seed": 252443,
+        "source_digest": "3f0ff2af5bcdb61484fcccb91e69290425bdf789835c3e2e7cf9ee5de1a2a9a5"
+      }
+    },
+    {
+      "id": "small_sticker_000035",
+      "failure_event": "color_shortcut",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [
+        "unknown_context",
+        "designated_stickers:1"
+      ],
+      "background": {
+        "parent_group": "Archive/Assets/楼宇/晨光大厦/照片/斜视_L形墙面与窗口_019.jpg"
+      },
+      "target": {
+        "count": 1,
+        "building": "C",
+        "distractor": null
+      },
+      "labels": {
+        "class_id": 0,
+        "scope": "entire_output"
+      },
+      "augmentation": {
+        "applied_stage": "source_gain",
+        "gain": 1
+      },
+      "sources": [
+        "Archive/Assets/working_sources/legacy/fire/楼宇/晨光大厦/照片/斜视_L形墙面与窗口_019.jpg"
+      ],
+      "parameters": {
+        "sample_seed": 252444,
+        "source_digest": "3f0ff2af5bcdb61484fcccb91e69290425bdf789835c3e2e7cf9ee5de1a2a9a5"
+      }
+    },
+    {
+      "id": "small_sticker_000036",
+      "failure_event": "color_shortcut",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [
+        "unknown_context",
+        "designated_stickers:1"
+      ],
+      "background": {
+        "parent_group": "Archive/Assets/楼宇/开心大厦/照片/正面远景_楼体整体_025.jpg"
+      },
+      "target": {
+        "count": 1,
+        "building": "A",
+        "distractor": null
+      },
+      "labels": {
+        "class_id": 0,
+        "scope": "entire_output"
+      },
+      "augmentation": {
+        "applied_stage": "source_gain",
+        "gain": 1
+      },
+      "sources": [
+        "Archive/Assets/working_sources/legacy/fire/楼宇/开心大厦/照片/正面远景_楼体整体_025.jpg"
+      ],
+      "parameters": {
+        "sample_seed": 252445,
+        "source_digest": "26df9914f4e6d290e7180ecd846ff17ebe5b7fd222f68c9cbf5f45398ba8ffe1"
+      }
+    },
+    {
+      "id": "small_sticker_000037",
+      "failure_event": "color_shortcut",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [
+        "unknown_context",
+        "designated_stickers:1"
+      ],
+      "background": {
+        "parent_group": "Archive/Assets/楼宇/开心大厦/照片/正面远景_楼体整体_025.jpg"
+      },
+      "target": {
+        "count": 1,
+        "building": "A",
+        "distractor": null
+      },
+      "labels": {
+        "class_id": 0,
+        "scope": "entire_output"
+      },
+      "augmentation": {
+        "applied_stage": "source_gain",
+        "gain": 1
+      },
+      "sources": [
+        "Archive/Assets/working_sources/legacy/fire/楼宇/开心大厦/照片/正面远景_楼体整体_025.jpg"
+      ],
+      "parameters": {
+        "sample_seed": 252446,
+        "source_digest": "26df9914f4e6d290e7180ecd846ff17ebe5b7fd222f68c9cbf5f45398ba8ffe1"
+      }
+    },
+    {
+      "id": "small_sticker_000038",
+      "failure_event": "color_shortcut",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [
+        "unknown_context",
+        "designated_stickers:1"
+      ],
+      "background": {
+        "parent_group": "Archive/Assets/楼宇/锦绣大厦/照片/远距离斜视_格栅和窗格_001.jpg"
+      },
+      "target": {
+        "count": 1,
+        "building": "B",
+        "distractor": null
+      },
+      "labels": {
+        "class_id": 0,
+        "scope": "entire_output"
+      },
+      "augmentation": {
+        "applied_stage": "source_gain",
+        "gain": 1
+      },
+      "sources": [
+        "Archive/Assets/working_sources/legacy/fire/楼宇/锦绣大厦/照片/远距离斜视_格栅和窗格_001.jpg"
+      ],
+      "parameters": {
+        "sample_seed": 252447,
+        "source_digest": "1341f3579684695c419f003055e5c0834f94c835427d76a96ae7127dd69f7224"
+      }
+    },
+    {
+      "id": "small_sticker_000039",
+      "failure_event": "color_shortcut",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [
+        "unknown_context",
+        "designated_stickers:1"
+      ],
+      "background": {
+        "parent_group": "Archive/Assets/楼宇/锦绣大厦/照片/远距离斜视_格栅和窗格_001.jpg"
+      },
+      "target": {
+        "count": 1,
+        "building": "B",
+        "distractor": null
+      },
+      "labels": {
+        "class_id": 0,
+        "scope": "entire_output"
+      },
+      "augmentation": {
+        "applied_stage": "source_gain",
+        "gain": 1
+      },
+      "sources": [
+        "Archive/Assets/working_sources/legacy/fire/楼宇/锦绣大厦/照片/远距离斜视_格栅和窗格_001.jpg"
+      ],
+      "parameters": {
+        "sample_seed": 252448,
+        "source_digest": "1341f3579684695c419f003055e5c0834f94c835427d76a96ae7127dd69f7224"
+      }
+    },
+    {
+      "id": "small_sticker_000040",
+      "failure_event": "color_shortcut",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [
+        "unknown_context",
+        "designated_stickers:1"
+      ],
+      "background": {
+        "parent_group": "Archive/Assets/楼宇/晨光大厦/照片/斜视_L形墙面与窗口_019.jpg"
+      },
+      "target": {
+        "count": 1,
+        "building": "C",
+        "distractor": null
+      },
+      "labels": {
+        "class_id": 0,
+        "scope": "entire_output"
+      },
+      "augmentation": {
+        "applied_stage": "source_gain",
+        "gain": 1
+      },
+      "sources": [
+        "Archive/Assets/working_sources/legacy/fire/楼宇/晨光大厦/照片/斜视_L形墙面与窗口_019.jpg"
+      ],
+      "parameters": {
+        "sample_seed": 252449,
+        "source_digest": "3f0ff2af5bcdb61484fcccb91e69290425bdf789835c3e2e7cf9ee5de1a2a9a5"
+      }
+    },
+    {
+      "id": "small_sticker_000041",
+      "failure_event": "color_shortcut",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [
+        "unknown_context",
+        "designated_stickers:1"
+      ],
+      "background": {
+        "parent_group": "Archive/Assets/楼宇/晨光大厦/照片/斜视_L形墙面与窗口_019.jpg"
+      },
+      "target": {
+        "count": 1,
+        "building": "C",
+        "distractor": null
+      },
+      "labels": {
+        "class_id": 0,
+        "scope": "entire_output"
+      },
+      "augmentation": {
+        "applied_stage": "source_gain",
+        "gain": 1
+      },
+      "sources": [
+        "Archive/Assets/working_sources/legacy/fire/楼宇/晨光大厦/照片/斜视_L形墙面与窗口_019.jpg"
+      ],
+      "parameters": {
+        "sample_seed": 252450,
+        "source_digest": "3f0ff2af5bcdb61484fcccb91e69290425bdf789835c3e2e7cf9ee5de1a2a9a5"
+      }
+    },
+    {
+      "id": "small_sticker_000042",
+      "failure_event": "color_shortcut",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [
+        "unknown_context",
+        "designated_stickers:1"
+      ],
+      "background": {
+        "parent_group": "Archive/Assets/楼宇/开心大厦/照片/正面远景_楼体整体_025.jpg"
+      },
+      "target": {
+        "count": 1,
+        "building": "A",
+        "distractor": null
+      },
+      "labels": {
+        "class_id": 0,
+        "scope": "entire_output"
+      },
+      "augmentation": {
+        "applied_stage": "source_gain",
+        "gain": 1
+      },
+      "sources": [
+        "Archive/Assets/working_sources/legacy/fire/楼宇/开心大厦/照片/正面远景_楼体整体_025.jpg"
+      ],
+      "parameters": {
+        "sample_seed": 252451,
+        "source_digest": "26df9914f4e6d290e7180ecd846ff17ebe5b7fd222f68c9cbf5f45398ba8ffe1"
+      }
+    },
+    {
+      "id": "small_sticker_000043",
+      "failure_event": "color_shortcut",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [
+        "unknown_context",
+        "designated_stickers:1"
+      ],
+      "background": {
+        "parent_group": "Archive/Assets/楼宇/开心大厦/照片/正面远景_楼体整体_025.jpg"
+      },
+      "target": {
+        "count": 1,
+        "building": "A",
+        "distractor": null
+      },
+      "labels": {
+        "class_id": 0,
+        "scope": "entire_output"
+      },
+      "augmentation": {
+        "applied_stage": "source_gain",
+        "gain": 1
+      },
+      "sources": [
+        "Archive/Assets/working_sources/legacy/fire/楼宇/开心大厦/照片/正面远景_楼体整体_025.jpg"
+      ],
+      "parameters": {
+        "sample_seed": 252452,
+        "source_digest": "26df9914f4e6d290e7180ecd846ff17ebe5b7fd222f68c9cbf5f45398ba8ffe1"
+      }
+    },
+    {
+      "id": "small_sticker_000044",
+      "failure_event": "color_shortcut",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [
+        "unknown_context",
+        "designated_stickers:1"
+      ],
+      "background": {
+        "parent_group": "Archive/Assets/楼宇/锦绣大厦/照片/远距离斜视_格栅和窗格_001.jpg"
+      },
+      "target": {
+        "count": 1,
+        "building": "B",
+        "distractor": null
+      },
+      "labels": {
+        "class_id": 0,
+        "scope": "entire_output"
+      },
+      "augmentation": {
+        "applied_stage": "source_gain",
+        "gain": 1
+      },
+      "sources": [
+        "Archive/Assets/working_sources/legacy/fire/楼宇/锦绣大厦/照片/远距离斜视_格栅和窗格_001.jpg"
+      ],
+      "parameters": {
+        "sample_seed": 252453,
+        "source_digest": "1341f3579684695c419f003055e5c0834f94c835427d76a96ae7127dd69f7224"
+      }
+    },
+    {
+      "id": "small_sticker_000045",
+      "failure_event": "color_shortcut",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [
+        "unknown_context",
+        "designated_stickers:1"
+      ],
+      "background": {
+        "parent_group": "Archive/Assets/楼宇/锦绣大厦/照片/远距离斜视_格栅和窗格_001.jpg"
+      },
+      "target": {
+        "count": 1,
+        "building": "B",
+        "distractor": null
+      },
+      "labels": {
+        "class_id": 0,
+        "scope": "entire_output"
+      },
+      "augmentation": {
+        "applied_stage": "source_gain",
+        "gain": 1
+      },
+      "sources": [
+        "Archive/Assets/working_sources/legacy/fire/楼宇/锦绣大厦/照片/远距离斜视_格栅和窗格_001.jpg"
+      ],
+      "parameters": {
+        "sample_seed": 252454,
+        "source_digest": "1341f3579684695c419f003055e5c0834f94c835427d76a96ae7127dd69f7224"
+      }
+    },
+    {
+      "id": "small_sticker_000046",
+      "failure_event": "color_shortcut",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [
+        "unknown_context",
+        "designated_stickers:1"
+      ],
+      "background": {
+        "parent_group": "Archive/Assets/楼宇/晨光大厦/照片/斜视_L形墙面与窗口_019.jpg"
+      },
+      "target": {
+        "count": 1,
+        "building": "C",
+        "distractor": null
+      },
+      "labels": {
+        "class_id": 0,
+        "scope": "entire_output"
+      },
+      "augmentation": {
+        "applied_stage": "source_gain",
+        "gain": 1
+      },
+      "sources": [
+        "Archive/Assets/working_sources/legacy/fire/楼宇/晨光大厦/照片/斜视_L形墙面与窗口_019.jpg"
+      ],
+      "parameters": {
+        "sample_seed": 252455,
+        "source_digest": "3f0ff2af5bcdb61484fcccb91e69290425bdf789835c3e2e7cf9ee5de1a2a9a5"
+      }
+    },
+    {
+      "id": "small_sticker_000047",
+      "failure_event": "color_shortcut",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [
+        "unknown_context",
+        "designated_stickers:1"
+      ],
+      "background": {
+        "parent_group": "Archive/Assets/楼宇/晨光大厦/照片/斜视_L形墙面与窗口_019.jpg"
+      },
+      "target": {
+        "count": 1,
+        "building": "C",
+        "distractor": null
+      },
+      "labels": {
+        "class_id": 0,
+        "scope": "entire_output"
+      },
+      "augmentation": {
+        "applied_stage": "source_gain",
+        "gain": 1
+      },
+      "sources": [
+        "Archive/Assets/working_sources/legacy/fire/楼宇/晨光大厦/照片/斜视_L形墙面与窗口_019.jpg"
+      ],
+      "parameters": {
+        "sample_seed": 252456,
+        "source_digest": "3f0ff2af5bcdb61484fcccb91e69290425bdf789835c3e2e7cf9ee5de1a2a9a5"
+      }
+    },
+    {
+      "id": "small_sticker_000048",
+      "failure_event": "color_shortcut",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [
+        "unknown_context",
+        "designated_stickers:1"
+      ],
+      "background": {
+        "parent_group": "Archive/Assets/楼宇/开心大厦/照片/正面远景_楼体整体_025.jpg"
+      },
+      "target": {
+        "count": 1,
+        "building": "A",
+        "distractor": null
+      },
+      "labels": {
+        "class_id": 0,
+        "scope": "entire_output"
+      },
+      "augmentation": {
+        "applied_stage": "source_gain",
+        "gain": 1
+      },
+      "sources": [
+        "Archive/Assets/working_sources/legacy/fire/楼宇/开心大厦/照片/正面远景_楼体整体_025.jpg"
+      ],
+      "parameters": {
+        "sample_seed": 252457,
+        "source_digest": "26df9914f4e6d290e7180ecd846ff17ebe5b7fd222f68c9cbf5f45398ba8ffe1"
+      }
+    },
+    {
+      "id": "small_sticker_000049",
+      "failure_event": "color_shortcut",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [
+        "unknown_context",
+        "designated_stickers:1"
+      ],
+      "background": {
+        "parent_group": "Archive/Assets/楼宇/开心大厦/照片/正面远景_楼体整体_025.jpg"
+      },
+      "target": {
+        "count": 1,
+        "building": "A",
+        "distractor": null
+      },
+      "labels": {
+        "class_id": 0,
+        "scope": "entire_output"
+      },
+      "augmentation": {
+        "applied_stage": "source_gain",
+        "gain": 1
+      },
+      "sources": [
+        "Archive/Assets/working_sources/legacy/fire/楼宇/开心大厦/照片/正面远景_楼体整体_025.jpg"
+      ],
+      "parameters": {
+        "sample_seed": 252458,
+        "source_digest": "26df9914f4e6d290e7180ecd846ff17ebe5b7fd222f68c9cbf5f45398ba8ffe1"
+      }
+    },
+    {
+      "id": "small_sticker_000050",
+      "failure_event": "color_shortcut",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [
+        "unknown_context",
+        "designated_stickers:1"
+      ],
+      "background": {
+        "parent_group": "Archive/Assets/楼宇/锦绣大厦/照片/远距离斜视_格栅和窗格_001.jpg"
+      },
+      "target": {
+        "count": 1,
+        "building": "B",
+        "distractor": null
+      },
+      "labels": {
+        "class_id": 0,
+        "scope": "entire_output"
+      },
+      "augmentation": {
+        "applied_stage": "source_gain",
+        "gain": 1
+      },
+      "sources": [
+        "Archive/Assets/working_sources/legacy/fire/楼宇/锦绣大厦/照片/远距离斜视_格栅和窗格_001.jpg"
+      ],
+      "parameters": {
+        "sample_seed": 252459,
+        "source_digest": "1341f3579684695c419f003055e5c0834f94c835427d76a96ae7127dd69f7224"
+      }
+    },
+    {
+      "id": "small_sticker_000051",
+      "failure_event": "color_shortcut",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [
+        "unknown_context",
+        "designated_stickers:1"
+      ],
+      "background": {
+        "parent_group": "Archive/Assets/楼宇/锦绣大厦/照片/远距离斜视_格栅和窗格_001.jpg"
+      },
+      "target": {
+        "count": 1,
+        "building": "B",
+        "distractor": null
+      },
+      "labels": {
+        "class_id": 0,
+        "scope": "entire_output"
+      },
+      "augmentation": {
+        "applied_stage": "source_gain",
+        "gain": 1
+      },
+      "sources": [
+        "Archive/Assets/working_sources/legacy/fire/楼宇/锦绣大厦/照片/远距离斜视_格栅和窗格_001.jpg"
+      ],
+      "parameters": {
+        "sample_seed": 252460,
+        "source_digest": "1341f3579684695c419f003055e5c0834f94c835427d76a96ae7127dd69f7224"
+      }
+    },
+    {
+      "id": "small_sticker_000052",
+      "failure_event": "color_shortcut",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [
+        "unknown_context",
+        "designated_stickers:1"
+      ],
+      "background": {
+        "parent_group": "Archive/Assets/楼宇/晨光大厦/照片/斜视_L形墙面与窗口_019.jpg"
+      },
+      "target": {
+        "count": 1,
+        "building": "C",
+        "distractor": null
+      },
+      "labels": {
+        "class_id": 0,
+        "scope": "entire_output"
+      },
+      "augmentation": {
+        "applied_stage": "source_gain",
+        "gain": 1
+      },
+      "sources": [
+        "Archive/Assets/working_sources/legacy/fire/楼宇/晨光大厦/照片/斜视_L形墙面与窗口_019.jpg"
+      ],
+      "parameters": {
+        "sample_seed": 252461,
+        "source_digest": "3f0ff2af5bcdb61484fcccb91e69290425bdf789835c3e2e7cf9ee5de1a2a9a5"
+      }
+    },
+    {
+      "id": "small_sticker_000053",
+      "failure_event": "color_shortcut",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [
+        "unknown_context",
+        "designated_stickers:1"
+      ],
+      "background": {
+        "parent_group": "Archive/Assets/楼宇/晨光大厦/照片/斜视_L形墙面与窗口_019.jpg"
+      },
+      "target": {
+        "count": 1,
+        "building": "C",
+        "distractor": null
+      },
+      "labels": {
+        "class_id": 0,
+        "scope": "entire_output"
+      },
+      "augmentation": {
+        "applied_stage": "source_gain",
+        "gain": 1
+      },
+      "sources": [
+        "Archive/Assets/working_sources/legacy/fire/楼宇/晨光大厦/照片/斜视_L形墙面与窗口_019.jpg"
+      ],
+      "parameters": {
+        "sample_seed": 252462,
+        "source_digest": "3f0ff2af5bcdb61484fcccb91e69290425bdf789835c3e2e7cf9ee5de1a2a9a5"
+      }
+    },
+    {
+      "id": "small_sticker_000054",
+      "failure_event": "color_shortcut",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [
+        "unknown_context",
+        "designated_stickers:1"
+      ],
+      "background": {
+        "parent_group": "Archive/Assets/楼宇/开心大厦/照片/正面远景_楼体整体_025.jpg"
+      },
+      "target": {
+        "count": 1,
+        "building": "A",
+        "distractor": null
+      },
+      "labels": {
+        "class_id": 0,
+        "scope": "entire_output"
+      },
+      "augmentation": {
+        "applied_stage": "source_gain",
+        "gain": 1
+      },
+      "sources": [
+        "Archive/Assets/working_sources/legacy/fire/楼宇/开心大厦/照片/正面远景_楼体整体_025.jpg"
+      ],
+      "parameters": {
+        "sample_seed": 252463,
+        "source_digest": "26df9914f4e6d290e7180ecd846ff17ebe5b7fd222f68c9cbf5f45398ba8ffe1"
+      }
+    },
+    {
+      "id": "small_sticker_000055",
+      "failure_event": "color_shortcut",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [
+        "unknown_context",
+        "designated_stickers:1"
+      ],
+      "background": {
+        "parent_group": "Archive/Assets/楼宇/开心大厦/照片/正面远景_楼体整体_025.jpg"
+      },
+      "target": {
+        "count": 1,
+        "building": "A",
+        "distractor": null
+      },
+      "labels": {
+        "class_id": 0,
+        "scope": "entire_output"
+      },
+      "augmentation": {
+        "applied_stage": "source_gain",
+        "gain": 1
+      },
+      "sources": [
+        "Archive/Assets/working_sources/legacy/fire/楼宇/开心大厦/照片/正面远景_楼体整体_025.jpg"
+      ],
+      "parameters": {
+        "sample_seed": 252464,
+        "source_digest": "26df9914f4e6d290e7180ecd846ff17ebe5b7fd222f68c9cbf5f45398ba8ffe1"
+      }
+    },
+    {
+      "id": "small_sticker_000056",
+      "failure_event": "color_shortcut",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [
+        "unknown_context",
+        "designated_stickers:3"
+      ],
+      "background": {
+        "parent_group": "Archive/Assets/楼宇/锦绣大厦/照片/远距离斜视_格栅和窗格_001.jpg"
+      },
+      "target": {
+        "count": 3,
+        "building": "B",
+        "distractor": null
+      },
+      "labels": {
+        "class_id": 0,
+        "scope": "entire_output"
+      },
+      "augmentation": {
+        "applied_stage": "source_gain",
+        "gain": 1
+      },
+      "sources": [
+        "Archive/Assets/working_sources/legacy/fire/楼宇/锦绣大厦/照片/远距离斜视_格栅和窗格_001.jpg"
+      ],
+      "parameters": {
+        "sample_seed": 252465,
+        "source_digest": "1341f3579684695c419f003055e5c0834f94c835427d76a96ae7127dd69f7224"
+      }
+    },
+    {
+      "id": "small_sticker_000057",
+      "failure_event": "color_shortcut",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [
+        "unknown_context",
+        "designated_stickers:3"
+      ],
+      "background": {
+        "parent_group": "Archive/Assets/楼宇/锦绣大厦/照片/远距离斜视_格栅和窗格_001.jpg"
+      },
+      "target": {
+        "count": 3,
+        "building": "B",
+        "distractor": null
+      },
+      "labels": {
+        "class_id": 0,
+        "scope": "entire_output"
+      },
+      "augmentation": {
+        "applied_stage": "source_gain",
+        "gain": 1
+      },
+      "sources": [
+        "Archive/Assets/working_sources/legacy/fire/楼宇/锦绣大厦/照片/远距离斜视_格栅和窗格_001.jpg"
+      ],
+      "parameters": {
+        "sample_seed": 252466,
+        "source_digest": "1341f3579684695c419f003055e5c0834f94c835427d76a96ae7127dd69f7224"
+      }
+    },
+    {
+      "id": "small_sticker_000058",
+      "failure_event": "color_shortcut",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [
+        "unknown_context",
+        "designated_stickers:3"
+      ],
+      "background": {
+        "parent_group": "Archive/Assets/楼宇/晨光大厦/照片/斜视_L形墙面与窗口_019.jpg"
+      },
+      "target": {
+        "count": 3,
+        "building": "C",
+        "distractor": null
+      },
+      "labels": {
+        "class_id": 0,
+        "scope": "entire_output"
+      },
+      "augmentation": {
+        "applied_stage": "source_gain",
+        "gain": 1
+      },
+      "sources": [
+        "Archive/Assets/working_sources/legacy/fire/楼宇/晨光大厦/照片/斜视_L形墙面与窗口_019.jpg"
+      ],
+      "parameters": {
+        "sample_seed": 252467,
+        "source_digest": "3f0ff2af5bcdb61484fcccb91e69290425bdf789835c3e2e7cf9ee5de1a2a9a5"
+      }
+    },
+    {
+      "id": "small_sticker_000059",
+      "failure_event": "color_shortcut",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [
+        "unknown_context",
+        "designated_stickers:3"
+      ],
+      "background": {
+        "parent_group": "Archive/Assets/楼宇/晨光大厦/照片/斜视_L形墙面与窗口_019.jpg"
+      },
+      "target": {
+        "count": 3,
+        "building": "C",
+        "distractor": null
+      },
+      "labels": {
+        "class_id": 0,
+        "scope": "entire_output"
+      },
+      "augmentation": {
+        "applied_stage": "source_gain",
+        "gain": 1
+      },
+      "sources": [
+        "Archive/Assets/working_sources/legacy/fire/楼宇/晨光大厦/照片/斜视_L形墙面与窗口_019.jpg"
+      ],
+      "parameters": {
+        "sample_seed": 252468,
+        "source_digest": "3f0ff2af5bcdb61484fcccb91e69290425bdf789835c3e2e7cf9ee5de1a2a9a5"
+      }
+    },
+    {
+      "id": "small_sticker_000060",
+      "failure_event": "color_shortcut",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [
+        "unknown_context",
+        "designated_stickers:3"
+      ],
+      "background": {
+        "parent_group": "Archive/Assets/楼宇/开心大厦/照片/正面远景_楼体整体_025.jpg"
+      },
+      "target": {
+        "count": 3,
+        "building": "A",
+        "distractor": null
+      },
+      "labels": {
+        "class_id": 0,
+        "scope": "entire_output"
+      },
+      "augmentation": {
+        "applied_stage": "source_gain",
+        "gain": 1
+      },
+      "sources": [
+        "Archive/Assets/working_sources/legacy/fire/楼宇/开心大厦/照片/正面远景_楼体整体_025.jpg"
+      ],
+      "parameters": {
+        "sample_seed": 252469,
+        "source_digest": "26df9914f4e6d290e7180ecd846ff17ebe5b7fd222f68c9cbf5f45398ba8ffe1"
+      }
+    },
+    {
+      "id": "small_sticker_000061",
+      "failure_event": "color_shortcut",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [
+        "unknown_context",
+        "designated_stickers:3"
+      ],
+      "background": {
+        "parent_group": "Archive/Assets/楼宇/开心大厦/照片/正面远景_楼体整体_025.jpg"
+      },
+      "target": {
+        "count": 3,
+        "building": "A",
+        "distractor": null
+      },
+      "labels": {
+        "class_id": 0,
+        "scope": "entire_output"
+      },
+      "augmentation": {
+        "applied_stage": "source_gain",
+        "gain": 1
+      },
+      "sources": [
+        "Archive/Assets/working_sources/legacy/fire/楼宇/开心大厦/照片/正面远景_楼体整体_025.jpg"
+      ],
+      "parameters": {
+        "sample_seed": 252470,
+        "source_digest": "26df9914f4e6d290e7180ecd846ff17ebe5b7fd222f68c9cbf5f45398ba8ffe1"
+      }
+    },
+    {
+      "id": "small_sticker_000062",
+      "failure_event": "color_shortcut",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [
+        "unknown_context",
+        "designated_stickers:3"
+      ],
+      "background": {
+        "parent_group": "Archive/Assets/楼宇/锦绣大厦/照片/远距离斜视_格栅和窗格_001.jpg"
+      },
+      "target": {
+        "count": 3,
+        "building": "B",
+        "distractor": null
+      },
+      "labels": {
+        "class_id": 0,
+        "scope": "entire_output"
+      },
+      "augmentation": {
+        "applied_stage": "source_gain",
+        "gain": 1
+      },
+      "sources": [
+        "Archive/Assets/working_sources/legacy/fire/楼宇/锦绣大厦/照片/远距离斜视_格栅和窗格_001.jpg"
+      ],
+      "parameters": {
+        "sample_seed": 252471,
+        "source_digest": "1341f3579684695c419f003055e5c0834f94c835427d76a96ae7127dd69f7224"
+      }
+    },
+    {
+      "id": "small_sticker_000063",
+      "failure_event": "color_shortcut",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [
+        "unknown_context",
+        "designated_stickers:3"
+      ],
+      "background": {
+        "parent_group": "Archive/Assets/楼宇/锦绣大厦/照片/远距离斜视_格栅和窗格_001.jpg"
+      },
+      "target": {
+        "count": 3,
+        "building": "B",
+        "distractor": null
+      },
+      "labels": {
+        "class_id": 0,
+        "scope": "entire_output"
+      },
+      "augmentation": {
+        "applied_stage": "source_gain",
+        "gain": 1
+      },
+      "sources": [
+        "Archive/Assets/working_sources/legacy/fire/楼宇/锦绣大厦/照片/远距离斜视_格栅和窗格_001.jpg"
+      ],
+      "parameters": {
+        "sample_seed": 252472,
+        "source_digest": "1341f3579684695c419f003055e5c0834f94c835427d76a96ae7127dd69f7224"
+      }
+    },
+    {
+      "id": "small_sticker_000064",
+      "failure_event": "color_shortcut",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [
+        "unknown_context",
+        "designated_stickers:3"
+      ],
+      "background": {
+        "parent_group": "Archive/Assets/楼宇/晨光大厦/照片/斜视_L形墙面与窗口_019.jpg"
+      },
+      "target": {
+        "count": 3,
+        "building": "C",
+        "distractor": null
+      },
+      "labels": {
+        "class_id": 0,
+        "scope": "entire_output"
+      },
+      "augmentation": {
+        "applied_stage": "source_gain",
+        "gain": 1
+      },
+      "sources": [
+        "Archive/Assets/working_sources/legacy/fire/楼宇/晨光大厦/照片/斜视_L形墙面与窗口_019.jpg"
+      ],
+      "parameters": {
+        "sample_seed": 252473,
+        "source_digest": "3f0ff2af5bcdb61484fcccb91e69290425bdf789835c3e2e7cf9ee5de1a2a9a5"
+      }
+    },
+    {
+      "id": "small_sticker_000065",
+      "failure_event": "color_shortcut",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [
+        "unknown_context",
+        "designated_stickers:3"
+      ],
+      "background": {
+        "parent_group": "Archive/Assets/楼宇/晨光大厦/照片/斜视_L形墙面与窗口_019.jpg"
+      },
+      "target": {
+        "count": 3,
+        "building": "C",
+        "distractor": null
+      },
+      "labels": {
+        "class_id": 0,
+        "scope": "entire_output"
+      },
+      "augmentation": {
+        "applied_stage": "source_gain",
+        "gain": 1
+      },
+      "sources": [
+        "Archive/Assets/working_sources/legacy/fire/楼宇/晨光大厦/照片/斜视_L形墙面与窗口_019.jpg"
+      ],
+      "parameters": {
+        "sample_seed": 252474,
+        "source_digest": "3f0ff2af5bcdb61484fcccb91e69290425bdf789835c3e2e7cf9ee5de1a2a9a5"
+      }
+    },
+    {
+      "id": "small_sticker_000066",
+      "failure_event": "color_shortcut",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [
+        "unknown_context",
+        "designated_stickers:3"
+      ],
+      "background": {
+        "parent_group": "Archive/Assets/楼宇/开心大厦/照片/正面远景_楼体整体_025.jpg"
+      },
+      "target": {
+        "count": 3,
+        "building": "A",
+        "distractor": null
+      },
+      "labels": {
+        "class_id": 0,
+        "scope": "entire_output"
+      },
+      "augmentation": {
+        "applied_stage": "source_gain",
+        "gain": 1
+      },
+      "sources": [
+        "Archive/Assets/working_sources/legacy/fire/楼宇/开心大厦/照片/正面远景_楼体整体_025.jpg"
+      ],
+      "parameters": {
+        "sample_seed": 252475,
+        "source_digest": "26df9914f4e6d290e7180ecd846ff17ebe5b7fd222f68c9cbf5f45398ba8ffe1"
+      }
+    },
+    {
+      "id": "small_sticker_000067",
+      "failure_event": "color_shortcut",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [
+        "unknown_context",
+        "designated_stickers:3"
+      ],
+      "background": {
+        "parent_group": "Archive/Assets/楼宇/开心大厦/照片/正面远景_楼体整体_025.jpg"
+      },
+      "target": {
+        "count": 3,
+        "building": "A",
+        "distractor": null
+      },
+      "labels": {
+        "class_id": 0,
+        "scope": "entire_output"
+      },
+      "augmentation": {
+        "applied_stage": "source_gain",
+        "gain": 1
+      },
+      "sources": [
+        "Archive/Assets/working_sources/legacy/fire/楼宇/开心大厦/照片/正面远景_楼体整体_025.jpg"
+      ],
+      "parameters": {
+        "sample_seed": 252476,
+        "source_digest": "26df9914f4e6d290e7180ecd846ff17ebe5b7fd222f68c9cbf5f45398ba8ffe1"
+      }
+    },
+    {
+      "id": "small_sticker_000068",
+      "failure_event": "color_shortcut",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [
+        "unknown_context",
+        "designated_stickers:3"
+      ],
+      "background": {
+        "parent_group": "Archive/Assets/楼宇/锦绣大厦/照片/远距离斜视_格栅和窗格_001.jpg"
+      },
+      "target": {
+        "count": 3,
+        "building": "B",
+        "distractor": null
+      },
+      "labels": {
+        "class_id": 0,
+        "scope": "entire_output"
+      },
+      "augmentation": {
+        "applied_stage": "source_gain",
+        "gain": 1
+      },
+      "sources": [
+        "Archive/Assets/working_sources/legacy/fire/楼宇/锦绣大厦/照片/远距离斜视_格栅和窗格_001.jpg"
+      ],
+      "parameters": {
+        "sample_seed": 252477,
+        "source_digest": "1341f3579684695c419f003055e5c0834f94c835427d76a96ae7127dd69f7224"
+      }
+    },
+    {
+      "id": "small_sticker_000069",
+      "failure_event": "color_shortcut",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [
+        "unknown_context",
+        "designated_stickers:3"
+      ],
+      "background": {
+        "parent_group": "Archive/Assets/楼宇/锦绣大厦/照片/远距离斜视_格栅和窗格_001.jpg"
+      },
+      "target": {
+        "count": 3,
+        "building": "B",
+        "distractor": null
+      },
+      "labels": {
+        "class_id": 0,
+        "scope": "entire_output"
+      },
+      "augmentation": {
+        "applied_stage": "source_gain",
+        "gain": 1
+      },
+      "sources": [
+        "Archive/Assets/working_sources/legacy/fire/楼宇/锦绣大厦/照片/远距离斜视_格栅和窗格_001.jpg"
+      ],
+      "parameters": {
+        "sample_seed": 252478,
+        "source_digest": "1341f3579684695c419f003055e5c0834f94c835427d76a96ae7127dd69f7224"
+      }
+    },
+    {
+      "id": "small_sticker_000070",
+      "failure_event": "color_shortcut",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [
+        "unknown_context",
+        "designated_stickers:3"
+      ],
+      "background": {
+        "parent_group": "Archive/Assets/楼宇/晨光大厦/照片/斜视_L形墙面与窗口_019.jpg"
+      },
+      "target": {
+        "count": 3,
+        "building": "C",
+        "distractor": null
+      },
+      "labels": {
+        "class_id": 0,
+        "scope": "entire_output"
+      },
+      "augmentation": {
+        "applied_stage": "source_gain",
+        "gain": 1
+      },
+      "sources": [
+        "Archive/Assets/working_sources/legacy/fire/楼宇/晨光大厦/照片/斜视_L形墙面与窗口_019.jpg"
+      ],
+      "parameters": {
+        "sample_seed": 252479,
+        "source_digest": "3f0ff2af5bcdb61484fcccb91e69290425bdf789835c3e2e7cf9ee5de1a2a9a5"
+      }
+    },
+    {
+      "id": "small_sticker_000071",
+      "failure_event": "color_shortcut",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [
+        "unknown_context",
+        "designated_stickers:3"
+      ],
+      "background": {
+        "parent_group": "Archive/Assets/楼宇/晨光大厦/照片/斜视_L形墙面与窗口_019.jpg"
+      },
+      "target": {
+        "count": 3,
+        "building": "C",
+        "distractor": null
+      },
+      "labels": {
+        "class_id": 0,
+        "scope": "entire_output"
+      },
+      "augmentation": {
+        "applied_stage": "source_gain",
+        "gain": 1
+      },
+      "sources": [
+        "Archive/Assets/working_sources/legacy/fire/楼宇/晨光大厦/照片/斜视_L形墙面与窗口_019.jpg"
+      ],
+      "parameters": {
+        "sample_seed": 252480,
+        "source_digest": "3f0ff2af5bcdb61484fcccb91e69290425bdf789835c3e2e7cf9ee5de1a2a9a5"
+      }
+    },
+    {
+      "id": "small_sticker_000072",
+      "failure_event": "color_shortcut",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [
+        "unknown_context",
+        "designated_stickers:3"
+      ],
+      "background": {
+        "parent_group": "Archive/Assets/楼宇/开心大厦/照片/正面远景_楼体整体_025.jpg"
+      },
+      "target": {
+        "count": 3,
+        "building": "A",
+        "distractor": null
+      },
+      "labels": {
+        "class_id": 0,
+        "scope": "entire_output"
+      },
+      "augmentation": {
+        "applied_stage": "source_gain",
+        "gain": 1
+      },
+      "sources": [
+        "Archive/Assets/working_sources/legacy/fire/楼宇/开心大厦/照片/正面远景_楼体整体_025.jpg"
+      ],
+      "parameters": {
+        "sample_seed": 252481,
+        "source_digest": "26df9914f4e6d290e7180ecd846ff17ebe5b7fd222f68c9cbf5f45398ba8ffe1"
+      }
+    },
+    {
+      "id": "small_sticker_000073",
+      "failure_event": "color_shortcut",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [
+        "unknown_context",
+        "designated_stickers:3"
+      ],
+      "background": {
+        "parent_group": "Archive/Assets/楼宇/开心大厦/照片/正面远景_楼体整体_025.jpg"
+      },
+      "target": {
+        "count": 3,
+        "building": "A",
+        "distractor": null
+      },
+      "labels": {
+        "class_id": 0,
+        "scope": "entire_output"
+      },
+      "augmentation": {
+        "applied_stage": "source_gain",
+        "gain": 1
+      },
+      "sources": [
+        "Archive/Assets/working_sources/legacy/fire/楼宇/开心大厦/照片/正面远景_楼体整体_025.jpg"
+      ],
+      "parameters": {
+        "sample_seed": 252482,
+        "source_digest": "26df9914f4e6d290e7180ecd846ff17ebe5b7fd222f68c9cbf5f45398ba8ffe1"
+      }
+    },
+    {
+      "id": "small_sticker_000074",
+      "failure_event": "color_shortcut",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [
+        "unknown_context",
+        "designated_stickers:3"
+      ],
+      "background": {
+        "parent_group": "Archive/Assets/楼宇/锦绣大厦/照片/远距离斜视_格栅和窗格_001.jpg"
+      },
+      "target": {
+        "count": 3,
+        "building": "B",
+        "distractor": null
+      },
+      "labels": {
+        "class_id": 0,
+        "scope": "entire_output"
+      },
+      "augmentation": {
+        "applied_stage": "source_gain",
+        "gain": 1
+      },
+      "sources": [
+        "Archive/Assets/working_sources/legacy/fire/楼宇/锦绣大厦/照片/远距离斜视_格栅和窗格_001.jpg"
+      ],
+      "parameters": {
+        "sample_seed": 252483,
+        "source_digest": "1341f3579684695c419f003055e5c0834f94c835427d76a96ae7127dd69f7224"
+      }
+    },
+    {
+      "id": "small_sticker_000075",
+      "failure_event": "color_shortcut",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [
+        "unknown_context",
+        "designated_stickers:3"
+      ],
+      "background": {
+        "parent_group": "Archive/Assets/楼宇/锦绣大厦/照片/远距离斜视_格栅和窗格_001.jpg"
+      },
+      "target": {
+        "count": 3,
+        "building": "B",
+        "distractor": null
+      },
+      "labels": {
+        "class_id": 0,
+        "scope": "entire_output"
+      },
+      "augmentation": {
+        "applied_stage": "source_gain",
+        "gain": 1
+      },
+      "sources": [
+        "Archive/Assets/working_sources/legacy/fire/楼宇/锦绣大厦/照片/远距离斜视_格栅和窗格_001.jpg"
+      ],
+      "parameters": {
+        "sample_seed": 252484,
+        "source_digest": "1341f3579684695c419f003055e5c0834f94c835427d76a96ae7127dd69f7224"
+      }
+    },
+    {
+      "id": "small_sticker_000076",
+      "failure_event": "color_shortcut",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [
+        "unknown_context",
+        "designated_stickers:3"
+      ],
+      "background": {
+        "parent_group": "Archive/Assets/楼宇/晨光大厦/照片/斜视_L形墙面与窗口_019.jpg"
+      },
+      "target": {
+        "count": 3,
+        "building": "C",
+        "distractor": null
+      },
+      "labels": {
+        "class_id": 0,
+        "scope": "entire_output"
+      },
+      "augmentation": {
+        "applied_stage": "source_gain",
+        "gain": 1
+      },
+      "sources": [
+        "Archive/Assets/working_sources/legacy/fire/楼宇/晨光大厦/照片/斜视_L形墙面与窗口_019.jpg"
+      ],
+      "parameters": {
+        "sample_seed": 252485,
+        "source_digest": "3f0ff2af5bcdb61484fcccb91e69290425bdf789835c3e2e7cf9ee5de1a2a9a5"
+      }
+    },
+    {
+      "id": "small_sticker_000077",
+      "failure_event": "color_shortcut",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [
+        "unknown_context",
+        "designated_stickers:3"
+      ],
+      "background": {
+        "parent_group": "Archive/Assets/楼宇/晨光大厦/照片/斜视_L形墙面与窗口_019.jpg"
+      },
+      "target": {
+        "count": 3,
+        "building": "C",
+        "distractor": null
+      },
+      "labels": {
+        "class_id": 0,
+        "scope": "entire_output"
+      },
+      "augmentation": {
+        "applied_stage": "source_gain",
+        "gain": 1
+      },
+      "sources": [
+        "Archive/Assets/working_sources/legacy/fire/楼宇/晨光大厦/照片/斜视_L形墙面与窗口_019.jpg"
+      ],
+      "parameters": {
+        "sample_seed": 252486,
+        "source_digest": "3f0ff2af5bcdb61484fcccb91e69290425bdf789835c3e2e7cf9ee5de1a2a9a5"
+      }
+    },
+    {
+      "id": "small_sticker_000078",
+      "failure_event": "color_shortcut",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [
+        "unknown_context",
+        "designated_stickers:3"
+      ],
+      "background": {
+        "parent_group": "Archive/Assets/楼宇/开心大厦/照片/正面远景_楼体整体_025.jpg"
+      },
+      "target": {
+        "count": 3,
+        "building": "A",
+        "distractor": null
+      },
+      "labels": {
+        "class_id": 0,
+        "scope": "entire_output"
+      },
+      "augmentation": {
+        "applied_stage": "source_gain",
+        "gain": 1
+      },
+      "sources": [
+        "Archive/Assets/working_sources/legacy/fire/楼宇/开心大厦/照片/正面远景_楼体整体_025.jpg"
+      ],
+      "parameters": {
+        "sample_seed": 252487,
+        "source_digest": "26df9914f4e6d290e7180ecd846ff17ebe5b7fd222f68c9cbf5f45398ba8ffe1"
+      }
+    },
+    {
+      "id": "small_sticker_000079",
+      "failure_event": "color_shortcut",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [
+        "unknown_context",
+        "designated_stickers:3"
+      ],
+      "background": {
+        "parent_group": "Archive/Assets/楼宇/开心大厦/照片/正面远景_楼体整体_025.jpg"
+      },
+      "target": {
+        "count": 3,
+        "building": "A",
+        "distractor": null
+      },
+      "labels": {
+        "class_id": 0,
+        "scope": "entire_output"
+      },
+      "augmentation": {
+        "applied_stage": "source_gain",
+        "gain": 1
+      },
+      "sources": [
+        "Archive/Assets/working_sources/legacy/fire/楼宇/开心大厦/照片/正面远景_楼体整体_025.jpg"
+      ],
+      "parameters": {
+        "sample_seed": 252488,
+        "source_digest": "26df9914f4e6d290e7180ecd846ff17ebe5b7fd222f68c9cbf5f45398ba8ffe1"
+      }
+    },
+    {
+      "id": "small_sticker_000080",
+      "failure_event": "color_shortcut",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [
+        "unknown_context",
+        "designated_stickers:3"
+      ],
+      "background": {
+        "parent_group": "Archive/Assets/楼宇/锦绣大厦/照片/远距离斜视_格栅和窗格_001.jpg"
+      },
+      "target": {
+        "count": 3,
+        "building": "B",
+        "distractor": null
+      },
+      "labels": {
+        "class_id": 0,
+        "scope": "entire_output"
+      },
+      "augmentation": {
+        "applied_stage": "source_gain",
+        "gain": 1
+      },
+      "sources": [
+        "Archive/Assets/working_sources/legacy/fire/楼宇/锦绣大厦/照片/远距离斜视_格栅和窗格_001.jpg"
+      ],
+      "parameters": {
+        "sample_seed": 252489,
+        "source_digest": "1341f3579684695c419f003055e5c0834f94c835427d76a96ae7127dd69f7224"
+      }
+    },
+    {
+      "id": "small_sticker_000081",
+      "failure_event": "color_shortcut",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [
+        "unknown_context",
+        "designated_stickers:3"
+      ],
+      "background": {
+        "parent_group": "Archive/Assets/楼宇/锦绣大厦/照片/远距离斜视_格栅和窗格_001.jpg"
+      },
+      "target": {
+        "count": 3,
+        "building": "B",
+        "distractor": null
+      },
+      "labels": {
+        "class_id": 0,
+        "scope": "entire_output"
+      },
+      "augmentation": {
+        "applied_stage": "source_gain",
+        "gain": 1
+      },
+      "sources": [
+        "Archive/Assets/working_sources/legacy/fire/楼宇/锦绣大厦/照片/远距离斜视_格栅和窗格_001.jpg"
+      ],
+      "parameters": {
+        "sample_seed": 252490,
+        "source_digest": "1341f3579684695c419f003055e5c0834f94c835427d76a96ae7127dd69f7224"
+      }
+    },
+    {
+      "id": "small_sticker_000082",
+      "failure_event": "color_shortcut",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [
+        "unknown_context",
+        "designated_stickers:3"
+      ],
+      "background": {
+        "parent_group": "Archive/Assets/楼宇/晨光大厦/照片/斜视_L形墙面与窗口_019.jpg"
+      },
+      "target": {
+        "count": 3,
+        "building": "C",
+        "distractor": null
+      },
+      "labels": {
+        "class_id": 0,
+        "scope": "entire_output"
+      },
+      "augmentation": {
+        "applied_stage": "source_gain",
+        "gain": 1
+      },
+      "sources": [
+        "Archive/Assets/working_sources/legacy/fire/楼宇/晨光大厦/照片/斜视_L形墙面与窗口_019.jpg"
+      ],
+      "parameters": {
+        "sample_seed": 252491,
+        "source_digest": "3f0ff2af5bcdb61484fcccb91e69290425bdf789835c3e2e7cf9ee5de1a2a9a5"
+      }
+    },
+    {
+      "id": "small_sticker_000083",
+      "failure_event": "color_shortcut",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [
+        "unknown_context",
+        "designated_stickers:3"
+      ],
+      "background": {
+        "parent_group": "Archive/Assets/楼宇/晨光大厦/照片/斜视_L形墙面与窗口_019.jpg"
+      },
+      "target": {
+        "count": 3,
+        "building": "C",
+        "distractor": null
+      },
+      "labels": {
+        "class_id": 0,
+        "scope": "entire_output"
+      },
+      "augmentation": {
+        "applied_stage": "source_gain",
+        "gain": 1
+      },
+      "sources": [
+        "Archive/Assets/working_sources/legacy/fire/楼宇/晨光大厦/照片/斜视_L形墙面与窗口_019.jpg"
+      ],
+      "parameters": {
+        "sample_seed": 252492,
+        "source_digest": "3f0ff2af5bcdb61484fcccb91e69290425bdf789835c3e2e7cf9ee5de1a2a9a5"
+      }
+    },
+    {
+      "id": "small_sticker_000084",
+      "failure_event": "color_shortcut",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [
+        "unknown_context",
+        "designated_stickers:3"
+      ],
+      "background": {
+        "parent_group": "Archive/Assets/楼宇/开心大厦/照片/正面远景_楼体整体_025.jpg"
+      },
+      "target": {
+        "count": 3,
+        "building": "A",
+        "distractor": null
+      },
+      "labels": {
+        "class_id": 0,
+        "scope": "entire_output"
+      },
+      "augmentation": {
+        "applied_stage": "source_gain",
+        "gain": 1
+      },
+      "sources": [
+        "Archive/Assets/working_sources/legacy/fire/楼宇/开心大厦/照片/正面远景_楼体整体_025.jpg"
+      ],
+      "parameters": {
+        "sample_seed": 252493,
+        "source_digest": "26df9914f4e6d290e7180ecd846ff17ebe5b7fd222f68c9cbf5f45398ba8ffe1"
+      }
+    },
+    {
+      "id": "small_sticker_000085",
+      "failure_event": "color_shortcut",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [
+        "unknown_context",
+        "designated_stickers:3"
+      ],
+      "background": {
+        "parent_group": "Archive/Assets/楼宇/开心大厦/照片/正面远景_楼体整体_025.jpg"
+      },
+      "target": {
+        "count": 3,
+        "building": "A",
+        "distractor": null
+      },
+      "labels": {
+        "class_id": 0,
+        "scope": "entire_output"
+      },
+      "augmentation": {
+        "applied_stage": "source_gain",
+        "gain": 1
+      },
+      "sources": [
+        "Archive/Assets/working_sources/legacy/fire/楼宇/开心大厦/照片/正面远景_楼体整体_025.jpg"
+      ],
+      "parameters": {
+        "sample_seed": 252494,
+        "source_digest": "26df9914f4e6d290e7180ecd846ff17ebe5b7fd222f68c9cbf5f45398ba8ffe1"
+      }
+    },
+    {
+      "id": "small_sticker_000086",
+      "failure_event": "color_shortcut",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [
+        "unknown_context",
+        "designated_stickers:3"
+      ],
+      "background": {
+        "parent_group": "Archive/Assets/楼宇/锦绣大厦/照片/远距离斜视_格栅和窗格_001.jpg"
+      },
+      "target": {
+        "count": 3,
+        "building": "B",
+        "distractor": null
+      },
+      "labels": {
+        "class_id": 0,
+        "scope": "entire_output"
+      },
+      "augmentation": {
+        "applied_stage": "source_gain",
+        "gain": 1
+      },
+      "sources": [
+        "Archive/Assets/working_sources/legacy/fire/楼宇/锦绣大厦/照片/远距离斜视_格栅和窗格_001.jpg"
+      ],
+      "parameters": {
+        "sample_seed": 252495,
+        "source_digest": "1341f3579684695c419f003055e5c0834f94c835427d76a96ae7127dd69f7224"
+      }
+    },
+    {
+      "id": "small_sticker_000087",
+      "failure_event": "color_shortcut",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [
+        "unknown_context",
+        "designated_stickers:3"
+      ],
+      "background": {
+        "parent_group": "Archive/Assets/楼宇/锦绣大厦/照片/远距离斜视_格栅和窗格_001.jpg"
+      },
+      "target": {
+        "count": 3,
+        "building": "B",
+        "distractor": null
+      },
+      "labels": {
+        "class_id": 0,
+        "scope": "entire_output"
+      },
+      "augmentation": {
+        "applied_stage": "source_gain",
+        "gain": 1
+      },
+      "sources": [
+        "Archive/Assets/working_sources/legacy/fire/楼宇/锦绣大厦/照片/远距离斜视_格栅和窗格_001.jpg"
+      ],
+      "parameters": {
+        "sample_seed": 252496,
+        "source_digest": "1341f3579684695c419f003055e5c0834f94c835427d76a96ae7127dd69f7224"
+      }
+    },
+    {
+      "id": "small_sticker_000088",
+      "failure_event": "color_shortcut",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [
+        "unknown_context",
+        "designated_stickers:3"
+      ],
+      "background": {
+        "parent_group": "Archive/Assets/楼宇/晨光大厦/照片/斜视_L形墙面与窗口_019.jpg"
+      },
+      "target": {
+        "count": 3,
+        "building": "C",
+        "distractor": null
+      },
+      "labels": {
+        "class_id": 0,
+        "scope": "entire_output"
+      },
+      "augmentation": {
+        "applied_stage": "source_gain",
+        "gain": 1
+      },
+      "sources": [
+        "Archive/Assets/working_sources/legacy/fire/楼宇/晨光大厦/照片/斜视_L形墙面与窗口_019.jpg"
+      ],
+      "parameters": {
+        "sample_seed": 252497,
+        "source_digest": "3f0ff2af5bcdb61484fcccb91e69290425bdf789835c3e2e7cf9ee5de1a2a9a5"
+      }
+    },
+    {
+      "id": "small_sticker_000089",
+      "failure_event": "color_shortcut",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [
+        "unknown_context",
+        "designated_stickers:3"
+      ],
+      "background": {
+        "parent_group": "Archive/Assets/楼宇/晨光大厦/照片/斜视_L形墙面与窗口_019.jpg"
+      },
+      "target": {
+        "count": 3,
+        "building": "C",
+        "distractor": null
+      },
+      "labels": {
+        "class_id": 0,
+        "scope": "entire_output"
+      },
+      "augmentation": {
+        "applied_stage": "source_gain",
+        "gain": 1
+      },
+      "sources": [
+        "Archive/Assets/working_sources/legacy/fire/楼宇/晨光大厦/照片/斜视_L形墙面与窗口_019.jpg"
+      ],
+      "parameters": {
+        "sample_seed": 252498,
+        "source_digest": "3f0ff2af5bcdb61484fcccb91e69290425bdf789835c3e2e7cf9ee5de1a2a9a5"
+      }
+    },
+    {
+      "id": "small_sticker_000090",
+      "failure_event": "color_shortcut",
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "conditions": [
+        "unknown_context",
+        "designated_stickers:3"
+      ],
+      "background": {
+        "parent_group": "Archive/Assets/楼宇/开心大厦/照片/正面远景_楼体整体_025.jpg"
+      },
+      "target": {
+        "count": 3,
+        "building": "A",
+        "distractor": null
+      },
+      "labels": {
+        "class_id": 0,
+        "scope": "entire_output"
+      },
+      "augmentation": {
+        "applied_stage": "source_gain",
+        "gain": 1
+      },
+      "sources": [
+        "Archive/Assets/working_sources/legacy/fire/楼宇/开心大厦/照片/正面远景_楼体整体_025.jpg"
+      ],
+      "parameters": {
+        "sample_seed": 252499,
+        "source_digest": "26df9914f4e6d290e7180ecd846ff17ebe5b7fd222f68c9cbf5f45398ba8ffe1"
+      }
+    }
+  ]
+}

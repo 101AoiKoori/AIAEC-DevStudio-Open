@@ -1,0 +1,38 @@
+{
+  "task": "building_name_paper",
+  "scope": "Detection-only whole-frame review; prior waypoint evaluation exposure retained",
+  "records": [
+    {
+      "image": "Archive/Assets/captures/car_real_capture_20261112/P09_B1.png",
+      "xyxy": [
+        155,
+        54,
+        280,
+        90
+      ]
+    },
+    {
+      "image": "Archive/Assets/captures/car_real_capture_20261112/P10_B2.png",
+      "xyxy": [
+        296,
+        76,
+        354,
+        116
+      ]
+    },
+    {
+      "image": "Archive/Assets/captures/car_real_capture_20261112/P24_B3.png",
+      "xyxy": [
+        270,
+        127,
+        337,
+        157
+      ]
+    }
+  ],
+  "registered_record_ids": [
+    "99a901123f17b2df4daa55d8fd56cbc7bbfcb036aaee8d58a2a1aa23e77588ba",
+    "a0197ea357454f648c0f43a3cbb8cf1000c67d2630dfc682fdad0fb4ea035d12",
+    "64e635279ac0ac0308859922ea81c674138b0a17c65e71cdd3c97fc5659f82d9"
+  ]
+}

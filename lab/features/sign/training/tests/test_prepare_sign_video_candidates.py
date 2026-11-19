@@ -13,7 +13,7 @@ class SignVideoCandidateTests(unittest.TestCase):
     def test_default_source_uses_categorized_sign_video(self):
         self.assertEqual(
             DEFAULT_SOURCE.relative_to(ROOT).as_posix(),
-            'datasets/raw/sign/archive_assets_legacy/视频/禁止直行牌视频.mp4',
+            'Archive/Assets/working_sources/legacy/sign/视频/禁止直行牌视频.mp4',
         )
 
     def test_missing_colored_assembly_is_unknown_not_an_empty_negative(self):

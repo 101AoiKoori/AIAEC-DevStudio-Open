@@ -23,7 +23,7 @@
   "cases": [
     {
       "id": "B01",
-      "path": "datasets/raw/person/teammate_submission_20261110/dataset/backgrounds/bg_00057_f00209.jpg",
+      "path": "datasets/assets/person/dataset/backgrounds/bg_00057_f00209.jpg",
       "parent_video": "Archive/Assets/场景/综合视频/空场与场景物料_001.mp4",
       "source_group": "legacy_empty_site",
       "metrics_batch": "v4_review_20261115_b5",
@@ -33,7 +33,7 @@
     },
     {
       "id": "B02",
-      "path": "datasets/raw/person/teammate_submission_20261110/dataset/backgrounds/bg_00146_f00749.jpg",
+      "path": "datasets/assets/person/dataset/backgrounds/bg_00146_f00749.jpg",
       "parent_video": "Archive/Assets/场景/综合视频/空场与场景物料_001.mp4",
       "source_group": "legacy_empty_site",
       "metrics_batch": "v4_review_20261115_b5",
@@ -44,7 +44,7 @@
     {
       "id": "B03",
       "path": "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_004001.png",
-      "parent_video": "datasets/raw/site_capture_20261112/videos/full_scene.mp4",
+      "parent_video": "Archive/Assets/captures/site_capture_20261112/videos/full_scene.mp4",
       "source_group": "site_capture_full_scene",
       "metrics_batch": "v4_review_20261115_b5",
       "proposed_label": "clean",
@@ -53,7 +53,7 @@
     },
     {
       "id": "B04",
-      "path": "datasets/raw/person/teammate_submission_20261110/dataset/backgrounds/bg_00000_f00001.jpg",
+      "path": "datasets/assets/person/dataset/backgrounds/bg_00000_f00001.jpg",
       "parent_video": "Archive/Assets/场景/综合视频/空场与场景物料_001.mp4",
       "source_group": "legacy_empty_site",
       "metrics_batch": "v4_review_20261115_b5",
@@ -63,7 +63,7 @@
     },
     {
       "id": "B05",
-      "path": "datasets/raw/person/teammate_submission_20261110/dataset/backgrounds/bg_00040_f00145.jpg",
+      "path": "datasets/assets/person/dataset/backgrounds/bg_00040_f00145.jpg",
       "parent_video": "Archive/Assets/场景/综合视频/空场与场景物料_001.mp4",
       "source_group": "legacy_empty_site",
       "metrics_batch": "v4_review_20261115_b5",
@@ -83,7 +83,7 @@
     },
     {
       "id": "B07",
-      "path": "datasets/raw/person/teammate_submission_20261110/dataset/backgrounds/bg_00017_f00064.jpg",
+      "path": "datasets/assets/person/dataset/backgrounds/bg_00017_f00064.jpg",
       "parent_video": "Archive/Assets/场景/综合视频/空场与场景物料_001.mp4",
       "source_group": "legacy_empty_site",
       "metrics_batch": "v4_review_calibration_legacy_20261115",
@@ -93,7 +93,7 @@
     },
     {
       "id": "B08",
-      "path": "datasets/raw/person/teammate_submission_20261110/dataset/backgrounds/bg_00132_f00703.jpg",
+      "path": "datasets/assets/person/dataset/backgrounds/bg_00132_f00703.jpg",
       "parent_video": "Archive/Assets/场景/综合视频/空场与场景物料_001.mp4",
       "source_group": "legacy_empty_site",
       "metrics_batch": "v4_review_calibration_legacy_20261115",
@@ -103,7 +103,7 @@
     },
     {
       "id": "B09",
-      "path": "datasets/raw/person/teammate_submission_20261110/dataset/backgrounds/bg_00232_f01290.jpg",
+      "path": "datasets/assets/person/dataset/backgrounds/bg_00232_f01290.jpg",
       "parent_video": "Archive/Assets/场景/综合视频/空场与场景物料_001.mp4",
       "source_group": "legacy_empty_site",
       "metrics_batch": "v4_review_20261115_b5",
@@ -114,7 +114,7 @@
     {
       "id": "B10",
       "path": "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_006001.png",
-      "parent_video": "datasets/raw/site_capture_20261112/videos/full_scene.mp4",
+      "parent_video": "Archive/Assets/captures/site_capture_20261112/videos/full_scene.mp4",
       "source_group": "site_capture_full_scene",
       "metrics_batch": "v4_review_20261115_b5",
       "proposed_label": "clutter",
@@ -124,7 +124,7 @@
     {
       "id": "B11",
       "path": "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_007001.png",
-      "parent_video": "datasets/raw/site_capture_20261112/videos/full_scene.mp4",
+      "parent_video": "Archive/Assets/captures/site_capture_20261112/videos/full_scene.mp4",
       "source_group": "site_capture_full_scene",
       "metrics_batch": "v4_review_20261115_b5",
       "proposed_label": "clutter",
@@ -133,7 +133,7 @@
     },
     {
       "id": "B12",
-      "path": "datasets/raw/person/teammate_submission_20261110/dataset/backgrounds/bg_00240_f01318.jpg",
+      "path": "datasets/assets/person/dataset/backgrounds/bg_00240_f01318.jpg",
       "parent_video": "Archive/Assets/场景/综合视频/空场与场景物料_001.mp4",
       "source_group": "legacy_empty_site",
       "metrics_batch": "v4_review_20261115_b5",
@@ -143,7 +143,7 @@
     },
     {
       "id": "B13",
-      "path": "datasets/raw/person/teammate_submission_20261110/dataset/backgrounds/bg_00280_f01474.jpg",
+      "path": "datasets/assets/person/dataset/backgrounds/bg_00280_f01474.jpg",
       "parent_video": "Archive/Assets/场景/综合视频/空场与场景物料_001.mp4",
       "source_group": "legacy_empty_site",
       "metrics_batch": "v4_review_20261115_b5",
@@ -183,7 +183,7 @@
     },
     {
       "id": "B17",
-      "path": "datasets/raw/person/teammate_submission_20261110/dataset/backgrounds/bg_00122_f00551.jpg",
+      "path": "datasets/assets/person/dataset/backgrounds/bg_00122_f00551.jpg",
       "parent_video": "Archive/Assets/场景/综合视频/空场与场景物料_001.mp4",
       "source_group": "legacy_empty_site",
       "metrics_batch": "v4_review_20261115_b5",
@@ -193,7 +193,7 @@
     },
     {
       "id": "B18",
-      "path": "datasets/raw/person/teammate_submission_20261110/dataset/backgrounds/bg_00165_f00930.jpg",
+      "path": "datasets/assets/person/dataset/backgrounds/bg_00165_f00930.jpg",
       "parent_video": "Archive/Assets/场景/综合视频/空场与场景物料_001.mp4",
       "source_group": "legacy_empty_site",
       "metrics_batch": "v4_review_20261115_b5",
@@ -204,7 +204,7 @@
     {
       "id": "B19",
       "path": "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_003001.png",
-      "parent_video": "datasets/raw/site_capture_20261112/videos/full_scene.mp4",
+      "parent_video": "Archive/Assets/captures/site_capture_20261112/videos/full_scene.mp4",
       "source_group": "site_capture_full_scene",
       "metrics_batch": "v4_review_20261115_b5",
       "proposed_label": "geometry_failed",
@@ -214,7 +214,7 @@
     {
       "id": "B20",
       "path": "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_005001.png",
-      "parent_video": "datasets/raw/site_capture_20261112/videos/full_scene.mp4",
+      "parent_video": "Archive/Assets/captures/site_capture_20261112/videos/full_scene.mp4",
       "source_group": "site_capture_full_scene",
       "metrics_batch": "v4_review_20261115_b5",
       "proposed_label": "geometry_failed",
@@ -223,7 +223,7 @@
     },
     {
       "id": "B21",
-      "path": "datasets/raw/person/teammate_submission_20261110/dataset/backgrounds/bg_00080_f00314.jpg",
+      "path": "datasets/assets/person/dataset/backgrounds/bg_00080_f00314.jpg",
       "parent_video": "Archive/Assets/场景/综合视频/空场与场景物料_001.mp4",
       "source_group": "legacy_empty_site",
       "metrics_batch": "v4_review_20261115_b5",
@@ -233,7 +233,7 @@
     },
     {
       "id": "B22",
-      "path": "datasets/raw/person/teammate_submission_20261110/dataset/backgrounds/bg_00120_f00543.jpg",
+      "path": "datasets/assets/person/dataset/backgrounds/bg_00120_f00543.jpg",
       "parent_video": "Archive/Assets/场景/综合视频/空场与场景物料_001.mp4",
       "source_group": "legacy_empty_site",
       "metrics_batch": "v4_review_20261115_b5",
@@ -243,7 +243,7 @@
     },
     {
       "id": "B23",
-      "path": "datasets/raw/person/teammate_submission_20261110/dataset/backgrounds/bg_00160_f00851.jpg",
+      "path": "datasets/assets/person/dataset/backgrounds/bg_00160_f00851.jpg",
       "parent_video": "Archive/Assets/场景/综合视频/空场与场景物料_001.mp4",
       "source_group": "legacy_empty_site",
       "metrics_batch": "v4_review_20261115_b5",

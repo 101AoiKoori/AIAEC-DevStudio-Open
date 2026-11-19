@@ -1,7 +1,7 @@
 """Produce fire candidates from explicitly reviewed facade footprints and a quota plan."""
 
 if __name__ == "__main__":
-    raise SystemExit("Legacy dataset CLI is retired; use datasets/scripts/fire/. Production remains paused.")
+    raise SystemExit("Legacy dataset CLI is retired; use datasets/scripts/fire/.")
 
 import argparse
 import json
@@ -24,7 +24,7 @@ from generate_fire_dataset import _generate, read_image
 ALLOWED_ROOTS = ('datasets/raw', 'Archive/Assets', 'datasets/assets/blender')
 CLASSIFICATION = 'datasets/annotated/raw_source_classification_manifest_20261114.jsonl'
 COPY_MANIFEST = 'datasets/source_copy_manifest.jsonl'
-ARTWORK = 'datasets/raw/fire/team_assets/image1.png'
+ARTWORK = 'Archive/Assets/working_sources/digital/fire/team_assets/image1.png'
 
 
 def checked_path(value, *, source=False, must_exist=True):
@@ -232,7 +232,8 @@ def select_sources(reviewed, seed):
     for index, line in enumerate(manifest.read_text(encoding='utf8').splitlines()):
         row = json.loads(line)
         path = row['path']
-        if (path.startswith('datasets/raw/fire/') and not row['observed_tasks']
+        if (path.startswith(('datasets/raw/fire/', 'Archive/Assets/working_sources/legacy/fire/',
+                             'Archive/Assets/captures/fire/')) and not row['observed_tasks']
                 and '正面' in row['view']):
             observations[path] = index
     db = media_index.connect(readonly=True)

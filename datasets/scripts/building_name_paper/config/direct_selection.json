@@ -10,76 +10,116 @@
       "image": "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_004921.png",
       "task": "building_name_paper",
       "split": "train",
-      "role": "direct_sample",
+      "role": "empty_negative",
       "status": "candidate",
-      "parent_source": "datasets/raw/site_capture_20261112/videos/full_scene.mp4",
+      "parent_source": "Archive/Assets/captures/site_capture_20261112/videos/full_scene.mp4",
       "evidence": {
         "manifest": "datasets/annotated/site_capture_20261112/fire_name_v4_review/review_manifest.json",
         "record_index": 5
       },
       "source_label": "datasets/annotated/site_capture_20261112/fire_name_v4_review/labels/building_name_paper/frame_004921.txt",
       "source_state": "complete_negative",
-      "historical_usage": "development_review; source split unassigned; AI candidate not human accepted"
+      "historical_usage": "development_review; source split unassigned; AI candidate not human accepted",
+      "source_review": {
+        "role": "empty_negative",
+        "frame_id": "16cfa63922d2385e3254c82f1e13055ad4ef538e0e171eeb8d2f4d5188009970",
+        "record_id": "4415bee49471fe039e1325b2ab1622bd5887e46729f20f7d8b6af7cfcd847467",
+        "evidence_ids": [
+          "ef8e8fd0f1ea462089308213c5e9b2ea363da579a31aa7abce2e669f9bd2f3b1"
+        ]
+      }
     },
     {
       "image": "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_002701.png",
       "task": "building_name_paper",
       "split": "train",
-      "role": "direct_sample",
+      "role": "empty_negative",
       "status": "candidate",
-      "parent_source": "datasets/raw/site_capture_20261112/videos/full_scene.mp4",
+      "parent_source": "Archive/Assets/captures/site_capture_20261112/videos/full_scene.mp4",
       "evidence": {
         "manifest": "datasets/annotated/site_capture_20261112/fire_name_v4_review/review_manifest.json",
         "record_index": 2
       },
       "source_label": "datasets/annotated/site_capture_20261112/fire_name_v4_review/labels/building_name_paper/frame_002701.txt",
       "source_state": "complete_negative",
-      "historical_usage": "development_review; source split unassigned; AI candidate not human accepted"
+      "historical_usage": "development_review; source split unassigned; AI candidate not human accepted",
+      "source_review": {
+        "role": "empty_negative",
+        "frame_id": "b5368c01fb638c3570fe350d9bc5776ace4f2e0736ef629c4b9fce81044ee113",
+        "record_id": "1215c50f070091edccb2b92c98295b9175aa875edddb6cf39dda91bc748d03c7",
+        "evidence_ids": [
+          "f6ad45a5f9d8f0d4fa79fe74fd870e599b0880cde6bc56c62d8a6bb2ad8166ee"
+        ]
+      }
     },
     {
       "image": "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_005101.png",
       "task": "building_name_paper",
       "split": "train",
-      "role": "direct_sample",
+      "role": "direct_target",
       "status": "candidate",
-      "parent_source": "datasets/raw/site_capture_20261112/videos/full_scene.mp4",
+      "parent_source": "Archive/Assets/captures/site_capture_20261112/videos/full_scene.mp4",
       "evidence": {
         "manifest": "datasets/annotated/site_capture_20261112/fire_name_v4_review/review_manifest.json",
         "record_index": 6
       },
       "source_label": "datasets/annotated/site_capture_20261112/fire_name_v4_review/labels/building_name_paper/frame_005101.txt",
       "source_state": "complete_positive",
-      "historical_usage": "development_review; source split unassigned; AI candidate not human accepted; OCR unknown"
+      "historical_usage": "development_review; source split unassigned; AI candidate not human accepted; OCR unknown",
+      "source_review": {
+        "role": "direct_target",
+        "frame_id": "9b4af4b725188adaf5bbc008a9e5908bd904e7b6d48780371d5d02d0a0624be9",
+        "record_id": "fc26d50958e87ea6a8fe3320599c66331e23fa0de2d2ed6a49a1685fc598e7ab",
+        "evidence_ids": [
+          "c741e967c3ae6a6d934fdb1f99e3e2831e1ed0f9221e2b22a94cec68917a497d"
+        ]
+      }
     },
     {
       "image": "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_002551.png",
       "task": "building_name_paper",
       "split": "train",
-      "role": "direct_sample",
+      "role": "empty_negative",
       "status": "candidate",
-      "parent_source": "datasets/raw/site_capture_20261112/videos/full_scene.mp4",
+      "parent_source": "Archive/Assets/captures/site_capture_20261112/videos/full_scene.mp4",
       "evidence": {
         "manifest": "datasets/annotated/site_capture_20261112/fire_name_v4_review/review_manifest.json",
         "record_index": 1
       },
       "source_label": "datasets/annotated/site_capture_20261112/fire_name_v4_review/labels/building_name_paper/frame_002551.txt",
       "source_state": "complete_negative",
-      "historical_usage": "development_review; source split unassigned; AI candidate not human accepted"
+      "historical_usage": "development_review; source split unassigned; AI candidate not human accepted",
+      "source_review": {
+        "role": "empty_negative",
+        "frame_id": "d74645d8475283fc46e2bb638de562425e123296162cb01917f7b32526b6990f",
+        "record_id": "5416751072b8747cb1252175a3b24dfc23cf0791b097dc6214aaeee9737a5479",
+        "evidence_ids": [
+          "15e2b085c64deb2331d2b83806bfcd985c8a3faf186c69a4b7ed5e7831b39780"
+        ]
+      }
     },
     {
       "image": "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_003391.png",
       "task": "building_name_paper",
       "split": "train",
-      "role": "direct_sample",
+      "role": "direct_target",
       "status": "candidate",
-      "parent_source": "datasets/raw/site_capture_20261112/videos/full_scene.mp4",
+      "parent_source": "Archive/Assets/captures/site_capture_20261112/videos/full_scene.mp4",
       "evidence": {
         "manifest": "datasets/annotated/site_capture_20261112/fire_name_v4_review/review_manifest.json",
         "record_index": 4
       },
       "source_label": "datasets/annotated/site_capture_20261112/fire_name_v4_review/labels/building_name_paper/frame_003391.txt",
       "source_state": "complete_positive",
-      "historical_usage": "development_review; source split unassigned; AI candidate not human accepted; OCR unknown"
+      "historical_usage": "development_review; source split unassigned; AI candidate not human accepted; OCR unknown",
+      "source_review": {
+        "role": "direct_target",
+        "frame_id": "63536c767c6ee6e78db2fae6c4cd1e71860f514c08005875a039c55eb0afd453",
+        "record_id": "6116a2f08d5d371e2497e5c9f8d1c60a938f8c564811bcaa2c10aa0116947b81",
+        "evidence_ids": [
+          "06ca0d39b0c43edf79a7df7ff1d61ad2ef916031670ba9d4e23a3a8c145e453c"
+        ]
+      }
     }
   ],
   "ocr_scope": "Original transcriptions unknown: keep detection labels, exclude original OCR supervision."

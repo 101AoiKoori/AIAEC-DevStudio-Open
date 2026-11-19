@@ -573,8 +573,9 @@ def scan_unlabelled_targets(
     "below_min_scale": "not_a_target"}`` a standee shorter than 28 % of the frame
     height is recorded in ``below_scale`` and a back-side board in
     ``hard_negatives``; neither enters ``suspects``.  A below-scale candidate
-    that the spec keeps (``below_min_scale="suspect"``) stays a suspect and is
-    not reclassified by side.  The defaults keep the
+    that the spec keeps (``below_min_scale="suspect"``) still undergoes any
+    enabled side check. The result is kept as evidence for the suspect when
+    the match window cannot establish the full object's size. The defaults keep the
     round-one behaviour (no scale filter, back side stays a suspect), so callers
     without a spec see unchanged verdicts.  ``unknown`` side evidence is always
     kept as a suspect.  When ``spec`` is omitted, spec keys found inside
@@ -612,8 +613,12 @@ def scan_unlabelled_targets(
             scales=merged["scales"],
             search_mask=search_mask,
         )
-        candidates.extend(boxes_found)
-        candidate_scores.extend(scores_found)
+        # Greedy NMS visits the highest scores first. A match below the
+        # acceptance score cannot suppress a match that will be reported.
+        for box, score in zip(boxes_found, scores_found):
+            if score > merged["suspect_min_score"]:
+                candidates.append(box)
+                candidate_scores.append(score)
 
     kept = nms(candidates, candidate_scores, merged["nms_iou"]) if candidates else []
     suspects: list[dict[str, Any]] = []
@@ -622,8 +627,6 @@ def scan_unlabelled_targets(
     min_height_fraction = effective_spec["min_height_fraction"]
     for index in kept:
         score = float(candidate_scores[index])
-        if score <= merged["suspect_min_score"]:
-            continue
         box = candidates[index]
         if merged["drop_explained_candidates"] and _centre_is_explained(mask, box):
             continue
@@ -632,23 +635,21 @@ def scan_unlabelled_targets(
         below_min_scale_candidate = (
             min_height_fraction > 0.0 and height_fraction < min_height_fraction
         )
-        if below_min_scale_candidate:
-            if effective_spec["below_min_scale"] == "not_a_target":
-                below_scale.append({"xyxy": box, "score": score, "height_fraction": height_fraction})
-            else:
-                # The spec keeps below-scale candidates: they stay suspects and
-                # are not reclassified as back sides.
-                suspects.append({"xyxy": box, "score": score, "method": "template"})
+        if below_min_scale_candidate and effective_spec["below_min_scale"] == "not_a_target":
+            below_scale.append({"xyxy": box, "score": score, "height_fraction": height_fraction})
             continue
 
+        suspect = {"xyxy": box, "score": score, "method": "template"}
         if effective_spec["back_side"] == "hard_negative":
             x1, y1, x2, y2 = box
             side = classify_standee_side(image_bgr[y1:y2, x1:x2], params=merged)
-            if side["side"] == SIDE_BACK:
+            if side["side"] == SIDE_BACK and not below_min_scale_candidate:
                 hard_negatives.append({"xyxy": box, "score": score, "side": SIDE_BACK})
                 continue
+            if below_min_scale_candidate:
+                suspect["side_observation"] = side
 
-        suspects.append({"xyxy": box, "score": score, "method": "template"})
+        suspects.append(suspect)
 
     suspects.sort(key=lambda item: (-item["score"], item["xyxy"]))
     below_scale.sort(key=lambda item: (-item["score"], item["xyxy"]))

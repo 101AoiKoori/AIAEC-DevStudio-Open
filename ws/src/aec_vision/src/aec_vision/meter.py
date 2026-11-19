@@ -126,6 +126,113 @@ def reading_from_ticks(angle_deg, center, ticks, minimum, maximum):
     return float(np.interp(target, angles, values))
 
 
+POSE_POINT_NAMES = ('temperature_pivot', 'temperature_tip', 'humidity_pivot', 'humidity_tip',
+                    'temperature_min', 'temperature_max', 'humidity_min', 'humidity_max')
+
+
+def equal_angle_scale(center, minimum_point, maximum_point, minimum, maximum,
+                      tick_step, major_step=10, direction='clockwise'):
+    """Construct inferred ticks on an image-plane circle using named endpoints.
+
+    Image Y grows downward, so increasing atan2 angles are clockwise. Direction
+    chooses the arc explicitly; the two endpoints alone do not choose its side.
+    This is an equal-angle estimate, without perspective rectification.
+    """
+    values = (minimum, maximum, tick_step, major_step)
+    if (any(not math.isfinite(float(x)) for x in values) or maximum <= minimum or
+            tick_step <= 0 or major_step <= 0 or direction not in ('clockwise', 'counterclockwise')):
+        raise ValueError('invalid equal-angle scale configuration')
+    positions = np.asarray([center, minimum_point, maximum_point], dtype=float)
+    if positions.shape != (3, 2) or not np.isfinite(positions).all():
+        raise ValueError('scale requires three finite XY points')
+    vectors = positions[1:] - positions[0]
+    radii = np.linalg.norm(vectors, axis=1)
+    if np.any(radii <= 1e-6):
+        raise ValueError('scale endpoint coincides with pivot')
+    start, end = [math.degrees(math.atan2(v[1], v[0])) for v in vectors]
+    sign = 1 if direction == 'clockwise' else -1
+    sweep = (sign * (end - start)) % 360
+    if sweep < 1e-6 or sweep > 360 - 1e-6:
+        raise ValueError('scale endpoints have the same direction')
+    intervals = int(round((maximum - minimum) / tick_step))
+    if intervals < 1 or intervals > 2000 or not math.isclose(intervals * tick_step, maximum-minimum, abs_tol=1e-7):
+        raise ValueError('tick_step must divide the range into 1..2000 intervals')
+    radius = float(np.mean(radii))
+    ticks = []
+    for i in range(intervals + 1):
+        value = minimum + i * tick_step
+        angle = start + sign * sweep * i / intervals
+        rad = math.radians(angle)
+        major = (i in (0, intervals) or math.isclose(value / major_step, round(value / major_step), abs_tol=1e-7))
+        length = radius * (.13 if major else .07)
+        vector = np.asarray([math.cos(rad), math.sin(rad)])
+        ticks.append({'index': i, 'value': value, 'major': major, 'angle_deg': angle,
+                      'start': (positions[0] + (radius-length)*vector).tolist(),
+                      'end': (positions[0] + radius*vector).tolist()})
+    return {'center': positions[0].tolist(), 'radius': radius, 'start_deg': start,
+            'sweep_deg': sweep, 'direction': direction, 'ticks': ticks}
+
+
+def read_pose_dials(points, scales, point_confidence=.5):
+    """Read independent temperature/humidity values from eight predicted XY/conf triplets.
+
+    Order: temperature pivot/tip, humidity pivot/tip, temperature min/max,
+    humidity min/max. Unknown points and out-of-arc needles yield a null reading
+    for that dial only. Generated ticks are inferred, not observed printed marks.
+    """
+    points = np.asarray(points, dtype=float)
+    if points.shape != (8, 3) or not 0 <= point_confidence <= 1:
+        raise ValueError('expected eight XY/confidence triplets and a confidence in [0,1]')
+    result = {}
+    for name, indices in (('temperature', (0, 1, 4, 5)), ('humidity', (2, 3, 6, 7))):
+        cfg = scales[name]
+        pivot, tip, low, high = indices
+        item = {'status': 'unknown', 'value': None, 'ratio': None, 'unit': cfg['unit'],
+                'minimum': cfg['minimum'], 'maximum': cfg['maximum'], 'reason': None,
+                'center': None, 'needle_tip': None, 'scale': None,
+                'method': 'image_plane_equal_angle_estimate'}
+        def usable(i):
+            return bool(np.isfinite(points[i]).all() and point_confidence <= points[i, 2] <= 1)
+        if not all(usable(i) for i in (pivot, low, high)):
+            item['reason'] = 'pivot_or_scale_endpoint_unavailable'
+            result[name] = item
+            continue
+        item['center'] = points[pivot, :2].tolist()
+        try:
+            scale = equal_angle_scale(points[pivot, :2], points[low, :2], points[high, :2],
+                                      cfg['minimum'], cfg['maximum'], cfg['tick_step'],
+                                      cfg.get('major_step', 10), cfg.get('direction', 'clockwise'))
+        except ValueError as error:
+            item['reason'] = 'invalid_scale_geometry: ' + str(error)
+            result[name] = item
+            continue
+        item['scale'] = scale
+        if not usable(tip):
+            item['reason'] = 'needle_tip_unavailable'
+        else:
+            item['needle_tip'] = points[tip, :2].tolist()
+            vector = points[tip, :2] - points[pivot, :2]
+            if np.linalg.norm(vector) <= 1e-6:
+                item['reason'] = 'needle_tip_coincides_with_pivot'
+            else:
+                angle = math.degrees(math.atan2(vector[1], vector[0]))
+                sign = 1 if scale['direction'] == 'clockwise' else -1
+                offset = (sign * (angle-scale['start_deg'])) % 360
+                if offset > 360-1e-7 or offset < 1e-7:
+                    value = cfg['minimum']
+                elif abs(offset-scale['sweep_deg']) < 1e-7:
+                    value = cfg['maximum']
+                else:
+                    value = reading_from_ticks(angle, item['center'], scale['ticks'], cfg['minimum'], cfg['maximum'])
+                if value is None:
+                    item['reason'] = 'needle_outside_configured_scale_arc'
+                else:
+                    item.update(status='estimated', value=float(value),
+                                ratio=float((value-cfg['minimum'])/(cfg['maximum']-cfg['minimum'])))
+        result[name] = item
+    return result
+
+
 def tick_visibility(template, aligned, ticks, threshold=.65):
     """Compare local appearance in template coordinates, independently per tick.
 

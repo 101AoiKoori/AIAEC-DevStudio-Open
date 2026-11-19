@@ -65,6 +65,64 @@ class BayesianAllocationTest(unittest.TestCase):
         self.assertIn('not state occurrence probabilities', result['scope'])
         self.assertEqual(result['status'], 'planned_not_produced')
 
+    def test_machine_validation_evidence_needs_no_human_confirmation_and_preserves_origin(self):
+        self.report.pop('review_status')
+        self.report.update(evidence_origin='machine', machine_evidence={
+            'method': 'detector comparison v1', 'result_reference': 'runs/evaluation.json'})
+        for group in self.report['groups']:
+            group.pop('review_status')
+            group['result_status'] = 'complete'
+        self.write_report()
+        self.observe('group_a', 'group_b')
+        for item in self.request['strata'][0]['observations']:
+            item.pop('review_status')
+            item['evidence_origin'] = 'machine'
+        row = allocation.allocate(self.request, self.root)['strata'][0]
+        self.assertEqual((row['observed_groups'], row['failed_groups']), (2, 1))
+        self.assertEqual(row['observation_status'], 'validation_groups')
+        self.assertEqual(row['group_observations'][0]['evidence_origin'], 'machine')
+        self.assertEqual(row['group_observations'][0]['machine_evidence']['result_reference'],
+                         'runs/evaluation.json')
+        self.assertNotIn('review_status', row['group_observations'][0])
+
+    def test_machine_evidence_rejects_missing_trace_incomplete_result_and_origin_mismatch(self):
+        self.report.pop('review_status')
+        self.report.update(evidence_origin='machine', machine_evidence={
+            'method': 'detector comparison v1', 'result_reference': 'runs/evaluation.json'})
+        for group in self.report['groups']:
+            group.pop('review_status')
+            group['result_status'] = 'complete'
+        self.observe('group_a')
+        observation = self.request['strata'][0]['observations'][0]
+        observation.pop('review_status')
+        observation['evidence_origin'] = 'machine'
+        self.report['machine_evidence']['result_reference'] = ''
+        self.write_report()
+        with self.assertRaisesRegex(ValueError, 'result_reference'):
+            allocation.allocate(self.request, self.root)
+        self.report['machine_evidence']['result_reference'] = 'runs/evaluation.json'
+        self.report['groups'][0]['result_status'] = 'pending'
+        self.write_report()
+        with self.assertRaisesRegex(ValueError, 'binary result'):
+            allocation.allocate(self.request, self.root)
+        self.report['groups'][0]['result_status'] = 'complete'
+        self.write_report()
+        observation.update(evidence_origin='human', review_status='confirmed')
+        with self.assertRaisesRegex(ValueError, 'origin differ'):
+            allocation.allocate(self.request, self.root)
+
+    def test_unselected_pending_groups_do_not_block_selected_group(self):
+        self.observe('group_a')
+        self.report['groups'][1]['review_status'] = 'pending'
+        self.report['groups'][1].pop('failed')
+        self.write_report()
+        row = allocation.allocate(self.request, self.root)['strata'][0]
+        self.assertEqual((row['observed_groups'], row['failed_groups']), (1, 1))
+        self.report['groups'][1]['group_id'] = 'group_a'
+        self.write_report()
+        with self.assertRaisesRegex(ValueError, 'unique ID'):
+            allocation.allocate(self.request, self.root)
+
     def test_beta_interval_matches_documented_group_example(self):
         self.report['groups'] = [{'group_id': f'g{i}', 'review_status': 'confirmed', 'failed': i < 3,
                                   'source_ids': [f'source{i}']} for i in range(10)]
@@ -155,7 +213,9 @@ class BayesianAllocationTest(unittest.TestCase):
             state.update(background={'name': 'scene'}, target={'name': 'fire'},
                          labels={'format': 'yolo'}, augmentation={'brightness': 'low'},
                          sources=['scene-a'], parameters={'seed': 2})
+        self.request['design_context'] = {'task': 'person', 'coverage': 'unverified', 'executable': False}
         result = allocation.plan_generation(self.request, self.root)
+        self.assertEqual(result['design_context'], self.request['design_context'])
         self.assertEqual(result['strata'][0]['parameters'], {'seed': 2})
         self.assertEqual(result['constraints'], {'camera': 'fixed'})
         self.assertEqual(result['planned_total'], 17)
@@ -179,6 +239,61 @@ class BayesianAllocationTest(unittest.TestCase):
             state['min_count'] = 1
         with self.assertRaisesRegex(ValueError, 'outside minimum/maximum'):
             allocation.plan_generation(self.request, self.root)
+
+    def test_conditioned_plan_balances_people_and_respects_feasible_capacity(self):
+        states = []
+        for people in range(2, 7):
+            for yaw in ('left', 'right'):
+                state = self.state(f'{people}_{yaw}', 0, 4)
+                state.update(axes={'person_count': people, 'yaw': yaw},
+                             background={'id': 'scene'}, target={'count': people},
+                             labels={'format': 'yolo'}, augmentation={'light': 'dark'},
+                             sources=['scene'], parameters={'yaw': yaw})
+                states.append(state)
+        self.request.update(budget=23, constraints={'visibility': 'declared'}, strata=states,
+                            conditional_balance={'axes': ['person_count', 'yaw'],
+                                                 'stratify_by': 'person_count', 'seed': 17})
+        result = allocation.plan_generation(self.request, self.root)
+        self.assertEqual(result, allocation.plan_generation(self.request, self.root))
+        counts = {item['value']: item['count']
+                  for item in result['conditional_balance']['counts']['person_count']}
+        self.assertEqual(sum(counts.values()), 23)
+        self.assertEqual(max(counts.values()) - min(counts.values()), 1)
+        self.assertTrue(all(0 <= row['planned_count'] <= 4 for row in result['strata']))
+        self.assertEqual(result['strata'][0]['axes'], states[0]['axes'])
+        for cell in result['conditional_balance']['cross_counts']['yaw']:
+            rows = [row for row in result['strata'] if row['axes']['person_count'] == cell['group_value']
+                    and row['axes']['yaw'] == cell['value']]
+            self.assertEqual(cell['count'], sum(row['planned_count'] for row in rows))
+            self.assertEqual(cell['capacity'], 4 * len(rows))
+            self.assertEqual(cell['group_count'], counts[cell['group_value']])
+
+    def test_conditional_cross_counts_only_report_declared_cells(self):
+        states = []
+        for name, group, background, minimum, maximum in (
+            ('a1', 'a', 'x', 1, 3), ('a2', 'a', 'x', 0, 2),
+            ('a3', 'a', 'y', 0, 0), ('b1', 'b', 'y', 2, 2),
+        ):
+            state = self.state(name, minimum, maximum)
+            state.update(axes={'category': group, 'background': background},
+                         background={'id': background}, target={'id': group},
+                         labels={'format': 'yolo'}, augmentation={'light': 'normal'},
+                         sources=[background], parameters={'seed': 1})
+            states.append(state)
+        self.request.update(budget=3, constraints={'visibility': 'declared'}, strata=states,
+                            conditional_balance={'axes': ['category', 'background'],
+                                                 'stratify_by': 'category', 'seed': 4})
+        result = allocation.plan_generation(self.request, self.root)
+        self.assertEqual([row['planned_count'] for row in result['strata']], [1, 0, 0, 2])
+        cells = result['conditional_balance']['cross_counts']['background']
+        self.assertEqual(cells, [
+            {'group_value': 'a', 'value': 'x', 'count': 1, 'capacity': 5, 'group_count': 1},
+            {'group_value': 'a', 'value': 'y', 'count': 0, 'capacity': 0, 'group_count': 1},
+            {'group_value': 'b', 'value': 'y', 'count': 2, 'capacity': 2, 'group_count': 2},
+        ])
+        self.assertNotIn(('b', 'x'), {(cell['group_value'], cell['value']) for cell in cells})
+        self.assertEqual(result, allocation.plan_generation(self.request, self.root))
+        self.assertEqual(json.loads(json.dumps(result))['conditional_balance']['cross_counts']['background'], cells)
 
     def test_cli_requires_database_before_any_plan_write(self):
         request = self.root / 'request.json'

@@ -8,7 +8,7 @@ import yaml
 ROOT = Path(__file__).resolve().parents[5]
 GEOMETRY = 'datasets/annotated/waste_bin/waste_sticker_surface_geometry_v5_20261114.jsonl'
 ART = 'datasets/annotated/waste_bin/waste_sticker_artwork_source_manifest_20261114.jsonl'
-TOOLKIT = 'datasets/raw/waste_bin/toolkit'
+TOOLKIT = 'Archive/Assets/working_sources/digital/waste_sticker/toolkit'
 CONSTRAINTS = {'max_long_edge': 1280, 'max_short_edge': 720,
                'region_geometry': 'explicit_bin_surface_quad',
                'labels': 'inserted_visible_candidates_background_unknown'}

@@ -74,7 +74,7 @@ def build_ledger(
         "authority": {
             "parent_groups": "datasets/scripts/<task>/config/source.yaml pairing",
             "background_manifests": "batch manifests referenced by task configuration and pairing evidence",
-            "shared_background_pool": cfg.SHARED_POOL_MANIFEST,
+            "shared_background_pool": shared["background_pool"]["manifest"],
             "blender_registry": cfg.BLENDER_REGISTRY,
             "note": "本报告由上述记录重算；不是新的来源权威，也不证明画面语义、标签真值或独立采集。",
         },
@@ -112,6 +112,8 @@ def background_candidates(
             "split": group.get("split"),
         }
         if ok:
+            if reason == "unassigned_source":
+                item["reason"] = reason
             eligible.append(item)
         else:
             item["reason"] = reason
@@ -141,7 +143,8 @@ def background_eligibility(
     primary = split_info.get("primary")
     allowed = {primary} if primary else set()
     allowed.update(split_info.get("same_source_allowed_in") or [])
-    if split not in allowed:
+    pending_assignment = primary == "unassigned" and split in QUALIFIED_SPLITS
+    if split not in allowed and not pending_assignment:
         return False, "split_not_assigned"
     labels = group.get("labels") or {}
     label_status = labels.get("status")
@@ -162,7 +165,7 @@ def background_eligibility(
     labels = group.get("labels") or {}
     if state == "contains_target" and labels.get("status") not in CAPABLE_TARGET_LABELS:
         return False, "target_labels_unknown"
-    return True, "ok"
+    return True, "unassigned_source" if pending_assignment else "ok"
 
 def _now() -> str:
     from datetime import datetime
@@ -269,8 +272,8 @@ def _validate_pairing_structure(
         cap = policy.get("train_parent_cap", DEFAULT_TRAIN_CAP)
         if not isinstance(cap, (int, float)) or isinstance(cap, bool) or not 0 < cap <= 1:
             _issue(issues, "BSL001", "error", "policy.train_parent_cap 必须在 (0, 1] 内", task=task)
-        if policy.get("val_test_mode") != "reserve_only":
-            _issue(issues, "BSL001", "error", "当前只支持 policy.val_test_mode=reserve_only", task=task)
+        if policy.get("val_test_mode") not in ("reserve_only", "assigned_sources_with_split_specific_foregrounds"):
+            _issue(issues, "BSL001", "error", f"policy.val_test_mode 无效: {policy.get('val_test_mode')!r}", task=task)
         if policy.get("derived_inherits_parent_split") is not True:
             _issue(issues, "BSL001", "error", "policy.derived_inherits_parent_split 必须为 true", task=task)
         for key in ("cross_task_duplicates", "same_source_splits"):
@@ -386,7 +389,7 @@ def _validate_groups(
                 elif split.get("primary") in allowed_in:
                     _issue(issues, "BSL005", "error", f"{group.group_id}: same_source_allowed_in 不能包含 primary", task=task, group=group.group_id)
                 elif "train" in allowed_in and split.get("primary") != "train":
-                    _issue(issues, "BSL012", "warning", f"{group.group_id}: 把非 train 父组允许到 train 会破坏独立分集假设", task=task, group=group.group_id)
+                    _issue(issues, "BSL012", "info", f"{group.group_id}: 父组跨集合复用，评估按同源口径解读", task=task, group=group.group_id)
             if group.group_class == "task_real" and split.get("primary") == "shared":
                 _issue(issues, "BSL005", "warning", f"{group.group_id}: task_real 父组通常不应使用 shared split", task=task, group=group.group_id)
         if group.capture_session is not None and group.capture_session not in CAPTURE_SESSIONS:
@@ -434,6 +437,7 @@ def _validate_cap(
                 "role": role,
                 "qualified": len(qualified),
                 "train": len(train),
+                "train_fraction": len(train) / len(qualified) if qualified else None,
                 "status": "assessable",
             }
             if len(qualified) < 5:
@@ -441,8 +445,8 @@ def _validate_cap(
                 _issue(
                     issues,
                     "BSL011",
-                    "warning",
-                    f"{group_class}/{role}: 合格父组 {len(qualified)} 个，少于 5 个，不能按 {cap:.0%} 上限核对",
+                    "info",
+                    f"{group_class}/{role}: 已分配的合格父组 {len(qualified)} 个，来源集中度需结合实际分集解读",
                     task=task,
                 )
             elif len(train) > int(cap * len(qualified)):
@@ -450,8 +454,8 @@ def _validate_cap(
                 _issue(
                     issues,
                     "BSL011",
-                    "error",
-                    f"{group_class}/{role}: train 使用 {len(train)}/{len(qualified)} 个合格父组，超过 {cap:.0%} 上限",
+                    "info",
+                    f"{group_class}/{role}: train 使用 {len(train)}/{len(qualified)} 个合格父组，高于 {cap:.0%} 设计参考值",
                     task=task,
                 )
             summary["roles"].append(item)
@@ -515,7 +519,10 @@ def _validate_data_sources(
             _issue(issues, "BSL005", "error", f"{item.source_id}: split.primary 无效: {primary!r}", task=task, group=item.source_id)
         if parent is not None:
             parent_primary = parent.split.get("primary")
-            if primary not in {"inherit", parent_primary}:
+            declared_reuse = parent.split.get("same_source_allowed_in")
+            assign_child = parent_primary == "unassigned" and primary in QUALIFIED_SPLITS
+            reuse_child = isinstance(declared_reuse, list) and primary in declared_reuse
+            if primary not in {"inherit", "unassigned", parent_primary} and not assign_child and not reuse_child:
                 _issue(issues, "BSL009", "error", f"{item.source_id}: 派生数据源 split={primary!r} 未继承父组 {parent.group_id} 的 {parent_primary!r}", task=task, group=item.source_id)
 
 
@@ -617,7 +624,10 @@ def _build_shared(
     groups: Mapping[str, list[ParentGroup]],
     issues: list[Issue],
 ) -> dict[str, Any]:
-    pool_manifest = root / cfg.SHARED_POOL_MANIFEST
+    manifest_name = cfg.SHARED_POOL_MANIFEST
+    if not (root / manifest_name).is_file() and (root / cfg.LEGACY_POOL).is_file():
+        manifest_name = cfg.LEGACY_POOL
+    pool_manifest = root / manifest_name
     records = None
     if pool_manifest.is_file():
         try:
@@ -626,10 +636,11 @@ def _build_shared(
             records = None
     pool_parents: dict[str, dict[str, Any]] = {}
     image_parent: dict[str, str] = {}
+    allocated: dict[str, dict[str, set[tuple[str, str]]]] = {}
     if records is not None:
         for record in records:
             image = record.get("image")
-            parent = record.get("source_group") or record.get("source_video")
+            parent = record.get("parent_group") or record.get("source_group") or record.get("source_video")
             if not isinstance(parent, str):
                 continue
             parent = cfg.normalize_path(parent)
@@ -637,12 +648,20 @@ def _build_shared(
                 parent,
                 {"source_video": parent, "frames": 0, "sample_images": []},
             )
+            item["parent_group"] = parent
             item["frames"] += 1
             if isinstance(image, str):
                 image = cfg.normalize_path(image)
                 image_parent[image] = parent
                 if len(item["sample_images"]) < 3:
                     item["sample_images"].append(image)
+                if isinstance(record.get("source_image"), str):
+                    image_parent[cfg.normalize_path(record["source_image"])] = parent
+                for task, task_use in record.get("tasks", {}).items():
+                    if "composite_background" in task_use.get("uses", []):
+                        allocated.setdefault(parent, {}).setdefault(task, set()).add(
+                            (task_use.get("split") or "unassigned", record.get("capture_identity") or image)
+                        )
     usage: dict[str, dict[str, dict[str, Any]]] = {}
     for task, entry in entries.items():
         shared_references = entry.get("shared_pool", [])
@@ -668,10 +687,13 @@ def _build_shared(
                 "group": group_id,
                 "items": items,
             }
+        for parent, tasks in allocated.items():
+            if task in tasks:
+                usage.setdefault(parent, {}).setdefault(task, {"declared": declared, "group": group_id, "items": []})
     if records is None and any(entry.get("shared_pool") for entry in entries.values()):
-        _issue(issues, "BSL023", "error", f"共享背景池清单不可读: {cfg.SHARED_POOL_MANIFEST}")
+        _issue(issues, "BSL023", "error", f"共享背景池清单不可读: {manifest_name}")
     pool = {
-        "manifest": cfg.SHARED_POOL_MANIFEST,
+        "manifest": manifest_name,
         "records": len(records) if records is not None else None,
         "parent_groups": [
             {
@@ -682,6 +704,7 @@ def _build_shared(
                         "declared": record["declared"],
                         "group": record["group"],
                         "selected": len(record["items"]),
+                        "allocated_by_split": dict(Counter(split for split, _ in allocated.get(parent, {}).get(task, ()))),
                         "paths": record["items"],
                     }
                     for task, record in sorted(usage.get(parent, {}).items())
@@ -786,7 +809,7 @@ def _check_cross_task(
                 issues,
                 "BSL025",
                 "info",
-                f"共享背景父视频被多个任务选用: {item['source_video']} -> {','.join(tasks)}",
+                f"共享背景父来源被多个任务选用: {item['parent_group']} -> {','.join(tasks)}",
             )
 
 

@@ -42,14 +42,18 @@ def render_readme_table(contract):
 
 
 def render_dataset_block(contract):
+    target_subdirs = contract['datasets'].get('task_target_subdirs', [])
+    target_rows = ['    <任务>/targets/{{{}}}/             任务目标源工作副本'.format(','.join(target_subdirs)),
+                   '    shared/backgrounds/{camera,rendered}/  跨任务共享背景工作图'] if target_subdirs else []
     lines = [
         '```text',
         'datasets/',
-        '  raw/                               原始采集',
+        '  raw/                               按任务和共享背景整理的来源工作副本',
+        *target_rows,
         '  annotated/',
         '    common/review/                   跨任务审查观测与批次清单',
         '    common/perspective/              跨任务透视模板',
-        '    common/sources/                  跨任务背景与来源总账报告',
+        '    common/sources/                  任务目标源、共享背景池与来源总账',
         '    media_index/                     查询缓存与生产回执',
         '    <任务声明的标注根>/               按任务声明，可能是共享批次目录',
         '  scripts/',
@@ -57,7 +61,7 @@ def render_dataset_block(contract):
         '    <任务>/config/                   任务配置',
         '  exports/<任务>/{train,test,val}/   当前数据集',
         '  samples/<任务>/                    当前小样',
-        '  assets/blender/                    Blender 源资产与批次场景',
+        '  assets/blender/                    Blender 编辑工程',
         '  assets/person/                     只读人物候选来源',
         '```',
         '',

@@ -36,7 +36,7 @@ def clean_emptiness():
 
 def metric(**kwargs):
     frame = kwargs.pop("frame", FrameRef(path="datasets/raw/x/frame_0001.png", parent_video="datasets/raw/x/v.mp4", timestamp_seconds=1.0))
-    record = MetricRecord(frame=frame, task="person")
+    record = MetricRecord(frame=frame, task=kwargs.pop("task", "person"))
     record.ground = kwargs.pop("ground", ground())
     record.emptiness = kwargs.pop("emptiness", clean_emptiness())
     record.duplicates = kwargs.pop("duplicates", None)
@@ -109,7 +109,7 @@ class JudgeTests(unittest.TestCase):
         self.assertEqual(verdict.verdict, VERDICT_READY)
         self.assertIn("source_unresolved", verdict.reason_codes)
 
-    def test_hard_negatives_and_below_scale_keep_ready_with_reasons(self):
+    def test_non_person_hard_negatives_and_below_scale_keep_ready_with_reasons(self):
         report = EmptinessReport(
             clean=True,
             suspects=[],
@@ -118,11 +118,53 @@ class JudgeTests(unittest.TestCase):
             below_scale=[{"xyxy": [10, 10, 40, 30], "score": 0.7, "height_fraction": 0.1}],
             hard_negatives=[{"xyxy": [50, 10, 80, 30], "score": 0.6, "side": "back"}],
         )
-        verdict = judge.decide(metric(emptiness=report), None)
+        verdict = judge.decide(metric(task="e_bike", emptiness=report), None)
         self.assertEqual(verdict.verdict, VERDICT_READY)
         self.assertIn("below_target_scale", verdict.reason_codes)
         self.assertIn("hard_negative_present", verdict.reason_codes)
         self.assertEqual(verdict.evidence.get("hard_negative_count"), 1)
+
+    def test_person_small_matches_precede_placement_unsure(self):
+        report = EmptinessReport(
+            clean=True,
+            below_scale=[{"xyxy": [10, 10, 20, 32], "score": 0.7}],
+        )
+        plan = {"placement": {"required": True}}
+        verdict = judge.decide(metric(emptiness=report), plan)
+        self.assertEqual(verdict.verdict, VERDICT_UNKNOWN)
+        self.assertEqual(verdict.reason_codes, ["below_target_scale", "unlabelled_target_suspected"])
+        self.assertEqual(verdict.evidence.get("below_scale_count"), 1)
+
+    def test_person_old_emptiness_scope_is_unknown_even_without_hits(self):
+        report = EmptinessReport(clean=True, target_spec={"below_min_scale": "not_a_target"})
+        verdict = judge.decide(metric(emptiness=report), {"placement": {"required": True}})
+        self.assertEqual(verdict.verdict, VERDICT_UNKNOWN)
+        self.assertEqual(verdict.reason_codes, ["emptiness_unproven"])
+        self.assertEqual(verdict.evidence.get("judge"), "stale_person_emptiness_scope")
+
+    def test_scaled_search_without_dropped_hits_can_be_ready(self):
+        report = EmptinessReport(clean=True, target_spec={"below_min_scale": "not_a_target"})
+        record = metric(emptiness=report, extra={"image_shape": SHAPE,
+                                                 "emptiness_search": {"reference_frame_height": 360}})
+        verdict = judge.decide(record)
+        self.assertEqual(verdict.verdict, VERDICT_READY)
+
+    def test_fresh_person_suspect_precedes_placement_even_if_emptiness_optional(self):
+        report = EmptinessReport(clean=False, suspects=[{"xyxy": [10, 10, 20, 32], "score": 0.7}])
+        plan = {"placement": {"required": True}, "thresholds": {"emptiness_required": False}}
+        verdict = judge.decide(metric(emptiness=report), plan)
+        self.assertEqual(verdict.verdict, VERDICT_UNKNOWN)
+        self.assertEqual(verdict.reason_codes, ["unlabelled_target_suspected"])
+        self.assertEqual(verdict.evidence.get("count"), 1)
+
+    def test_known_person_box_excludes_empty_background_and_is_preserved(self):
+        targets = [{"class_name": "community", "xyxy": [10, 10, 20, 32]}]
+        record = metric(extra={"image_shape": SHAPE, "existing_targets": targets})
+        verdict = judge.decide(record, {"placement": {"required": True}})
+        self.assertEqual(verdict.verdict, VERDICT_EXCLUDED)
+        self.assertEqual(verdict.reason_codes, ["target_annotation_present"])
+        self.assertEqual(verdict.existing_targets, targets)
+        self.assertEqual(judge.decide(record, role="foreground").verdict, VERDICT_READY)
 
     def test_background_without_placement_patch_is_unknown(self):
         bare = GroundObservation(

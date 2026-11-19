@@ -1,7 +1,7 @@
 """Crop existing source-tracked frontal standee scenes to 640x480 candidates."""
 
 if __name__ == "__main__":
-    raise SystemExit("Task helper is import-only; use the primary entry in datasets/scripts/person/. Production remains paused.")
+    raise SystemExit("Task helper is import-only; use the primary entry in datasets/scripts/person/.")
 
 import argparse
 import json
@@ -30,10 +30,13 @@ def rel(path):
     return path.relative_to(ROOT).as_posix()
 
 
-def source_role_inputs(root):
+def source_role_inputs(root, *, known=None, queue_dependencies=None):
     """Declare the source queue and the files source_role compares."""
-    known = build_queue(root)
-    media, procedural, code = queue_inputs(root)
+    if queue_dependencies is None:
+        queue_dependencies = queue_inputs(root)
+    if known is None:
+        known = build_queue(root, inputs=queue_dependencies)
+    media, procedural, code = queue_dependencies
     media = set(media)
     for name in known['exposed_images']:
         path = root / name

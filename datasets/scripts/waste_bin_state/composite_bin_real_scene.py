@@ -6,7 +6,7 @@ are candidates, not independent validation/test images. No model is trained.
 """
 
 if __name__ == "__main__":
-    raise SystemExit("Task helper is import-only; use the primary entry in datasets/scripts/waste_bin_state/. Production remains paused.")
+    raise SystemExit("Task helper is import-only; use the primary entry in datasets/scripts/waste_bin_state/.")
 
 import argparse
 import csv
@@ -23,9 +23,9 @@ import yaml
 ROOT = Path(__file__).resolve().parents[3]
 SRC = ROOT / 'datasets/exports/waste_bin/blender_state_candidates_160_20261110'
 EXPORT = ROOT / 'datasets/exports/waste_bin/blender_state_yolo_candidates_160_20261110'
-BASE = ROOT / 'datasets/raw/person/teammate_submission_20261110/dataset'
+BASE = ROOT / 'datasets/assets/person/dataset'
 CACHE = ROOT / 'datasets/exports/waste_bin/.cache/assets'
-CLASSES = ROOT / 'datasets/raw/waste_bin/toolkit/configs/classes.yaml'
+CLASSES = ROOT / 'Archive/Assets/working_sources/digital/waste_sticker/toolkit/configs/classes.yaml'
 COLORS = {'blue': (1, 0, 0), 'red': (0, 1, 0), 'green': (0, 0, 1), 'gray': (1, 1, 0)}
 
 
@@ -332,7 +332,7 @@ def _guard_icons():
     """Declare cached artwork, its original media, and its category contract."""
     classes = yaml.safe_load(CLASSES.read_text(encoding='utf8'))
     names = [item['name'] for item in classes['items']]
-    media = {ROOT / 'datasets/raw/waste_bin/toolkit/SourcePic' / (name + '.png') for name in names}
+    media = {ROOT / 'Archive/Assets/working_sources/digital/waste_sticker/toolkit/SourcePic' / (name + '.png') for name in names}
     procedural = {CLASSES, ROOT / 'config/perception_tasks.json'}
     procedural.update(CACHE / (name + '.npz') for name in names)
     return media, procedural

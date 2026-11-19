@@ -1,7 +1,7 @@
 
 
 if __name__ == "__main__":
-    raise SystemExit("Legacy dataset CLI is retired; use datasets/scripts/meter/. Production remains paused.")
+    raise SystemExit("Legacy dataset CLI is retired; use datasets/scripts/meter/.")
 #!/usr/bin/env python3
 """Use the selected face texture and invoke Blender for a small experiment.
 

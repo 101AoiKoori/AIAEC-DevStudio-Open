@@ -69,7 +69,7 @@ def make_plan(scene_key, seed=20261114, pilot=False):
     return {'schema_version': 1, 'model_key': 'e_bike', 'target_split': 'train',
             'purpose': 'Explicit fitted Blender e-bike candidate states.', 'budget': len(states),
             'uncertainty_weight': 0, 'independence_basis': 'Scene and real cutout parents recur; fitted renders are not independent camera captures.',
-            'scene': scene, 'constraints': {'minimum_visible_fraction': .7, 'minimum_visible_pixels': 120,
+            'scene': scene, 'scene_key': scene_key, 'constraints': {'minimum_visible_fraction': .7, 'minimum_visible_pixels': 120,
                                            'allow_truncation': False}, 'strata': states}
 
 

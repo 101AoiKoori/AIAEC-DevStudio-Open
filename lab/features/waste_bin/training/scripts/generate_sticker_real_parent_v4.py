@@ -1,7 +1,7 @@
 """Compose sticker candidates on a recorded real-scene frame with an indexed bin mask."""
 
 if __name__ == "__main__":
-    raise SystemExit("Legacy dataset CLI is retired; use datasets/scripts/waste_bin_state or waste_sticker/. Production remains paused.")
+    raise SystemExit("Legacy dataset CLI is retired; use datasets/scripts/waste_bin_state or waste_sticker/.")
 
 import argparse
 import json
@@ -23,7 +23,7 @@ from lab.training_common.production_guard import generation_guard
 
 BACKGROUND = ROOT / 'datasets/annotated/fire/real_background_candidates_20261110/images/0001.png'
 BACKGROUND_MANIFEST = ROOT / 'datasets/annotated/fire/real_background_candidates_20261110/manifest.json'
-PARENT_VIDEO = 'datasets/raw/site_archive_legacy/场景/综合视频/空场与场景物料_001.mp4'
+PARENT_VIDEO = 'Archive/Assets/working_sources/legacy/site/场景/综合视频/空场与场景物料_001.mp4'
 CONSTRAINTS = {'source_bin_color': 'red', 'height_px': [165, 210],
                'bottom_px': [410, 462], 'paper_size_rule': 'max(12,round(bin_width*0.22))'}
 
@@ -50,7 +50,7 @@ def validate_plan(plan, names, src, mask):
                 raise ValueError(key + ' must be finite and between 0 and 2')
         name = names[cls] if cls is not None else None
         target = {'kind': 'sticker', 'class_id': cls, 'name': name} if name else {'kind': 'negative'}
-        artwork = [f'datasets/raw/waste_bin/toolkit/SourcePic/{name}.png'] if name else []
+        artwork = [f'Archive/Assets/working_sources/digital/waste_sticker/toolkit/SourcePic/{name}.png'] if name else []
         if (state['background'] != {'kind': 'real_frame', 'image': background} or
                 state['target'] != target or state['labels'] != {'format': 'yolo_detection', 'class_id': cls} or
                 state['augmentation'] != {'gain': params['gain'], 'saturation': params['saturation'],
@@ -82,8 +82,8 @@ def main():
     names = [x['name'] for x in classes]
     validate_plan(declaration, names, src, mask)
     media = [BACKGROUND, src, mask]
-    media += [ROOT / 'datasets/raw/waste_bin/toolkit/SourcePic' / (name + '.png') for name in names]
-    toolkit = ROOT / 'datasets/raw/waste_bin/toolkit'
+    media += [ROOT / 'Archive/Assets/working_sources/digital/waste_sticker/toolkit/SourcePic' / (name + '.png') for name in names]
+    toolkit = ROOT / 'Archive/Assets/working_sources/digital/waste_sticker/toolkit'
     procedural = [BACKGROUND_MANIFEST, scene_manifest, base.CLASSES, ROOT / 'config/perception_tasks.json',
                   toolkit / 'configs/gen_default.yaml', plan_path]
     with generation_guard('waste_sticker_real_parent_v4:' + out.relative_to(ROOT).as_posix(), media, [out],

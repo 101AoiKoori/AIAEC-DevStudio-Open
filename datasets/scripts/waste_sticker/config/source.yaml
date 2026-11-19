@@ -1,13 +1,20 @@
 task: waste_sticker
-animated_asset: datasets/assets/blender/waste_bin/waste_sticker_animated_v4.blend
+target_working_manifest: datasets/annotated/common/sources/targets/waste_sticker/target_sources_manifest.json
+background_pool_manifest: datasets/annotated/common/sources/background_pool_manifest.json
+direct_capture_manifests:
+- datasets/annotated/car_real_capture_20261112/direct_real_manifest.json
+- datasets/annotated/common/sources/archive_real_capture.json
+animated_asset: datasets/assets/blender/aiaec_dataset.blend
 animated_source_plan: lab/features/waste_bin/training/config/waste_sticker_source_plan_20261114.json
-status: explicit_real_frames_and_synthetic_inputs_consumed_production_paused
+status: explicit_real_frames_and_synthetic_inputs_consumed
 real_photo_geometry_manifest: datasets/annotated/waste_bin/waste_sticker_surface_geometry_v5_20261114.jsonl
+rendered_surface_manifest: datasets/annotated/waste_bin/waste_sticker_arena_surfaces_20261117/manifest.json
 databases:
   media_query: datasets/annotated/media_index/query_cache.sqlite3
   blender_registry: datasets/blender_source_registry.sqlite3
-real_sticker_source: datasets/raw/car_real_capture_20261112/P22_TRASH.png
-real_video_frames_root: datasets/raw/car_real_capture_20261112/frames_20261112_152304
+  frame_environment: datasets/annotated/common/sources/frame_environment.sqlite3
+real_sticker_source: Archive/Assets/captures/car_real_capture_20261112/P22_TRASH.png
+real_video_frames_root: Archive/Assets/captures/car_real_capture_20261112/frames_20261112_152304
 real_video_frames: V_20261112_152304_002011.jpg..V_20261112_152304_002052.jpg
 stationary_frame_range: V_20261112_152304_002016.jpg..V_20261112_152304_002044.jpg
 frame_filename_pattern: V_20261112_152304_{index:06d}.jpg
@@ -17,109 +24,124 @@ frame_indices:
   stationary_first: 2016
   stationary_last: 2044
 roots:
-- datasets/raw/waste_bin
-- datasets/raw/car_real_capture_20261112
-- datasets/assets/blender/waste_bin
+- Archive/Assets/working_sources/legacy/waste_bin
+- Archive/Assets/working_sources/digital/waste_sticker
+- Archive/Assets/captures/car_real_capture_20261112
+- datasets/assets/blender
 records:
 - datasets/annotated/waste_bin/waste_sticker_artwork_source_manifest_20261114.jsonl
-selection: 带贴实拍使用指定采集组；空桶视频、24种图案和Blender可用于合成。
+selection: 带贴实拍按类别和可见框的完整标签选用，贴纸可在桶面、其他表面或独立摆放。当前合成使用空桶视频、24 种图案和 Blender 桶面场景。
 real_annotations: datasets/annotated/waste_bin/waste_sticker_p22_stationary_annotations_20261114.json
-real_video_parent: datasets/raw/car_real_capture_20261112/V_20261112_152304.mp4
-artwork_toolkit: datasets/raw/waste_bin/toolkit
-arena_scene: datasets/assets/blender/shared/arena_4m2_pbr_20261112/arena_master_user_20261113.blend
+real_video_parent: Archive/Assets/captures/car_real_capture_20261112/V_20261112_152304.mp4
+artwork_toolkit: Archive/Assets/working_sources/digital/waste_sticker/toolkit
+arena_scene: datasets/assets/blender/aiaec_dataset.blend
 surface_background_roles: datasets/annotated/waste_bin/waste_sticker_video_background_roles_20261114.jsonl
-production_plan: datasets/scripts/waste_sticker/config/production_plan.json
-direct_real_plan: datasets/scripts/waste_sticker/config/direct_real_plan.json
-blender_plan: datasets/scripts/waste_sticker/config/blender_plan.json
+production_plan: datasets/scripts/waste_sticker/config/full_train_plan.json
+legacy_finetune_plan: datasets/scripts/waste_sticker/config/hard_negative_finetune_plan.json
+finetune_plan: datasets/scripts/waste_sticker/config/recall_preserving_finetune_plan.json
+legacy_finetune_manifest: datasets/annotated/waste_bin/waste_sticker_hard_negative/manifest.json
+finetune_manifest: datasets/annotated/waste_bin/waste_sticker_recall_preserving/manifest.json
+finetune_result: runs/waste_sticker/v4_recall_preserving_from_remote_20261118/comparison/workflow_status.json
+reshoot_negative_evidence: datasets/scripts/waste_sticker/config/recall_preserving_finetune_plan.json#reshoot_negative_sources
+legacy_surface_plan: datasets/scripts/waste_sticker/config/production_plan.json
+native_full_plan: datasets/scripts/waste_sticker/config/native_full_plan.json
+surface_full_plan: datasets/scripts/waste_sticker/config/surface_full_plan.json
+hybrid_full_plan: datasets/scripts/waste_sticker/config/hybrid_full_plan.json
+full_val_plan: datasets/scripts/waste_sticker/config/full_val_plan.json
+full_test_plan: datasets/scripts/waste_sticker/config/full_test_plan.json
+sample_manifest: datasets/samples/waste_sticker/manifest.json
+legacy_direct_real_plan: datasets/scripts/waste_sticker/config/direct_real_plan.json
+legacy_blender_plan: datasets/scripts/waste_sticker/config/blender_plan.json
+legacy_sample_note: 旧独立渲染与指定实拍计划保留历史配方；当前小样实际内容查询 sample_manifest，不合并进正式分集配额。
 current_selection:
   scope: current_batch_only_original_annotations_unchanged
   direct_images:
-  - datasets/raw/car_real_capture_20261112/frames_20261112_152304/V_20261112_152304_002016.jpg
+  - Archive/Assets/captures/car_real_capture_20261112/frames_20261112_152304/V_20261112_152304_002016.jpg
   excluded_direct_images:
-  - image: datasets/raw/car_real_capture_20261112/P22_TRASH.png
+  - image: Archive/Assets/captures/car_real_capture_20261112/P22_TRASH.png
     reason: existing_train_excluded_regression
-  - image: datasets/raw/car_real_capture_20261112/frames_20261112_152304/V_20261112_152304_002011.jpg
-    reason: annotation_missing
-  - image: datasets/raw/car_real_capture_20261112/frames_20261112_152304/V_20261112_152304_002012.jpg
-    reason: annotation_missing
-  - image: datasets/raw/car_real_capture_20261112/frames_20261112_152304/V_20261112_152304_002013.jpg
-    reason: annotation_missing
-  - image: datasets/raw/car_real_capture_20261112/frames_20261112_152304/V_20261112_152304_002014.jpg
-    reason: annotation_missing
-  - image: datasets/raw/car_real_capture_20261112/frames_20261112_152304/V_20261112_152304_002015.jpg
-    reason: annotation_missing
-  - image: datasets/raw/car_real_capture_20261112/frames_20261112_152304/V_20261112_152304_002017.jpg
-    reason: annotation_missing
-  - image: datasets/raw/car_real_capture_20261112/frames_20261112_152304/V_20261112_152304_002018.jpg
-    reason: annotation_missing
-  - image: datasets/raw/car_real_capture_20261112/frames_20261112_152304/V_20261112_152304_002019.jpg
-    reason: annotation_missing
-  - image: datasets/raw/car_real_capture_20261112/frames_20261112_152304/V_20261112_152304_002020.jpg
-    reason: annotation_missing
-  - image: datasets/raw/car_real_capture_20261112/frames_20261112_152304/V_20261112_152304_002021.jpg
-    reason: annotation_missing
-  - image: datasets/raw/car_real_capture_20261112/frames_20261112_152304/V_20261112_152304_002022.jpg
-    reason: annotation_missing
-  - image: datasets/raw/car_real_capture_20261112/frames_20261112_152304/V_20261112_152304_002023.jpg
-    reason: annotation_missing
-  - image: datasets/raw/car_real_capture_20261112/frames_20261112_152304/V_20261112_152304_002024.jpg
-    reason: annotation_missing
-  - image: datasets/raw/car_real_capture_20261112/frames_20261112_152304/V_20261112_152304_002025.jpg
-    reason: annotation_missing
-  - image: datasets/raw/car_real_capture_20261112/frames_20261112_152304/V_20261112_152304_002026.jpg
-    reason: annotation_missing
-  - image: datasets/raw/car_real_capture_20261112/frames_20261112_152304/V_20261112_152304_002027.jpg
-    reason: annotation_missing
-  - image: datasets/raw/car_real_capture_20261112/frames_20261112_152304/V_20261112_152304_002028.jpg
-    reason: annotation_missing
-  - image: datasets/raw/car_real_capture_20261112/frames_20261112_152304/V_20261112_152304_002029.jpg
-    reason: annotation_missing
-  - image: datasets/raw/car_real_capture_20261112/frames_20261112_152304/V_20261112_152304_002030.jpg
-    reason: annotation_missing
-  - image: datasets/raw/car_real_capture_20261112/frames_20261112_152304/V_20261112_152304_002031.jpg
-    reason: annotation_missing
-  - image: datasets/raw/car_real_capture_20261112/frames_20261112_152304/V_20261112_152304_002032.jpg
-    reason: annotation_missing
-  - image: datasets/raw/car_real_capture_20261112/frames_20261112_152304/V_20261112_152304_002033.jpg
-    reason: annotation_missing
-  - image: datasets/raw/car_real_capture_20261112/frames_20261112_152304/V_20261112_152304_002034.jpg
-    reason: annotation_missing
-  - image: datasets/raw/car_real_capture_20261112/frames_20261112_152304/V_20261112_152304_002035.jpg
-    reason: annotation_missing
-  - image: datasets/raw/car_real_capture_20261112/frames_20261112_152304/V_20261112_152304_002036.jpg
-    reason: annotation_missing
-  - image: datasets/raw/car_real_capture_20261112/frames_20261112_152304/V_20261112_152304_002037.jpg
-    reason: annotation_missing
-  - image: datasets/raw/car_real_capture_20261112/frames_20261112_152304/V_20261112_152304_002038.jpg
-    reason: annotation_missing
-  - image: datasets/raw/car_real_capture_20261112/frames_20261112_152304/V_20261112_152304_002039.jpg
-    reason: annotation_missing
-  - image: datasets/raw/car_real_capture_20261112/frames_20261112_152304/V_20261112_152304_002040.jpg
-    reason: annotation_missing
-  - image: datasets/raw/car_real_capture_20261112/frames_20261112_152304/V_20261112_152304_002041.jpg
-    reason: annotation_missing
-  - image: datasets/raw/car_real_capture_20261112/frames_20261112_152304/V_20261112_152304_002042.jpg
-    reason: annotation_missing
-  - image: datasets/raw/car_real_capture_20261112/frames_20261112_152304/V_20261112_152304_002043.jpg
-    reason: annotation_missing
-  - image: datasets/raw/car_real_capture_20261112/frames_20261112_152304/V_20261112_152304_002044.jpg
-    reason: partial_classes_unknown
-  - image: datasets/raw/car_real_capture_20261112/frames_20261112_152304/V_20261112_152304_002045.jpg
-    reason: annotation_missing
-  - image: datasets/raw/car_real_capture_20261112/frames_20261112_152304/V_20261112_152304_002046.jpg
-    reason: annotation_missing
-  - image: datasets/raw/car_real_capture_20261112/frames_20261112_152304/V_20261112_152304_002047.jpg
-    reason: annotation_missing
-  - image: datasets/raw/car_real_capture_20261112/frames_20261112_152304/V_20261112_152304_002048.jpg
-    reason: annotation_missing
-  - image: datasets/raw/car_real_capture_20261112/frames_20261112_152304/V_20261112_152304_002049.jpg
-    reason: annotation_missing
-  - image: datasets/raw/car_real_capture_20261112/frames_20261112_152304/V_20261112_152304_002050.jpg
-    reason: annotation_missing
-  - image: datasets/raw/car_real_capture_20261112/frames_20261112_152304/V_20261112_152304_002051.jpg
-    reason: annotation_missing
-  - image: datasets/raw/car_real_capture_20261112/frames_20261112_152304/V_20261112_152304_002052.jpg
-    reason: annotation_missing
+  - image: Archive/Assets/captures/car_real_capture_20261112/frames_20261112_152304/V_20261112_152304_002011.jpg
+    reason: reviewed_complete_unassigned_not_selected
+  - image: Archive/Assets/captures/car_real_capture_20261112/frames_20261112_152304/V_20261112_152304_002012.jpg
+    reason: reviewed_complete_unassigned_not_selected
+  - image: Archive/Assets/captures/car_real_capture_20261112/frames_20261112_152304/V_20261112_152304_002013.jpg
+    reason: partial_label_or_visibility
+  - image: Archive/Assets/captures/car_real_capture_20261112/frames_20261112_152304/V_20261112_152304_002014.jpg
+    reason: reviewed_complete_unassigned_not_selected
+  - image: Archive/Assets/captures/car_real_capture_20261112/frames_20261112_152304/V_20261112_152304_002015.jpg
+    reason: reviewed_complete_unassigned_not_selected
+  - image: Archive/Assets/captures/car_real_capture_20261112/frames_20261112_152304/V_20261112_152304_002017.jpg
+    reason: reviewed_complete_unassigned_not_selected
+  - image: Archive/Assets/captures/car_real_capture_20261112/frames_20261112_152304/V_20261112_152304_002018.jpg
+    reason: reviewed_complete_unassigned_not_selected
+  - image: Archive/Assets/captures/car_real_capture_20261112/frames_20261112_152304/V_20261112_152304_002019.jpg
+    reason: reviewed_complete_unassigned_not_selected
+  - image: Archive/Assets/captures/car_real_capture_20261112/frames_20261112_152304/V_20261112_152304_002020.jpg
+    reason: reviewed_complete_unassigned_not_selected
+  - image: Archive/Assets/captures/car_real_capture_20261112/frames_20261112_152304/V_20261112_152304_002021.jpg
+    reason: reviewed_complete_unassigned_not_selected
+  - image: Archive/Assets/captures/car_real_capture_20261112/frames_20261112_152304/V_20261112_152304_002022.jpg
+    reason: reviewed_complete_unassigned_not_selected
+  - image: Archive/Assets/captures/car_real_capture_20261112/frames_20261112_152304/V_20261112_152304_002023.jpg
+    reason: reviewed_complete_unassigned_not_selected
+  - image: Archive/Assets/captures/car_real_capture_20261112/frames_20261112_152304/V_20261112_152304_002024.jpg
+    reason: reviewed_complete_unassigned_not_selected
+  - image: Archive/Assets/captures/car_real_capture_20261112/frames_20261112_152304/V_20261112_152304_002025.jpg
+    reason: reviewed_complete_unassigned_not_selected
+  - image: Archive/Assets/captures/car_real_capture_20261112/frames_20261112_152304/V_20261112_152304_002026.jpg
+    reason: reviewed_complete_unassigned_not_selected
+  - image: Archive/Assets/captures/car_real_capture_20261112/frames_20261112_152304/V_20261112_152304_002027.jpg
+    reason: reviewed_complete_unassigned_not_selected
+  - image: Archive/Assets/captures/car_real_capture_20261112/frames_20261112_152304/V_20261112_152304_002028.jpg
+    reason: reviewed_complete_unassigned_not_selected
+  - image: Archive/Assets/captures/car_real_capture_20261112/frames_20261112_152304/V_20261112_152304_002029.jpg
+    reason: reviewed_complete_unassigned_not_selected
+  - image: Archive/Assets/captures/car_real_capture_20261112/frames_20261112_152304/V_20261112_152304_002030.jpg
+    reason: reviewed_complete_unassigned_not_selected
+  - image: Archive/Assets/captures/car_real_capture_20261112/frames_20261112_152304/V_20261112_152304_002031.jpg
+    reason: reviewed_complete_unassigned_not_selected
+  - image: Archive/Assets/captures/car_real_capture_20261112/frames_20261112_152304/V_20261112_152304_002032.jpg
+    reason: reviewed_complete_unassigned_not_selected
+  - image: Archive/Assets/captures/car_real_capture_20261112/frames_20261112_152304/V_20261112_152304_002033.jpg
+    reason: reviewed_complete_unassigned_not_selected
+  - image: Archive/Assets/captures/car_real_capture_20261112/frames_20261112_152304/V_20261112_152304_002034.jpg
+    reason: reviewed_complete_unassigned_not_selected
+  - image: Archive/Assets/captures/car_real_capture_20261112/frames_20261112_152304/V_20261112_152304_002035.jpg
+    reason: reviewed_complete_unassigned_not_selected
+  - image: Archive/Assets/captures/car_real_capture_20261112/frames_20261112_152304/V_20261112_152304_002036.jpg
+    reason: reviewed_complete_unassigned_not_selected
+  - image: Archive/Assets/captures/car_real_capture_20261112/frames_20261112_152304/V_20261112_152304_002037.jpg
+    reason: reviewed_complete_unassigned_not_selected
+  - image: Archive/Assets/captures/car_real_capture_20261112/frames_20261112_152304/V_20261112_152304_002038.jpg
+    reason: reviewed_complete_unassigned_not_selected
+  - image: Archive/Assets/captures/car_real_capture_20261112/frames_20261112_152304/V_20261112_152304_002039.jpg
+    reason: reviewed_complete_unassigned_not_selected
+  - image: Archive/Assets/captures/car_real_capture_20261112/frames_20261112_152304/V_20261112_152304_002040.jpg
+    reason: reviewed_complete_unassigned_not_selected
+  - image: Archive/Assets/captures/car_real_capture_20261112/frames_20261112_152304/V_20261112_152304_002041.jpg
+    reason: reviewed_complete_unassigned_not_selected
+  - image: Archive/Assets/captures/car_real_capture_20261112/frames_20261112_152304/V_20261112_152304_002042.jpg
+    reason: reviewed_complete_unassigned_not_selected
+  - image: Archive/Assets/captures/car_real_capture_20261112/frames_20261112_152304/V_20261112_152304_002043.jpg
+    reason: partial_label_or_visibility
+  - image: Archive/Assets/captures/car_real_capture_20261112/frames_20261112_152304/V_20261112_152304_002044.jpg
+    reason: partial_label_or_visibility
+  - image: Archive/Assets/captures/car_real_capture_20261112/frames_20261112_152304/V_20261112_152304_002045.jpg
+    reason: partial_label_or_visibility
+  - image: Archive/Assets/captures/car_real_capture_20261112/frames_20261112_152304/V_20261112_152304_002046.jpg
+    reason: partial_label_or_visibility
+  - image: Archive/Assets/captures/car_real_capture_20261112/frames_20261112_152304/V_20261112_152304_002047.jpg
+    reason: partial_label_or_visibility
+  - image: Archive/Assets/captures/car_real_capture_20261112/frames_20261112_152304/V_20261112_152304_002048.jpg
+    reason: partial_label_or_visibility
+  - image: Archive/Assets/captures/car_real_capture_20261112/frames_20261112_152304/V_20261112_152304_002049.jpg
+    reason: partial_label_or_visibility
+  - image: Archive/Assets/captures/car_real_capture_20261112/frames_20261112_152304/V_20261112_152304_002050.jpg
+    reason: partial_label_or_visibility
+  - image: Archive/Assets/captures/car_real_capture_20261112/frames_20261112_152304/V_20261112_152304_002051.jpg
+    reason: partial_label_or_visibility
+  - image: Archive/Assets/captures/car_real_capture_20261112/frames_20261112_152304/V_20261112_152304_002052.jpg
+    reason: partial_label_or_visibility
   surface_images:
   - datasets/annotated/waste_bin/real_review_candidates_20261110/images/0002.png
   - datasets/annotated/waste_bin/real_review_candidates_20261110/images/0005.png
@@ -153,17 +175,16 @@ candidate_pool:
   strata: 12
   parent_surfaces: 2
   geometry_manifest: datasets/annotated/waste_bin/bin_reference_geometry_manifest.jsonl
-  blocking_review: per-class instance truth on the two real surfaces; unknown pattern or bucket ownership stays unknown and the 24-class balance needs the expanded plan.
+  blocking_review: verify artwork class and visible box for each instance in this batch; record the verified surface binding for the two on-bin composites.
 pairing:
   schema_version: 1
   status: draft
   composition_policy:
     target_source: blender_primary
     blender_priority: increased
-    blender_share_target: 0.50
     target_components: [animated_sticker_scene]
     background_components: [arena_scene]
-    note: 用户 2026-11-15 确认采用 10/40/50；动画场景覆盖 24 类与四色桶，实拍带贴仅 1 组
+    note: Train 纳入可用直接实拍目标并结合合成，实际比例随当批选源和计划确定；使用实拍底图的整桶混合和实拍桶面贴纸均计实拍背景合成。P22 同源实拍回归范围按实际接触记录。
   policy:
     parent_classes: [task_real, background]
     split_unit: parent_group
@@ -177,44 +198,59 @@ pairing:
       class: task_real
       kind: parent_video
       paths:
-        - datasets/raw/car_real_capture_20261112/P22_TRASH.png
-        - datasets/raw/car_real_capture_20261112/V_20261112_152304.mp4
+        - Archive/Assets/captures/car_real_capture_20261112/P22_TRASH.png
+        - Archive/Assets/captures/car_real_capture_20261112/V_20261112_152304.mp4
       evidence:
         - {manifest: datasets/annotated/waste_bin/waste_sticker_p22_stationary_annotations_20261114.json}
+        - {manifest: datasets/annotated/common/review/shared_multitask_sticker_002016_sample_20261117.jsonl}
+        - {manifest: datasets/annotated/common/review/shared_multitask_sticker_car_real_remaining_20261117.jsonl}
       capture_session: unknown
-      labels: {status: partial, note: 42 帧，002016 完全可判；P22 已排除 train}
+      labels: {status: partial, note: 机器逐图审查记录含 31 帧完整、11 帧部分标注及 1 张标签完整的 P22 照片。002016 曾用于旧 train 候选包。当前同源实拍计划用于单独回归，配对以回归清单为准。}
       roles: [direct_target, composite_target]
-      split: {primary: train, status: proposed}
+      split: {primary: unassigned, status: proposed, note: P22 同源回归留在本次 2280 张之外。}
       plan: null
     - id: tr_sticker_capture_val
       class: task_real
       kind: field_session
-      paths: [datasets/raw/waste_bin/sticker_capture_20261116_val]
+      paths: [Archive/Assets/captures/waste_sticker/sticker_capture_20261116_val]
       evidence:
-        - {note: 待采；采后登记原视频/照片与 24 类真值清单}
+        - {note: 当前无新增实拍带贴素材，补采暂缓；将来素材到位后登记原视频/照片与 24 类真值清单}
       capture_session: planned
       capture_id: cap_sticker_val_20261116
-      labels: {status: unknown, note: 待采后标注每贴类别、桶 ID、桶色、开闭、可见框}
+      labels: {status: unknown, note: 待采后标注每贴类别和可见框；投放联调子集另记可确认的桶归属及桶色}
       roles: [direct_target, composite_target]
       split: {primary: val, status: proposed, action: to_capture}
       plan: null
     - id: tr_sticker_capture_test
       class: task_real
       kind: field_session
-      paths: [datasets/raw/waste_bin/sticker_capture_20261116_test]
+      paths: [Archive/Assets/captures/waste_sticker/sticker_capture_20261116_test]
       evidence:
-        - {note: 待采；采后登记原视频/照片与 24 类真值清单}
+        - {note: 当前无新增实拍带贴素材，补采暂缓；将来素材到位后登记原视频/照片与 24 类真值清单}
       capture_session: planned
       capture_id: cap_sticker_test_20261116
-      labels: {status: unknown, note: 待采后标注每贴类别、桶 ID、桶色、开闭、可见框}
+      labels: {status: unknown, note: 待采后标注每贴类别和可见框；投放联调子集另记可确认的桶归属及桶色}
       roles: [direct_target, composite_target]
       split: {primary: test, status: proposed, action: to_capture}
       plan: null
   backgrounds:
+    - id: bg_reshoot_white_20261118
+      class: background
+      kind: field_session
+      paths: [training_packages/waste_bin_state/Reshoot]
+      capture_session: proven
+      capture_id: bins_reshoot_20261118
+      evidence:
+        - {manifest: datasets/scripts/waste_sticker/config/recall_preserving_finetune_plan.json, field: reshoot_negative_sources}
+      labels: {status: partial, note: 36 张中 27 张经 agent 全帧确认无物品贴，逐图 SHA 和空负证据在计划中；其余 9 张有贴，未作为空负使用。不复用开闭任务整桶框作为贴纸真值。}
+      review: {state: confirmed_empty, method: agent_visual_full_frame, accepted_by: null, note: 仅逐图清单列出的27张无贴原图可为空负，目录中其余图片不据此获得空负资格。}
+      roles: [empty_negative]
+      split: {primary: train, status: confirmed, note: 单一实拍会话及全部裁剪仅进入 Train。}
+      plan: datasets/scripts/waste_sticker/config/recall_preserving_finetune_plan.json
     - id: bg_001
       class: background
       kind: parent_video
-      paths: [datasets/raw/waste_bin/archive_assets_legacy/视频/四色桶_灰绿开盖_红蓝闭盖_001.mp4]
+      paths: [Archive/Assets/working_sources/legacy/waste_bin/视频/四色桶_灰绿开盖_红蓝闭盖_001.mp4]
       evidence:
         - {manifest: datasets/annotated/waste_bin/waste_sticker_video_background_roles_20261114.jsonl}
       review: {state: candidate_empty, method: contact_sheet, accepted_by: null, note: 空桶视频，贴纸面候选}
@@ -225,29 +261,44 @@ pairing:
     - id: bg_004
       class: background
       kind: parent_video
-      paths: [datasets/raw/waste_bin/archive_assets_legacy/视频/四色桶较低视角_灰绿闭盖_红蓝开盖_004.mp4]
+      paths: [Archive/Assets/working_sources/legacy/waste_bin/视频/四色桶较低视角_灰绿闭盖_红蓝开盖_004.mp4]
       evidence:
         - {manifest: datasets/annotated/waste_bin/waste_sticker_video_background_roles_20261114.jsonl}
+        - {manifest: datasets/annotated/waste_bin/whole_bin_ground_reuse_20261117/production_split_assignment_receipt.json}
+        - {manifest: datasets/annotated/waste_bin/waste_sticker_current_surface_review/intake_receipt.json}
       review: {state: candidate_empty, method: contact_sheet, accepted_by: null}
       labels: {status: ready}
       roles: [composite_background, surface]
-      split: {primary: train, status: proposed}
-      plan: null
+      split: {primary: val, status: confirmed, note: 正式逐图库已按父视频绑定 20 张合格桶面帧，作为本域合成验证。}
+      plan: datasets/scripts/waste_sticker/config/val_surface_plan.json
+    - id: bg_junction_005_ground
+      class: background
+      kind: parent_video
+      paths: [Archive/Assets/场景/三楼与场地视频/三栋楼_路口及垃圾桶_005.mp4]
+      evidence:
+        - {manifest: datasets/annotated/waste_bin/whole_bin_ground_reuse_20261117/production_split_assignment_receipt.json}
+      labels: {status: ready, note: 13 张实拍场地有完整无贴标签和整桶接地证据。}
+      roles: [composite_background]
+      split: {primary: test, status: confirmed, note: 全部来自一个父视频，按当前场地合成诊断计。}
+      plan: datasets/scripts/waste_sticker/config/test_ground_plan.json
     - id: bg_003
       class: background
       kind: parent_video
-      paths: [datasets/raw/waste_bin/archive_assets_legacy/视频/四色桶_灰绿闭盖_红蓝开盖_003.mp4]
+      paths: [Archive/Assets/working_sources/legacy/waste_bin/视频/四色桶_灰绿闭盖_红蓝开盖_003.mp4]
       evidence:
         - {manifest: datasets/annotated/waste_bin/waste_sticker_video_background_roles_20261114.jsonl}
       review: {state: candidate_empty, method: contact_sheet, accepted_by: null, note: 空桶视频，贴纸面候选}
       labels: {status: ready}
       roles: [composite_background, surface]
-      split: {primary: val, status: proposed}
+      split:
+        primary: train
+        status: confirmed
+        note: 原 val 仅为未兑现提案；0005.png 当前逐帧库为 train，历史 train 生成批有该背景使用记录，不据此断言已进入模型训练。两份 _003.mp4 原件/工作副本 SHA-256 相同，贴纸 val/test 无该父组实际出图回执。
       plan: null
     - id: bg_005
       class: background
       kind: parent_video
-      paths: [datasets/raw/waste_bin/archive_assets_legacy/视频/灰桶关盖_多面与桶盖近景_005.mp4]
+      paths: [Archive/Assets/working_sources/legacy/waste_bin/视频/灰桶关盖_多面与桶盖近景_005.mp4]
       evidence:
         - {manifest: datasets/annotated/waste_bin/waste_sticker_video_background_roles_20261114.jsonl}
       review: {state: candidate_empty, method: contact_sheet, accepted_by: null}
@@ -258,7 +309,7 @@ pairing:
     - id: bg_007
       class: background
       kind: parent_video
-      paths: [datasets/raw/waste_bin/archive_assets_legacy/视频/浅色地面四色桶_灰绿闭盖_红蓝开盖_007.mp4]
+      paths: [Archive/Assets/working_sources/legacy/waste_bin/视频/浅色地面四色桶_灰绿闭盖_红蓝开盖_007.mp4]
       evidence:
         - {manifest: datasets/annotated/waste_bin/waste_sticker_video_background_roles_20261114.jsonl}
       review: {state: candidate_empty, method: contact_sheet, accepted_by: null}
@@ -269,7 +320,7 @@ pairing:
     - id: bg_006
       class: background
       kind: parent_video
-      paths: [datasets/raw/waste_bin/archive_assets_legacy/视频/灰桶开盖_多面及桶内近景_006.mp4]
+      paths: [Archive/Assets/working_sources/legacy/waste_bin/视频/灰桶开盖_多面及桶内近景_006.mp4]
       evidence:
         - {manifest: datasets/annotated/waste_bin/waste_sticker_video_background_roles_20261114.jsonl}
       review: {state: candidate_empty, method: contact_sheet, accepted_by: null}
@@ -298,20 +349,20 @@ pairing:
       split: {primary: inherit, status: confirmed, action: to_extract}
     - id: ds_24_patterns
       kind: fixed_artwork
-      path: datasets/raw/waste_bin/toolkit/SourcePic
+      path: Archive/Assets/working_sources/digital/waste_sticker/toolkit/SourcePic
       parent_group: null
       roles: [target_foreground]
       split: {primary: shared, status: confirmed}
   blender:
     - id: bl_sticker_animated
       kind: blender_scene
-      path: datasets/assets/blender/waste_bin/waste_sticker_animated_v4.blend
+      path: datasets/assets/blender/aiaec_dataset.blend
       role: target_scene
       priority: primary
       split: {primary: shared, status: confirmed, same_source_note: 从照片标识场景派生；与 waste_bin 同谱系}
     - id: bl_arena_master
       kind: blender_scene
-      path: datasets/assets/blender/shared/arena_4m2_pbr_20261112/arena_master_user_20261113.blend
+      path: datasets/assets/blender/aiaec_dataset.blend
       role: background_scene
       priority: primary
       split: {primary: shared, status: confirmed, same_source_note: 多任务共享母场景}
@@ -320,34 +371,31 @@ pairing:
       target_split: val
       reason: no_independent_parent
       status: proposed
-      object: 四色桶 + 24 类贴纸（每桶正面一张）
-      scene: 与 P22 不同的桶位/背景
+      object: 24 类物品贴纸，可独立摆放或贴于其他表面；考虑现场联调时每桶正面一张
+      scene: 与 P22 不同的载体、摆位或背景
       views: [front, oblique]
       lighting: [normal, dark]
       amount: 30–60 帧或 2–3 段短视频
-      truth: [class_id, bin_id, bin_color, bin_state, visible_box]
-      save_to: datasets/raw/waste_bin/sticker_capture_20261116_val/
+      truth: [class_id, visible_box]
+      save_to: Archive/Assets/captures/waste_sticker/sticker_capture_20261116_val/
     - id: cap_sticker_test_20261116
       target_split: test
       reason: no_independent_parent
       status: proposed
-      object: 四色桶 + 24 类贴纸（每桶正面一张）
-      scene: 第三种桶位/背景
+      object: 24 类物品贴纸，可独立摆放或贴于其他表面；考虑现场联调时每桶正面一张
+      scene: 独立采集的载体、摆位或背景
       views: [front, oblique]
       lighting: [normal, dark, bright]
       amount: 30–60 帧或 2–3 段短视频
-      truth: [class_id, bin_id, bin_color, bin_state, visible_box]
-      save_to: datasets/raw/waste_bin/sticker_capture_20261116_test/
+      truth: [class_id, visible_box]
+      save_to: Archive/Assets/captures/waste_sticker/sticker_capture_20261116_test/
   plan_bindings:
     train:
-      - datasets/scripts/waste_sticker/config/production_plan.json
-      - datasets/scripts/waste_sticker/config/direct_real_plan.json
-    val: []
-    test: [datasets/scripts/waste_sticker/config/blender_plan.json]
+      - datasets/scripts/waste_sticker/config/full_train_plan.json
+    val: [datasets/scripts/waste_sticker/config/full_val_plan.json]
+    test:
+      - datasets/scripts/waste_sticker/config/full_test_plan.json
   plan_alignment:
-    status: stale
-    note: 现有 train production_plan 的背景批次覆盖 001–006；pairing 将 003/005 标为 val、006 标为 test，编译前需重编或调整 split。
-    conflicts:
-      - {parent: bg_003, plan: datasets/scripts/waste_sticker/config/production_plan.json, pairing_split: val, plan_use: train}
-      - {parent: bg_005, plan: datasets/scripts/waste_sticker/config/production_plan.json, pairing_split: val, plan_use: train}
-      - {parent: bg_006, plan: datasets/scripts/waste_sticker/config/production_plan.json, pairing_split: test, plan_use: train}
+    status: aligned
+    note: 全量汇总计划分别声明 Train 1800、Val 240、Test 240 张。实拍桶面 Train 使用 _001/_003、Val 使用 _004，整桶实拍 Train 使用空场_001、Test 使用 junction_005，共享固定图案及 Blender 工程按同源诊断登记。旧 192 张桶面计划保留为历史参考。
+    conflicts: []

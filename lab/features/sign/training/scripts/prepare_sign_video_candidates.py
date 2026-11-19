@@ -14,7 +14,7 @@ import cv2
 import numpy as np
 
 ROOT = Path(__file__).resolve().parents[5]
-DEFAULT_SOURCE = ROOT / 'datasets/raw/sign/archive_assets_legacy/视频/禁止直行牌视频.mp4'
+DEFAULT_SOURCE = ROOT / 'Archive/Assets/working_sources/legacy/sign/视频/禁止直行牌视频.mp4'
 OUTPUT_ROOT = ROOT / 'datasets/annotated/sign'
 
 

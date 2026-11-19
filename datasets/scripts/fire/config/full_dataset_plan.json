@@ -1,0 +1,430 @@
+{
+  "schema_version": 1,
+  "task": "fire",
+  "purpose": "User-authorized 3000/300/300 parent-group allocation; current production, no release tag",
+  "totals": {
+    "train": 3000,
+    "val": 300,
+    "test": 300,
+    "total": 3600
+  },
+  "source_quotas": {
+    "direct_real": {
+      "train": 21,
+      "val": 27,
+      "test": 7
+    },
+    "real_background_composite": {
+      "train": 1779,
+      "val": 273,
+      "test": 293
+    },
+    "blender_render": {
+      "train": 960,
+      "val": 0,
+      "test": 0
+    },
+    "blender_real_background_composite_trial": {
+      "train": 240,
+      "val": 0,
+      "test": 0
+    }
+  },
+  "counts": {
+    "train": {
+      "zero": 600,
+      "single": 1200,
+      "multi": 1200
+    },
+    "val": {
+      "zero": 60,
+      "single": 120,
+      "multi": 120
+    },
+    "test": {
+      "zero": 60,
+      "single": 120,
+      "multi": 120
+    }
+  },
+  "composite_counts": {
+    "train": {
+      "zero": 342,
+      "single": 720,
+      "multi": 717
+    },
+    "val": {
+      "zero": 34,
+      "single": 120,
+      "multi": 119
+    },
+    "test": {
+      "zero": 54,
+      "single": 119,
+      "multi": 120
+    }
+  },
+  "blender_split": "train",
+  "blender_counts": {
+    "blender_render": {
+      "zero": 192,
+      "single": 384,
+      "multi": 384
+    },
+    "blender_real_background_composite_trial": {
+      "zero": 48,
+      "single": 96,
+      "multi": 96
+    }
+  },
+  "render_image_size": [
+    480,
+    640
+  ],
+  "hybrid_backgrounds": [
+    "3205a6ba8233",
+    "ded3e45e68dd"
+  ],
+  "frames": [
+    {
+      "frame_id": "05eefb00de6751c4284e4d252d8f08ef39e3bd73d65f6fdb893cb9d03a9bb112",
+      "parent_group": "Archive/Assets/楼宇/晨光大厦/照片/正面_楼名纸条和1张火焰贴_001.jpg",
+      "split": "test",
+      "wall_background": false
+    },
+    {
+      "frame_id": "07ae54c32fe3169357028e31b69e401df505048d5e99726806219733e64cc688",
+      "parent_group": "Archive/Assets/楼宇/开心大厦/照片/底部局部_开口与底座_018.jpg",
+      "split": "train",
+      "wall_background": false
+    },
+    {
+      "frame_id": "08dc769d4a82b8859d1ed3936efb1b8dcb989a75798d01f1b7f47dbd89d3ba70",
+      "parent_group": "Archive/Assets/楼宇/锦绣大厦/照片/局部近景_底层窗格和侧面_005.jpg",
+      "split": "train",
+      "wall_background": false
+    },
+    {
+      "frame_id": "113d45ced4e721ba82d5b59a01fcc31169793e5d57dd709e5975f6f6437acc85",
+      "parent_group": "Archive/Assets/楼宇/开心大厦/照片/另一侧斜视_整体_013.jpg",
+      "split": "train",
+      "wall_background": true
+    },
+    {
+      "frame_id": "1555f50c316e9c679cdb9f69e4521a2be12cdd3a293c11c560ed39a5f6cb5f55",
+      "parent_group": "Archive/Assets/楼宇/锦绣大厦/照片/远距离斜视_格栅和窗格_001.jpg",
+      "split": "test",
+      "wall_background": true
+    },
+    {
+      "frame_id": "16f4db11af67edf385764280f705ccfda5933c595873d7ff0bcd95238f973b69",
+      "parent_group": "datasets/raw/site_capture_20261112/videos/full_scene.mp4",
+      "split": "train",
+      "wall_background": false
+    },
+    {
+      "frame_id": "189c41e28e81dd7ee15be40771f072c88e5687e5b0d8978fde1ea818407d65ba",
+      "parent_group": "Archive/Assets/楼宇/晨光大厦/照片/较近正侧斜视_窗格与入口_005.jpg",
+      "split": "val",
+      "wall_background": true
+    },
+    {
+      "frame_id": "221ab6cd5892a9997f9da4527ffffde329be29d1df7831daa2d402393e53ebc9",
+      "parent_group": "Archive/Assets/楼宇/晨光大厦/照片/斜视_L形墙面与窗口_019.jpg",
+      "split": "test",
+      "wall_background": true
+    },
+    {
+      "frame_id": "25bf2c4cccfb9405d0632d5c5d2cee6a37aa707dc35242e8dce3b286cd4223e6",
+      "parent_group": "Archive/Assets/楼宇/开心大厦/照片/正侧斜视_横向窗洞_007.jpg",
+      "split": "train",
+      "wall_background": true
+    },
+    {
+      "frame_id": "274174c8c1a11c8ee7b16d6efdf4c6b6739d1086eaa7d23f57b4ee9e045ad578",
+      "parent_group": "Archive/Assets/楼宇/锦绣大厦/照片/近景_顶部窗格与中轴_013.jpg",
+      "split": "train",
+      "wall_background": false
+    },
+    {
+      "frame_id": "2ebc80d29128162007bf1bb36bfd05b10dc116baa950f10a3bddf327b7f486a8",
+      "parent_group": "Archive/Assets/楼宇/晨光大厦/照片/正面_楼名和4张火焰纸贴_023.jpg",
+      "split": "train",
+      "wall_background": false
+    },
+    {
+      "frame_id": "310e8eaa3f58c463ba398def897ccb5b6663acf11f7d694752b26fa55fab57da",
+      "parent_group": "Archive/Assets/场景/三楼与场地视频/三栋楼_路口及垃圾桶_005.mp4",
+      "split": "val",
+      "wall_background": false
+    },
+    {
+      "frame_id": "31954ee6b7dbf54075ccc7434c658a4509c274908e3b3a10fe3546376f3ad770",
+      "parent_group": "Archive/Assets/场景/三楼与场地视频/三栋楼_路口及垃圾桶_005.mp4",
+      "split": "val",
+      "wall_background": false
+    },
+    {
+      "frame_id": "3205a6ba8233f744b4f96064a0633cf6d0b78eda49a958ac18696499f545ed53",
+      "parent_group": "Archive/Assets/楼宇/锦绣大厦/照片/中距离斜视_楼体和格栅_004.jpg",
+      "split": "train",
+      "wall_background": true
+    },
+    {
+      "frame_id": "392e72eed0398b32175c6a4e93f3be06a23e001a51aa2168930fdfc8151c7704",
+      "parent_group": "Archive/Assets/场景/三楼与场地视频/三栋楼_路口及垃圾桶_005.mp4",
+      "split": "val",
+      "wall_background": false
+    },
+    {
+      "frame_id": "3945d6ff19703d9742027c94c52ac86e6da9d7f983c9d891432c5ee18bfdef56",
+      "parent_group": "Archive/Assets/楼宇/晨光大厦/照片/高角度斜视_立面窗格_007.jpg",
+      "split": "train",
+      "wall_background": false
+    },
+    {
+      "frame_id": "410886359be3c1f36b76cae7649dec5892d97d108c1953a48871990d5ad0bffe",
+      "parent_group": "Archive/Assets/场景/三楼与场地视频/三栋楼_路口及垃圾桶_005.mp4",
+      "split": "val",
+      "wall_background": false
+    },
+    {
+      "frame_id": "48356e853ef85f5770e6b2fe35690c451a5f03347af0adfc4199a98a8e8eedab",
+      "parent_group": "Archive/Assets/楼宇/锦绣大厦/照片/正侧斜视_与前图相近_012.jpg",
+      "split": "train",
+      "wall_background": false
+    },
+    {
+      "frame_id": "488b058b718f3469be111cc77b51490c0ee8cbb310cb53de65e597c1c66fe91e",
+      "parent_group": "Archive/Assets/楼宇/晨光大厦/照片/正侧斜视_L形窗格立面_006.jpg",
+      "split": "train",
+      "wall_background": true
+    },
+    {
+      "frame_id": "498fbf4a57311d433183c5fcf45567dbbe11c481f69a9fc802eaa7c557fb9950",
+      "parent_group": "Archive/Assets/楼宇/锦绣大厦/照片/正面_楼名与3张火焰纸贴_017.jpg",
+      "split": "val",
+      "wall_background": false
+    },
+    {
+      "frame_id": "53d21dc0d4270ceaed9a0bfbccfa6c7e7c60e8546925da4a328444c29b6943c3",
+      "parent_group": "Archive/Assets/楼宇/开心大厦/照片/远距离斜视_楼体与地面_022.jpg",
+      "split": "test",
+      "wall_background": false
+    },
+    {
+      "frame_id": "54b001b0c4da08fdc0e728f8cbd4798a75aa31c45f182593e5a530b869c1f84d",
+      "parent_group": "Archive/Assets/楼宇/晨光大厦/照片/背面_L形内侧与窗格_021.jpg",
+      "split": "train",
+      "wall_background": false
+    },
+    {
+      "frame_id": "58c04ef8aca482832c17c587c163ed44d29d8c8d905f5efca6bef52fc5c88c4c",
+      "parent_group": "Archive/Assets/楼宇/锦绣大厦/照片/正面整体_竖格栅_010.jpg",
+      "split": "val",
+      "wall_background": false
+    },
+    {
+      "frame_id": "5bbcea340d73ce79c2f089ecc90a298cf33bcce6eb090a4dd87e13af22c6de2d",
+      "parent_group": "Archive/Assets/楼宇/开心大厦/照片/正面近景_窗口与底部_014.jpg",
+      "split": "train",
+      "wall_background": true
+    },
+    {
+      "frame_id": "622b816460020d564281eebb7863b6d2141e1e64adb1c97e3dfc02b2ec38ff4c",
+      "parent_group": "Archive/Assets/楼宇/开心大厦/照片/较近正侧斜视_层间细节_009.jpg",
+      "split": "train",
+      "wall_background": false
+    },
+    {
+      "frame_id": "6972b4bdf745dd8e976c3e93c9376998c0459656bd2b3f0019fe47e823e0b3bc",
+      "parent_group": "Archive/Assets/场景/三楼与场地视频/三栋楼_路口及垃圾桶_005.mp4",
+      "split": "val",
+      "wall_background": false
+    },
+    {
+      "frame_id": "69a98204b1fd165b6e62aff827248fa2145e430739acfc04530e847819bf8bb0",
+      "parent_group": "Archive/Assets/楼宇/开心大厦/照片/正面远景_楼体整体_025.jpg",
+      "split": "test",
+      "wall_background": true
+    },
+    {
+      "frame_id": "6a28ca83ee63f811289e0bf82cfdef44fa228f7cf74a2d35d508e8408f7d1e94",
+      "parent_group": "Archive/Assets/楼宇/开心大厦/照片/正面_横向窗洞及底部开口_006.jpg",
+      "split": "val",
+      "wall_background": true
+    },
+    {
+      "frame_id": "717d4260a578c0859f7867047fd1b1de0492939d93a729e5d38139bc350fbfdb",
+      "parent_group": "Archive/Assets/楼宇/锦绣大厦/照片/远距离斜视_格栅和窗格_003.jpg",
+      "split": "test",
+      "wall_background": false
+    },
+    {
+      "frame_id": "731b5aab3091d6773457eab1d65f864eb3dc00cbd0f509ef5174b462a3f43cae",
+      "parent_group": "Archive/Assets/楼宇/锦绣大厦/照片/中距离斜视_楼体和格栅_006.jpg",
+      "split": "train",
+      "wall_background": true
+    },
+    {
+      "frame_id": "919db90b7896eff11d10fdf18af09a86c67f2af74fe27abcd99355504d3c4bbc",
+      "parent_group": "Archive/Assets/楼宇/晨光大厦/照片/斜俯近景_窗口与墙体_008.jpg",
+      "split": "train",
+      "wall_background": true
+    },
+    {
+      "frame_id": "92cd0dc88bbd4d1fdeeba3bb85144c4353de6e67252bb973b8f5f8aa019a78d3",
+      "parent_group": "Archive/Assets/场景/三楼与场地视频/三栋楼_路口及垃圾桶_005.mp4",
+      "split": "val",
+      "wall_background": false
+    },
+    {
+      "frame_id": "92f30241dd5c76184303fb0c1ae9946f1499786ec7f7e17ffc2ca25910c3f831",
+      "parent_group": "Archive/Assets/场景/三楼与场地视频/三栋楼_路口及垃圾桶_005.mp4",
+      "split": "val",
+      "wall_background": false
+    },
+    {
+      "frame_id": "946501aad9bc9c60dd85cf8b7339044f85515f204c876bf26ccf563e0e47cbd2",
+      "parent_group": "Archive/Assets/场景/三楼与场地视频/三栋楼_路口及垃圾桶_005.mp4",
+      "split": "val",
+      "wall_background": false
+    },
+    {
+      "frame_id": "9a3fced4dcadeed96b6e967725281d407d60621736f4bcd8a1ef6509966040ec",
+      "parent_group": "Archive/Assets/场景/三楼与场地视频/三栋楼_路口及垃圾桶_005.mp4",
+      "split": "val",
+      "wall_background": false
+    },
+    {
+      "frame_id": "9b69db70078b4727bf7f3410370845730a78fc060910ec4047ceb14315c1abe3",
+      "parent_group": "Archive/Assets/楼宇/锦绣大厦/照片/正面中远景_竖格栅与窗格_015.jpg",
+      "split": "test",
+      "wall_background": false
+    },
+    {
+      "frame_id": "a0d3a487d3e1d3d052a4923670846f6e9dd32593eb5d09d935867846a07b6686",
+      "parent_group": "Archive/Assets/楼宇/开心大厦/照片/远距离正面_整体_017.jpg",
+      "split": "val",
+      "wall_background": false
+    },
+    {
+      "frame_id": "a216ca636fac990430443e4a775b62b89a0f388186aaff17a39f30622ebc76bf",
+      "parent_group": "Archive/Assets/场景/三楼与场地视频/三栋楼_路口及垃圾桶_005.mp4",
+      "split": "val",
+      "wall_background": false
+    },
+    {
+      "frame_id": "aa992d7bdea6b03c941c840cb52b6364408e4e43fd3e8c409e6157e1513c0a96",
+      "parent_group": "Archive/Assets/场景/三楼与场地视频/三栋楼_路口及垃圾桶_005.mp4",
+      "split": "val",
+      "wall_background": false
+    },
+    {
+      "frame_id": "b4b585ac6e5fdb686b9378a2af07e2a14c5a94158ea04d8bc7e7066fb1390ab8",
+      "parent_group": "Archive/Assets/场景/三楼与场地视频/三栋楼_路口及垃圾桶_005.mp4",
+      "split": "val",
+      "wall_background": false
+    },
+    {
+      "frame_id": "b53b570dd3e5dc1576af46e7946a13b6339b2e3009e4cc9573a4c9e8338155af",
+      "parent_group": "Archive/Assets/楼宇/开心大厦/照片/底部近景_开口及底座_016.jpg",
+      "split": "train",
+      "wall_background": false
+    },
+    {
+      "frame_id": "b7404df8165ea6374bfa23c029b8039cb4409d71431bcf8d38222e0f5b42f331",
+      "parent_group": "Archive/Assets/楼宇/开心大厦/照片/正面_楼名_火焰_横向窗洞_004.jpg",
+      "split": "train",
+      "wall_background": false
+    },
+    {
+      "frame_id": "baffbe6184884e377233f90c2ec7db2547eebd93cbf317107140e124fdbe9705",
+      "parent_group": "Archive/Assets/场景/三楼与场地视频/三栋楼_路口及垃圾桶_005.mp4",
+      "split": "val",
+      "wall_background": false
+    },
+    {
+      "frame_id": "baffcaa63a1bf2c5a4a9cec1fd73fafa86d3fb25434759528bd4336e2a76bc23",
+      "parent_group": "Archive/Assets/场景/三楼与场地视频/三栋楼_路口及垃圾桶_005.mp4",
+      "split": "val",
+      "wall_background": false
+    },
+    {
+      "frame_id": "c8ab8999041572a39bdd680cc557949bc99e04b5aa72c0cc84ffe02b42112693",
+      "parent_group": "Archive/Assets/场景/三楼与场地视频/三栋楼_路口及垃圾桶_005.mp4",
+      "split": "val",
+      "wall_background": false
+    },
+    {
+      "frame_id": "ca034e5ac4ac0c7ea0c7caf501beaba629f83960e2d59a26dc67a2df7d580fff",
+      "parent_group": "Archive/Assets/场景/三楼与场地视频/三栋楼_路口及垃圾桶_005.mp4",
+      "split": "val",
+      "wall_background": false
+    },
+    {
+      "frame_id": "cc0235f45aab30a5d26f2ab611aecd4363e0e1ee9b8aeb6223f6ae58f36c42b3",
+      "parent_group": "Archive/Assets/场景/三楼与场地视频/三栋楼_路口及垃圾桶_005.mp4",
+      "split": "val",
+      "wall_background": false
+    },
+    {
+      "frame_id": "d75e716b5560eaba0b0c0e768a29846f64cc6160685edd4fec143807a05b8a92",
+      "parent_group": "Archive/Assets/楼宇/晨光大厦/照片/俯视_L形屋顶及立面_009.jpg",
+      "split": "train",
+      "wall_background": false
+    },
+    {
+      "frame_id": "d89627fdcd16094e559e68582153abf870562eb01a82eb2f5318c63c477fcf41",
+      "parent_group": "Archive/Assets/场景/三楼与场地视频/三栋楼_路口及垃圾桶_005.mp4",
+      "split": "val",
+      "wall_background": false
+    },
+    {
+      "frame_id": "de4bc035158f3a2c673860d6f9b74f3ea9ed468c0551b5460a9268a39b34f27e",
+      "parent_group": "Archive/Assets/场景/三楼与场地视频/三栋楼_路口及垃圾桶_005.mp4",
+      "split": "val",
+      "wall_background": false
+    },
+    {
+      "frame_id": "ded3e45e68ddc6a9000472635f3754cf181dd97294e9473b0c112935dbdd6c7a",
+      "parent_group": "Archive/Assets/楼宇/锦绣大厦/照片/正侧斜视_竖格栅及侧面_011.jpg",
+      "split": "train",
+      "wall_background": true
+    },
+    {
+      "frame_id": "ea605bd74722493b52b03c5f58e6a365798a52d17427b1fde80b8ad746020def",
+      "parent_group": "Archive/Assets/场景/三楼与场地视频/三栋楼_路口及垃圾桶_005.mp4",
+      "split": "val",
+      "wall_background": false
+    },
+    {
+      "frame_id": "f0ed3594b6a8d1a43082ae7cb5b6c6a05ea1d8a9d9869dcff758d0a9554d5c98",
+      "parent_group": "Archive/Assets/楼宇/晨光大厦/照片/左侧_外墙小窗洞_022.jpg",
+      "split": "train",
+      "wall_background": true
+    },
+    {
+      "frame_id": "f6370bb4661b297ae34b197c954dc730f15b318788d9acc10ff4bad90eaabe94",
+      "parent_group": "Archive/Assets/楼宇/开心大厦/照片/背面_小窗洞和分层_003.jpg",
+      "split": "val",
+      "wall_background": false
+    },
+    {
+      "frame_id": "ffed24136e0ab905575e487430836ba957cee9e74706186baa7cad3df6c3a814",
+      "parent_group": "Archive/Assets/楼宇/锦绣大厦/照片/正面中景_中央竖格栅_007.jpg",
+      "split": "val",
+      "wall_background": true
+    }
+  ],
+  "exposure_notes": [
+    "All five direct positive photos/frames were displayed in the development sample.",
+    "Photo sessions are unknown; file/video parent isolation does not establish independent capture sessions.",
+    "One Blender mother is train only. Hybrid inherits photo and Blender parents.",
+    "Real positive holdout coverage is val B and test C; composite evaluation reported separately."
+  ],
+  "coverage_scope": "source_and_geometry_foundation",
+  "first_round_learning_plan": "datasets/scripts/fire/config/first_round_learning.yaml",
+  "hard_negative_materialization": "Foundation quotas precede substitution; see current_manifest",
+  "current_manifest": "datasets/exports/fire/manifest.json"
+}

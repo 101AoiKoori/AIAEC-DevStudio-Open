@@ -10,10 +10,10 @@
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | artifact | - | 是 | - | none | none | abstract | mixed | - |
 | source_artifact | artifact | 是 | - | manifest | manifest | immutable | mixed | captured, catalogued, retired |
-| raw_media | source_artifact | 否 | datasets/raw/ | manifest | manifest | immutable | False | captured, catalogued, retired |
+| raw_media | source_artifact | 否 | datasets/raw/, Archive/Assets/captures/ | manifest | manifest | immutable | False | captured, catalogued, retired |
 | capture_batch | source_artifact | 否 | datasets/CAR_REAL_CAPTURE_, datasets/SITE_CAPTURE_ | manifest | manifest | immutable | True | captured, catalogued, retired |
 | blender_asset | source_artifact | 否 | datasets/assets/blender/ | blender_registry | registry | versioned | False | captured, catalogued, retired |
-| candidate_source_asset | source_artifact | 否 | datasets/assets/person/ | manifest | manifest | immutable | False | catalogued, retired |
+| candidate_source_asset | source_artifact | 否 | datasets/assets/person/, Archive/Assets/working_sources/ | manifest | manifest | immutable | False | catalogued, retired |
 | derived_artifact | artifact | 是 | - | manifest | manifest | rebuildable | False | candidate, reviewed, accepted, superseded |
 | candidate_batch | derived_artifact | 否 | datasets/annotated/ | manifest | manifest | rebuildable | False | candidate, reviewed, accepted, isolated, superseded |
 | review_observation | derived_artifact | 否 | datasets/annotated/common/review/, datasets/annotated/common/perspective/ | manifest | manifest | rebuildable | False | generated, reviewed, superseded |
@@ -22,6 +22,7 @@
 | media_index_store | record_artifact | 否 | datasets/annotated/media_index/ | media_index | manifest | mixed | False | active, superseded |
 | media_index_cache | media_index_store | 否 | - | media_index | manifest | rebuildable | False | active, superseded |
 | production_receipt | media_index_store | 否 | - | production_receipt | receipt | append_only | False | active, superseded |
+| frame_environment | record_artifact | 否 | - | mixed | frame_environment | versioned | False | active, superseded |
 | asset_registry | record_artifact | 否 | - | blender_registry | registry | append_only | True | active, superseded |
 | review_decision | record_artifact | 否 | - | git | git | versioned | True | current, superseded |
 | plan_artifact | artifact | 是 | - | git | git | versioned | True | draft, reviewed, approved, active, executed, superseded |
@@ -29,6 +30,7 @@
 | layout_contract | plan_artifact | 否 | - | git | git | versioned | True | active, superseded |
 | ontology_contract | plan_artifact | 否 | - | git | git | versioned | True | active, superseded |
 | design_contract | plan_artifact | 否 | - | git | git | versioned | True | active, superseded |
+| design_observation_snapshot | plan_artifact | 否 | - | git | git | versioned | True | active, superseded |
 | task_config | plan_artifact | 否 | - | git | git | versioned | True | active, superseded |
 | plan_draft | plan_artifact | 否 | - | git | git | versioned | True | design_draft, reviewed, approved, compiled, superseded |
 | generation_plan | plan_artifact | 否 | - | git | git | versioned | True | active, executed, superseded |
@@ -80,6 +82,7 @@
 | git | 文本、代码、配置和文档由 Git 保存当前版本；不建版本命名目录，历史用提交。 |
 | manifest | 数据/标注用清单记录来源、派生、用途和状态；当前集合只保留一套。 |
 | registry | Blender 资产状态以 blender_source_registry.sqlite3 为权威。 |
+| frame_environment | 逐图数据库维护当前任务用途资格，资格与证据修订 ID 供选源、生成和历史回执引用。 |
 | receipt | production_state.sqlite3 保存持久生产回执，不当可重建缓存清理。 |
 | run | runs 内运行记录保持原位；内层 V3 runs 不移动、删除或覆盖。 |
 | model | 模型权重按来源、训练数据版本、类别顺序和运行记录管理；大文件不入 Git。 |
@@ -98,6 +101,7 @@
 | `config/task_targets.yaml` | design_contract |
 | `config/id_policy.yaml` | design_contract |
 | `config/combination_axes.yaml` | design_contract |
+| `config/combination_axis_observations.yaml` | design_observation_snapshot |
 | `config/full_train_allocation.yaml` | plan_draft |
 | `docs/FULL_TRAIN_PLAN_DESIGN.md` | generated_doc |
 | `docs/ID_AND_COUNT_POLICY.md` | generated_doc |
@@ -107,6 +111,7 @@
 | `datasets/blender_source_registry.sqlite3` | asset_registry |
 | `datasets/annotated/media_index/query_cache.sqlite3` | media_index_cache |
 | `datasets/annotated/media_index/production_state.sqlite3` | production_receipt |
+| `datasets/annotated/common/sources/frame_environment.sqlite3` | frame_environment |
 | `datasets/CAR_REAL_CAPTURE_20261112.md` | capture_batch |
 | `datasets/SITE_CAPTURE_20261112.md` | capture_batch |
 | `datasets/README.md` | project_doc |

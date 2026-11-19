@@ -1,25 +1,29 @@
-"""Composite a rendered meter foreground onto indexed real backgrounds as candidates.
+"""Composite a rendered meter foreground onto stored-eligible real backgrounds.
 
-Inputs must name existing manifest records that directly associate each background
-with its raw photograph or video. The result is not an accepted training set:
-ground contact, scene occlusion, reflections and other meter instances need review.
+The task record supplies background labels and a fixed station projection.
+Generated keypoint visibility and reflected appearance remain output candidates.
 """
 
 
 import argparse
+from contextlib import contextmanager
 import filecmp
 import json
 import math
 from pathlib import Path
+import re
 import sys
 
 from PIL import Image
 
 ROOT = Path(__file__).resolve().parents[3]
 sys.path[:0] = [str(ROOT), str(ROOT / 'lab/scripts/media')]
-from lab.training_common.production_guard import generation_guard
+from lab.training_common.production_guard import generation_guard, receipt_completed
 import media_index
+from datasets.scripts.common import recoverable_publish
 from datasets.scripts.common.config import load_task_config
+from datasets.scripts.common.frame_environment import image_digest, query_frames
+from datasets.scripts.common.working_inputs import CODE as WORKING_INPUTS_CODE, WorkingInputs
 from datasets.scripts.common.paths import sample_dir, split_dir
 
 POINTS = ('temperature_pivot', 'temperature_tip', 'humidity_pivot', 'humidity_tip',
@@ -78,10 +82,8 @@ def configured_backgrounds(config):
             raise ValueError('invalid or duplicate configured background record index')
         seen.add(index)
         row = rows[index]
-        if row.get('id') != choice['id'] or row.get('pose_state') != 'candidate_complete_negative':
-            raise ValueError('selected background identity or candidate label state changed')
-        if not row.get('label') or workspace(row['label']).read_text(encoding='utf8').strip():
-            raise ValueError('configured negative background must have its recorded empty candidate label')
+        if row.get('id') != choice['id']:
+            raise ValueError('selected background identity changed')
         result.append([row['image'], row['parent_video'], rel(manifest), str(index), 'review_record'])
     return result
 
@@ -105,10 +107,33 @@ def background_spec(values, *, candidate_reuse=False):
         raise ValueError('background is excluded')
     if not candidate_reuse and 'regression' in restricted:
         raise ValueError('background is restricted to regression or excluded')
-    if candidate_reuse and row.get('pose_state') != 'candidate_complete_negative':
-        raise ValueError('candidate reuse cannot promote a partial or unknown background')
     return {'image': image, 'parent': parent, 'manifest': manifest, 'record_index': index,
             'relation': relation, 'row': row}
+
+
+def stored_backgrounds(source, backgrounds):
+    """Bind selected meter frames to persisted task and placement eligibility."""
+    database = workspace(source['databases']['frame_environment'])
+    available = query_frames(task='meter', role='composite_background', split='train', database=database)
+    matched = {}
+    for item in backgrounds:
+        image, parent = rel(item['image']), rel(item['parent'])
+        rows = [row for row in available if image in row['paths']]
+        if len(rows) != 1:
+            raise ValueError('meter background lacks one eligible stored record: ' + image)
+        row = rows[0]
+        label, geometry = row.get('label') or {}, row.get('geometry') or {}
+        if (row.get('parent_video') != parent or image_digest(image) != row['content_sha256'] or
+                label.get('presence') != 'absent' or label.get('completeness') != 'complete' or
+                row.get('scope', {}).get('projection') != 'alpha_composite_identity' or
+                geometry.get('mode') != 'alpha_composite_identity' or
+                geometry.get('coordinate_size') != row['image_size'] or
+                geometry.get('scope') != 'existing center crop and fixed station projection'):
+            raise ValueError('stored meter background lacks matching labels or fixed-station placement: ' + image)
+        matched[image] = {'frame_id': row['frame_id'], 'record_id': row['record_id'],
+                          'evidence_ids': [entry['evidence_id'] for entry in row['evidence']],
+                          'source_image_size': row['image_size'], 'parent_video': parent}
+    return database, matched
 
 
 def lineage_link(values):
@@ -402,12 +427,58 @@ def background_meter_review(path, backgrounds):
     return raw, result
 
 
+def owned_outputs(output, previous, output_state, workspace, label_folder):
+    """Recognize this compositor's previous batch by manifest and receipt."""
+    if previous is None:
+        return set()
+    manifest = json.loads((output / 'manifest.json').read_text(encoding='utf-8'))
+    if (manifest.get('status') != 'complete_candidates' or manifest.get('generation_method') != 'composite'
+            or manifest.get('samples') != 'samples.jsonl'):
+        raise ValueError('output manifest does not describe a completed meter composite batch')
+    records = [json.loads(line) for line in (output / 'samples.jsonl').read_text(encoding='utf-8').splitlines()]
+    if len(records) != manifest.get('completed_count'):
+        raise ValueError('meter composite sample count differs from its manifest')
+    names = ['manifest.json', 'samples.jsonl']
+    for record in records:
+        name = record['id']
+        if not re.fullmatch(r'meter_real_composite_[0-9]{5}', name):
+            raise ValueError('invalid meter composite sample id: ' + name)
+        image, label = f'images/{name}.png', f'{label_folder}/{name}.txt'
+        if record.get('image') != image or record.get('label_candidate') != label:
+            raise ValueError('meter composite image or label path disagrees with its sample id')
+        names.extend((image, label, f'annotations/{name}.json'))
+    if len(set(names)) != len(names):
+        raise ValueError('meter composite manifest contains duplicate paths')
+    root = output.relative_to(workspace).as_posix()
+    before = {row['path']: row for row in previous['outputs'] if row.get('type') == 'file'}
+    current = {row['path']: row for row in output_state if row.get('type') == 'file'}
+    for name in names:
+        key = f'{root}/{name}'
+        if key not in before or before[key] != current.get(key):
+            raise ValueError('meter composite output differs from its production receipt: ' + name)
+    return set(names)
+
+
+@contextmanager
+def publication(output, operation):
+    def committed(token):
+        return receipt_completed(ROOT, operation, token)
+
+    with recoverable_publish.sample_lock(output):
+        recoverable_publish.recover(output, committed)
+        try:
+            yield
+        finally:
+            recoverable_publish.recover(output, committed)
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     _, source = load_task_config('meter')
     defaults = source['real_composite']
     parser.add_argument('--batch', default=defaults['foreground_batch'])
     parser.add_argument('--output', required=True)
+    parser.add_argument('--replace', action='store_true', help='Replace a completed meter composite batch in place')
     parser.add_argument('--count', type=int, default=defaults['count'])
     parser.add_argument('--seed', type=int, default=20261113)
     parser.add_argument('--production-plan', default=defaults['production_plan'], help='Workspace JSON declaration')
@@ -421,13 +492,14 @@ def main():
     args.background = args.background if args.background is not None else configured
     args.lineage_link = args.lineage_link or defaults.get('lineage_links', [])
     if not args.background or any(list(row) not in configured for row in args.background):
-        raise ValueError('backgrounds must be selected from meter.source.yaml review records')
+        raise ValueError('backgrounds differ from real_composite.selected_background_records in '
+                         'datasets/scripts/meter/config/source.yaml')
     batch = workspace(args.batch, existing=False)
     if not batch.is_dir() or not batch.is_relative_to(ROOT / 'datasets'):
         raise ValueError('configured rendered meter foreground batch is missing')
     output = workspace(args.output, existing=False)
-    if output not in {sample_dir('meter'), split_dir('meter', 'train')} or (output.exists() and any(output.iterdir())):
-        raise ValueError('compositor output must be the empty current meter sample or train directory')
+    if output not in {sample_dir('meter'), split_dir('meter', 'train')}:
+        raise ValueError('compositor output must be the current meter sample or train directory')
     if batch == output:
         raise ValueError('foreground batch and composite output must be different directories')
     if not 1 <= args.count <= 5000:
@@ -438,7 +510,8 @@ def main():
     if len({item['image'] for item in backgrounds}) != len(backgrounds):
         raise ValueError('background image is repeated')
     review_path = workspace(args.background_meter_review) if args.background_meter_review else None
-    review_bytes, review_context = background_meter_review(review_path, backgrounds) if review_path else (None, {})
+    review_bytes = review_path.read_bytes() if review_path else None
+    environment_path, review_context = stored_backgrounds(source, backgrounds)
     parents = sorted({item['parent'] for item in backgrounds})
     for index, parent in enumerate(parents):
         for other in parents[index + 1:]:
@@ -470,16 +543,19 @@ def main():
                          for s in declaration['strata']}
         if set(sampling_groups) != planned_pairs:
             raise ValueError('sampling evidence and planned pairs differ')
-    media = {item[key] for item in backgrounds for key in ('image', 'parent')}
+    working = WorkingInputs('meter', backgrounds=[item['image'] for item in backgrounds],
+                            targets=[item[3] for item in selected], split=declaration['target_split'])
+    media = {item[key] for item in backgrounds for key in ('image', 'parent')} | working.media
     media.update(item[key] for item in links for key in ('subject', 'parent'))
     media.update(path for _, _, image, foreground, _, _, _ in selected for path in (image, foreground))
     configs = [ROOT / 'datasets/scripts/meter/config' / name for name in ('dataset.yaml', 'source.yaml')]
     procedural = {*configs, manifest_path, records_path, plan_path, *(item['manifest'] for item in backgrounds + links)}
+    procedural.update(working.evidence)
+    procedural.add(environment_path)
     if sampling_evidence:
         procedural.add(sampling_evidence)
     if review_path:
         procedural.add(review_path)
-        procedural.update(workspace(item['label']) for item in review_context.values())
     procedural.update(path for _, _, _, _, label, annotation, _ in selected for path in (label, annotation))
     params = {'count': args.count, 'seed': args.seed,
               'backgrounds': [{key: rel(item[key]) if key in ('image', 'parent', 'manifest') else item[key]
@@ -489,11 +565,23 @@ def main():
                                 for key in ('subject', 'parent', 'manifest', 'record_index', 'relation')}
                                for item in links]
     params['background_meter_review'] = rel(review_path) if review_path else None
+    params['frame_environment'] = {image: row['record_id'] for image, row in review_context.items()}
     params['sampling_evidence'] = rel(sampling_evidence) if sampling_evidence else None
     operation = 'meter.compose_real_background_v4:' + rel(output)
-    with generation_guard(operation, sorted(media), [output], params,
-                          procedural_inputs=sorted(procedural), code_paths=[Path(__file__)], root=ROOT,
-                          production_plan=declaration, sample_output_paths=[output / 'images']) as run:
+    label_folder = 'labels' if output == split_dir('meter', 'train') else 'labels_candidate'
+    owned = set()
+
+    def verify_existing(workspace, output_state, previous):
+        owned.update(owned_outputs(output, previous, output_state, workspace, label_folder))
+        return {'preserved_paths': [row['path'] for row in output_state if row.get('type') == 'file'
+                                    and (workspace / row['path']).relative_to(output).as_posix() not in owned]}
+
+    with publication(output, operation), generation_guard(
+            operation, sorted(media), [output], params, procedural_inputs=sorted(procedural),
+            code_paths=[Path(__file__), Path(recoverable_publish.__file__), WORKING_INPUTS_CODE,
+                        ROOT/'datasets/scripts/common/frame_environment.py'], root=ROOT,
+            production_plan=declaration, sample_output_paths=[output / 'images'],
+            replace_outputs=args.replace, replace_verifier=verify_existing if args.replace else None) as run:
         if plan_path.read_bytes() != plan_bytes:
             raise ValueError('production plan changed while entering the guard')
         if review_path and review_path.read_bytes() != review_bytes:
@@ -502,25 +590,11 @@ def main():
             print('METER_REAL_COMPOSITE_REUSED', json.dumps(run.value, ensure_ascii=False))
             return
         for item in backgrounds:
-            refs = run.source_refs[rel(item['image'])]
-            if item['relation'] != 'review_record' and not any(ref.get('manifest') == rel(item['manifest']) and
-                       ref.get('record_index') == item['record_index'] and
-                       ref.get('relation') == item['relation'] for ref in refs):
-                raise ValueError('background manifest record is absent from synchronized index')
             if record_at(item['manifest'], item['record_index']) != item['row']:
                 raise ValueError('background source record changed while entering the guard')
         for item in links:
-            refs = run.source_refs[rel(item['subject'])]
-            if not any(ref.get('manifest') == rel(item['manifest']) and
-                       ref.get('record_index') == item['record_index'] and
-                       ref.get('relation') == item['relation'] for ref in refs):
-                raise ValueError('lineage link is absent from synchronized index')
             if record_at(item['manifest'], item['record_index']) != item['row']:
                 raise ValueError('lineage record changed while entering the guard')
-        for index, _, image, _, _, _, _ in selected:
-            if not any(ref.get('manifest') == rel(records_path) and ref.get('record_index') == index and
-                       ref.get('relation') == 'describes' for ref in run.source_refs[rel(image)]):
-                raise ValueError('foreground source sample record is absent from synchronized index')
         _, _, current_manifest, current_selected = source_rows(batch)
         if current_manifest != manifest or current_selected != selected:
             raise ValueError('foreground batch changed while entering the guard')
@@ -535,44 +609,56 @@ def main():
         if declaration['constraints']['geometry'] == 'uniform_scale_translate':
             for state in states:
                 source = foreground_map[state['parameters']['foreground_id']]
-                with Image.open(source[3]) as foreground:
+                with Image.open(working.path(source[3])) as foreground:
                     place_foreground(foreground, source[6], state['parameters']['placement'])
-        if output.exists() and any(output.iterdir()):
-            raise ValueError('output already contains samples')
-        output.mkdir(parents=True, exist_ok=True)
-        label_folder = 'labels' if output == split_dir('meter', 'train') else 'labels_candidate'
+        stage = recoverable_publish.prepare(output, run.token)
+        recoverable_publish.copy_unowned(output, stage, owned)
         for folder in ('images', label_folder, 'annotations'):
-            (output / folder).mkdir()
+            (stage / folder).mkdir(exist_ok=True)
         result = {'status': 'running', 'requested_count': args.count, 'completed_count': 0,
                   'source_batch': rel(manifest_path), 'seed': args.seed, 'resolution': [640, 480],
                   'production_plan': rel(plan_path),
                   'sampling_evidence': params['sampling_evidence'],
                   'samples': 'samples.jsonl', 'generation_method': 'composite',
-                  'scope': ('Synthetic meter on real backgrounds; pose and box candidates only. '
-                            'Background occlusion, reflection, existing meter instances, placement and ground contact '
-                            'have not been verified; not an independent camera capture.')}
-        manifest_output = output / 'manifest.json'
+                  'scope': ('Synthetic meter on a task-eligible stored background; pose and box candidates only. '
+                            'Generated occlusion, reflection and keypoint readability remain unknown; '
+                            'not an independent camera capture.')}
+        manifest_output = stage / 'manifest.json'
+        samples_output = stage / 'samples.jsonl'
+        for path in (manifest_output, samples_output):
+            if path.exists():
+                hint = '' if args.replace else '; use --replace for a prior composite batch'
+                raise ValueError(f'meter composite would overwrite an unowned {path.name}{hint}')
+
         def save():
             manifest_output.write_text(json.dumps(result, ensure_ascii=False, indent=2) + '\n', encoding='utf8')
         save()
+        assignments = []
         try:
             for index in range(args.count):
                 state = states[index]
                 source_index, row, source_image, foreground, label, annotation, values = foreground_map[state['parameters']['foreground_id']]
                 background = background_map[state['parameters']['background_image']]
                 geometry = 'identity'
-                with Image.open(background['image']) as bg, Image.open(foreground) as fg:
+                with Image.open(working.path(background['image'])) as bg, Image.open(working.path(foreground)) as fg:
                     if declaration['constraints']['geometry'] == 'uniform_scale_translate':
                         fg, values, geometry = place_foreground(fg, values, state['parameters']['placement'])
                     composed, background_transform = compose(bg, fg)
                 name = 'meter_real_composite_%05d' % index
-                composed.save(output / 'images' / (name + '.png'))
-                (output / label_folder / (name + '.txt')).write_text(
+                image = stage / 'images' / (name + '.png')
+                label_path = stage / label_folder / (name + '.txt')
+                annotation_path = stage / 'annotations' / (name + '.json')
+                if any(path.exists() for path in (image, label_path, annotation_path)):
+                    raise ValueError('meter composite would overwrite an unowned file for ' + name)
+                composed.save(image)
+                label_path.write_text(
                     ' '.join(str(int(value)) if i == 0 or (i >= 7 and (i - 7) % 3 == 0)
                              else f'{value:.8f}' for i, value in enumerate(values)) + '\n', encoding='utf8')
                 record = {'id': name, 'image': 'images/' + name + '.png',
                           'label_candidate': label_folder + '/' + name + '.txt', 'split': 'train' if label_folder == 'labels' else 'unassigned',
                           'background': rel(background['image']), 'background_parent': rel(background['parent']),
+                          'working_background': working.actual(background['image']),
+                          'working_foreground': working.actual(foreground),
                           'background_evidence': {key: rel(background[key]) if key == 'manifest' else background[key]
                                                   for key in ('manifest', 'record_index', 'relation')},
                           'background_lineage_links': params['lineage_links'],
@@ -592,14 +678,14 @@ def main():
                           'visibility_policy': 'source v0 remains v0; all in-frame points v1 after background change',
                           'keypoint_readability': dict.fromkeys(POINTS, 'unknown'),
                           'reflection_status': 'unknown', 'physical_reading': 'unknown',
-                          'status': 'candidate; visual scene and occlusion review required'}
-                (output / 'annotations' / (name + '.json')).write_text(
+                          'status': 'candidate; generated occlusion and reflection unverified'}
+                annotation_path.write_text(
                     json.dumps(record, ensure_ascii=False, indent=2) + '\n', encoding='utf8')
-                with (output / 'samples.jsonl').open('a', encoding='utf8') as stream:
+                with samples_output.open('a', encoding='utf8') as stream:
                     stream.write(json.dumps(record, ensure_ascii=False) + '\n')
-                run.record_sample(state['id'], output=output / 'images' / (name + '.png'),
-                                  sources=state['sources'], parameters=state['parameters'],
-                                  actual={'background': rel(background['image']),
+                assignments.append((state, record['image'], {'background': rel(background['image']),
+                                          'working_background': record['working_background'],
+                                          'working_foreground': record['working_foreground'],
                                           'background_parent': rel(background['parent']),
                                           'background_evidence': record['background_evidence'],
                                           'background_meter_review': record['background_meter_review'],
@@ -614,7 +700,7 @@ def main():
                                           'keypoint_readability': record['keypoint_readability'],
                                           'reflection_status': record['reflection_status'],
                                           'physical_reading': record['physical_reading'],
-                                          'visibility_policy': record['visibility_policy']})
+                                          'visibility_policy': record['visibility_policy']}))
                 result['completed_count'] = index + 1
                 if (index + 1) % 25 == 0:
                     save()
@@ -624,6 +710,10 @@ def main():
             raise
         finally:
             save()
+        recoverable_publish.publish(output, stage, run.token)
+        for state, image, actual in assignments:
+            run.record_sample(state['id'], output=output / image, sources=state['sources'],
+                              parameters=state['parameters'], actual=actual)
         run.set_result({'count': result['completed_count'], 'status': result['status']})
         print('METER_REAL_COMPOSITE_CANDIDATES', json.dumps(run.value, ensure_ascii=False))
 

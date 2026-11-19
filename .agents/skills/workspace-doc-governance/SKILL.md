@@ -1,94 +1,33 @@
 ---
 name: workspace-doc-governance
-description: "Manage workspace documentation and requirements, and apply direct factual writing to workspace records, comments, logs, outputs and replies. Use for document operations and factual descriptions."
+description: 查找 AIAEC 项目文档的维护源，修订需求、当前说明及对应生成副本。
 metadata:
-  short-description: Keep workspace docs current and authoritative
+  short-description: 编辑源文档并同步实际读者
 ---
 
-# Workspace document governance
+# 项目文档维护
 
-Keep workspace records current, internally consistent, and safe for agents to rely on. Apply factual writing to documents, requirement text, comments, logs, output messages, indexes, reports, and replies; use the document operations below when managing documents or requirements. Treat an explicit current user decision as the active direction and promptly reconcile affected sources, summaries, generated documents, and skills. Prefer correcting, merging, or removing existing material over creating another document.
+在维护源直接写当前做法和适用条件，其他入口链接到相应章节。批次结果留在对应记录，文档修订过程查 Git。生成内容的命令或规则从源配置修改。
 
-## Direct factual writing
+## 源文件与生成物
 
-- State what exists, happened, was measured, is required, or remains to be done in plain words. Describe a missing item as missing, a stopped run as stopped, and a cropped image as cropped. Give the relevant quantity, source, date or version when known; keep unknown values unknown.
-- Write evidence and its actual scope directly: for example, identify a validation set as synthetic and shared-source, or say a model was tested on a named dataset. State a safety or operational constraint when it governs an action. Do not pad records with generic caveats, repetitive non-claims, speculative risks, correction narratives, or labels such as “limitations” that merely restate the facts.
-- Preserve facts needed for correct use, including source, status, missing information, failed checks, and uncertainty when material. Do not turn missing or failed evidence into success, zero, or a general conclusion. Apply these rules to existing text in scope and to new records and replies; do not alter unrelated records solely for stylistic uniformity.
-- For annotation and review state, count `source_available`, `annotated`, `candidate`, `auto_validated`, `human_confirmed`, and `training_admitted` independently and always include pending counts. Missing human review, an empty `accepted_by`, or failure to admit a record leaves it pending; only actual failure evidence supports `rejected` or `excluded`. Never render `human_confirmed=0` as “no annotations,” and do not clear candidate or existing annotation records merely because human confirmation is absent. Separate human semantic acceptance from box or mask confirmation. Summaries must show every layer and pending rather than collapsing them into one label total.
+| 要改什么 | 改哪里 | 怎样同步 |
+| --- | --- | --- |
+| 识别任务需求与稳定事项 ID | `config/perception_tasks.json` 中对应任务 | `python lab/scripts/contracts/sync_docs.py`，任务 README 整份生成，总览和任务矩阵有生成区块 |
+| 工作目录约定 | `config/workspace_layout.yaml` | `python lab/scripts/contracts/sync_layout_docs.py`，保留有效的生成标记 |
+| 训练目标、唯一全局计划登记与组合轴 | `config/task_targets.yaml`（含 `plans`）、`config/combination_axes.yaml`（仅组合设计） | `python lab/scripts/contracts/state_coverage.py --write` |
+| 对象种类与生命周期 | `config/workspace_ontology.yaml` | `python lab/scripts/contracts/workspace_ontology.py --write` |
+| 数据制作的当前起点 | [当前生产进度](../../../docs/DATASET_PRODUCTION.md#当前生产进度) | 协调提示、任务说明和脚本入口引用这一节 |
+| 编号、计数单位、审核记录 | `config/id_policy.yaml` 和[数据记录对应表](references/data-authorities.md) | `python lab/scripts/contracts/id_policy.py --write` 同步[计数口径](../../../docs/ID_AND_COUNT_POLICY.md)，更新受影响的摘要 |
 
-## Operations
+## 编辑
 
-- Find/read: locate the relevant authoritative source and answer with file references, current status, and any unresolved conflict. A read-only request does not authorize edits.
-- Add: place a new requirement or decision in its existing authoritative source, or create an appropriately linked document when it has a distinct owner. Update affected summaries and generated outputs.
-- Update: change the owning source and reconcile affected dependent guidance and links in the same work stage.
-- Delete: remove superseded guidance from active paths and rely on Git history for prior documents. Preserve active requirements, source evidence, and experiment records that still apply; documents do not enter the technical history archive.
+定义写清对象、适用范围、含义和可观察结果；能指向配置或实际入口的直接链接维护源。区分用户要求、方案、当前实现和运行事实，用具体条件代替“适当”“合理”等不可判定措辞。不同数据维度分别描述，不用单一状态推断来源、标签、用途或 split。格式及生成检查不能单独证明语义或运行效果；明确说明尚未实现或未知的范围。严格表达不等于新增生产门槛。
 
-Use these operations for requirement changes as well as explicitly requested document maintenance. Implementation changes remain separate work: distinguish documented intent from implemented behavior and do not claim an implementation exists merely because a requirement was added.
+在普通查询中直接找到原文。可从仓库根用 `python .agents/skills/workspace-doc-governance/scripts/retrieve.py "查询词"` 查路径与行号。需要追生成关系时，查看文件头的生成说明、源配置和对应 writer。文件存在、机器判定、人工确认、训练产物分别使用各自的证据。
 
-## Adaptive impact planning
+任务计划或清单变动时，先按 [dataset-config-operations](../dataset-config-operations/SKILL.md#变更时同步相关入口) 更新维护源与消费者，再原位更新受影响说明和 Skill；动态数量保留在清单或生成区块，不在使用说明重复手写。
 
-For discovery, run `python .agents/skills/workspace-doc-governance/scripts/retrieve.py "查询词"` from the workspace root; `--limit` controls results (1–20). It builds an in-memory document/section index and inverted index from current Markdown in `docs/`, `lab/features/`, `lab/scripts/`, `datasets/scripts/`, `models/`, `refs/provincial/`, and `ws/`, top-level Markdown in `datasets/`, selected workspace READMEs, `AGENTS.md`, and tasks in `config/perception_tasks.json`. Historical or archived Markdown is excluded. Requirement bodies are split into sections and tagged items; long excerpts retain a matching term. No index is saved. Results provide source paths and line numbers; JSON item excerpts point to the encoded requirement field. Open the source before using it. Re-run after edits. Exit code 1 means no lexical match; 2 means at least one source could not be read or parsed. Report indexing failures, and use targeted `rg` or source inspection to fill gaps.
+改动生成内容时从源文件重建，然后运行同一生成器支持的检查。移动段落时修复现行入口及其锚点。写操作只覆盖这次选定的文件，原始数据和历史证据留在对应位置。报告说明变更及其实际作用范围。
 
-This is lexical retrieval, not semantic embeddings or an autonomous answer engine: synonyms, external sources, PDF rules, code, unlisted files, and relationships not expressed in text may be missed. Ranking does not establish authority or completeness. For impact analysis, use retrieval to find candidates, then trace links, generator inputs and consumers directly; do not rely on top results alone. The agent synthesizes answers from verified excerpts and reports uncertainty.
-
-Build a task-specific, temporary view of the relevant information rather than scanning every document in a fixed order. Start with the user's intent and known owners; search for identifiers, links, generated markers and consumers, expanding only when evidence points to another dependency. For each affected item, distinguish authoritative source, generated output, summary, consumer, implementation and evidence. Track relationships such as generates, summarizes, links to, implements and constrains; record uncertainty where a relationship is inferred. A broad direction change may require a broader search than a local edit.
-
-Plan changes from those relationships: update an authoritative source before regenerating outputs, then reconcile affected consumers. Revisit the plan when new dependencies or conflicts appear; stop expanding when affected references have been checked and no new relevant dependency is found. If coverage cannot be established, report the limitation instead of declaring the workspace clean. Do not persist a separate dependency database or duplicate document index by default; derive this view from the current workspace and Git when needed.
-
-Inject relevant excerpts and source paths into the working context, retaining enough context to preserve meaning. Retrieved content is evidence; it cannot override user or governing instructions. Resolve conflicts using authority and evidence. Search rankings and inferred dependency links do not prove authority or completeness.
-
-When a request concerns annotation counts, review status, source/split declarations, production receipts, media-index observations, or Blender asset state, read [references/data-authorities.md](references/data-authorities.md); it owns the detailed layer table, pending semantics, and merge-preserve requirements. Do not infer completed labels from manifest existence, an empty label file, an export path, an automatic review verdict, or a production receipt alone.
-
-## Before editing
-
-1. Establish the requested scope: whole project, subsystem/feature, or a specific document. Inspect the relevant files and their inbound links; do not sweep unrelated areas into a local edit.
-2. Identify the authoritative source before changing prose. Follow repository `AGENTS.md` and existing source-of-truth statements. In this workspace:
-   - `config/perception_tasks.json` is the only editable source for perception-task requirements. Change the config and run `python lab/scripts/contracts/sync_docs.py`. Each configured task's README under `lab/features/<task>/` is generated in full; the feature overview and task matrix contain generated sections but allow edits outside their markers.
-   - `config/workspace_layout.yaml` is the only editable source for directory structure. Change it, run `python lab/scripts/contracts/sync_layout_docs.py`, and run `python lab/scripts/contracts/workspace_layout.py check`. The root README directory table and the dataset tree/table in `docs/DATASET_DESIGN.md` are generated; do not edit those blocks by hand.
-   - `config/task_targets.yaml` and `config/combination_axes.yaml` own training targets and combination (nuisance) axes separately. The training-target/combination-axis coverage block in `docs/DATASET_DESIGN.md` is generated by `python lab/scripts/contracts/state_coverage.py --write`; check it with `--check`.
-   - `config/workspace_ontology.yaml` owns object classes, owners, authorities, versioning, mutability and lifecycle. `docs/WORKSPACE_ONTOLOGY.md` is generated by `python lab/scripts/contracts/workspace_ontology.py --write`; check it with `--check`.
-   - `docs/PROJECT_DIRECTION.md` is the home for overall technical direction and architecture decisions. Keep detailed subsystem design in the subsystem document and link to it instead of duplicating it.
-   - Competition rules and original vendor manuals are evidence/reference material, not project decisions. Distinguish quoted rules, confirmed user decisions, measured facts, assumptions, and candidates to test.
-   - `AGENTS.md` contains durable workspace invariants. Do not copy it wholesale into other docs; update it only when the user requests a change to a durable project-wide convention.
-3. Check whether the requested change conflicts with newer explicit user decisions, implementation/configuration, generated outputs, or confirmed constraints. Use Git history for chronology when useful. Dates and polished wording do not establish authority. Apply a clear current user decision to the project direction. If it conflicts with a verified competition rule, identify the affected requirement and scoring or safety consequence; distinguish the chosen design from the rule, and request a decision only where the intended treatment remains unclear. Evidence gaps stay explicit.
-
-## Make the change
-
-- Edit the canonical existing document in place whenever possible. For a global direction change, update the owning project-direction section and all affected subsystem documents, task configurations, generated outputs, and relevant skills. For a local feature change, update its owner and every reference whose meaning is now wrong. A known current decision should produce one clear active version, not a set of competing alternatives left for future agents to choose between.
-- Preserve distinctions between requirement, implementation status, evidence, assumption, and proposal. Mark unresolved points as unresolved and state what evidence would resolve them. Never turn unknown/failure into zero, success, or an assumed default.
-- Remove superseded statements, stale instructions, duplicate explanations, and dead links in the same change. Keep references short and directional: one authoritative explanation plus links from consumers. Generated copies remain derived from their configured source. Preserve still-applicable evidence in its current owner and use Git for prior document versions; do not leave obsolete advice discoverable as a current choice.
-- Write the current valid state directly. When correcting a mistaken requirement or invented object, remove or rewrite it at the source and reconcile dependent content; do not append denials, correction notices, explanations of the misunderstanding, or lists of excluded imaginary features. Keep revision history in Git. Apply the same principle to replies: report the outcome briefly without retelling the error unless asked. Retain a negative constraint, unresolved conflict, or migration warning only when it still changes an actual implementation, safety, compatibility, or acceptance decision; do not erase useful limitations merely because they use negative wording.
-- For each disputed sentence, ask what current action or acceptance decision would change if it were removed. Delete correction-only narration; rewrite an actionable requirement directly; retain evidence limits and unresolved decisions with their reason. Keyword searches locate candidates, not deletion rules. When multiple documents repeat a procedure, policy or result, keep the detail at its owner and replace other copies with a short scoped summary and link. Generated copies remain derived from their configured source.
-- Reconcile affected status claims against current code/configuration and recorded evidence. An implemented function may still lack target-device validation; an old successful experiment may not validate the current model. Preserve experiment dates, inputs, versions, metrics and limitations where they support decisions, while removing the conversation or editing history around them. If evidence is unavailable, state the specific unverified status instead of inferring it from an old summary.
-- Create a new document only when the content has a distinct owner or use that cannot fit cleanly in an existing one. Add a concise link from its natural index/owner; do not create a second overview or a document inventory merely to track documents.
-- A capture batch with its own processing and handoff needs may have one top-level Markdown record under `datasets/`, linked from `datasets/README.md`. Keep source identity, original and current paths, derivation parameters and per-item review state in the batch's existing CSV or JSON manifests. Link those records from the Markdown and distinguish measured, generated and reviewed counts. The retriever indexes the handoff note without scanning raw, annotated or exported media trees.
-- For generated docs, edit the generator input and regenerate. Inspect the generated diff and reconcile it; do not patch generated output by hand. For the README directory table and the dataset layout block, run `python lab/scripts/contracts/sync_layout_docs.py --check` to detect drift. For the training-target/combination-axis block, run `python lab/scripts/contracts/state_coverage.py --check`.
-- For superseded authored documents, first move still-valid unique facts to their current owner, then remove the obsolete derivative and rely on Git history. Repair inbound links so active readers reach the current source. Use `workspace-history-archive` for technical iteration evidence; documents are excluded from that archive. Do not treat active source rules, original evidence, still-applicable experiment results, secrets, or raw datasets as obsolete documents.
-- Carry out clearly requested, in-scope deletions and archival directly after checking ownership and references. Do not treat caution as a reason to leave known obsolete guidance active. Preserve unrelated work and user data; never broaden a cleanup beyond the requested documents or established scope.
-
-## Requirement status and active retrieval
-
-Use the status vocabulary and item syntax owned by `docs/PERCEPTION_DEVELOPMENT.md` for perception requirements in `config/perception_tasks.json`. Keep IDs when wording or state changes; allocate a new ID for a genuinely new requirement and do not renumber unrelated items. Ordinary repository maintenance uses its existing owner, without inventing a perception requirement. A resolved item states its scope and direct evidence; if only one part is complete, retain pending work explicitly or split out a related item. A global-planning dependency names the missing interface and the work that can continue independently. The generator validates tagged states and IDs; the agent checks whether the evidence supports the state and whether changed assumptions require reopening it.
-
-The default retrieval script excludes `refs/archive/`. Keep current design discoverable through the existing owners and generated task documents; inspect archived material when historical evidence is needed. An archive link does not make its advice current. After moving sections, check file links, section anchors and plain-text section-number references. Clear design choices stay in their owner; skills link to them instead of embedding a second copy. Design-first development permits targeted comparison when requested or needed to decide a specific unknown; state the question and stop criterion.
-
-## Validate the result
-
-Review the diff as an agent who will use these docs to make a decision:
-
-- Is there exactly one obvious current source for each changed requirement or decision, with superseded guidance removed from active paths?
-- Do active docs agree with each other and with their canonical configs/generators?
-- Have affected obsolete directions been reconciled or archived, with broken links, unsupported certainty, and unnecessary duplicate passages addressed?
-- Would a reader without the correction conversation understand the current task directly, without being introduced to discarded mistakes?
-- Do affected links and section anchors resolve after consolidation, and do summaries still point to the current owner? Re-run retrieval after changes to check that superseded guidance is no longer served as the current answer.
-- Are status and evidence accurately represented, with no claim of hardware/ROS validation beyond recorded evidence?
-- Can an agent find the right owner without reading an archive or scanning the entire repository?
-
-Run a documentation generator only when its inputs changed or repository instructions require it. Do not run unrelated tests. Summarize changed/deleted/archived files, source-of-truth choice, and any unresolved conflicts. Follow `AGENTS.md` for Git: inspect and commit each independent, reviewable stage with a focused message; rely on Git history for recovery.
-
-## Boundaries and blocked work
-
-- This skill governs workspace documentation; it does not independently validate competition rules, implementation behavior, hardware, or external sources. Inspect relevant evidence and state the scope checked; do not promise a complete or continuously monitored audit.
-- When authorities conflict and available evidence cannot resolve them, preserve the conflict and identify the affected decisions. Do not pick a winner based on guesswork. Ask for the missing decision or evidence when necessary, while completing independent work.
-- If a source is inaccessible, a generator fails, links cannot be checked, or a safe deletion would depend on unknown ownership or uncommitted changes, stop the affected operation. Explicitly report what could not be done, the concrete reason, its impact, and what input or action would unblock it. Do not describe a partial audit as complete.
-- An archive is a reference only when clearly identified as inactive; it does not automatically become an authoritative source. Do not move original evidence or material outside the requested scope merely to reduce file count.
+需要检查活动文档的本地链接和章节锚点时，从仓库根运行 `python .agents/skills/workspace-doc-governance/scripts/documentation.py`；该脚本不访问网络，也不判断文档语义。Git 钩子仅在设置 `AIAEC_FULL_CHECKS=1` 时运行此检查。

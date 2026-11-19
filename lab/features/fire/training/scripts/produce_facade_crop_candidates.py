@@ -1,7 +1,7 @@
 """Run a bounded prior-only inspection using three locally reviewed facade crops."""
 
 if __name__ == "__main__":
-    raise SystemExit("Legacy dataset CLI is retired; use datasets/scripts/fire/. Production remains paused.")
+    raise SystemExit("Legacy dataset CLI is retired; use datasets/scripts/fire/.")
 
 import copy
 import json
@@ -41,7 +41,8 @@ def load_entries():
         if r['wall_patch_xy'] != expected_quad:
             raise ValueError('wall patch differs from the inspected region')
         parent, crop = (ROOT / r['parent']).resolve(), (ROOT / r['crop']).resolve()
-        if (not parent.is_relative_to(ROOT / 'datasets/raw/fire') or
+        if (not any(parent.is_relative_to(ROOT / base) for base in (
+                'datasets/raw/fire', 'Archive/Assets/working_sources/legacy/fire', 'Archive/Assets/captures/fire')) or
                 not crop.is_relative_to(ROOT / 'runs/fire_sticker') or
                 not parent.is_file() or not crop.is_file()):
             raise ValueError('parent or crop missing or outside its source scope')

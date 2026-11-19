@@ -1,0 +1,1038 @@
+{
+  "observed_at_utc": "2026-11-19T02:11:08.198982+00:00",
+  "source_git_head": "e68595e740df27dba0f7d5a60f8ea593a264f1a7",
+  "source_state": "Working-tree snapshot; includes uncommitted source changes. No data/model release.",
+  "scope": "Local labels counted without image decoding; metrics extracted from existing run receipts, no retraining.",
+  "datasets": {
+    "person": {
+      "train": {
+        "images": 3000,
+        "label_files": 3000,
+        "instances": 8987,
+        "empty_labels": 257,
+        "label_inventory_sha256": "f093422ba54f5d3b6d40cbda18efbb5c6859b59b27f047432fd2bb01c3d51ad3"
+      },
+      "val": {
+        "images": 300,
+        "label_files": 300,
+        "instances": 1013,
+        "empty_labels": 19,
+        "label_inventory_sha256": "29e2db7358c4b2d0221a2d19ff7a4995f1945e3e7b26350dbfb59dcf120480e6"
+      },
+      "test": {
+        "images": 300,
+        "label_files": 300,
+        "instances": 933,
+        "empty_labels": 43,
+        "label_inventory_sha256": "ffb3759f44d4c02a70669ebcaa9c9366c7675c4bf5007a71217824acffb34b89"
+      }
+    },
+    "fire": {
+      "train": {
+        "images": 3000,
+        "label_files": 3000,
+        "instances": 4744,
+        "empty_labels": 600,
+        "label_inventory_sha256": "982d2a34a72e8477579290da168de4d5093df45dc9e88b485c396534fe612e57"
+      },
+      "val": {
+        "images": 300,
+        "label_files": 300,
+        "instances": 480,
+        "empty_labels": 60,
+        "label_inventory_sha256": "19efb1a113577b70a71e67a6b47eb43cbf277f2c71ddcc984282ed9c9d410b80"
+      },
+      "test": {
+        "images": 300,
+        "label_files": 300,
+        "instances": 480,
+        "empty_labels": 60,
+        "label_inventory_sha256": "967e3a889a6519d1ac212f0d9ba1be475ae8e04187e8db9b6c75136b53debeb2"
+      }
+    },
+    "waste_sticker": {
+      "train": {
+        "images": 1800,
+        "label_files": 1800,
+        "instances": 4050,
+        "empty_labels": 180,
+        "label_inventory_sha256": "cc6085db04b2f157f2c74792ccc85900aac391ef15b02ddcf42e5eef6f7ddc65"
+      },
+      "val": {
+        "images": 240,
+        "label_files": 240,
+        "instances": 540,
+        "empty_labels": 24,
+        "label_inventory_sha256": "92d250ab686af72da20a8a3947c53fc2dddd35b4badac995c1093844eca5d05e"
+      },
+      "test": {
+        "images": 240,
+        "label_files": 240,
+        "instances": 540,
+        "empty_labels": 24,
+        "label_inventory_sha256": "f9e3a0d5e0ba0fec4d0a619e610ff46aaae7d04cf212a3a02596339c8853adf4"
+      }
+    },
+    "waste_bin_state": {
+      "train": {
+        "images": 804,
+        "label_files": 804,
+        "instances": 1502,
+        "empty_labels": 64,
+        "label_inventory_sha256": "7b98dc7a602872d9619fdd6e169a17b843ee0751c72d3c709f373b98b04e1626"
+      },
+      "val": {
+        "images": 186,
+        "label_files": 186,
+        "instances": 456,
+        "empty_labels": 25,
+        "label_inventory_sha256": "cec70efaa472358e78e19af42cbf93fab468bf99970022efffd2ce2bacd864eb"
+      },
+      "test": {
+        "images": 253,
+        "label_files": 253,
+        "instances": 415,
+        "empty_labels": 52,
+        "label_inventory_sha256": "6166f802669b93e4f0515a7b3388e21600cfcfb9d8de694cd9ffcecc9e5422c6"
+      }
+    },
+    "meter": {
+      "train": {
+        "images": 6480,
+        "label_files": 6480,
+        "instances": 5832,
+        "empty_labels": 648,
+        "label_inventory_sha256": "fae64f26c48dbfe2931e5733586cbd52064cebe75f751fb476ebf585c339db2a"
+      },
+      "val": {
+        "images": 1080,
+        "label_files": 1080,
+        "instances": 972,
+        "empty_labels": 108,
+        "label_inventory_sha256": "ce8d4c0571120fd2e788fe9e44b789fc2f77a184a77ddef7166ed8b24a1d5cf9"
+      },
+      "test": {
+        "images": 1080,
+        "label_files": 1080,
+        "instances": 972,
+        "empty_labels": 108,
+        "label_inventory_sha256": "18e604cd74887f0094d3cb402c01d3b989c0ee660ee3c75aeaaa24a05517cb82"
+      }
+    },
+    "building_name_paper": {
+      "train": {
+        "images": 3000,
+        "label_files": 3000,
+        "instances": 3495,
+        "empty_labels": 601,
+        "label_inventory_sha256": "f2dacc7975b2f4a7445ac60e758d7094013f744834a61007cc46b76bc31b5434"
+      },
+      "val": {
+        "images": 300,
+        "label_files": 300,
+        "instances": 323,
+        "empty_labels": 82,
+        "label_inventory_sha256": "c81e48dc22c2901dcfcb3589b77204bbcb9c70fc1cb394374af509f8cce3eec3"
+      },
+      "test": {
+        "images": 300,
+        "label_files": 300,
+        "instances": 334,
+        "empty_labels": 73,
+        "label_inventory_sha256": "008d856437c0d5b4b50d151b066bb2b3182f79bd90adf6543eb4a7c5cf9b8b8f"
+      }
+    },
+    "sign": {
+      "train": {
+        "images": 2500,
+        "label_files": 2500,
+        "instances": 2000,
+        "empty_labels": 500,
+        "label_inventory_sha256": "59ad1d6663a61de21fefd8d3349c9395dfcd608b99a114372721a8ac4b71b9f5"
+      },
+      "val": {
+        "images": 300,
+        "label_files": 300,
+        "instances": 275,
+        "empty_labels": 75,
+        "label_inventory_sha256": "57e4244f25656af399a028b2fb8abaf7f1142f72c5b326a53dc62d7afc3795e1"
+      },
+      "test": {
+        "images": 300,
+        "label_files": 300,
+        "instances": 225,
+        "empty_labels": 75,
+        "label_inventory_sha256": "2acc2953487392f24d0a37e891966361b5a6a387cbae30052740e1490cacd158"
+      }
+    },
+    "e_bike": {
+      "train": {
+        "images": 108,
+        "label_files": 108,
+        "instances": 364,
+        "empty_labels": 4,
+        "label_inventory_sha256": "95ac4d9a68f18ed604522358db83a7ec31ded25e1dfa06f948a76c2dcc27dcf8"
+      },
+      "val": {
+        "images": 10,
+        "label_files": 10,
+        "instances": 38,
+        "empty_labels": 0,
+        "label_inventory_sha256": "9d39ffee7d5da5df040dc9dc96dd1ac046b76311b6c764f5773bd797a2f723fe"
+      },
+      "test": {
+        "status": "not_present"
+      }
+    }
+  },
+  "baselines": {
+    "fire_sticker": {
+      "completed_epochs": 135,
+      "selection": {
+        "metric": "Box mAP50-95",
+        "split": "val",
+        "epoch": 37,
+        "score": 0.88415
+      },
+      "best_sha256": "da6ce0d7589552f0880640f7f7ce5e6c6689423949e6e22939c24612f7154528",
+      "val": {
+        "images": 300,
+        "annotated_instances": 480,
+        "metrics": {
+          "metrics/precision(B)": 0.9987391159388145,
+          "metrics/recall(B)": 0.9958333333333333,
+          "metrics/mAP50(B)": 0.995,
+          "metrics/mAP50-95(B)": 0.8841429994251178,
+          "fitness": 0.8841429994251178
+        },
+        "diagnostics": {
+          "confidence_threshold": 0.25,
+          "match_iou": 0.5,
+          "nms_iou": 0.7,
+          "true_positives": 474,
+          "false_positives": 0,
+          "false_negatives": 6,
+          "negative_images": 60,
+          "negative_images_with_false_positives": 0
+        }
+      },
+      "test": {
+        "images": 300,
+        "annotated_instances": 480,
+        "metrics": {
+          "metrics/precision(B)": 0.9875505352045176,
+          "metrics/recall(B)": 0.9915594385020009,
+          "metrics/mAP50(B)": 0.994194029486501,
+          "metrics/mAP50-95(B)": 0.855693677496338,
+          "fitness": 0.855693677496338
+        },
+        "diagnostics": {
+          "confidence_threshold": 0.25,
+          "match_iou": 0.5,
+          "nms_iou": 0.7,
+          "true_positives": 475,
+          "false_positives": 9,
+          "false_negatives": 5,
+          "negative_images": 60,
+          "negative_images_with_false_positives": 6
+        }
+      }
+    },
+    "building_name_paper": {
+      "completed_epochs": 135,
+      "selection": {
+        "metric": "Box mAP50-95",
+        "split": "val",
+        "epoch": 108,
+        "score": 0.89858
+      },
+      "best_sha256": "28f8c6ab6f03f9de60ba6448e6bb14e86990360f2cb58024130a7c113a28c99d",
+      "val": {
+        "images": 300,
+        "annotated_instances": 323,
+        "metrics": {
+          "metrics/precision(B)": 0.9995627816949421,
+          "metrics/recall(B)": 1.0,
+          "metrics/mAP50(B)": 0.995,
+          "metrics/mAP50-95(B)": 0.8987014700096865,
+          "fitness": 0.8987014700096865
+        },
+        "diagnostics": {
+          "confidence_threshold": 0.25,
+          "match_iou": 0.5,
+          "nms_iou": 0.7,
+          "true_positives": 323,
+          "false_positives": 6,
+          "false_negatives": 0,
+          "negative_images": 82,
+          "negative_images_with_false_positives": 2
+        }
+      },
+      "test": {
+        "images": 300,
+        "annotated_instances": 334,
+        "metrics": {
+          "metrics/precision(B)": 0.9666702370879874,
+          "metrics/recall(B)": 0.9880239520958084,
+          "metrics/mAP50(B)": 0.9941853870951408,
+          "metrics/mAP50-95(B)": 0.9000674581676948,
+          "fitness": 0.9000674581676948
+        },
+        "diagnostics": {
+          "confidence_threshold": 0.25,
+          "match_iou": 0.5,
+          "nms_iou": 0.7,
+          "true_positives": 332,
+          "false_positives": 28,
+          "false_negatives": 2,
+          "negative_images": 73,
+          "negative_images_with_false_positives": 3
+        }
+      }
+    },
+    "waste_bin_state": {
+      "completed_epochs": 120,
+      "selection": {
+        "metric": "Box mAP50-95",
+        "split": "val",
+        "epoch": 112,
+        "score": 0.65626
+      },
+      "best_sha256": "c5c3b8c59881b6798df4614a469d595ed892ce1d49e235f84c06e1058f2f872e",
+      "val": {
+        "images": 186,
+        "annotated_instances": 456,
+        "metrics": {
+          "metrics/precision(B)": 0.9796099726514821,
+          "metrics/recall(B)": 0.5859840603059971,
+          "metrics/mAP50(B)": 0.8071226712462916,
+          "metrics/mAP50-95(B)": 0.6558054600672174,
+          "fitness": 0.6558054600672174
+        },
+        "diagnostics": {
+          "confidence_threshold": 0.25,
+          "match_iou": 0.5,
+          "nms_iou": 0.7,
+          "true_positives": 191,
+          "false_positives": 2,
+          "false_negatives": 265,
+          "negative_images": 25,
+          "negative_images_with_false_positives": 0
+        }
+      },
+      "test": {
+        "images": 253,
+        "annotated_instances": 415,
+        "metrics": {
+          "metrics/precision(B)": 0.9953657336101303,
+          "metrics/recall(B)": 0.9327354199792712,
+          "metrics/mAP50(B)": 0.9725285216192489,
+          "metrics/mAP50-95(B)": 0.9013065347258731,
+          "fitness": 0.9013065347258731
+        },
+        "diagnostics": {
+          "confidence_threshold": 0.25,
+          "match_iou": 0.5,
+          "nms_iou": 0.7,
+          "true_positives": 388,
+          "false_positives": 2,
+          "false_negatives": 27,
+          "negative_images": 52,
+          "negative_images_with_false_positives": 0
+        }
+      }
+    },
+    "waste_sticker": {
+      "completed_epochs": 150,
+      "selection": {
+        "metric": "Box mAP50-95",
+        "split": "val",
+        "epoch": 94,
+        "score": 0.96489
+      },
+      "best_sha256": "102838e73d765581b9e6d9e907d75cc6c623bce616ed60366708f8927fb1624c",
+      "val": {
+        "images": 240,
+        "annotated_instances": 540,
+        "metrics": {
+          "metrics/precision(B)": 0.9972446715664912,
+          "metrics/recall(B)": 1.0,
+          "metrics/mAP50(B)": 0.995,
+          "metrics/mAP50-95(B)": 0.9636459376764148,
+          "fitness": 0.9636459376764148
+        },
+        "diagnostics": {
+          "confidence_threshold": 0.25,
+          "match_iou": 0.5,
+          "nms_iou": 0.7,
+          "true_positives": 540,
+          "false_positives": 3,
+          "false_negatives": 0,
+          "negative_images": 24,
+          "negative_images_with_false_positives": 0
+        }
+      },
+      "test": {
+        "images": 240,
+        "annotated_instances": 540,
+        "metrics": {
+          "metrics/precision(B)": 0.9970164911752857,
+          "metrics/recall(B)": 0.9960062347610371,
+          "metrics/mAP50(B)": 0.995,
+          "metrics/mAP50-95(B)": 0.9706674689531348,
+          "fitness": 0.9706674689531348
+        },
+        "diagnostics": {
+          "confidence_threshold": 0.25,
+          "match_iou": 0.5,
+          "nms_iou": 0.7,
+          "true_positives": 539,
+          "false_positives": 16,
+          "false_negatives": 1,
+          "negative_images": 24,
+          "negative_images_with_false_positives": 0
+        }
+      }
+    },
+    "sign": {
+      "completed_epochs": 115,
+      "selection": {
+        "metric": "Box mAP50-95",
+        "split": "val",
+        "epoch": 95,
+        "score": 0.90752
+      },
+      "best_sha256": "3db43a5ccacbe31fe549c0177c08b694d1c1de2bf5b41d4b13d228ffa600dae5",
+      "val": {
+        "images": 300,
+        "annotated_instances": 275,
+        "metrics": {
+          "metrics/precision(B)": 0.9988773116825265,
+          "metrics/recall(B)": 0.9163636363636364,
+          "metrics/mAP50(B)": 0.9730275644610186,
+          "metrics/mAP50-95(B)": 0.9070723958875012,
+          "fitness": 0.9070723958875012
+        },
+        "diagnostics": {
+          "confidence_threshold": 0.25,
+          "match_iou": 0.5,
+          "nms_iou": 0.7,
+          "true_positives": 257,
+          "false_positives": 9,
+          "false_negatives": 18,
+          "negative_images": 75,
+          "negative_images_with_false_positives": 0
+        }
+      },
+      "test": {
+        "images": 300,
+        "annotated_instances": 225,
+        "metrics": {
+          "metrics/precision(B)": 0.9997687220634446,
+          "metrics/recall(B)": 1.0,
+          "metrics/mAP50(B)": 0.995,
+          "metrics/mAP50-95(B)": 0.9949999999999999,
+          "fitness": 0.9949999999999999
+        },
+        "diagnostics": {
+          "confidence_threshold": 0.25,
+          "match_iou": 0.5,
+          "nms_iou": 0.7,
+          "true_positives": 225,
+          "false_positives": 0,
+          "false_negatives": 0,
+          "negative_images": 75,
+          "negative_images_with_false_positives": 0
+        }
+      }
+    },
+    "meter": {
+      "completed_epochs": 120,
+      "selection": {
+        "epoch": 97,
+        "metric": "Pose mAP50-95",
+        "score": 0.99434
+      },
+      "best_sha256": "6ff831c1a2a08d32be9c060cf472ed437729825a2464b168e8a049b8f3c01fa2",
+      "optimization_status": "validation_early_stop",
+      "val": {
+        "images": 1080,
+        "annotated_instances": 972,
+        "metrics": {
+          "metrics/precision(B)": 0.9999365075540394,
+          "metrics/recall(B)": 1.0,
+          "metrics/mAP50(B)": 0.995,
+          "metrics/mAP50-95(B)": 0.994601631120615,
+          "metrics/precision(P)": 0.9999365075540394,
+          "metrics/recall(P)": 1.0,
+          "metrics/mAP50(P)": 0.995,
+          "metrics/mAP50-95(P)": 0.9943056969993517,
+          "fitness": 1.9889073281199665
+        },
+        "diagnostics": {
+          "confidence_threshold": 0.25,
+          "match_iou": 0.5,
+          "nms_iou": 0.7,
+          "true_positives": 972,
+          "false_positives": 0,
+          "false_negatives": 0,
+          "negative_images": 108,
+          "negative_images_with_false_positives": 0
+        }
+      },
+      "test": {
+        "images": 1080,
+        "annotated_instances": 972,
+        "metrics": {
+          "metrics/precision(B)": 1.0,
+          "metrics/recall(B)": 0.9988617258083548,
+          "metrics/mAP50(B)": 0.995,
+          "metrics/mAP50-95(B)": 0.9949907216494844,
+          "metrics/precision(P)": 1.0,
+          "metrics/recall(P)": 0.9988617258083548,
+          "metrics/mAP50(P)": 0.995,
+          "metrics/mAP50-95(P)": 0.9931980716796833,
+          "fitness": 1.9881887933291678
+        },
+        "diagnostics": {
+          "confidence_threshold": 0.25,
+          "match_iou": 0.5,
+          "nms_iou": 0.7,
+          "true_positives": 971,
+          "false_positives": 25,
+          "false_negatives": 1,
+          "negative_images": 108,
+          "negative_images_with_false_positives": 2
+        }
+      },
+      "task_report": {
+        "counts": {
+          "images": 1080,
+          "positive_images": 972,
+          "negative_images": 108,
+          "negative_images_with_false_positives": 2,
+          "ground_truth": 972,
+          "matched_boxes": 971,
+          "missed_boxes": 1,
+          "false_predictions": 25
+        },
+        "negative_image_false_positive_rate": 0.018518518518518517,
+        "needles": {
+          "temperature": {
+            "eligible": 972,
+            "measured": 971,
+            "box_missed": 1,
+            "point_unavailable": 0,
+            "degenerate_truth": 0,
+            "degenerate_prediction": 0,
+            "unmeasured": 1,
+            "coverage": 0.9989711934156379,
+            "angle_error_degrees": {
+              "count": 971,
+              "mean": 1.9115021704501873,
+              "p50": 1.4678582900421995,
+              "p90": 3.8252295821564406,
+              "p95": 4.782701680438917,
+              "max": 39.290545440028325
+            },
+            "tip_error_pixels": {
+              "count": 971,
+              "mean": 1.0541187279406536,
+              "p50": 0.869003399863292,
+              "p90": 1.9831751394844295,
+              "p95": 2.4321254301564275,
+              "max": 9.81308858928988
+            },
+            "within_angle_degrees": {
+              "2": {
+                "count": 615,
+                "fraction_of_measured": 0.6333676622039135,
+                "fraction_of_eligible": 0.6327160493827161
+              },
+              "5": {
+                "count": 929,
+                "fraction_of_measured": 0.956745623069001,
+                "fraction_of_eligible": 0.9557613168724279
+              },
+              "10": {
+                "count": 966,
+                "fraction_of_measured": 0.9948506694129763,
+                "fraction_of_eligible": 0.9938271604938271
+              }
+            }
+          },
+          "humidity": {
+            "eligible": 972,
+            "measured": 971,
+            "box_missed": 1,
+            "point_unavailable": 0,
+            "degenerate_truth": 0,
+            "degenerate_prediction": 0,
+            "unmeasured": 1,
+            "coverage": 0.9989711934156379,
+            "angle_error_degrees": {
+              "count": 971,
+              "mean": 10.518495834796179,
+              "p50": 5.285007321286878,
+              "p90": 18.260390800091276,
+              "p95": 32.85532882932529,
+              "max": 179.7439120358815
+            },
+            "tip_error_pixels": {
+              "count": 971,
+              "mean": 1.8216028212844786,
+              "p50": 1.2809957572412298,
+              "p90": 3.2821389459334505,
+              "p95": 4.622882533151966,
+              "max": 34.48908286270534
+            },
+            "within_angle_degrees": {
+              "2": {
+                "count": 222,
+                "fraction_of_measured": 0.2286302780638517,
+                "fraction_of_eligible": 0.22839506172839505
+              },
+              "5": {
+                "count": 468,
+                "fraction_of_measured": 0.4819773429454171,
+                "fraction_of_eligible": 0.48148148148148145
+              },
+              "10": {
+                "count": 754,
+                "fraction_of_measured": 0.776519052523172,
+                "fraction_of_eligible": 0.7757201646090535
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "environment_example": {
+    "python": "3.12.8 (tags/v3.12.8:2dc476b, Dec  3 2024, 19:30:04) [MSC v.1942 64 bit (AMD64)]",
+    "platform": "Windows-11-10.0.26200-SP0",
+    "packages": {
+      "torch": "2.7.1+cu128",
+      "torchvision": "0.22.1+cu128",
+      "ultralytics": "8.3.203",
+      "numpy": "1.26.4",
+      "opencv-python": "4.10.0.84",
+      "tensorboard": "2.14.1",
+      "matplotlib": "3.9.2",
+      "PyYAML": "6.0.2"
+    }
+  },
+  "finetuning": {
+    "fire": {
+      "completed_epochs": 10,
+      "best_epoch": 6,
+      "training_seconds": 572.280999999999,
+      "weights_sha256": "ea14079b80e8c240cda9dcd3fd5ce34294e3ae828ea6a1886120dc0d42bc04e6",
+      "recommended_inference": {
+        "confidence": 0.5,
+        "imgsz": 640,
+        "nms_iou": 0.7,
+        "max_det": 100,
+        "basis": "User prioritizes large real stickers and accepts loss on tiny targets; cached predictions only, no new inference",
+        "remaining_known_false_positives": [
+          "orange window object about 0.60",
+          "duplicate sticker box about 0.59"
+        ]
+      },
+      "threshold_note": "Recorded recommendation only; historical evaluation/training configs remain at diagnostic confidence 0.25. Confidence 0.5 was chosen by user after inspecting known Val/Test diagnostics."
+    },
+    "paper": {
+      "completed_epochs": 43,
+      "best_epoch": 33,
+      "elapsed_seconds": 343.922,
+      "evaluation": {
+        "protocol": {
+          "imgsz": 640,
+          "conf": 0.25,
+          "nms_iou": 0.7,
+          "match_iou": 0.5,
+          "max_det": 100,
+          "batch": 1,
+          "rect": true,
+          "half": false,
+          "device": "cpu"
+        },
+        "original_training_images": 0,
+        "scope": "Candidate already selected by new Val; old Test is post-selection regression only. New Val shares scene/session; B paper is present only in training replay. Per-image detection counts do not measure cross-frame unique counting.",
+        "weights": {
+          "before": {
+            "path": "building_name_paper_best_Val_Test\\best.pt",
+            "sha256": "28f8c6ab6f03f9de60ba6448e6bb14e86990360f2cb58024130a7c113a28c99d"
+          },
+          "after": {
+            "path": "runs\\video_finetune\\new_video_finetune_20261118\\training\\weights\\best.pt",
+            "sha256": "0a82140bbdf62c54e9d55d72242c797b2eb9fe84695d07830a59c4eb13e2f0b0"
+          }
+        },
+        "groups": {
+          "new_val_same_scene": {
+            "before": {
+              "images": 21,
+              "tp": 4,
+              "fp": 2,
+              "fn": 9,
+              "exact": 10,
+              "count_correct": 10,
+              "overcount_images": 2,
+              "duplicate_overlap_suspects": 0
+            },
+            "after": {
+              "images": 21,
+              "tp": 10,
+              "fp": 0,
+              "fn": 3,
+              "exact": 18,
+              "count_correct": 18,
+              "overcount_images": 0,
+              "duplicate_overlap_suspects": 0
+            }
+          },
+          "new_train_raw_replay": {
+            "before": {
+              "images": 51,
+              "tp": 22,
+              "fp": 5,
+              "fn": 17,
+              "exact": 31,
+              "count_correct": 32,
+              "overcount_images": 3,
+              "duplicate_overlap_suspects": 3
+            },
+            "after": {
+              "images": 51,
+              "tp": 39,
+              "fp": 0,
+              "fn": 0,
+              "exact": 51,
+              "count_correct": 51,
+              "overcount_images": 0,
+              "duplicate_overlap_suspects": 0
+            }
+          },
+          "old_test_regression_only": {
+            "before": {
+              "images": 300,
+              "tp": 333,
+              "fp": 50,
+              "fn": 1,
+              "exact": 268,
+              "count_correct": 268,
+              "overcount_images": 31,
+              "duplicate_overlap_suspects": 34
+            },
+            "after": {
+              "images": 300,
+              "tp": 334,
+              "fp": 38,
+              "fn": 0,
+              "exact": 264,
+              "count_correct": 264,
+              "overcount_images": 36,
+              "duplicate_overlap_suspects": 2
+            }
+          }
+        }
+      }
+    },
+    "bin_state": {
+      "val": {
+        "before": {
+          "images": 186,
+          "instances": 456,
+          "correct_state": 191,
+          "opposite_state": 0,
+          "localization_miss": 265,
+          "unmatched_predictions": 2,
+          "exactly_correct_images": 115
+        },
+        "after": {
+          "images": 186,
+          "instances": 456,
+          "correct_state": 199,
+          "opposite_state": 0,
+          "localization_miss": 257,
+          "unmatched_predictions": 3,
+          "exactly_correct_images": 115
+        },
+        "last": {
+          "images": 186,
+          "instances": 456,
+          "correct_state": 196,
+          "opposite_state": 2,
+          "localization_miss": 258,
+          "unmatched_predictions": 23,
+          "exactly_correct_images": 108
+        }
+      },
+      "test": {
+        "before": {
+          "images": 253,
+          "instances": 415,
+          "correct_state": 388,
+          "opposite_state": 0,
+          "localization_miss": 27,
+          "unmatched_predictions": 2,
+          "exactly_correct_images": 225
+        },
+        "after": {
+          "images": 253,
+          "instances": 415,
+          "correct_state": 385,
+          "opposite_state": 2,
+          "localization_miss": 28,
+          "unmatched_predictions": 43,
+          "exactly_correct_images": 193
+        },
+        "last": {
+          "images": 253,
+          "instances": 415,
+          "correct_state": 364,
+          "opposite_state": 2,
+          "localization_miss": 49,
+          "unmatched_predictions": 49,
+          "exactly_correct_images": 194
+        }
+      }
+    },
+    "sticker": {
+      "training_epochs": 10,
+      "selected_epoch": 7,
+      "adopted": false,
+      "validation": {
+        "baseline": {
+          "true_positives": 612,
+          "false_positives": 131,
+          "false_negatives": 24,
+          "negative_images": 140,
+          "negative_images_with_false_positives": 89
+        },
+        "finetuned": {
+          "true_positives": 617,
+          "false_positives": 42,
+          "false_negatives": 19,
+          "negative_images": 140,
+          "negative_images_with_false_positives": 16
+        }
+      },
+      "known_test": {
+        "baseline": {
+          "true_positives": 575,
+          "false_positives": 162,
+          "false_negatives": 5,
+          "negative_images": 104,
+          "negative_images_with_false_positives": 52
+        },
+        "finetuned": {
+          "true_positives": 573,
+          "false_positives": 31,
+          "false_negatives": 7,
+          "negative_images": 104,
+          "negative_images_with_false_positives": 15
+        }
+      },
+      "reason": "Known Test false positives decrease but false negatives increase5to7;11of20 stripe negatives still false-positive; selected rice sticker regresses to shell.",
+      "candidate_sha256": "95d58d817c615d6512d6c7ad854800df6470f2733bb2ce153ab157d64d9f2ffc"
+    },
+    "person": {
+      "previous": {
+        "tp": 83,
+        "fp": 29,
+        "fn": 6,
+        "images": 53,
+        "recall": 0.9325842696629213,
+        "precision": 0.7410714285714286,
+        "by_class": {
+          "community": {
+            "gt": 87,
+            "class_matched": 81,
+            "near_gt": 32,
+            "near_detected": 32,
+            "near_class_matched": 32
+          },
+          "noncommunity": {
+            "gt": 2,
+            "class_matched": 2,
+            "near_gt": 2,
+            "near_detected": 2,
+            "near_class_matched": 2
+          }
+        },
+        "near_by_outcome": {
+          "community": {
+            "correct": 32,
+            "miss": 0,
+            "wrong_class": 0
+          },
+          "noncommunity": {
+            "correct": 2,
+            "miss": 0,
+            "wrong_class": 0
+          }
+        },
+        "tracked": {
+          "all_reviewed": {
+            "frames": 23,
+            "frames_with_box": 23,
+            "median_detected_confidence": 0.660965621471405,
+            "max_detected_confidence": 0.7496206760406494
+          },
+          "continuous_clip": {
+            "frames": 22,
+            "frames_with_box": 22,
+            "median_detected_confidence": 0.6630841493606567,
+            "max_detected_confidence": 0.7496206760406494
+          },
+          "clip_reused_training": {
+            "frames": 4,
+            "frames_with_box": 4,
+            "median_detected_confidence": 0.6593250930309296,
+            "max_detected_confidence": 0.7336124777793884
+          },
+          "clip_other_frames": {
+            "frames": 18,
+            "frames_with_box": 18,
+            "median_detected_confidence": 0.6658378541469574,
+            "max_detected_confidence": 0.7496206760406494
+          }
+        }
+      },
+      "current": {
+        "tp": 83,
+        "fp": 4,
+        "fn": 6,
+        "images": 53,
+        "recall": 0.9325842696629213,
+        "precision": 0.9540229885057471,
+        "by_class": {
+          "community": {
+            "gt": 87,
+            "class_matched": 81,
+            "near_gt": 32,
+            "near_detected": 32,
+            "near_class_matched": 32
+          },
+          "noncommunity": {
+            "gt": 2,
+            "class_matched": 2,
+            "near_gt": 2,
+            "near_detected": 2,
+            "near_class_matched": 2
+          }
+        },
+        "near_by_outcome": {
+          "community": {
+            "correct": 32,
+            "miss": 0,
+            "wrong_class": 0
+          },
+          "noncommunity": {
+            "correct": 2,
+            "miss": 0,
+            "wrong_class": 0
+          }
+        },
+        "tracked": {
+          "all_reviewed": {
+            "frames": 23,
+            "frames_with_box": 1,
+            "median_detected_confidence": 0.28721046447753906,
+            "max_detected_confidence": 0.28721046447753906
+          },
+          "continuous_clip": {
+            "frames": 22,
+            "frames_with_box": 1,
+            "median_detected_confidence": 0.28721046447753906,
+            "max_detected_confidence": 0.28721046447753906
+          },
+          "clip_reused_training": {
+            "frames": 4,
+            "frames_with_box": 1,
+            "median_detected_confidence": 0.28721046447753906,
+            "max_detected_confidence": 0.28721046447753906
+          },
+          "clip_other_frames": {
+            "frames": 18,
+            "frames_with_box": 0,
+            "median_detected_confidence": null,
+            "max_detected_confidence": null
+          }
+        }
+      }
+    },
+    "e_bike_audit": {
+      "status": "initial_metric_and_family_replay_complete_source_isolation_audit_pending",
+      "summary": "runs/e_bike/evaluation_audit_20261118/summary.json",
+      "scope": "Known-source development replay; grouping does not undo prior exposure or establish source isolation.",
+      "primary_iou": 0.5,
+      "definitions": {
+        "count_exact": "Upright and fallen counts both equal GT, irrespective of localization.",
+        "strict_instance_exact": "Every GT and prediction paired at threshold with correct posture; no extras or misses.",
+        "optimal_matching": "Maximum valid pair cardinality, then maximum total IoU; diagnostic, not native AP.",
+        "family_all": "Every mirror/pose variant in the family succeeds; robustness check, not independent sample."
+      },
+      "pending": [
+        "Audit training source overlap, alias identities, near-frame similarity and initializer contact across all relevant models.",
+        "Measure frozen pipeline wall-clock latency consistently.",
+        "Build predeclared grouped development protocol; do not relabel historically exposed images as unseen test.",
+        "Candidate completeness/quality and same-vehicle relation experiments with frozen controls, followed by bounded multi-seed confirmation if a gain appears."
+      ]
+    }
+  },
+  "source_sha256": {
+    "datasets/exports/person/train/manifest.json": "891dc9f372f835bfa36b5784a9e952936e306ff24438fc17b6aa60310a65ede8",
+    "datasets/exports/person/val/manifest.json": "26403f2fc9a218c3f24cb8f90809fbd3d600af7e4ff250ba674120648df6cb4a",
+    "datasets/exports/person/test/manifest.json": "3a432d7c27d57d9656aea64d6018ba8a60e0b3e60c6666f04f282a79bcf7c5c4",
+    "datasets/exports/fire/train/manifest.json": "c283b59a02f67176a43a95ec00171ae8f61ccb80dae9db35780983ed34e74b28",
+    "datasets/exports/fire/val/manifest.json": "00c51ce5dd567ae996ee3a1e3ed2580b10d221ea0d9946fb51cea4d7ca12fda5",
+    "datasets/exports/fire/test/manifest.json": "f374fe7fa896b006546b92774953077b74a78630e8ff7cfe7c4545b735a3a714",
+    "datasets/exports/waste_sticker/train/manifest.json": "663008001ba32a091f008fad1cce6f5254a5555f3e042fdaac0409c1ed3be6b2",
+    "datasets/exports/waste_sticker/val/manifest.json": "7e7da3fa3ff361b606eea140a1657a738e50c0db6834c23b2a1480be0be9d62c",
+    "datasets/exports/waste_sticker/test/manifest.json": "19626d25a25a593f507efddf4d02aaef2110e788adf4ab029ceb351aabf0921b",
+    "datasets/exports/waste_bin_state/train/manifest.json": "78d158f4c8e9bc6a63a675c776c37a93924d3311918c91013008d4877ab610b5",
+    "datasets/exports/waste_bin_state/val/manifest.json": "762d25027a301012f423d135b3e2704f65feba77b77ae4a553c768086354ffda",
+    "datasets/exports/waste_bin_state/test/manifest.json": "ec4f2b0a8159dd18ac3bcaa690e2ce4c6e75397c3b686df672e3466381012417",
+    "datasets/exports/meter/train/manifest.json": "4bf5d7ac212fea1937c6365bf52b41fb751ab343f4536b9ecaaa8e932807037d",
+    "datasets/exports/meter/val/manifest.json": "475d03c556665687e096d0657b6b3f65917cd2c8a2ed3af8583f67e93c8ef828",
+    "datasets/exports/meter/test/manifest.json": "1588b624734fc3e1af86e7af6b02f6126a59583c629170e3183e1035ec5bed39",
+    "datasets/exports/building_name_paper/train/manifest.json": "9fff96330f2e485ec90040e8e76340d57c40255f39e804db4e92b62c4643e5c9",
+    "datasets/exports/building_name_paper/val/manifest.json": "0f6571448e5912101e9b87bafaca188c64a5fcb799793a8b5eb9375e5842acaf",
+    "datasets/exports/building_name_paper/test/manifest.json": "9456bbb93cdf276ed9f8570b7e8462b95227e856143dc670f54046a5dbcae814",
+    "datasets/exports/sign/train/manifest.json": "e079836048c89511b8256d25a88288fb1927bf54c6fce54f61b65aafb0eba7c0",
+    "datasets/exports/sign/val/manifest.json": "efc8f21679f88c170ea44b0e3345a864fb41ad4034755c7d7896baf7c9189425",
+    "datasets/exports/sign/test/manifest.json": "5e97b3a6440125339f7f8ce1d85a02d2ef40f1f1eaa6043b2e8e898810f4f4b7",
+    "datasets/exports/e_bike/train/manifest.json": "f6e6a1bd7897776d64d8155e8647e5a205b66cca62c7ba779a4673486a2b1e67",
+    "datasets/exports/e_bike/val/manifest.json": "a69d9589704d4adcebfd97cf6f8a464294c31a61452b12082d046dc017dec723",
+    "training_packages/fire_sticker/fire_sticker_best_Val_Test/audit.json": "9ab18279d1c91e15d5710892efeeae0f9e37ade067e475f2e89cb913d511cf98",
+    "training_packages/fire_sticker/fire_sticker_best_Val_Test/evaluation/val_final/summary.json": "3d112679ff589409d17fb75b4fa82f7d37c75bb74b8cf666ba47b277b58098a9",
+    "training_packages/fire_sticker/fire_sticker_best_Val_Test/evaluation/test/summary.json": "1e294344cc1d2e78a695b465cb6e70689f57e3fdb29a111d189084cad0ecf2bf",
+    "training_packages/building_name_paper/building_name_paper_best_Val_Test/audit.json": "f3484ba3279853cca4fd9f295cc53782ed2ef7301a4ab2608fe57b066d32bbd3",
+    "training_packages/building_name_paper/building_name_paper_best_Val_Test/evaluation/val_final/summary.json": "d09483e88b1fe5a99934ac2e750404d4af4a20c391e928a8b19ae39bae4a3b20",
+    "training_packages/building_name_paper/building_name_paper_best_Val_Test/evaluation/test/summary.json": "6d2540c2d40c8c0989a0df85471c9499c735d0acaf01e2df92badfe95d8a39b1",
+    "training_packages/waste_bin_state/waste_bin_state_best_Val_Test/audit.json": "7b887249bdc0e5c838b57ce87273fe30c4af942c3e0dce13d8d6667b4c3aae0a",
+    "training_packages/waste_bin_state/waste_bin_state_best_Val_Test/evaluation/val_final/summary.json": "ce8cfe9c058b1caf6ed71cc8dffc3f6aba71f295889d85682e494078de056ffa",
+    "training_packages/waste_bin_state/waste_bin_state_best_Val_Test/evaluation/test/summary.json": "765c95a1ffd1f829e1c15c62a1d8af1be36c6ae18e6b7f6b8c3914d3b0328931",
+    "training_packages/waste_sticker/waste_sticker_best_Val_Test/audit.json": "8956de56fa026ef3c5bffc2a8c6b744a4e3f653f349d09a6687a1ca45d6744ec",
+    "training_packages/waste_sticker/waste_sticker_best_Val_Test/evaluation/val_final/summary.json": "034770256a39a607089e5698046f7e4e2bd35bb73b0f4df98940fd22ec73ecbb",
+    "training_packages/waste_sticker/waste_sticker_best_Val_Test/evaluation/test/summary.json": "a6bbe79cae992a1e727ac81fed7cb722b7036949aa7c0e0eae89c08189e8217d",
+    "training_packages/sign/sign_best_Val_Test/audit.json": "33c2cad52962e03d97ec591a33991b1554d5c9cf50bff6522f23d2bb1c01d607",
+    "training_packages/sign/sign_best_Val_Test/evaluation/val_final/summary.json": "d3374123d755e1b589bac548759e12865e6f7706ce2504fae0b2f6d82017218a",
+    "training_packages/sign/sign_best_Val_Test/evaluation/test/summary.json": "0d6344cbe892de4b4edb135ef3a2e20da0de8dc772bdc1ee1ec5b47f1ab8b96a",
+    "training_packages/meter/runs/meter/v4_20261118_140109_229142/metadata/optimization_summary.json": "3478fb993c562c19f376c1fdbbc4308c965967c53cf0b3df2bd393254f58dcfa",
+    "training_packages/meter/runs/meter/v4_20261118_140109_229142/metadata/environment.json": "9b9c3eacad9b95d938140c4f9e08263e3649f8ad7aee12e1f8f48672dbddfa9f",
+    "training_packages/meter/runs/meter/v4_20261118_140109_229142/training/results.csv": "4a2cf3f39a0f82386f28492dea32f1a02a1022b3db9eaafbe27456650171fae9",
+    "training_packages/meter/runs/meter/v4_20261118_140109_229142/evaluation/val_final/summary.json": "abc1cc9beb3a0fe69ec3ed821009e2e00f78ddc9c763d26e6cf9f650d03de361",
+    "training_packages/meter/runs/meter/v4_20261118_140109_229142/evaluation/test/summary.json": "8213681747d34bada2162fe9fed0eb3e95f0e2f9a180b49f19d3da987408a457",
+    "training_packages/meter/runs/meter/v4_20261118_140109_229142/evaluation/test/meter_report.json": "425abf314020d70610f5d6af40dc04f114578b22f48606154ae62e391c06c122",
+    "runs/waste_bin_state/v4_real_priority_comparison640_batch4_20261118/bin_state_comparison.json": "3d08283c42b10619afa89e966bad145e0960c72f40971a91b2dc6c9672013fc9",
+    "training_packages/building_name_paper/finetune_result.json": "5fdac2f40e1f6afabe912db9f7e4c3bad35e342377dfb89b8af8c87235092884",
+    "training_packages/fire_sticker/finetune_result.json": "8a74d041364cf5841f2205afa79e58ff402b2c40f6268f7394aa3e36a57d8f8c",
+    "runs/waste_sticker/v4_recall_preserving_from_remote_20261118/comparison/workflow_status.json": "c4d89e9f903bbbbd39ef76d2250a471a9447ebb9a0617d8f0ff28b7b51133d37",
+    "training_packages/person/runs/person/v4_narrow_edge_finetune_20261116/evaluation/development_regression_53/summary.json": "1a2f7b455378f34b200e8337bc24622b1c714fb81f621f15e75299849c2d2c94",
+    "datasets/annotated/e_bike/evaluation_audit_result.json": "7bfba95d84aea929089020192913cf2f16df487d8a2f917947c0133cb77a5db9"
+  }
+}

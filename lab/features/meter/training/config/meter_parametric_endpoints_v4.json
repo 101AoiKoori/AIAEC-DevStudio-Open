@@ -1,6 +1,6 @@
 {
-  "source_blend": "datasets/assets/blender/meter/v4_parametric_station_v2_20261113/station.blend",
-  "source_face": "datasets/assets/blender/meter/v4_parametric_station_v2_20261113/face.png",
+  "source_blend": "datasets/assets/blender/aiaec_dataset.blend",
+  "source_face": "datasets/raw/meter/targets/digital/station_face/face.png",
   "image_size": [
     1254,
     1254

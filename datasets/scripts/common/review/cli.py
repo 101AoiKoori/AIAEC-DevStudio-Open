@@ -19,6 +19,7 @@ import argparse
 import importlib
 import inspect
 import re
+from dataclasses import asdict
 from datetime import datetime
 from pathlib import Path
 from typing import Any, Mapping, Sequence
@@ -593,7 +594,23 @@ def _cmd_analyze(args: argparse.Namespace) -> int:
         return 1
     global_boxes = _plan_boxes(plan)
     geometry_params = _geometry_params(plan)
-    emptiness_params = _emptiness_config(plan).get("params")
+    emptiness_config = _emptiness_config(plan)
+    emptiness_params = emptiness_config.get("params")
+    emptiness_spec = emptiness_config.get("spec")
+    reference_height = emptiness_config.get("reference_frame_height")
+    if reference_height is not None and (type(reference_height) is not int or reference_height <= 0):
+        print("错误: emptiness.reference_frame_height 必须是正整数")
+        return 1
+    person_background_params = None
+    if args.task == "person" or reference_height is not None:
+        from .emptiness import DEFAULT_PARAMS as default_emptiness_params
+
+    if args.task == "person":
+        # The two current standee crops are 117–120 px high. The default 0.6
+        # scale only examines heights from 70 px; add a bounded distant search.
+        person_background_params = dict(emptiness_params or {})
+        scales = person_background_params.get("scales", default_emptiness_params["scales"])
+        person_background_params["scales"] = tuple(dict.fromkeys((0.2, 0.3, 0.45, *scales)))
 
     digest = _code_hash()
     parameter_digest = params_hash(plan)
@@ -611,6 +628,20 @@ def _cmd_analyze(args: argparse.Namespace) -> int:
             image = read_image(_workspace_path(frame.path))
             ground = _ground(_measure_geometry(geometry, image, geometry_params))
             boxes = _frame_boxes(frame_payload, global_boxes)
+            role = str(frame_payload.get("role") or "background")
+            person_background = args.task == "person" and role == "background"
+            spec = emptiness_spec
+            if person_background and reference_height is None:
+                base_spec = emptiness_params if spec is None else spec
+                # Legacy person plans did not distinguish template-window
+                # scale from the scale of an independently measured object.
+                spec = {**(base_spec or {}), "below_min_scale": "suspect"}
+            frame_params = person_background_params if person_background else emptiness_params
+            if reference_height is not None:
+                frame_params = dict(frame_params or {})
+                scales = frame_params.get("scales", default_emptiness_params["scales"])
+                height_ratio = image.shape[0] / reference_height
+                frame_params["scales"] = tuple(float(scale) * height_ratio for scale in scales)
             placement_config = plan.get("placement") or {}
             placement_masks = None
             if ground is not None and ground.placement_patch:
@@ -630,21 +661,36 @@ def _cmd_analyze(args: argparse.Namespace) -> int:
                     image,
                     boxes,
                     templates,
-                    emptiness_params,
-                    _emptiness_config(plan).get("spec"),
+                    frame_params,
+                    spec,
                 )
             )
             duplicate = _duplicates(frame_payload.get("duplicates")) if "duplicates" in frame_payload else None
+            extra = {
+                "image_shape": list(image.shape[:2]),
+                "parent_link_verified": bool(frame_payload.get("parent_link_verified", True)),
+            }
+            if args.task == "person" and role != "background":
+                extra["role"] = role
+            if person_background or reference_height is not None:
+                extra["emptiness_search"] = {
+                    "method": "template_match",
+                    "scales": list(frame_params["scales"]),
+                    "template_count": len(templates),
+                }
+                if reference_height is not None:
+                    extra["emptiness_search"]["reference_frame_height"] = reference_height
+            if person_background:
+                if boxes is not global_boxes:
+                    # Only the frame's declarations establish a known target here.
+                    extra["existing_targets"] = [asdict(box) for box in boxes]
             record = MetricRecord(
                 frame=frame,
                 task=args.task,
                 ground=ground,
                 emptiness=empty,
                 duplicates=duplicate,
-                extra={
-                    "image_shape": list(image.shape[:2]),
-                    "parent_link_verified": bool(frame_payload.get("parent_link_verified", True)),
-                },
+                extra=extra,
                 code_hash=digest,
                 params={
                     "sampling": plan.get("sampling"),
@@ -678,7 +724,7 @@ def _cmd_analyze(args: argparse.Namespace) -> int:
             "frame_count": len(frames),
             "code_hash": digest,
             "params_hash": parameter_digest,
-            "review_plan": _relative(review_plan_path(args.task)),
+            "review_plan": _relative(_plan_path(args.task, args.plan)),
         },
         task=args.task,
     )
@@ -731,7 +777,20 @@ def _cmd_apply(args: argparse.Namespace) -> int:
     if decide is None:
         print("judge 缺少 decide(metric, plan) 接口")
         return 2
-    verdicts = [decide(_metric_from_payload(payload), plan) for payload in payloads]
+    verdicts = []
+    for payload in payloads:
+        metric = _metric_from_payload(payload)
+        role = metric.extra.get("role", "background") if metric.task == "person" else "background"
+        verdict = decide(metric, plan, role=role)
+        if metric.emptiness is not None:
+            verdict.evidence["automatic_empty_observation"] = to_jsonable(metric.emptiness)
+            if metric.code_hash:
+                verdict.evidence["automatic_observation_code_hash"] = metric.code_hash
+        if metric.ground and metric.ground.ok and metric.ground.placement_patch and metric.ground.foot_xy:
+            verdict.evidence["measured_ground_polygon"] = metric.ground.polygon
+            verdict.evidence["measured_placement_patch"] = metric.ground.placement_patch
+            verdict.evidence["measured_ground_foot_xy"] = metric.ground.foot_xy
+        verdicts.append(verdict)
     stats = _summarize(judge, verdicts)
     if args.dry_run:
         print(f"任务: {args.task}")
@@ -751,19 +810,39 @@ def _cmd_apply(args: argparse.Namespace) -> int:
     if target.exists():
         previous = read_json(target)
         if previous.get("batch") == batch:
-            accepted = {
-                (record.get("frame", {}).get("path"), record.get("verdict")): record
-                for record in previous.get("records") or []
-                if record.get("accepted_by")
-            }
+            prior_records = previous.get("records") or []
+            prior_by_path = {record.get("frame", {}).get("path"): record for record in prior_records}
+            current_paths = {record.get("frame", {}).get("path") for record in selection["records"]}
             for record in selection["records"]:
-                prior = accepted.get((record.get("frame", {}).get("path"), record.get("verdict")))
-                if prior:
-                    record["accepted_by"] = prior["accepted_by"]
-                    if prior.get("evidence", {}).get("acceptance_scope"):
-                        record["evidence"]["acceptance_scope"] = prior["evidence"]["acceptance_scope"]
-                    if prior.get("evidence", {}).get("parent_relation_verified_by"):
-                        record["evidence"]["parent_relation_verified_by"] = prior["evidence"]["parent_relation_verified_by"]
+                prior = prior_by_path.get(record.get("frame", {}).get("path"))
+                if not prior:
+                    continue
+                prior_evidence = prior.get("evidence") or {}
+                current_evidence = record["evidence"]
+                for key in ("source_record", "source_batch"):
+                    if key in prior_evidence:
+                        current_evidence.setdefault(key, prior_evidence[key])
+                history = list(prior_evidence.get("previous_acceptances") or [])
+                if prior.get("accepted_by"):
+                    scope = prior_evidence.get("acceptance_scope")
+                    if prior.get("verdict") == record.get("verdict"):
+                        record["accepted_by"] = prior["accepted_by"]
+                        if scope is not None:
+                            current_evidence["acceptance_scope"] = scope
+                    else:
+                        old_acceptance = {"verdict": prior.get("verdict"), "accepted_by": prior["accepted_by"]}
+                        if scope is not None:
+                            old_acceptance["acceptance_scope"] = scope
+                        if old_acceptance not in history:
+                            history.append(old_acceptance)
+                if history:
+                    current_evidence["previous_acceptances"] = history
+                if prior_evidence.get("parent_relation_verified_by"):
+                    current_evidence["parent_relation_verified_by"] = prior_evidence["parent_relation_verified_by"]
+            selection["records"].extend(record for record in prior_records
+                                        if record.get("frame", {}).get("path") not in current_paths)
+            if "previous_batches" in previous:
+                selection["previous_batches"] = previous["previous_batches"]
         else:
             selection["previous_batches"] = [*(previous.get("previous_batches") or []),
                                               {key: previous[key] for key in ("batch", "records") if key in previous}]

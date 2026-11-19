@@ -1,7 +1,7 @@
 """Compose multi-bike scenes using per-frame real bike size and ground anchors."""
 
 if __name__ == "__main__":
-    raise SystemExit("Legacy dataset CLI is retired; use datasets/scripts/e_bike/. Production remains paused.")
+    raise SystemExit("Legacy dataset CLI is retired; use datasets/scripts/e_bike/.")
 
 import argparse
 import json

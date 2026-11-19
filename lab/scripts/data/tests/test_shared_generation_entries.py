@@ -17,6 +17,7 @@ from lab.training_common import bayesian_allocation as allocation
 from lab.training_common import camera_tone as tone
 from lab.scripts.media import extract_capture_frames as capture
 from lab.scripts.data import export_site_adaptation as adaptation
+from datasets.scripts.common import working_inputs
 
 
 class SharedGenerationEntriesTest(unittest.TestCase):
@@ -167,6 +168,26 @@ class SharedGenerationEntriesTest(unittest.TestCase):
             self.assertEqual(work.call_count, 1)
             self.assertEqual(before, (out / 'summary.json').stat().st_mtime_ns)
 
+    def test_extraction_cli_accepts_archived_capture_with_annotated_output(self):
+        batch = self.root / 'Archive/Assets/captures/site_capture_20261112'
+        batch.mkdir(parents=True)
+        plan = self.write('datasets/annotated/segments.csv', {})
+        out = self.root / 'datasets/annotated/extraction'
+        argv = ['extract_capture_frames.py', '--raw-batch', str(batch),
+                '--segments', str(plan), '--output', str(out)]
+        segments = [object()]
+        with mock.patch.object(sys, 'argv', argv), \
+                mock.patch.object(capture.shutil, 'which', side_effect=lambda name: name), \
+                mock.patch.object(capture, 'read_segments', return_value=segments) as reader, \
+                mock.patch.object(capture, 'extract', return_value=1) as extract:
+            capture.main()
+        reader.assert_called_once_with(plan, batch, 'ffprobe')
+        extract.assert_called_once_with('ffmpeg', batch, plan, out, segments)
+        with self.assertRaises(ValueError):
+            capture.path_under(batch, 'datasets/annotated')
+        with self.assertRaises(ValueError):
+            capture.path_under(self.root / 'Archive/technical/old_capture', 'datasets/raw', 'Archive/Assets')
+
     def test_site_export_entry_reuses_before_copying(self):
         self.write('config.json', {})
         self.write('data.yaml', {})
@@ -184,6 +205,37 @@ class SharedGenerationEntriesTest(unittest.TestCase):
             adaptation.export(plan, set())
             self.assertEqual(work.call_count, 1)
             self.assertEqual(before, (out / 'summary.json').stat().st_mtime_ns)
+
+    def test_dual_role_source_uses_two_workspace_copies_across_splits(self):
+        source = self.source.relative_to(self.root).as_posix()
+        target = 'datasets/raw/person/targets/camera/batch/frames/frame.jpg'
+        background = 'datasets/raw/shared/backgrounds/camera/batch/frame.jpg'
+        for image in (target, background):
+            copy = self.root / image
+            copy.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copy2(self.source, copy)
+        target_manifest = 'datasets/annotated/person/targets.json'
+        background_manifest = 'datasets/annotated/common/backgrounds.json'
+        self.write(target_manifest, {'schema_version': 1, 'records': [
+            {'source_image': source, 'image': target},
+        ]})
+        self.write(background_manifest, {'schema_version': 1, 'records': [
+            {'source_image': source, 'image': background, 'tasks': {'person': {
+                'state': 'ready', 'uses': ['composite_background'], 'split': 'train',
+            }}},
+        ]})
+        config = {'target_working_manifest': target_manifest, 'background_pool_manifest': background_manifest}
+        with mock.patch.object(working_inputs, 'WORKSPACE', self.root), \
+             mock.patch.object(working_inputs, 'load_task_config', return_value=(None, config)):
+            for split in ('train', 'val', 'test'):
+                with self.subTest(split=split):
+                    lookup = working_inputs.WorkingInputs(
+                        'person', backgrounds=[source], targets=[source], split=split,
+                    )
+                    self.assertEqual(lookup.actual(source, role='target'), target)
+                    self.assertEqual(lookup.actual(source, role='background'), background)
+                    self.assertEqual(lookup.actual(source), source)
+                    self.assertEqual(lookup.media, {self.root / target, self.root / background})
 
     def test_stale_database_rejects_before_any_output(self):
         shard = self.root / self.fixture.parts['datasets/raw/camera']['shard']

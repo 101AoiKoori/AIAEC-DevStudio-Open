@@ -10,6 +10,9 @@ The output is evidence, not a verdict. ``judge`` applies the task plan's
 thresholds and maps the result to ``ready``/``excluded``/``unknown``. A frame
 with a generated patch and failed clutter gate is not ready; a low-confidence
 measurement stays ``unknown`` and is never promoted.
+
+``assess_placeable_ground`` combines this clutter evidence with positive floor
+support to screen pixel contacts for a compositor.
 """
 
 from __future__ import annotations
@@ -25,7 +28,9 @@ from .geometry import ground_clearance
 
 __all__ = [
     "DEFAULT_PARAMS",
+    "GroundPlacement",
     "PlacementAssessment",
+    "assess_placeable_ground",
     "assess_placement",
     "placement_decision",
 ]
@@ -86,6 +91,32 @@ class PlacementAssessment:
 
     metrics: dict[str, Any] = field(default_factory=dict)
     masks: dict[str, Any] = field(default_factory=dict)
+
+
+@dataclass
+class GroundPlacement:
+    """Image-sized masks for a placement candidate and suspected obstacles."""
+
+    status: str
+    basis: str
+    candidate_mask: np.ndarray
+    obstacle_mask: np.ndarray
+
+    def contact_status(self, foot_xy: Sequence[float], *, contact_width: float = 0) -> str:
+        """Return candidate, blocked or unknown for the entire pixel contact segment."""
+        x, y = foot_xy
+        if not all(math.isfinite(v) for v in (x, y, contact_width)) or contact_width < 0:
+            raise ValueError("contact requires finite coordinates and a nonnegative width")
+        left = math.floor(x - contact_width / 2)
+        right = math.ceil(x + contact_width / 2)
+        top, bottom = math.floor(y), math.ceil(y)
+        height, width = self.candidate_mask.shape
+        if left < 0 or right >= width or top < 0 or bottom >= height:
+            return "unknown"
+        contact = np.s_[top:bottom + 1, left:right + 1]
+        if self.obstacle_mask[contact].any():
+            return "blocked"
+        return "candidate" if self.candidate_mask[contact].all() else "unknown"
 
 
 def _bgr_uint8(image: Any) -> np.ndarray:
@@ -536,6 +567,122 @@ def assess_placement(
         "best_body_box": best_box,
     }
     return PlacementAssessment(metrics=metrics, masks=masks)
+
+
+def _near_floor_support(image: np.ndarray) -> np.ndarray | None:
+    """Propose foreground floor from a distinct bottom-band appearance."""
+    height = image.shape[0]
+    if min(image.shape[:2]) < 32:
+        return None
+    # Use the image's near field, since fitting the whole review polygon can
+    # learn the facade when it occupies a large part of that polygon.
+    lab = cv2.cvtColor(cv2.medianBlur(image, 5), cv2.COLOR_BGR2LAB).astype(np.float32)
+    seed_start = int(0.85 * height)
+    seeds = lab[seed_start:]
+    median = np.median(seeds, axis=(0, 1))
+    mad = np.median(np.abs(seeds - median), axis=(0, 1))
+    if mad[0] < 2:
+        return None
+    tolerance = np.clip(3 * mad, (12, 6, 6), (30, 12, 12))
+    similar = np.all(np.abs(lab - median) <= tolerance, axis=2)
+    seed_agreement = float(similar[seed_start:].mean())
+    if seed_agreement < 0.4 or seed_agreement - float(similar[:height // 3].mean()) < 0.25:
+        return None
+
+    # Closing connects narrow gaps from paint/shadows for the connectivity
+    # test; only pixels supported by the original appearance mask are returned.
+    connected = cv2.morphologyEx(similar.astype(np.uint8), cv2.MORPH_CLOSE, np.ones((5, 5), np.uint8))
+    _, labels = cv2.connectedComponents(connected, connectivity=8)
+    bottom_labels, counts = np.unique(labels[seed_start:], return_counts=True)
+    foreground_labels = bottom_labels[(bottom_labels != 0) & (counts >= 0.03 * seeds.shape[0] * seeds.shape[1])]
+    return similar & np.isin(labels, foreground_labels)
+
+
+def _local_floor_contacts(support: np.ndarray, patch: np.ndarray, obstacle: np.ndarray) -> np.ndarray:
+    """Find a near-field contact island with an unobstructed route to the foreground."""
+    height, width = support.shape
+    # Unlike 2-D connectivity, a column cannot turn around the side of a
+    # building and then continue upwards into a similar-looking facade.
+    appearance = cv2.morphologyEx(support.astype(np.uint8), cv2.MORPH_CLOSE,
+                                  np.ones((5, 1), np.uint8)) > 0
+    route = np.logical_and.accumulate((appearance & ~obstacle)[::-1], axis=0)[::-1]
+    near = np.arange(height)[:, None] >= 0.70 * height
+    valid = support & patch & route & near
+    margin = max(2, round(0.00625 * width))
+    diameter = 2 * margin + 1
+    valid = cv2.erode(valid.astype(np.uint8), np.ones((diameter, diameter), np.uint8),
+                      borderType=cv2.BORDER_CONSTANT, borderValue=0)
+    _, labels, stats, _ = cv2.connectedComponentsWithStats(valid, connectivity=8)
+    retained = ((stats[:, cv2.CC_STAT_WIDTH] >= max(diameter, round(0.03 * width)))
+                & (stats[:, cv2.CC_STAT_HEIGHT] >= diameter)
+                & (stats[:, cv2.CC_STAT_AREA] >= diameter ** 2))
+    retained[0] = False
+    return retained[labels]
+
+
+def assess_placeable_ground(
+    image_bgr: Any,
+    polygon: Sequence[Sequence[float]],
+    *,
+    boxes: Iterable[Any] = (),
+    floor_mask: np.ndarray | None = None,
+    obstacle_mask: np.ndarray | None = None,
+) -> GroundPlacement:
+    """Screen the original, unpadded image for possible contact within a review polygon.
+
+    Provide a per-frame floor mask to supply independent positive evidence, or
+    use the automatic near-field appearance cue. The latter is a heuristic for
+    continuous-looking floor and can confuse surfaces of similar appearance.
+    Existing clutter, target masks, and supplied obstacle evidence veto contact. Every unblocked pixel
+    without positive support stays unknown. The result assesses sprite contact
+    geometry only; a separate emptiness observation covers the entire image.
+    """
+    image = _bgr_uint8(image_bgr)
+    shape = image.shape[:2]
+    explicit_obstacle = _evidence_mask(obstacle_mask, shape, "obstacle_mask")
+    points = np.asarray(polygon, dtype=float)
+    if not points.size:
+        return GroundPlacement("unknown", "ground_polygon_missing", np.zeros(shape, bool),
+                               (_boxes_mask(shape, boxes) > 0) | explicit_obstacle)
+    if (points.ndim != 2 or points.shape[1] != 2 or len(points) < 3
+            or not np.isfinite(points).all() or np.any(points < 0)
+            or np.any(points > (shape[1] - 1, shape[0] - 1))
+            or cv2.contourArea(points.astype(np.float32)) <= 0):
+        raise ValueError("polygon must be a nondegenerate region in the input image")
+    patch = _patch_mask(shape, points) > 0
+    assessment = assess_placement(image, points, boxes=boxes)
+    obstacle = (assessment.masks["object"] > 0) | (assessment.masks["target"] > 0) | explicit_obstacle
+    if floor_mask is None:
+        decision, _ = placement_decision(assessment.metrics)
+        floor = _near_floor_support(image)
+        if decision != "usable":
+            if floor is not None:
+                contacts = _local_floor_contacts(floor, patch, obstacle)
+                if contacts.any():
+                    return GroundPlacement("candidate", "local_floor_contact_support", contacts, obstacle)
+            return GroundPlacement("unknown", f"placement_{decision}", np.zeros(shape, bool), obstacle)
+        if floor is None:
+            return GroundPlacement("unknown", "near_floor_appearance_unresolved", np.zeros(shape, bool), obstacle)
+        basis = "near_floor_appearance"
+    else:
+        floor = _evidence_mask(floor_mask, shape, "floor_mask")
+        basis = "supplied_floor_mask"
+
+    supported = floor & patch & ~obstacle
+    # Leave a pixel of clearance at the edge of evidence or a detected obstacle.
+    supported = cv2.erode(supported.astype(np.uint8), np.ones((3, 3), np.uint8),
+                          borderType=cv2.BORDER_CONSTANT, borderValue=0) > 0
+    return GroundPlacement("candidate" if supported.any() else "unknown", basis, supported, obstacle)
+
+
+def _evidence_mask(mask: np.ndarray | None, shape: tuple[int, int], name: str) -> np.ndarray:
+    if mask is None:
+        return np.zeros(shape, dtype=bool)
+    array = np.asarray(mask)
+    if (array.shape != shape or not (array.dtype == np.bool_ or np.issubdtype(array.dtype, np.integer))
+            or not np.isin(array, (0, 1, 255)).all()):
+        raise ValueError(f"{name} must be an image-sized binary mask")
+    return array > 0
 
 
 def placement_decision(

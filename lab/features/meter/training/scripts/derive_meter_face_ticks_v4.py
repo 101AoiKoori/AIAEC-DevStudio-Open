@@ -10,7 +10,7 @@ ROOT = Path(__file__).resolve().parents[5]
 sys.path.insert(0, str(ROOT))
 from lab.training_common.production_guard import generation_guard
 
-SOURCE = ROOT / 'datasets/assets/blender/meter/v4_parametric_station_v2_20261113/face.png'
+SOURCE = ROOT / 'datasets/raw/meter/targets/digital/station_face/face.png'
 OUT = ROOT / 'runs/meter/v4_tick_face_r4_20261114'
 PARAMS = {'threshold': 64, 'kernel': 'ellipse', 'radius_pixels': 4,
           'method': 'dilate dark tick mask; retain original pixels outside mask',

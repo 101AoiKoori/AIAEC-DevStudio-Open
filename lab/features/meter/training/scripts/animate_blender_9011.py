@@ -6,7 +6,7 @@ Geometry and nominal values are illustrative; no training labels are asserted.
 """
 
 if __name__ == "__main__":
-    raise SystemExit("Legacy dataset CLI is retired; use datasets/scripts/meter/. Production remains paused.")
+    raise SystemExit("Legacy dataset CLI is retired; use datasets/scripts/meter/.")
 
 import argparse
 import json

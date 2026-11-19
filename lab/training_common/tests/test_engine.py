@@ -11,13 +11,27 @@ from unittest.mock import patch
 import yaml
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
-from engine.config import validate
+from engine.config import validate, read_yaml
 from engine.data import records, select_records, stage_dataset, relocate_staged_data, inspect_dataset
 from engine.freeze_gate import freeze_selection
 from engine.reporting import match_detections, artifact_manifest
 from engine.runtime import new_run, run_context
 from engine.runner import train_run, assert_model_contract, compare_runs, resume_configuration, _training_options
 from engine.bounded import BudgetExhausted, run_bounded
+
+
+class FrozenJsonConfigTests(unittest.TestCase):
+    def test_json_scientific_notation_preserves_numeric_types(self):
+        root=Path(__file__).resolve().parents[3]
+        with tempfile.TemporaryDirectory(dir=root/'tmp') as temporary:
+            path=Path(temporary)/'effective.json'
+            path.write_text('{"lr0":5e-05,"eps":1e-08,"name":"鱼骨"}',encoding='utf-8')
+            value=read_yaml(path)
+            self.assertEqual(value,{'lr0':.00005,'eps':.00000001,'name':'鱼骨'})
+            self.assertIsInstance(value['lr0'],float)
+            path=Path(temporary)/'effective.yaml'
+            path.write_text('lr0: 5.0e-05\n',encoding='utf-8')
+            self.assertEqual(read_yaml(path)['lr0'],.00005)
 
 
 class EngineContracts(unittest.TestCase):
@@ -96,6 +110,26 @@ class EngineContracts(unittest.TestCase):
         row = records(self.root, self.config, 'train')[0]
         self.assertEqual(row['source_group'], 'original-session')
         self.assertEqual(row['workspace_image'], 'datasets/exports/original.jpg')
+
+    def test_manifest_selection_preserves_but_excludes_unowned_images(self):
+        manual = self.root / 'dataset/images/train/manual.jpg'
+        manual.write_bytes(b'human-owned')
+        (self.root / 'dataset/labels/train/manual.txt').write_text('', encoding='utf-8')
+        manifest = {'selection_mode': 'manifest_only', 'records': [
+            {'image': f'dataset/images/{split}/{index}.jpg',
+             'label': f'dataset/labels/{split}/{index}.txt', 'split': split}
+            for split in ('train', 'val', 'test') for index in range(4)]}
+        (self.root / 'dataset/workspace_sources.json').write_text(json.dumps(manifest), encoding='utf-8')
+        self.assertEqual(len(records(self.root, self.config, 'train')), 4)
+        run = new_run(self.root, self.config, 'manifest_selection')
+        _, report = stage_dataset(self.root, self.config, run)
+        staged = json.loads((run / 'data/samples.json').read_text(encoding='utf-8'))
+        self.assertEqual(report['selected_images']['train'], 2)
+        self.assertNotIn('dataset/images/train/manual.jpg', [row['image'] for row in staged])
+        self.assertEqual(manual.read_bytes(), b'human-owned')
+        (self.root / 'dataset/images/train/0.jpg').unlink()
+        with self.assertRaisesRegex(ValueError, 'Manifest image is missing'):
+            records(self.root, self.config, 'train')
 
     def test_unsupported_option_and_overwrite_rejected(self):
         with self.assertRaisesRegex(ValueError, 'Unsupported'):

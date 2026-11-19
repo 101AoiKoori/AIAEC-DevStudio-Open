@@ -68,7 +68,7 @@ pairing_ids:
   - 新增配对设计需求使用 PAIR-RNN，新增校核规则使用 PAIR-VNN。
   - 现有 R1-R12、V1-V12 和 BSL 编号冻结；不再新增裸 R、V 或 BSL 编号。
   - source_pairing.py 是配对单一 checker；source_ledger 的 BSL 只作派生报告诊断，不是第二套 gate。
-  - V11 目前没有自动 checker，编译逐 split 计划前仍需专项核对。
+  - V11 按实际批次核对选中父组的 split、同源复用及评估范围。
 
 task_scopes:
   sources:
@@ -102,13 +102,13 @@ task_scopes:
 
 count_units:
   image:
-    definition: 一张最终训练图片；同一图片被多个任务复用时，各任务分别计图片，但父来源不因此成为新的独立采集。
-    authority: datasets/scripts/<任务>/config/dataset.yaml 与 config/full_train_allocation.yaml
+    definition: 按报表范围计入库源图或最终导出图。同一原帧的原件、别名和内容相同的工作副本在身份已核实后共享图像身份；裁切、画面变换和重渲染沿各自图像身份追溯父来源。任务使用量按任务分别计。
+    authority: 入库图查逐图持久数据库与来源证据，导出图查对应批次清单
   instance:
-    definition: 图片中的一个独立目标实例；同一图片可以有多个实例，不能与图片数互相替代。
-    authority: config/task_targets.yaml 与任务标签/清单
+    definition: 图像中的一个任务目标；同一图可有多个任务及多个实例。对应同一物体的任务标注引用共享 object_id，任务目标和标签层各自保留。同一目标的检测框、关键点、文字等层可关联至同一实例；标签完整性按任务、标签层及作用域分别核对。
+    authority: 逐图任务实例记录及其引用的任务标签与作用域，目标定义见 config/task_targets.yaml
   parent_group:
-    definition: 一个独立采集场次或可独立归组的父来源；同一视频的帧、裁剪、增强和渲染不增加父组。
+    definition: 按用途和来源证据归组的父素材；一个组可对应源视频、场次、物理物料或 Blender 母场景。同一父源的帧、裁剪、增强和多机位渲染不增加父组；独立采集需要另有场次证据。
     authority: datasets/scripts/<任务>/config/source.yaml 的 pairing
   state:
     definition: 一个可编辑场景、渲染状态或组合状态；不等于最终图片张数，也不等于父组数。
@@ -120,17 +120,17 @@ count_units:
     definition: 现有计划 strata 的 max_count 之和；表示当前计划结构最多能承载的图片数，不是父源容量。
     authority: datasets/scripts/<任务>/config/*.json
   quota:
-    definition: 设计分配给某任务或某组的图片数，来自 PlanDraft 或 ProductionPlan；不是实测分布或模型效果。
-    authority: config/full_train_allocation.yaml 或 production_plan.json
+    definition: 计划为任务或状态组合分配的产出张数。用途资格按图像身份、任务和角色证据判断，split 记录实际分配。合格未分配现货可进入计划选源，实际可排张数按可行组合计。已入库资格、已分配库存、计划配额与导出产量分别报告。
+    authority: 资格查逐图持久数据库，配额查 config/full_train_allocation.yaml 或实际执行计划
 
 annotation_layers:
   independent_layers:
   - id: source_available
-    definition: 已纳入指定来源范围、文件可访问且来源关系可追溯的图片或实例；不要求已有标注。
-    authority: 任务 source.yaml、原始清单和实际文件核验
+    definition: 已纳入指定来源范围、文件可访问且来源关系可追溯的图片或实例。
+    authority: 逐图来源身份及父来源记录、原始清单和实际文件核验
   - id: annotated
     definition: 已存在明确标签载荷的图片或实例；标签文件、JSONL 记录、polygon 或 mask 需能核对到当前图片，单纯清单声明不单独提升本层。
-    authority: 任务标签、JSONL、polygon 与掩膜文件
+    authority: 逐图任务标签引用及其原始标签、JSONL、polygon 与掩膜文件
   - id: candidate
     definition: 由模型、图像处理或程序生成的候选框、候选实例或候选审查记录；候选不等于人工确认。
     authority: 任务候选清单、review selection 与候选标注记录
@@ -141,30 +141,30 @@ annotation_layers:
     definition: 当前记录所需人工语义确认以及适用的人工框或掩膜确认均已完成并留下确认人证据的图片或实例。
     authority: 人工复核记录、确认人、确认时间和逐项确认结果
   - id: training_admitted
-    definition: 按当前训练准入规则明确接纳的图片或实例；不能仅由文件存在、候选生成、自动通过或人工确认中的单项事实推定。
-    authority: 训练准入清单、当前 ProductionPlan 与任务实际消费入口
+    definition: 已由当前任务入口用于指定训练集合的图片或实例。入库后满足某用途的图可进入可分配池，训练准入按实际选用和消费记录认定。
+    authority: 训练准入清单、实际执行计划与任务入口记录
   count_rule: 六层是相互独立的计数视图，同一记录可以同时属于多层；不得把它们相加当总量，也不得用一层计数替代另一层。
-  unit_rule: 每张摘要必须声明计数单位，六层和 pending 只能在同一单位、同一任务范围与同一时间口径下并列展示。
+  unit_rule: 报告写明计数单位、任务范围和适用批次。并列比较六层和 pending 时使用同一口径；单项查询报告相关计数与单位。
   pending:
-    definition: 尚未完成当前层所需确认或证据、但也没有实际失败证据的状态；pending 不是 rejected 或 excluded。
-    rule: 缺少 accepted_by、尚未人工复核、尚未准入或当前工具不能判定时记 pending；不得自动改写既有标注或候选记录。
+    definition: 当前用途所需的某项证据待补的状态。unknown 表示具体字段未判明，其影响以该任务、角色、split 和证据范围为限。
+    rule: 按待补字段、范围和原因，从入库端复用原帧、任务模型、规则、几何和已有标签自动补证；机器证据满足用途条件即可写回当前依据并重算对应资格。选源和生成直接消费有效资格。空的 accepted_by 只描述人工确认层。
   confirmation_dimensions:
     semantic:
       definition: 确认对象类别、存在性、任务归属和语义是否正确的独立人工维度。
       rule: 程序化接受只支持 auto_validated，不能填充本维度。
     box:
       definition: 确认目标框的位置、范围和数量是否正确的独立人工维度。
-      rule: 语义确认不得替代框确认；框仍待确认时保留 pending 框状态。
+      rule: 框与语义各自记录确认依据。已安排人工框复核但尚未确认时，人工框状态记 pending。
     mask:
       definition: 确认掩膜、多边形或实例覆盖是否正确的独立人工维度；不要求每个任务都存在掩膜。
-      rule: 语义或框确认不得替代掩膜确认；任务适用掩膜但尚未确认时保留 pending 掩膜状态。
+      rule: 掩膜按实际核查范围记录。已安排人工掩膜复核但尚未确认时，人工掩膜状态记 pending。
     separation_rule: 人工语义、人工框和人工掩膜分别计数；human_confirmed 只有在当前记录所需维度全部完成时才成立。
   negative_states:
     values:
     - rejected
     - excluded
     evidence_required: 只有存在实际失败证据时才可记 rejected 或 excluded；证据应能指向失败的检查、标签、来源、规则或人工判断。
-    rule: 缺少确认、未审核、未准入、空结果或无法判定都只能是 pending 或 unknown，不得因未完成而自动转为负状态。
+    rule: 证据未明的字段按用途记录 pending 或 unknown。机器已判明的完整正例或负例按对应标签状态记录；存在明确失败依据时记录对应拒绝原因。
   summary_contract:
     required_layers:
     - source_available
@@ -178,7 +178,7 @@ annotation_layers:
     - semantic
     - box
     - mask
-    rule: 适用确认维度尚未完成时保留 pending；不适用的人工确认维度明确写“不适用”，不得用程序化或空缺字段代替。
+    rule: 已安排人工确认的维度按实际状态报告。未安排时写“不适用”。导出图片与标签文件的配对数、直接实拍监督图片数及训练准入数按各自证据报告。实拍背景合成计入合成产量，标签内容按任务和覆盖范围判断。
 
 authorities:
 - fact: 识别任务清单
@@ -191,8 +191,10 @@ authorities:
   source: config/combination_axes.yaml
 - fact: 全量 train 规模与来源组成
   source: config/full_train_allocation.yaml 与 datasets/scripts/<任务>/config/dataset.yaml
-- fact: 父子源、split 与 80% 上限
+- fact: 父子源与 split
   source: datasets/scripts/<任务>/config/source.yaml 的 pairing
+- fact: 当前逐图入库结论及按用途计入配额的资格
+  source: datasets/annotated/common/sources/frame_environment.sqlite3 及其引用的来源、任务标签与观测证据；当前已接线范围见 docs/DATASET_PRODUCTION.md
 - fact: 可执行计划
   source: datasets/scripts/<任务>/config/*.json
 - fact: 对象类别、所有者与权威
@@ -204,9 +206,13 @@ rules:
 - 新增配对设计需求用 PAIR-RNN，新增校核规则用 PAIR-VNN；现有 R1-R12、V1-V12、BSL 编号冻结。
 - 任何 ID 改动先更新引用；跨文档引用必须指向已登记 ID 或生成锚点。
 - 计数必须写单位；图片、实例、父组、状态、预算、容量、配额不得互相替代。
+- 库存按逐图库中该任务与角色下证据有效的 eligible 记录计。unassigned 单列为可分配现货，按父来源安排后计入目标 split；分集查询为 0 表示该任务、角色与 split 暂无已分配的有效记录。逐图库存按 frame_id 去重；同一任务和 split 的直接实拍合并 direct_target 正例与实拍来源的 empty_negative，按可核的 capture_identity 跨角色去重。
+- 直接实拍监督统计按原始相机画面及完整任务标签计算，内容一致的工作副本沿用原图身份；实拍背景生成的样本计入合成产量。
+- 按接收任务的目标定义检查整帧，证实无识别范围内的目标后计为 empty_negative。任务目录用于发现候选。crop 或 surface 的负标注只支持对应区域。空间观测缺项或不可放置时单独判断合成背景资格。
+- 算法更新后在入库端批量重算受影响的机器观测，按新版本更新所涉用途的可分配资格；人工内容与历史批次的证据版本及回执保留。
 - 计划数量不是实际产量，设计比例不是实测分布，未知不得写成零或成功。
-- 标注事实按 source_available、annotated、candidate、auto_validated、human_confirmed、training_admitted 六个独立层计数；摘要同时展示六层、pending 和适用的人工语义/框/掩膜确认计数。
-- pending 是未完成或未确认状态；缺少 accepted_by、未审核、未准入或无法判定不得自动改写为 rejected/excluded。
+- 标注事实按 source_available、annotated、candidate、auto_validated、human_confirmed、training_admitted 六个独立层计数；全流程盘点同时展示六层、pending 和适用的人工语义/框/掩膜确认计数。
+- pending 附具体用途与证据缺口；同一范围得到充分机器证据时可直接更新判定和用途。
 - 自动或程序化验证只填 auto_validated，不填 human_confirmed；人工语义确认与人工框、掩膜确认分开记录。
 - rejected 和 excluded 只有在存在实际失败证据时使用，不得用“人工接受为 0”代替“标注或标签为 0”。
 

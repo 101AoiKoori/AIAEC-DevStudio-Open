@@ -5,7 +5,7 @@ visibility are approximate and require review against the physical meter.
 """
 
 if __name__ == "__main__":
-    raise SystemExit("Legacy dataset CLI is retired; use datasets/scripts/meter/. Production remains paused.")
+    raise SystemExit("Legacy dataset CLI is retired; use datasets/scripts/meter/.")
 
 import argparse
 import json

@@ -1,0 +1,83 @@
+{
+  "schema_version": 1,
+  "model_key": "waste_bin_state",
+  "target_split": "train",
+  "budget": 1,
+  "purpose": "Current real-background compositions from actual rendered bin evidence",
+  "independence_basis": "one source model and selected recorded background parents; not independent capture",
+  "uncertainty_weight": 0,
+  "constraints": {
+    "resolution": [
+      640,
+      480
+    ],
+    "label_mode": "candidate",
+    "ground_placement": "stored_contact_mask"
+  },
+  "strata": [
+    {
+      "id": "composite_00000",
+      "conditions": [],
+      "min_count": 1,
+      "max_count": 1,
+      "prior": {
+        "alpha": 1,
+        "beta": 1
+      },
+      "exposure_weight": 1,
+      "failure_cost": 1,
+      "failure_event": "bin_state_label_unavailable",
+      "background": {
+        "manifest": "datasets/annotated/common/sources/frame_environment.sqlite3",
+        "id": "pool_b843859faac6607e1a7de37f15bb84a18decdf83ff9c27494c17c9d144281787",
+        "frame_id": "b843859faac6607e1a7de37f15bb84a18decdf83ff9c27494c17c9d144281787",
+        "record_id": "0c7e51fc977364eaeb72aad79142bb8511fb25a10e44542372892519523c7ec4"
+      },
+      "target": {
+        "render_manifest": "datasets/annotated/waste_bin_state/foreground/manifest.json",
+        "render_image": "images/planned_000000.png",
+        "bins": {
+          "blue": "open"
+        }
+      },
+      "labels": {
+        "mode": "candidate",
+        "open": 0,
+        "closed": 1
+      },
+      "augmentation": {
+        "value_gain": 1.0,
+        "saturation_gain": 1.0,
+        "shadow": "simulated_gaussian"
+      },
+      "parameters": {
+        "placement_xywh": [
+          200,
+          284,
+          118,
+          162
+        ]
+      },
+      "sources": [
+        "datasets/raw/shared/backgrounds/rendered/aiaec_eight_routes_20261117/waste_bin_state_f063.png",
+        "datasets/annotated/waste_bin_state/foreground/images/planned_000000.png",
+        "datasets/annotated/waste_bin_state/foreground/mask_visible/planned_000000.png"
+      ]
+    }
+  ],
+  "planning": {
+    "seed": 1918,
+    "render_manifest": "datasets/annotated/waste_bin_state/foreground/manifest.json",
+    "excluded_render_samples": [
+      {
+        "image": "images/planned_000018.png",
+        "reason": "empty_scene_or_incomplete_target_and_state_evidence"
+      }
+    ],
+    "background_without_stored_qualification": [],
+    "background_count": 1,
+    "qualified_frame_ids": [
+      "b843859faac6607e1a7de37f15bb84a18decdf83ff9c27494c17c9d144281787"
+    ]
+  }
+}

@@ -1,0 +1,243 @@
+{
+  "schema_version": 1,
+  "model_key": "building_name_paper",
+  "output": "training_packages/building_name_paper/finetune_dataset",
+  "image_size": [
+    1280,
+    720
+  ],
+  "seed": 20261118,
+  "initial_weights": "training_packages/building_name_paper/building_name_paper_best_Val_Test/best.pt",
+  "original_training_images": 0,
+  "session_group": "provided_buildingname_videos_same_site_session",
+  "review_method": "codex_visual_anchor_review_and_optical_flow_homography",
+  "scope": "Only the three user-provided new videos and their crops/multiview montages. File-grouped held-out video is a same-site diagnostic, not independent scene evaluation. No OCR supervision.",
+  "sources": [
+    {
+      "video": "training_packages/building_name_paper/buildingname.mp4",
+      "split": "val",
+      "tracks": [
+        {
+          "building_id": "C",
+          "anchor": 0,
+          "quad": [
+            [
+              178,
+              102
+            ],
+            [
+              300,
+              83
+            ],
+            [
+              313,
+              130
+            ],
+            [
+              190,
+              152
+            ]
+          ],
+          "frames": [
+            0,
+            6,
+            12,
+            18,
+            24,
+            30
+          ]
+        },
+        {
+          "building_id": "A",
+          "anchor": 180,
+          "quad": [
+            [
+              128,
+              86
+            ],
+            [
+              264,
+              23
+            ],
+            [
+              292,
+              99
+            ],
+            [
+              145,
+              159
+            ]
+          ],
+          "frames": [
+            174,
+            180,
+            186,
+            192,
+            198,
+            204,
+            210
+          ]
+        }
+      ],
+      "negative_frames": [
+        66,
+        72,
+        78,
+        84,
+        90,
+        96,
+        102,
+        108
+      ]
+    },
+    {
+      "video": "training_packages/building_name_paper/buildingname1.mp4",
+      "split": "train",
+      "tracks": [
+        {
+          "building_id": "C",
+          "anchor": 0,
+          "quad": [
+            [
+              58,
+              52
+            ],
+            [
+              242,
+              46
+            ],
+            [
+              249,
+              107
+            ],
+            [
+              69,
+              116
+            ]
+          ],
+          "frames": [
+            0,
+            4,
+            8,
+            12,
+            16
+          ]
+        },
+        {
+          "building_id": "A",
+          "anchor": 230,
+          "quad": [
+            [
+              267,
+              27
+            ],
+            [
+              382,
+              52
+            ],
+            [
+              392,
+              104
+            ],
+            [
+              279,
+              89
+            ]
+          ],
+          "frames": [
+            190,
+            194,
+            198,
+            202,
+            206,
+            210,
+            214,
+            218,
+            222,
+            226,
+            230,
+            234,
+            238,
+            242,
+            246,
+            250,
+            254,
+            258,
+            262,
+            266,
+            270
+          ]
+        }
+      ],
+      "negative_frames": [
+        60,
+        66,
+        72,
+        78,
+        126,
+        132,
+        138,
+        144,
+        150,
+        156,
+        162,
+        168
+      ],
+      "excluded_after_tracking": [
+        {
+          "frame": 274,
+          "reason": "only nine consistent optical-flow features remained; omitted from supervised set"
+        }
+      ]
+    },
+    {
+      "video": "training_packages/building_name_paper/buildingname2.mp4",
+      "split": "train",
+      "tracks": [
+        {
+          "building_id": "B",
+          "anchor": 0,
+          "quad": [
+            [
+              266,
+              50
+            ],
+            [
+              372,
+              39
+            ],
+            [
+              391,
+              88
+            ],
+            [
+              279,
+              106
+            ]
+          ],
+          "frames": [
+            0,
+            4,
+            8,
+            12,
+            16,
+            20,
+            24,
+            28,
+            32,
+            36,
+            40,
+            44,
+            46
+          ]
+        }
+      ],
+      "negative_frames": []
+    }
+  ],
+  "augmentation": {
+    "positive_crops": 2,
+    "negative_crops": 2,
+    "multiview_montages": 24
+  }
+}

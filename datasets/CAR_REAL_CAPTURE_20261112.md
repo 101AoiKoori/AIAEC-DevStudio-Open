@@ -1,10 +1,10 @@
 # 2026-11-12 小车路线实拍批次
 
-本批次由用户提供，原件保存在 [CarRealPicture](../Archive/Assets/CarRealPicture/)，工作副本位于 `datasets/raw/car_real_capture_20261112/`，路径关系见[来源副本映射](source_copy_map.json)。用户确认根目录 18 张 P 图分别是在 18 个导航 waypoint 点位拍摄的实拍照片；视频、逐帧图片和 `train/` 抽样图属于同一批导出。`train/` 是逐帧子集，不代表当前 train 集合。本批次是 V4 的核心实拍来源，用于确定真实取景、640×480 成像、目标尺度、安装姿态、遮挡、场景背景和垃圾图片贴桶后的外观。旧实拍和合成来源继续参与多源组合，具体制作策略见[数据制作细则](../docs/DATASET_PRODUCTION.md)。
+本批次由用户提供，原件保存在 [CarRealPicture](../Archive/Assets/CarRealPicture/)，工作副本位于 `Archive/Assets/captures/car_real_capture_20261112/`，路径关系见[来源副本映射](source_copy_map.json)。用户确认根目录 18 张 P 图分别是在 18 个导航 waypoint 点位拍摄的实拍照片；视频、逐帧图片和 `train/` 抽样图属于同一批导出。`train/` 是逐帧子集，不代表当前 train 集合。本批次是 V4 的核心实拍来源，用于确定真实取景、640×480 成像、目标尺度、安装姿态、遮挡、场景背景和垃圾图片贴桶后的外观。旧实拍和合成来源继续参与多源组合，具体制作策略见[数据制作细则](../docs/DATASET_PRODUCTION.md)。
 
 ## 已有素材与处理位置
 
-Archive 原件保留原位，raw 保存本批工作副本。批次的逐文件清单、来源关系、尺寸和处理状态保存在 [inventory.json](annotated/car_real_capture_20261112/inventory.json)；`annotated/car_real_capture_20261112/` 专门保存本批次的清单和后续审核产物。原件、清单及预览图不提交 Git。
+原件保留在 `Archive/Assets/CarRealPicture/`。完整工作批次从 `Archive/Assets/captures/car_real_capture_20261112/` 读取，选入各任务的目标图和共享背景图按各自角色写入 `raw/`。批次的逐文件清单、来源关系、尺寸和处理状态保存在 [inventory.json](annotated/car_real_capture_20261112/inventory.json)；`annotated/car_real_capture_20261112/` 专门保存本批次的清单和后续审核产物。原件、清单及预览图不提交 Git。
 
 | 素材 | 实测数量与尺寸 | 用途与状态 |
 | --- | --- | --- |

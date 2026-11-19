@@ -1,0 +1,45 @@
+# 历史迁移快照：非实时状态；时间与逐条原始依据未知。
+version: 1
+status: historical_snapshot
+source: 迁移自 config/combination_axes.yaml；原始依据未逐条登记
+observed_at: null
+tasks:
+  person:
+    crosses:
+      category_context: 全量合成清单已记录人物类别、偏航控制、可见率及要求的重叠；实拍另按完整标签选入。
+      front_back: 当前三个 split 的导出均已有仅白背与正背同框；真实薄边或侧后视面的覆盖仍按独立实拍证据核对。
+  e_bike:
+    crosses:
+      pose_context: 已编子批在两张可放底图上配空场、单直立、单倒伏，另两张底图仅用于空场。两姿态均有原色和轻度调色；较深调色及街道／停车区与真实视面仍需补齐对照。
+      occlusion_view: 已有低机位混合姿态实拍候选；小批合成禁裁边，也未安排人车遮挡配对。
+    source_exposure:
+      history: 多车低机位 _003 父视频的旧 bulk_real train 回执有 8 个实际出图状态，含原帧及派生样本。
+      scope: 该父组保留为有历史接触的诊断来源；旧直拍计划退出当前 train 容量。
+  fire:
+    crosses:
+      facade_position: 实景合成支持同楼面零／单贴，当前每楼固定一处；相似硬负和同楼换位待选源。
+      building_counts: 独立 Blender 火焰入口能安排多贴及分楼标签；现行实景计划只编排零／单。
+  building_name_paper:
+    crosses:
+      building_text: Blender 档位为单楼无纸、单楼单纸、双楼双纸；实景小批已有两帧单纸候选与三帧无纸候选，都来自同一视频。
+  sign:
+    crosses:
+      fixture_background: 现用子批在一张合格底图上安排正／斜视正例及可辨牌杆与底座裁切；普通杆及空场留待选入。
+      view_tone: 当前有正／斜视和联合调色控制；可辨侧背及相应父来源仍需补证。
+    source_exposure:
+      history: 停车区底图 parking_003_017 在 expanded_sources_check 和 video_photo_check 的实际出图记录分别为 3、2 张，父视频与人物 test 已用视频同 SHA-256。
+      scope: 同父组的 sign/test 技术资格限于有历史接触的诊断。该父组已移出当前 train。
+  waste_bin_state:
+    crosses:
+      lid_color_position: 19 个渲染状态含四色开闭对照、互补多桶和空场；未分集实拍源也含四色各自开闭；当前渲染颜色与绝对桶位绑定。
+      view_occlusion: 当前渲染计划没有独立低视角／邻挡对照，需补合格机位和逐桶可辨证据。
+  waste_sticker:
+    crosses:
+      carrier_position: 旧实景 192 态计划使用两个红桶面覆盖 24 类，作为历史覆盖证据。新增覆盖按实际计划、标注和批次核对。
+    source_exposure:
+      history: 旧 fullframe_v4 train 回执有 254 个出图状态使用四色桶 _003 的帧 0005。所核 val／test 回执未见使用。
+      scope: 该父组保留为 train 实拍桶面来源，模型训练接触另查训练回执。002016 直拍曾与 192 张合成图组成候选 ZIP，P22 同源原图用于单独回归。
+  meter:
+    crosses:
+      reading_view_light: 12 个渲染针位固定 65 度安装倾角和相机坐标，部分湿度针与饱和增益绑定；36 态合成复用这些前景换背景。
+      background_glare: 合成可复用前景跨背景；当前有表计划缺无表及高光对照，实拍候选缺完整关键点。

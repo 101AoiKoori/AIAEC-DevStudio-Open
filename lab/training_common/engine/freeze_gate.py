@@ -1,17 +1,19 @@
 """Freeze a validated V4 candidate before explicitly evaluating the test split.
 
-The gate compares files directly and does not calculate or persist hashes. It
-freezes the run-local data as the actual test input. It cannot establish label
-truth or protect its frozen directory from intentional modification.
+It preserves the validation snapshot and freezes the configured test inputs for
+this selection.
 """
 from datetime import datetime, timezone
 import json
 import math
 from pathlib import Path
 import shutil
+from tempfile import TemporaryDirectory
+
+import yaml
 
 from .config import resolve, read_yaml
-from .data import EXTENSIONS, relocate_staged_data
+from .data import EXTENSIONS, _file_sha256, _require_v4_review, dataset_header, records, relocate_staged_data
 
 
 def _run(root, run_dir):
@@ -54,19 +56,20 @@ def _name(value):
     return value
 
 
-def _staged_files(run):
+def _staged_files(run, *, require_test=True):
     """Require the staged split directories and sample list to describe the same files."""
     data = run / 'data'
     if not (data / 'data.yaml').is_file():
         raise ValueError('Staged dataset YAML is missing')
     spec = read_yaml(data / 'data.yaml')
-    if 'download' in spec or any(spec.get(split) != 'images/' + split for split in ('train', 'val', 'test')):
+    splits = ('train', 'val', 'test') if require_test or spec.get('test') is not None else ('train', 'val')
+    if 'download' in spec or any(spec.get(split) != 'images/' + split for split in splits):
         raise ValueError('Staged dataset YAML must point to its local train/val/test directories')
     records = json.loads((data / 'samples.json').read_text(encoding='utf-8'))
     if not isinstance(records, list) or not records:
         raise ValueError('Staged sample manifest is empty')
     images, labels = set(), set()
-    counts = {split: 0 for split in ('train', 'val', 'test')}
+    counts = dict.fromkeys(splits, 0)
     for row in records:
         split = row['split']
         if split not in counts:
@@ -90,19 +93,66 @@ def _staged_files(run):
     return sorted(images | labels)
 
 
-def _same_dataset(first, second):
+def _same_dataset(first, second, *, added_test=False):
     """Compare actual snapshot files; permit only YAML's relocatable path to differ."""
     first, second = Path(first), Path(second)
-    _staged_files(first.parent); _staged_files(second.parent)
+    _staged_files(first.parent, require_test=not added_test); _staged_files(second.parent)
     first_yaml, second_yaml = read_yaml(first / 'data.yaml'), read_yaml(second / 'data.yaml')
     first_yaml.pop('path', None); second_yaml.pop('path', None)
+    if added_test:
+        first_yaml.pop('test', None)
+        second_yaml.pop('test', None)
+        first_samples = json.loads((first / 'samples.json').read_text(encoding='utf-8'))
+        second_samples = json.loads((second / 'samples.json').read_text(encoding='utf-8'))
+        if first_samples != [row for row in second_samples if row['split'] != 'test']:
+            return False
     if first_yaml != second_yaml:
         return False
     def files(base):
         return {p.relative_to(base) for p in base.rglob('*') if p.is_file() and
                 p.relative_to(base) != Path('data.yaml') and p.suffix.lower() != '.cache'}
-    names = files(first)
-    return names == files(second) and all(_same_bytes(first / name, second / name) for name in names)
+    names, copied = files(first), files(second)
+    if added_test:
+        names.remove(Path('samples.json'))
+        copied = {name for name in copied if name != Path('samples.json') and
+                  name.parts[:2] not in (('images', 'test'), ('labels', 'test'))}
+    return names == copied and all(_same_bytes(first / name, second / name) for name in names)
+
+
+def _append_configured_test(root, config, destination):
+    data = destination / 'data'
+    spec = read_yaml(data / 'data.yaml')
+    header = dataset_header(root, config['data'])
+    if any(header.get(key) != spec.get(key) for key in ('names', 'kpt_shape')):
+        raise ValueError('Configured test class or keypoint schema differs from the validation snapshot')
+    try:
+        selected = records(root, config, 'test', training_mode='fixed_validation')
+    except (OSError, ValueError) as error:
+        raise ValueError(f'Cannot read the configured test split from data={config["data"]}: {error}') from error
+    _require_v4_review({'test': selected})
+    samples_path = data / 'samples.json'
+    samples = json.loads(samples_path.read_text(encoding='utf-8'))
+    test_digests = {}
+    for kind in ('images', 'labels'):
+        (data / kind / 'test').mkdir(parents=True)
+    for index, row in enumerate(selected):
+        source_image, source_label = root / row['image'], root / row['label']
+        stem = f'test_{index:06d}_{source_image.stem}'
+        image = Path('data/images/test') / (stem + source_image.suffix.lower())
+        label = Path('data/labels/test') / (stem + '.txt')
+        for source, target in ((source_image, image), (source_label, label)):
+            _copy_exclusive(source, destination / target)
+            if not _same_bytes(source, destination / target):
+                raise RuntimeError('Test input changed during freezing: ' + str(source))
+            test_digests[target.as_posix()] = _file_sha256(destination / target)
+        if test_digests[label.as_posix()] != row['label_sha256']:
+            raise RuntimeError('Test label changed after validation: ' + row['label'])
+        samples.append({**row, 'run_image': image.as_posix(), 'run_label': label.as_posix()})
+    spec['test'] = 'images/test'
+    (data / 'data.yaml').write_text(yaml.safe_dump(spec, allow_unicode=True, sort_keys=False), encoding='utf-8')
+    samples_path.write_text(json.dumps(samples, ensure_ascii=False, indent=2), encoding='utf-8')
+    test_digests['data/samples.json'] = _file_sha256(samples_path)
+    return test_digests
 
 
 def _validation(root, run, config, weights, name):
@@ -140,16 +190,14 @@ def _validation(root, run, config, weights, name):
     sample_path = snapshot_home / 'data/samples.json'
     if not sample_path.is_file():
         raise ValueError('Run dataset manifest is missing')
-    _staged_files(snapshot_home)
+    _staged_files(snapshot_home, require_test=False)
     return checkpoint, snapshot, summary_path, status_path, config_path, sample_path, snapshot_home
 
 
-def freeze_selection(root, config, run_dir, weights, validation_name, selection_reason):
+def freeze_selection(root, config, run_dir, weights, validation_name, selection_reason=None):
     """Freeze a completed explicit val evaluation; return root-relative selected.pt."""
     if config.get('test_unavailable'):
         raise ValueError('Final test is unavailable; add an audited test set before freezing')
-    if not isinstance(selection_reason, str) or not selection_reason.strip() or len(selection_reason) > 2000:
-        raise ValueError('A nonempty selection reason of at most 2000 characters is required')
     root, run = _run(root, run_dir)
     checkpoint, snapshot, summary, status, evaluated_config, samples, snapshot_home = _validation(
         root, run, config, weights, validation_name)
@@ -158,35 +206,43 @@ def freeze_selection(root, config, run_dir, weights, validation_name, selection_
     previous_status = _read(final_status) if final_status.exists() else {'status': 'not_executed'}
     if previous_status.get('status') != 'not_executed':
         raise ValueError('Final test has already started or completed')
-    destination.mkdir(exist_ok=False)
-    copies = ((snapshot, destination / 'selected.pt'),
-              (summary, destination / 'validation_summary.json'),
-              (status, destination / 'validation_status.json'),
-              (evaluated_config, destination / 'validation_config.json'),
-              (samples, destination / 'samples.json'))
-    for source, target in copies:
-        _copy_exclusive(source, target)
-    shutil.copytree(snapshot_home / 'data', destination / 'data', ignore=shutil.ignore_patterns('*.cache'))
-    if not _same_dataset(snapshot_home / 'data', destination / 'data'):
-        raise RuntimeError('Validation dataset changed during freezing')
-    if not _same_bytes(checkpoint, destination / 'selected.pt') or any(
-            not _same_bytes(source, target) for source, target in copies):
-        raise RuntimeError('Validation inputs changed during freezing')
+    if destination.exists():
+        raise FileExistsError(destination)
     record = {'schema_version': 1, 'status': 'frozen', 'model_key': config['model_key'],
               'version': config['version'], 'task': config['task'], 'validation_name': validation_name,
-              'selection_reason': selection_reason.strip(),
               'selected_checkpoint': 'frozen_selection/selected.pt',
               'source_checkpoint': checkpoint.relative_to(root).as_posix(),
               'frozen_at_utc': datetime.now(timezone.utc).isoformat(),
               'scope': 'Frozen selection and copied staged inputs are used for test; label truth and tampering are not established.'}
-    if final_status.exists() and _read(final_status).get('status') != 'not_executed':
-        raise ValueError('Final test has already started or completed')
+    if selection_reason:
+        record['selection_reason'] = selection_reason
+    with TemporaryDirectory(dir=run, prefix='.freeze-') as temp:
+        staged = Path(temp) / 'selection'
+        staged.mkdir()
+        copies = ((snapshot, staged / 'selected.pt'),
+                  (summary, staged / 'validation_summary.json'),
+                  (status, staged / 'validation_status.json'),
+                  (evaluated_config, staged / 'validation_config.json'),
+                  (samples, staged / 'samples.json'))
+        for source, target in copies:
+            _copy_exclusive(source, target)
+        shutil.copytree(snapshot_home / 'data', staged / 'data', ignore=shutil.ignore_patterns('*.cache'))
+        added_test = not read_yaml(staged / 'data/data.yaml').get('test')
+        if added_test:
+            record['configured_test_sha256'] = _append_configured_test(root, config, staged)
+        if not _same_dataset(snapshot_home / 'data', staged / 'data', added_test=added_test):
+            raise RuntimeError('Validation dataset changed during freezing')
+        if not _same_bytes(checkpoint, staged / 'selected.pt') or any(
+                not _same_bytes(source, target) for source, target in copies):
+            raise RuntimeError('Validation inputs changed during freezing')
+        if final_status.exists() and _read(final_status).get('status') != 'not_executed':
+            raise ValueError('Final test has already started or completed')
+        (staged / 'record.json').write_text(json.dumps(record, indent=2) + '\n', encoding='utf-8')
+        staged.rename(destination)
     previous_status['selection'] = 'frozen_selection/record.json'
     with final_status.open('w', encoding='utf-8') as stream:
         json.dump(previous_status, stream, indent=2)
         stream.write('\n')
-    with (destination / 'record.json').open('x', encoding='utf-8') as stream:
-        json.dump(record, stream, ensure_ascii=False, indent=2); stream.write('\n')
     return (destination / 'selected.pt').relative_to(root).as_posix()
 
 
@@ -197,8 +253,7 @@ def require_frozen_selection(root, config, run_dir, weights):
     record = _read(selection / 'record.json')
     if (record.get('schema_version') != 1 or record.get('status') != 'frozen' or
             record.get('model_key') != config.get('model_key') or record.get('version') != config.get('version') or
-            record.get('task') != config.get('task') or str(config.get('version', '')).lower() != 'v4' or
-            not isinstance(record.get('selection_reason'), str) or not record['selection_reason'].strip()):
+            record.get('task') != config.get('task') or str(config.get('version', '')).lower() != 'v4'):
         raise ValueError('Frozen selection does not match V4 configuration')
     selected = (selection / 'selected.pt').resolve()
     if resolve(root, weights, allow_absolute=True) != selected or not selected.is_file():
@@ -213,8 +268,13 @@ def require_frozen_selection(root, config, run_dir, weights):
         raise ValueError('Frozen validation evidence or selected checkpoint changed')
     if _read(selection / 'validation_config.json') != config:
         raise ValueError('Test configuration differs from frozen validation configuration')
-    if not _same_dataset(run / 'metadata/evaluation_inputs' / name / 'data', selection / 'data'):
+    test_digests = record.get('configured_test_sha256')
+    if not _same_dataset(run / 'metadata/evaluation_inputs' / name / 'data', selection / 'data',
+                         added_test=test_digests is not None):
         raise ValueError('Frozen data differs from validation dataset')
+    if test_digests is not None and any(
+            _file_sha256(resolve(selection, path)) != digest for path, digest in test_digests.items()):
+        raise ValueError('Frozen configured test input changed after selection')
     return record
 
 

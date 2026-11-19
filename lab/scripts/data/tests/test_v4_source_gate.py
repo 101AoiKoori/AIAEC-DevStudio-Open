@@ -60,7 +60,9 @@ class SourceGateTest(unittest.TestCase):
                  'canonical_models': {'person': {'names': ['community', 'non_community']}}}
         (self.root / 'exposed').write_bytes(b'other')
         (self.root / 'ancestor').write_bytes(b'ancestor')
-        self.assertEqual(audit(self.root, self.data, known)['status'], 'failed')
+        result = audit(self.root, self.data, known)
+        self.assertEqual(result['status'], 'passed')
+        self.assertEqual(result['development_contact']['sample'], ['known_diagnostic_lineage'])
 
     def test_shared_parent_composites_cross_splits_with_recorded_reuse(self):
         Image.new('RGB', (32, 32), 'yellow').save(self.root / 'parent.png')
@@ -158,8 +160,10 @@ class SourceGateTest(unittest.TestCase):
                  'canonical_models': {'person': {'names': ['community', 'non_community']}},
                  'missing_exposure_paths': missing}
         result = audit(self.root, self.data, known)
-        self.assertEqual(result['status'], 'failed')
-        self.assertTrue(any('历史文件/证据缺失' in error for error in result['errors']))
+        self.assertEqual(result['status'], 'passed')
+        self.assertTrue(any('证据缺失' in note for note in result['exposure_warnings']))
+        self.assertEqual(provenance(self.data, 'person', result)['records'][0]['development_contact'],
+                         ['known_diagnostic_lineage'])
 
     def test_missing_canonical_header_cannot_pass_source_audit(self):
         known = {'samples': [], 'near_duplicate_pairs': [], 'exposed_images': [],
@@ -245,7 +249,9 @@ class SourceGateTest(unittest.TestCase):
         self.assertEqual(source_role(self.root, self.root / 'image.jpg', known)[0], 'unknown')
         self.assertEqual(source_role(self.root, path, known)[0], 'regression')
         known.update(samples=[], near_duplicate_pairs=[], canonical_models={'person': {'names': ['community', 'non_community']}})
-        self.assertEqual(audit(self.root, self.data, known)['status'], 'failed')
+        result = audit(self.root, self.data, known)
+        self.assertEqual(result['status'], 'passed')
+        self.assertTrue(result['exposure_warnings'])
     def test_development_near_duplicate_evidence_links_selected_splits(self):
         path = self.root / 'datasets/annotated/site_capture_20261112/v4_development_exposure.json'
         path.parent.mkdir(parents=True)
@@ -289,7 +295,7 @@ class SourceGateTest(unittest.TestCase):
         result = audit(self.root, self.data, known)
         self.assertTrue(any('字节相同' in error for error in result['errors']))
 
-    def test_unassigned_renamed_ancestor_of_diagnostic_is_rejected(self):
+    def test_unassigned_renamed_ancestor_retains_diagnostic_contact(self):
         Image.new('RGB', (32, 32), 'red').save(self.root / 'diagnostic.png')
         (self.root / 'renamed.png').write_bytes((self.root / 'diagnostic.png').read_bytes())
         Image.new('RGB', (32, 32), 'green').save(self.root / 'intermediate.png')
@@ -301,9 +307,10 @@ class SourceGateTest(unittest.TestCase):
         known = {'samples': [], 'near_duplicate_pairs': [], 'exposed_images': ['diagnostic.png'],
                  'canonical_models': {'person': {'names': ['community', 'non_community']}}}
         result = audit(self.root, self.data, known)
-        self.assertTrue(any('已接触诊断图或其派生' in error for error in result['errors']))
+        self.assertEqual(result['status'], 'passed')
+        self.assertEqual(result['development_contact']['sample'], ['known_diagnostic_lineage'])
 
-    def test_unassigned_copy_of_known_diagnostic_near_duplicate_is_rejected(self):
+    def test_unassigned_copy_of_diagnostic_near_duplicate_retains_contact(self):
         Image.new('RGB', (32, 32), 'red').save(self.root / 'diagnostic.png')
         Image.new('RGB', (32, 32), 'green').save(self.root / 'near.png')
         (self.root / 'alias.png').write_bytes((self.root / 'near.png').read_bytes())
@@ -313,7 +320,9 @@ class SourceGateTest(unittest.TestCase):
         known = {'samples': [], 'near_duplicate_pairs': [['diagnostic.png', 'near.png']],
                  'exposed_images': ['diagnostic.png'],
                  'canonical_models': {'person': {'names': ['community', 'non_community']}}}
-        self.assertTrue(any('已接触诊断图或其派生' in e for e in audit(self.root, self.data, known)['errors']))
+        result = audit(self.root, self.data, known)
+        self.assertEqual(result['status'], 'passed')
+        self.assertEqual(result['development_contact']['sample'], ['known_diagnostic_lineage'])
 
     def test_unassigned_duplicate_parents_allow_distinct_children_across_splits(self):
         Image.new('RGB', (32, 32), 'red').save(self.root / 'parent.png')
@@ -347,7 +356,9 @@ class SourceGateTest(unittest.TestCase):
             {'id': 'diagnostic', 'image': 'diagnostic.png', 'parent_ids': [], 'split': 'unassigned'}])
         known = {'samples': [], 'near_duplicate_pairs': [], 'exposed_images': ['diagnostic.png'],
                  'canonical_models': {'person': {'names': ['community', 'non_community']}}}
-        self.assertTrue(any('已接触诊断图或其派生' in e for e in audit(self.root, self.data, known)['errors']))
+        result = audit(self.root, self.data, known)
+        self.assertEqual(result['status'], 'passed')
+        self.assertEqual(result['development_contact']['sample'], ['known_diagnostic_lineage'])
 
     def test_alias_of_known_near_duplicate_parent_records_cross_split_reuse(self):
         Image.new('RGB', (32, 32), 'red').save(self.root / 'a.png')
@@ -395,7 +406,9 @@ class SourceGateTest(unittest.TestCase):
                  'exposed_images': [], 'exposed_video_frames': [
                      {'video': 'video.mp4', 'seconds': 10.0, 'image': 'contact.png'}],
                  'canonical_models': {'person': {'names': ['community', 'non_community']}}}
-        self.assertTrue(any('已接触诊断图或其派生' in e for e in audit(self.root, self.data, known)['errors']))
+        result = audit(self.root, self.data, known)
+        self.assertEqual(result['status'], 'passed')
+        self.assertIn('near_diagnostic_frame', result['development_contact']['sample'])
         known['samples'][0]['source_time_seconds'] = 11.0
         self.assertEqual(audit(self.root, self.data, known)['status'], 'passed')
         del known['samples'][0]['source_time_seconds']
@@ -415,7 +428,7 @@ class SourceGateTest(unittest.TestCase):
                  'canonical_models': {'person': {'names': ['community', 'non_community']}}}
         result = audit(self.root, self.data, known)
         self.assertTrue(any('已登记原图不符' in e for e in result['errors']))
-        self.assertTrue(any('已接触诊断图或其派生' in e for e in result['errors']))
+        self.assertIn('near_diagnostic_frame', result['development_contact']['sample'])
 
     def test_renamed_identical_bytes_cross_split_rejected(self):
         (self.root / 'copy.jpg').write_bytes((self.root / 'image.jpg').read_bytes())
@@ -517,7 +530,7 @@ class SourceGateTest(unittest.TestCase):
         (sequence / 'ffmpeg.log').write_text(
             '[showinfo] n: 0 pts: 0 pts_time:0\n'
             '[showinfo] n: 1 pts: 19170 pts_time:0.213\n', encoding='utf8')
-        video = self.root / 'datasets/raw/site_capture_20261112/videos/full_scene.mp4'
+        video = self.root / 'Archive/Assets/captures/site_capture_20261112/videos/full_scene.mp4'
         video.parent.mkdir(parents=True)
         video.write_bytes(b'fixture')
         self.row.update(image=image.relative_to(self.root).as_posix(), source_kind='video_frame',
@@ -538,7 +551,7 @@ class SourceGateTest(unittest.TestCase):
         (sequence / 'frames_probe.json').write_text(
             '{"frames":[{"best_effort_timestamp_time":"0.0"},'
             '{"best_effort_timestamp_time":"0.213"}]}', encoding='utf8')
-        video = self.root / 'datasets/raw/site_capture_20261112/videos/person_standees.mp4'
+        video = self.root / 'Archive/Assets/captures/site_capture_20261112/videos/person_standees.mp4'
         video.parent.mkdir(parents=True)
         video.write_bytes(b'fixture')
         self.row.update(image=image.relative_to(self.root).as_posix(), source_kind='frame_sequence',
@@ -553,10 +566,10 @@ class SourceGateTest(unittest.TestCase):
             with self.subTest(sequence=which):
                 if which == 'site':
                     sequence = self.root / 'datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene'
-                    video = self.root / 'datasets/raw/site_capture_20261112/videos/full_scene.mp4'
+                    video = self.root / 'Archive/Assets/captures/site_capture_20261112/videos/full_scene.mp4'
                 else:
                     sequence = self.root / 'datasets/annotated/site_capture_20261112/sequence_v2/person_standees'
-                    video = self.root / 'datasets/raw/site_capture_20261112/videos/person_standees.mp4'
+                    video = self.root / 'Archive/Assets/captures/site_capture_20261112/videos/person_standees.mp4'
                 sequence.mkdir(parents=True, exist_ok=True)
                 video.parent.mkdir(parents=True, exist_ok=True)
                 video.write_bytes(b'fixture')
@@ -585,9 +598,11 @@ class SourceGateTest(unittest.TestCase):
                 self.assertEqual(audit(self.root, self.data, known)['status'], 'failed')
                 parent['source_kind'] = 'video_frame'
                 known['exposed_video_frames'][0]['seconds'] = 0.3
-                self.assertEqual(audit(self.root, self.data, known)['status'], 'failed')
+                result = audit(self.root, self.data, known)
+                self.assertEqual(result['status'], 'passed')
+                self.assertIn('near_diagnostic_frame', result['development_contact']['sample'])
 
-    def test_site_diagnostic_frame_is_blocked_across_encodings(self):
+    def test_site_diagnostic_frame_time_is_recorded_across_encodings(self):
         (self.root / 'source.mp4').write_bytes(b'video fixture')
         self.row.update(source_kind='video_frame', generation_method='provided_video_frame',
                         parent_video='source.mp4', segment_id='s', episode_group='e')
@@ -595,10 +610,11 @@ class SourceGateTest(unittest.TestCase):
                  'exposed_video_frames': [{'video': 'source.mp4', 'seconds': 80.0, 'image': 'old.jpg'}],
                  'canonical_models': {'person': {'names': ['community', 'non_community']}}}
         self.assertTrue(any('须记录源时间' in e for e in audit(self.root, self.data, known)['errors']))
-        self.row['source_time_seconds'] = 80.005
-        self.assertTrue(any('0.25 秒缓冲内' in e for e in audit(self.root, self.data, known)['errors']))
-        self.row['source_time_seconds'] = 80.20
-        self.assertTrue(any('0.25 秒缓冲内' in e for e in audit(self.root, self.data, known)['errors']))
+        for seconds in (80.005, 80.20):
+            self.row['source_time_seconds'] = seconds
+            result = audit(self.root, self.data, known)
+            self.assertEqual(result['status'], 'passed')
+            self.assertIn('near_diagnostic_frame', result['development_contact']['sample'])
         self.row['source_time_seconds'] = 81.0
         self.assertEqual(audit(self.root, self.data, known)['status'], 'passed')
 

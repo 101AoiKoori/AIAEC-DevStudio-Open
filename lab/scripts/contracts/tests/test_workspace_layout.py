@@ -100,6 +100,24 @@ class LayoutTest(unittest.TestCase):
     def test_check_passes_on_complete_tree(self):
         self.assertEqual(workspace_layout.check(self.root, self.data), [])
 
+    def test_task_target_roots_are_checked_and_scaffolded(self):
+        self.data['datasets']['task_target_subdirs'] = ['digital', 'camera', 'rendered']
+        sources = {f'datasets/raw/demo/targets/{kind}' for kind in self.data['datasets']['task_target_subdirs']}
+        self.assertEqual({item['path'] for item in workspace_layout.check(self.root, self.data)}, sources)
+        created, missing = workspace_layout.scaffold(self.root, self.data, ['demo'])
+        self.assertEqual(set(created), sources)
+        self.assertEqual(missing, [])
+        self.assertEqual(workspace_layout.check(self.root, self.data), [])
+
+    def test_raw_rejects_unclassified_batches_and_task_bundles(self):
+        self.data['datasets']['task_target_subdirs'] = ['digital', 'camera', 'rendered']
+        workspace_layout.scaffold(self.root, self.data, ['demo'])
+        loose = ['datasets/raw/car_batch', 'datasets/raw/demo/old_bundle',
+                 'datasets/raw/demo/targets/camera/clip/labels']
+        for relative in loose:
+            (self.root / relative).mkdir(parents=True)
+        self.assertEqual({item['path'] for item in workspace_layout.check(self.root, self.data)}, set(loose))
+
     def test_check_skips_dataset_tree_when_not_materialized(self):
         shutil.rmtree(self.root / 'datasets/annotated')
         (self.root / 'runs').rmdir()

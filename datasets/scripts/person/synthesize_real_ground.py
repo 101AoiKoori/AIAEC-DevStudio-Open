@@ -7,7 +7,7 @@ and pitch are bounded planar projections, not novel measured 3D viewpoints.
 """
 
 if __name__ == "__main__":
-    raise SystemExit("Task helper is import-only; use the primary entry in datasets/scripts/person/. Production remains paused.")
+    raise SystemExit("Task helper is import-only; use datasets/scripts/person/compose_planned_ground_person.py.")
 
 import argparse
 import csv
@@ -33,9 +33,9 @@ from datasets.scripts.common.perspective import planar_warp, project_corners
 from camera_tone import apply_tone
 from lab.training_common.production_guard import generation_guard
 
-VIDEO = 'datasets/raw/site_archive_legacy/场景/综合视频/空场与场景物料_001.mp4'
-BACKGROUND_ROOT = ROOT / 'datasets/raw/person/teammate_submission_20261110/dataset'
-PEOPLE_ROOT = ROOT / 'datasets/raw/person/team_assets'
+VIDEO = 'Archive/Assets/working_sources/legacy/site/场景/综合视频/空场与场景物料_001.mp4'
+BACKGROUND_ROOT = ROOT / 'datasets/assets/person/dataset'
+PEOPLE_ROOT = ROOT / 'Archive/Assets/working_sources/digital/person/team_assets'
 VEHICLE_SELECTION = ROOT / 'datasets/annotated/e_bike/multiview_masks_refined_20261110_v2/selection.json'
 GROUND_CROP = (480, 600, 1440, 1080)
 CONTEXT_CROP = (0, 360, 1440, 1080)

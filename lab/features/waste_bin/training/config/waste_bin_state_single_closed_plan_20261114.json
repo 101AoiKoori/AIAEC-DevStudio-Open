@@ -123,7 +123,7 @@
           "record_index": 0
         },
         "parent_image": "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_000163.png",
-        "parent_video": "datasets/raw/site_capture_20261112/videos/full_scene.mp4",
+        "parent_video": "Archive/Assets/captures/site_capture_20261112/videos/full_scene.mp4",
         "source_time_seconds": 5.4,
         "source_group": "datasets/raw/site_capture_20261112/videos/full_scene.mp4",
         "task_use_status": [
@@ -253,7 +253,7 @@
           "record_index": 1
         },
         "parent_image": "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_005751.png",
-        "parent_video": "datasets/raw/site_capture_20261112/videos/full_scene.mp4",
+        "parent_video": "Archive/Assets/captures/site_capture_20261112/videos/full_scene.mp4",
         "source_time_seconds": 191.820633,
         "source_group": "datasets/raw/site_capture_20261112/videos/full_scene.mp4",
         "task_use_status": [
@@ -375,7 +375,7 @@
           "record_index": 2
         },
         "parent_image": "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_000091.png",
-        "parent_video": "datasets/raw/site_capture_20261112/videos/full_scene.mp4",
+        "parent_video": "Archive/Assets/captures/site_capture_20261112/videos/full_scene.mp4",
         "source_time_seconds": 3.0,
         "source_group": "datasets/raw/site_capture_20261112/videos/full_scene.mp4",
         "task_use_status": [
@@ -505,7 +505,7 @@
           "record_index": 3
         },
         "parent_image": "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_002188.png",
-        "parent_video": "datasets/raw/site_capture_20261112/videos/full_scene.mp4",
+        "parent_video": "Archive/Assets/captures/site_capture_20261112/videos/full_scene.mp4",
         "source_time_seconds": 72.993467,
         "source_group": "datasets/raw/site_capture_20261112/videos/full_scene.mp4",
         "task_use_status": [
@@ -627,7 +627,7 @@
           "record_index": 4
         },
         "parent_image": "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_005277.png",
-        "parent_video": "datasets/raw/site_capture_20261112/videos/full_scene.mp4",
+        "parent_video": "Archive/Assets/captures/site_capture_20261112/videos/full_scene.mp4",
         "source_time_seconds": 176.000533,
         "source_group": "datasets/raw/site_capture_20261112/videos/full_scene.mp4",
         "task_use_status": [
@@ -749,7 +749,7 @@
           "record_index": 5
         },
         "parent_image": "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_005996.png",
-        "parent_video": "datasets/raw/site_capture_20261112/videos/full_scene.mp4",
+        "parent_video": "Archive/Assets/captures/site_capture_20261112/videos/full_scene.mp4",
         "source_time_seconds": 199.9873,
         "source_group": "datasets/raw/site_capture_20261112/videos/full_scene.mp4",
         "task_use_status": [
@@ -871,7 +871,7 @@
           "record_index": 6
         },
         "parent_image": "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_006236.png",
-        "parent_video": "datasets/raw/site_capture_20261112/videos/full_scene.mp4",
+        "parent_video": "Archive/Assets/captures/site_capture_20261112/videos/full_scene.mp4",
         "source_time_seconds": 207.9873,
         "source_group": "datasets/raw/site_capture_20261112/videos/full_scene.mp4",
         "task_use_status": [
@@ -993,7 +993,7 @@
           "record_index": 7
         },
         "parent_image": "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_007045.png",
-        "parent_video": "datasets/raw/site_capture_20261112/videos/full_scene.mp4",
+        "parent_video": "Archive/Assets/captures/site_capture_20261112/videos/full_scene.mp4",
         "source_time_seconds": 234.992733,
         "source_group": "datasets/raw/site_capture_20261112/videos/full_scene.mp4",
         "task_use_status": [
@@ -1115,7 +1115,7 @@
           "record_index": 8
         },
         "parent_image": "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_008185.png",
-        "parent_video": "datasets/raw/site_capture_20261112/videos/full_scene.mp4",
+        "parent_video": "Archive/Assets/captures/site_capture_20261112/videos/full_scene.mp4",
         "source_time_seconds": 273.013056,
         "source_group": "datasets/raw/site_capture_20261112/videos/full_scene.mp4",
         "task_use_status": [
@@ -1237,7 +1237,7 @@
           "record_index": 9
         },
         "parent_image": "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_008485.png",
-        "parent_video": "datasets/raw/site_capture_20261112/videos/full_scene.mp4",
+        "parent_video": "Archive/Assets/captures/site_capture_20261112/videos/full_scene.mp4",
         "source_time_seconds": 283.013056,
         "source_group": "datasets/raw/site_capture_20261112/videos/full_scene.mp4",
         "task_use_status": [
@@ -1354,7 +1354,7 @@
           "json_pointer": "/images/0",
           "record_index": 0
         },
-        "parent_video": "datasets/raw/site_capture_20261112/videos/full_scene.mp4",
+        "parent_video": "Archive/Assets/captures/site_capture_20261112/videos/full_scene.mp4",
         "source_group": "site_capture_20261112_full_scene",
         "source_time_seconds": 77.093467,
         "task_use_status": [
@@ -1433,7 +1433,7 @@
           "json_pointer": "/images/3",
           "record_index": 3
         },
-        "parent_video": "datasets/raw/site_capture_20261112/videos/full_scene.mp4",
+        "parent_video": "Archive/Assets/captures/site_capture_20261112/videos/full_scene.mp4",
         "source_group": "site_capture_20261112_full_scene",
         "source_time_seconds": 90.093467,
         "task_use_status": [
@@ -1469,7 +1469,7 @@
         ]
       },
       {
-        "image": "datasets/raw/car_real_capture_20261112/P22_TRASH.png",
+        "image": "Archive/Assets/captures/car_real_capture_20261112/P22_TRASH.png",
         "original_record": {
           "manifest": "datasets/annotated/waste_bin/v4_review_20261112/review_manifest.json",
           "json_pointer": "/images/4",
@@ -1504,7 +1504,7 @@
           "json_pointer": "/samples/6",
           "record_index": 6
         },
-        "parent_video": "datasets/raw/waste_bin/archive_assets_legacy/视频/灰桶开盖_多面及桶内近景_006.mp4",
+        "parent_video": "Archive/Assets/working_sources/legacy/waste_bin/视频/灰桶开盖_多面及桶内近景_006.mp4",
         "historical_source_group": "Archive/Assets/垃圾桶/视频/灰桶开盖_多面及桶内近景_006.mp4",
         "task_use_status": [
           {
@@ -1529,7 +1529,7 @@
         ]
       },
       {
-        "image": "datasets/raw/site_capture_20261112/onboard_camera_images/vehicle_0003.png",
+        "image": "Archive/Assets/captures/site_capture_20261112/onboard_camera_images/vehicle_0003.png",
         "original_record": {
           "manifest": "datasets/annotated/site_capture_20261112/ground_geometry_manifest.jsonl",
           "record_index": 2
@@ -1565,7 +1565,7 @@
           "json_pointer": "/images/6",
           "record_index": 6
         },
-        "parent_video": "datasets/raw/site_capture_20261112/videos/full_scene.mp4",
+        "parent_video": "Archive/Assets/captures/site_capture_20261112/videos/full_scene.mp4",
         "source_group": "site_capture_20261112_full_scene",
         "task_use_status": [
           {

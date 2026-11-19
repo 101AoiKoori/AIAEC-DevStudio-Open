@@ -98,10 +98,11 @@ class LabelMaskTest(unittest.TestCase):
         self.assertEqual(report["summary"]["unknown_not_negative"], 1)
         self.assertEqual(report["summary"]["confirmed_negative"], 0)
 
-    def test_confirmed_negative_requires_human_reviewer(self):
+    def test_full_frame_negative_does_not_require_human_reviewer(self):
         record = self.record(state="confirmed_negative", instances=[], accepted_by=None)
-        with self.assertRaisesRegex(ValueError, "accepted_by"):
-            labels.audit_manifest({"records": [record]}, root=self.root)
+        report = labels.audit_manifest({"records": [record]}, root=self.root)
+        self.assertEqual(report["records"][0]["status"], "confirmed_negative")
+        self.assertEqual(report["summary"]["status_layers"]["human_confirmed_records"], 0)
         record["review"]["accepted_by"] = "reviewer"
         report = labels.audit_manifest({"records": [record]}, root=self.root)
         self.assertEqual(report["records"][0]["status"], "confirmed_negative")

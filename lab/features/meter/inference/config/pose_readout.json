@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "weights": "training_packages/meter/runs/meter/v4_20261118_140109_229142/training/weights/best.pt",
+  "imgsz": 640,
+  "confidence": 0.25,
+  "nms_iou": 0.7,
+  "point_confidence": 0.5,
+  "geometry": "image_plane_equal_angle",
+  "scales": {
+    "temperature": {"minimum": -30, "maximum": 50, "unit": "°C", "tick_step": 1, "major_step": 10, "direction": "clockwise"},
+    "humidity": {"minimum": 0, "maximum": 100, "unit": "%RH", "tick_step": 2, "major_step": 10, "direction": "clockwise"}
+  }
+}

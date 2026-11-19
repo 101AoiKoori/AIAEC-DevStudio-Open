@@ -1,11 +1,13 @@
 task: waste_bin_state
-status: canonical_entry_sources_connected_production_paused
+status: reshoot_finetune_ready
 allocation: {required: true, engine: datasets/scripts/common/bayesian.py, weights: per_plan_design_assumptions}
 goal: 定位垃圾桶并识别开闭状态，桶色不替代开闭证据。
 states: [四色, 开, 闭, 单桶, 多桶, 不同桶位, 邻桶遮挡, 低视角, 明暗, 饱和度]
 train_target_images: 3500
-source_mix_initial: {direct_real: 0.20, real_background_composite: 0.40, blender_background: 0.40}
+source_mix_initial: {direct_real: 0.008, real_background_composite: 0.22857, blender_background: 0.76343}
 source_config: config/source.yaml
 sample_output: datasets/samples/waste_bin_state
 dataset_output: datasets/exports/waste_bin_state
+actual_manifest: datasets/exports/waste_bin_state/manifest.json
+finetune_plan: config/reshoot_finetune_plan.json
 design_reference: docs/DATASET_DESIGN.md

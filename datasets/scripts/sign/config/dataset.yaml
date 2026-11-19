@@ -1,11 +1,12 @@
 task: sign
-status: configured_candidate_and_split_entries_connected_production_paused
+status: full_train_val_test_generated_checked
 allocation: {required: true, engine: datasets/scripts/common/bayesian.py, weights: per_plan_design_assumptions}
 goal: 定位禁行牌具及有辨识线索的截断牌杆，普通立杆作负例。
 states: [无牌, 单牌, 正侧背视面, 远近, 截断, 仅可辨牌杆, 普通立杆, 遮挡, 明暗, 饱和度]
 train_target_images: 2500
-source_mix_initial: {direct_real: 0.30, real_background_composite: 0.40, blender_background: 0.30}
+source_mix_initial: {direct_real: 0.0036, real_background_composite: 0.6764, blender_background: 0.32}
 source_config: config/source.yaml
 sample_output: datasets/samples/sign
 dataset_output: datasets/exports/sign
 design_reference: docs/DATASET_DESIGN.md
+actual_manifest: datasets/exports/sign/manifest.json

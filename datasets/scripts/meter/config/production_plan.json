@@ -41,7 +41,7 @@
       },
       "sources": [
         "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_003601.png",
-        "datasets/raw/site_capture_20261112/videos/full_scene.mp4",
+        "Archive/Assets/captures/site_capture_20261112/videos/full_scene.mp4",
         "datasets/samples/meter/images/arena_meter_00000.png",
         "datasets/samples/meter/foreground/arena_meter_00000.png"
       ],
@@ -76,7 +76,7 @@
       },
       "sources": [
         "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_003601.png",
-        "datasets/raw/site_capture_20261112/videos/full_scene.mp4",
+        "Archive/Assets/captures/site_capture_20261112/videos/full_scene.mp4",
         "datasets/samples/meter/images/arena_meter_00001.png",
         "datasets/samples/meter/foreground/arena_meter_00001.png"
       ],
@@ -111,7 +111,7 @@
       },
       "sources": [
         "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_003601.png",
-        "datasets/raw/site_capture_20261112/videos/full_scene.mp4",
+        "Archive/Assets/captures/site_capture_20261112/videos/full_scene.mp4",
         "datasets/samples/meter/images/arena_meter_00002.png",
         "datasets/samples/meter/foreground/arena_meter_00002.png"
       ],
@@ -146,7 +146,7 @@
       },
       "sources": [
         "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_003601.png",
-        "datasets/raw/site_capture_20261112/videos/full_scene.mp4",
+        "Archive/Assets/captures/site_capture_20261112/videos/full_scene.mp4",
         "datasets/samples/meter/images/arena_meter_00003.png",
         "datasets/samples/meter/foreground/arena_meter_00003.png"
       ],
@@ -181,7 +181,7 @@
       },
       "sources": [
         "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_003601.png",
-        "datasets/raw/site_capture_20261112/videos/full_scene.mp4",
+        "Archive/Assets/captures/site_capture_20261112/videos/full_scene.mp4",
         "datasets/samples/meter/images/arena_meter_00004.png",
         "datasets/samples/meter/foreground/arena_meter_00004.png"
       ],
@@ -216,7 +216,7 @@
       },
       "sources": [
         "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_003601.png",
-        "datasets/raw/site_capture_20261112/videos/full_scene.mp4",
+        "Archive/Assets/captures/site_capture_20261112/videos/full_scene.mp4",
         "datasets/samples/meter/images/arena_meter_00005.png",
         "datasets/samples/meter/foreground/arena_meter_00005.png"
       ],
@@ -251,7 +251,7 @@
       },
       "sources": [
         "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_003601.png",
-        "datasets/raw/site_capture_20261112/videos/full_scene.mp4",
+        "Archive/Assets/captures/site_capture_20261112/videos/full_scene.mp4",
         "datasets/samples/meter/images/arena_meter_00006.png",
         "datasets/samples/meter/foreground/arena_meter_00006.png"
       ],
@@ -286,7 +286,7 @@
       },
       "sources": [
         "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_003601.png",
-        "datasets/raw/site_capture_20261112/videos/full_scene.mp4",
+        "Archive/Assets/captures/site_capture_20261112/videos/full_scene.mp4",
         "datasets/samples/meter/images/arena_meter_00007.png",
         "datasets/samples/meter/foreground/arena_meter_00007.png"
       ],
@@ -321,7 +321,7 @@
       },
       "sources": [
         "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_003601.png",
-        "datasets/raw/site_capture_20261112/videos/full_scene.mp4",
+        "Archive/Assets/captures/site_capture_20261112/videos/full_scene.mp4",
         "datasets/samples/meter/images/arena_meter_00008.png",
         "datasets/samples/meter/foreground/arena_meter_00008.png"
       ],
@@ -356,7 +356,7 @@
       },
       "sources": [
         "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_003601.png",
-        "datasets/raw/site_capture_20261112/videos/full_scene.mp4",
+        "Archive/Assets/captures/site_capture_20261112/videos/full_scene.mp4",
         "datasets/samples/meter/images/arena_meter_00009.png",
         "datasets/samples/meter/foreground/arena_meter_00009.png"
       ],
@@ -391,7 +391,7 @@
       },
       "sources": [
         "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_003601.png",
-        "datasets/raw/site_capture_20261112/videos/full_scene.mp4",
+        "Archive/Assets/captures/site_capture_20261112/videos/full_scene.mp4",
         "datasets/samples/meter/images/arena_meter_00010.png",
         "datasets/samples/meter/foreground/arena_meter_00010.png"
       ],
@@ -426,7 +426,7 @@
       },
       "sources": [
         "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_003601.png",
-        "datasets/raw/site_capture_20261112/videos/full_scene.mp4",
+        "Archive/Assets/captures/site_capture_20261112/videos/full_scene.mp4",
         "datasets/samples/meter/images/arena_meter_00011.png",
         "datasets/samples/meter/foreground/arena_meter_00011.png"
       ],
@@ -461,7 +461,7 @@
       },
       "sources": [
         "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_009901.png",
-        "datasets/raw/site_capture_20261112/videos/full_scene.mp4",
+        "Archive/Assets/captures/site_capture_20261112/videos/full_scene.mp4",
         "datasets/samples/meter/images/arena_meter_00000.png",
         "datasets/samples/meter/foreground/arena_meter_00000.png"
       ],
@@ -496,7 +496,7 @@
       },
       "sources": [
         "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_009901.png",
-        "datasets/raw/site_capture_20261112/videos/full_scene.mp4",
+        "Archive/Assets/captures/site_capture_20261112/videos/full_scene.mp4",
         "datasets/samples/meter/images/arena_meter_00001.png",
         "datasets/samples/meter/foreground/arena_meter_00001.png"
       ],
@@ -531,7 +531,7 @@
       },
       "sources": [
         "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_009901.png",
-        "datasets/raw/site_capture_20261112/videos/full_scene.mp4",
+        "Archive/Assets/captures/site_capture_20261112/videos/full_scene.mp4",
         "datasets/samples/meter/images/arena_meter_00002.png",
         "datasets/samples/meter/foreground/arena_meter_00002.png"
       ],
@@ -566,7 +566,7 @@
       },
       "sources": [
         "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_009901.png",
-        "datasets/raw/site_capture_20261112/videos/full_scene.mp4",
+        "Archive/Assets/captures/site_capture_20261112/videos/full_scene.mp4",
         "datasets/samples/meter/images/arena_meter_00003.png",
         "datasets/samples/meter/foreground/arena_meter_00003.png"
       ],
@@ -601,7 +601,7 @@
       },
       "sources": [
         "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_009901.png",
-        "datasets/raw/site_capture_20261112/videos/full_scene.mp4",
+        "Archive/Assets/captures/site_capture_20261112/videos/full_scene.mp4",
         "datasets/samples/meter/images/arena_meter_00004.png",
         "datasets/samples/meter/foreground/arena_meter_00004.png"
       ],
@@ -636,7 +636,7 @@
       },
       "sources": [
         "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_009901.png",
-        "datasets/raw/site_capture_20261112/videos/full_scene.mp4",
+        "Archive/Assets/captures/site_capture_20261112/videos/full_scene.mp4",
         "datasets/samples/meter/images/arena_meter_00005.png",
         "datasets/samples/meter/foreground/arena_meter_00005.png"
       ],
@@ -671,7 +671,7 @@
       },
       "sources": [
         "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_009901.png",
-        "datasets/raw/site_capture_20261112/videos/full_scene.mp4",
+        "Archive/Assets/captures/site_capture_20261112/videos/full_scene.mp4",
         "datasets/samples/meter/images/arena_meter_00006.png",
         "datasets/samples/meter/foreground/arena_meter_00006.png"
       ],
@@ -706,7 +706,7 @@
       },
       "sources": [
         "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_009901.png",
-        "datasets/raw/site_capture_20261112/videos/full_scene.mp4",
+        "Archive/Assets/captures/site_capture_20261112/videos/full_scene.mp4",
         "datasets/samples/meter/images/arena_meter_00007.png",
         "datasets/samples/meter/foreground/arena_meter_00007.png"
       ],
@@ -741,7 +741,7 @@
       },
       "sources": [
         "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_009901.png",
-        "datasets/raw/site_capture_20261112/videos/full_scene.mp4",
+        "Archive/Assets/captures/site_capture_20261112/videos/full_scene.mp4",
         "datasets/samples/meter/images/arena_meter_00008.png",
         "datasets/samples/meter/foreground/arena_meter_00008.png"
       ],
@@ -776,7 +776,7 @@
       },
       "sources": [
         "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_009901.png",
-        "datasets/raw/site_capture_20261112/videos/full_scene.mp4",
+        "Archive/Assets/captures/site_capture_20261112/videos/full_scene.mp4",
         "datasets/samples/meter/images/arena_meter_00009.png",
         "datasets/samples/meter/foreground/arena_meter_00009.png"
       ],
@@ -811,7 +811,7 @@
       },
       "sources": [
         "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_009901.png",
-        "datasets/raw/site_capture_20261112/videos/full_scene.mp4",
+        "Archive/Assets/captures/site_capture_20261112/videos/full_scene.mp4",
         "datasets/samples/meter/images/arena_meter_00010.png",
         "datasets/samples/meter/foreground/arena_meter_00010.png"
       ],
@@ -846,7 +846,7 @@
       },
       "sources": [
         "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_009901.png",
-        "datasets/raw/site_capture_20261112/videos/full_scene.mp4",
+        "Archive/Assets/captures/site_capture_20261112/videos/full_scene.mp4",
         "datasets/samples/meter/images/arena_meter_00011.png",
         "datasets/samples/meter/foreground/arena_meter_00011.png"
       ],
@@ -881,7 +881,7 @@
       },
       "sources": [
         "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_010501.png",
-        "datasets/raw/site_capture_20261112/videos/full_scene.mp4",
+        "Archive/Assets/captures/site_capture_20261112/videos/full_scene.mp4",
         "datasets/samples/meter/images/arena_meter_00000.png",
         "datasets/samples/meter/foreground/arena_meter_00000.png"
       ],
@@ -916,7 +916,7 @@
       },
       "sources": [
         "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_010501.png",
-        "datasets/raw/site_capture_20261112/videos/full_scene.mp4",
+        "Archive/Assets/captures/site_capture_20261112/videos/full_scene.mp4",
         "datasets/samples/meter/images/arena_meter_00001.png",
         "datasets/samples/meter/foreground/arena_meter_00001.png"
       ],
@@ -951,7 +951,7 @@
       },
       "sources": [
         "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_010501.png",
-        "datasets/raw/site_capture_20261112/videos/full_scene.mp4",
+        "Archive/Assets/captures/site_capture_20261112/videos/full_scene.mp4",
         "datasets/samples/meter/images/arena_meter_00002.png",
         "datasets/samples/meter/foreground/arena_meter_00002.png"
       ],
@@ -986,7 +986,7 @@
       },
       "sources": [
         "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_010501.png",
-        "datasets/raw/site_capture_20261112/videos/full_scene.mp4",
+        "Archive/Assets/captures/site_capture_20261112/videos/full_scene.mp4",
         "datasets/samples/meter/images/arena_meter_00003.png",
         "datasets/samples/meter/foreground/arena_meter_00003.png"
       ],
@@ -1021,7 +1021,7 @@
       },
       "sources": [
         "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_010501.png",
-        "datasets/raw/site_capture_20261112/videos/full_scene.mp4",
+        "Archive/Assets/captures/site_capture_20261112/videos/full_scene.mp4",
         "datasets/samples/meter/images/arena_meter_00004.png",
         "datasets/samples/meter/foreground/arena_meter_00004.png"
       ],
@@ -1056,7 +1056,7 @@
       },
       "sources": [
         "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_010501.png",
-        "datasets/raw/site_capture_20261112/videos/full_scene.mp4",
+        "Archive/Assets/captures/site_capture_20261112/videos/full_scene.mp4",
         "datasets/samples/meter/images/arena_meter_00005.png",
         "datasets/samples/meter/foreground/arena_meter_00005.png"
       ],
@@ -1091,7 +1091,7 @@
       },
       "sources": [
         "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_010501.png",
-        "datasets/raw/site_capture_20261112/videos/full_scene.mp4",
+        "Archive/Assets/captures/site_capture_20261112/videos/full_scene.mp4",
         "datasets/samples/meter/images/arena_meter_00006.png",
         "datasets/samples/meter/foreground/arena_meter_00006.png"
       ],
@@ -1126,7 +1126,7 @@
       },
       "sources": [
         "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_010501.png",
-        "datasets/raw/site_capture_20261112/videos/full_scene.mp4",
+        "Archive/Assets/captures/site_capture_20261112/videos/full_scene.mp4",
         "datasets/samples/meter/images/arena_meter_00007.png",
         "datasets/samples/meter/foreground/arena_meter_00007.png"
       ],
@@ -1161,7 +1161,7 @@
       },
       "sources": [
         "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_010501.png",
-        "datasets/raw/site_capture_20261112/videos/full_scene.mp4",
+        "Archive/Assets/captures/site_capture_20261112/videos/full_scene.mp4",
         "datasets/samples/meter/images/arena_meter_00008.png",
         "datasets/samples/meter/foreground/arena_meter_00008.png"
       ],
@@ -1196,7 +1196,7 @@
       },
       "sources": [
         "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_010501.png",
-        "datasets/raw/site_capture_20261112/videos/full_scene.mp4",
+        "Archive/Assets/captures/site_capture_20261112/videos/full_scene.mp4",
         "datasets/samples/meter/images/arena_meter_00009.png",
         "datasets/samples/meter/foreground/arena_meter_00009.png"
       ],
@@ -1231,7 +1231,7 @@
       },
       "sources": [
         "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_010501.png",
-        "datasets/raw/site_capture_20261112/videos/full_scene.mp4",
+        "Archive/Assets/captures/site_capture_20261112/videos/full_scene.mp4",
         "datasets/samples/meter/images/arena_meter_00010.png",
         "datasets/samples/meter/foreground/arena_meter_00010.png"
       ],
@@ -1266,7 +1266,7 @@
       },
       "sources": [
         "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_010501.png",
-        "datasets/raw/site_capture_20261112/videos/full_scene.mp4",
+        "Archive/Assets/captures/site_capture_20261112/videos/full_scene.mp4",
         "datasets/samples/meter/images/arena_meter_00011.png",
         "datasets/samples/meter/foreground/arena_meter_00011.png"
       ],

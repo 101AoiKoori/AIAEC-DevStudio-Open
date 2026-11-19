@@ -1,0 +1,48 @@
+{
+  "schema_version": 2,
+  "task": "waste_bin_state",
+  "purpose": "four_color_real_appearance_finetune",
+  "seed": 42,
+  "baseline_export": "datasets/exports/waste_bin_state",
+  "baseline_package": "training_packages/waste_bin_state",
+  "annotation_manifest": "datasets/annotated/waste_bin_state/reshoot/manifest.json",
+  "view_observations": "datasets/annotated/waste_bin_state/reshoot/view_observations.json",
+  "output": "datasets/annotated/waste_bin_state/reshoot_finetune",
+  "dataset_output": "datasets/exports/waste_bin_state",
+  "initial_weights": "training_packages/waste_bin_state/waste_bin_state_best_Val_Test/best.pt",
+  "capture_session": "bins_reshoot_20261118",
+  "split_policy": "All source photos and their derivatives remain train; preserve baseline val and test pixels and labels.",
+  "train": {
+    "source_photos": 36,
+    "real_cutout_composites": 576,
+    "composition_recipe": "all_color_combinations_all_binary_states_equal_repetitions",
+    "single_view_policy": "paired_state_views_per_color",
+    "composition_groups": [
+      {"count": 1, "images": 256, "heights_px": [90, 110, 150, 200]},
+      {"count": 2, "images": 192, "heights_px": [90, 110, 140, 170]},
+      {"count": 4, "images": 128, "heights_px": [90, 110, 125, 140]}
+    ],
+    "replay_images": 192,
+    "replay_empty_images": 64,
+    "total": 804
+  },
+  "background_domain_cycle": ["camera", "camera", "camera", "blender"],
+  "multi_view_groups": ["medium_front", "medium_rear"],
+  "layouts": ["separated", "adjacent", "light_overlap"],
+  "augmentation": {
+    "value_gain": [0.8, 0.95, 1.05, 1.15],
+    "saturation_gain": [0.8, 1.0],
+    "hue_shift": 0,
+    "tone_scope": "whole_composite_after_alpha_blending",
+    "geometry_policy": "Preserve observed lid state, attached lid silhouette and aspect ratio; compatible observed front/rear groups for multi-bin scenes; no invented camera views.",
+    "occlusion_policy": "Use visible whole-bin boxes including attached lid; protect the upper 45 percent of each source mask as a conservative state-evidence region. Record measured visibility and any layout fallback."
+  },
+  "evaluation_scope": "Old Val and Test are known regression sets; source photos are one session and not independent validation.",
+  "limitations": [
+    "One physical bin per color; actual view and state counts are in the annotation manifest.",
+    "Only gray closed has confirmed low-view photos; medium front/rear cover all colors and states. No new calibrated low open or overhead views can be generated from these photos.",
+    "Unpaired camera views remain original direct photos; cutout synthesis only amplifies view groups supported by both states of the same color.",
+    "Composites are approximate camera/view-compatible layouts, not calibrated 3D reconstructions or independent real scenes.",
+    "Frame-edge source photos marked composite_eligible=false remain direct-only."
+  ]
+}

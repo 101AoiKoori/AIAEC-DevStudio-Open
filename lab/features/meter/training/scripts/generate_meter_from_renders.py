@@ -5,7 +5,7 @@ by a planar homography; this does not re-render 3-D glass, needles, or shadows.
 """
 
 if __name__ == "__main__":
-    raise SystemExit("Legacy dataset CLI is retired; use datasets/scripts/meter/. Production remains paused.")
+    raise SystemExit("Legacy dataset CLI is retired; use datasets/scripts/meter/.")
 
 import argparse
 import json

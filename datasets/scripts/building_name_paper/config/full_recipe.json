@@ -1,0 +1,101 @@
+{
+  "schema_version": 1,
+  "model_key": "building_name_paper",
+  "seed": 20261118,
+  "samples": 12,
+  "building_combinations": [
+    "A",
+    "B",
+    "C",
+    "AB",
+    "AC",
+    "BC",
+    "ABC"
+  ],
+  "render_views": [
+    {
+      "id": "left",
+      "camera_height_m": 0.14,
+      "single_yaw_degrees": -70,
+      "multi_yaw_degrees": -50
+    },
+    {
+      "id": "front",
+      "camera_height_m": 0.2,
+      "single_yaw_degrees": 0,
+      "multi_yaw_degrees": 0
+    }
+  ],
+  "camera_height_fallback_m": [
+    0.2,
+    0.23
+  ],
+  "lighting": {
+    "world_color": [
+      0.65,
+      0.65,
+      0.65
+    ],
+    "world_strength": 0.7,
+    "area_offset_m": [
+      -0.6,
+      -0.3,
+      1.5
+    ],
+    "area_energy_w": 32,
+    "area_size_m": 1.5,
+    "shadow_strength": 0.85,
+    "foreground_blur_sigma_px": 0.45
+  },
+  "splits": {
+    "train": {
+      "budget": 3000,
+      "direct_real": 5,
+      "real_background_composite": 195,
+      "blender_photo_composite": 1800,
+      "blender_render": 1000
+    },
+    "val": {
+      "budget": 300,
+      "direct_real": 22,
+      "real_background_composite": 0,
+      "blender_photo_composite": 178,
+      "blender_render": 100
+    },
+    "test": {
+      "budget": 300,
+      "direct_real": 14,
+      "real_background_composite": 0,
+      "blender_photo_composite": 186,
+      "blender_render": 100
+    }
+  },
+  "augmentation": {
+    "scale": [
+      0.96,
+      1.04
+    ],
+    "translate_px": [
+      -5,
+      5
+    ],
+    "exposure_ev": [
+      -0.35,
+      0.25
+    ],
+    "saturation": [
+      0.8,
+      1.1
+    ],
+    "blur_sigma_px": [
+      0.2,
+      0.65
+    ]
+  },
+  "scope": "Current training data and diagnostic validation/test. No OCR supervision. Synthetic views share the building asset; source video groups are split-specific.",
+  "minimum_visible_paper_pixels": 12,
+  "layer_manifests": [
+    "datasets/annotated/fire/building_name_paper_full/layers/manifest.json",
+    "datasets/annotated/fire/building_name_paper_full/supplement_layers/manifest.json"
+  ]
+}

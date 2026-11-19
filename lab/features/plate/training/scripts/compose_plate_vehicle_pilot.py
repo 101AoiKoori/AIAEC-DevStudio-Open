@@ -38,8 +38,8 @@ def generate(output):
     output = output.resolve()
     if not output.is_relative_to(EXPORTS.resolve()) or output == EXPORTS.resolve():
         raise ValueError('output must be a new directory under datasets/exports/plate')
-    backgrounds = [ROOT / 'datasets/raw/car_real_capture_20261112' / name for name in BACKGROUNDS]
-    plates = [ROOT / 'datasets/raw/plate/provincial_source_pic' / name for name in PLATES]
+    backgrounds = [ROOT / 'Archive/Assets/captures/car_real_capture_20261112' / name for name in BACKGROUNDS]
+    plates = [ROOT / 'Archive/Assets/working_sources/digital/plate/provincial_source_pic' / name for name in PLATES]
     with generation_guard(
         'plate_vehicle_pilot:' + output.relative_to(ROOT).as_posix(),
         [*backgrounds, *plates, ANNOTATIONS], [output],
@@ -64,7 +64,7 @@ def _generate(output, source_refs):
               'review': 'pending', 'image_size': [640, 480], 'samples': []}
     try:
         for background_name in BACKGROUNDS:
-            background = ROOT / 'datasets/raw/car_real_capture_20261112' / background_name
+            background = ROOT / 'Archive/Assets/captures/car_real_capture_20261112' / background_name
             records = [r for r in annotations if r['model_key'] == 'plate_detection'
                        and r['image'] == background.relative_to(ROOT).as_posix()]
             if len(records) != 1 or len(records[0]['boxes']) != 1:
@@ -73,7 +73,7 @@ def _generate(output, source_refs):
             if not (0 <= x1 < x2 <= 640 and 0 <= y1 < y2 <= 480):
                 raise ValueError('Invalid candidate plate box')
             for index, plate_name in enumerate(PLATES, 1):
-                plate_path = ROOT / 'datasets/raw/plate/provincial_source_pic' / plate_name
+                plate_path = ROOT / 'Archive/Assets/working_sources/digital/plate/provincial_source_pic' / plate_name
                 frame = read_image(background)
                 if frame.shape != (480, 640, 3):
                     raise ValueError('Expected native 640x480 car frame')

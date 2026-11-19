@@ -34,7 +34,7 @@
       },
       "parent_sources": [
         {
-          "path": "datasets/raw/site_capture_20261112/videos/person_standees.mp4",
+          "path": "Archive/Assets/captures/site_capture_20261112/videos/person_standees.mp4",
           "role": "camera_source"
         },
         {
@@ -68,11 +68,11 @@
       "partial_reason": "已有候选框与标签，但整图语义和人工验收未完成",
       "parent_sources": [
         {
-          "path": "datasets/raw/person/teammate_submission_20261110/dataset/backgrounds/bg_00206_f01193.jpg",
+          "path": "datasets/assets/person/dataset/backgrounds/bg_00206_f01193.jpg",
           "role": "real_background"
         },
         {
-          "path": "datasets/raw/person/team_assets/非社区人员/F1.png",
+          "path": "Archive/Assets/working_sources/digital/person/team_assets/非社区人员/F1.png",
           "role": "target_source"
         },
         {
@@ -106,7 +106,7 @@
       "partial_reason": "三近距正面候选已框；全图远处小目标和反射完整性仍待人工确认",
       "parent_sources": [
         {
-          "path": "datasets/raw/site_capture_20261112/videos/person_standees.mp4",
+          "path": "Archive/Assets/captures/site_capture_20261112/videos/person_standees.mp4",
           "role": "camera_source"
         },
         {
@@ -146,7 +146,7 @@
       },
       "parent_sources": [
         {
-          "path": "datasets/raw/site_capture_20261112/videos/person_standees.mp4",
+          "path": "Archive/Assets/captures/site_capture_20261112/videos/person_standees.mp4",
           "role": "camera_source"
         },
         {

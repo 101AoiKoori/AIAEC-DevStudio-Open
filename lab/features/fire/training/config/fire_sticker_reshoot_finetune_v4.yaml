@@ -1,0 +1,56 @@
+schema_version: 3
+task_id: fire
+model_key: fire_sticker
+version: v4
+task: detect
+data: training_packages/fire_sticker/dataset_finetune_compact/data.yaml
+model: training_packages/fire_sticker/weights/finetune_initial.pt
+output_root: runs/fire_sticker
+description: Compact 1224-image fire fine-tuning; 10 epochs prepared, training not
+  started.
+imgsz: 640
+epochs: 10
+batch: 4
+workers: 0
+patience: 0
+seed: 42
+device: '0'
+optimizer: AdamW
+lr0: 4.0e-05
+lrf: 0.08
+momentum: 0.9
+weight_decay: 0.0005
+warmup_epochs: 1
+cos_lr: true
+close_mosaic: 0
+amp: false
+deterministic: true
+max_det: 100
+diagnostic_conf: 0.25
+match_iou: 0.5
+nms_iou: 0.7
+preview_limit: 48
+training_policy:
+  mode: fixed_validation
+  save_period: 5
+evaluate_after_training: true
+augment:
+  degrees: 2.0
+  translate: 0.02
+  scale: 0.05
+  shear: 0.0
+  perspective: 0.0
+  flipud: 0.0
+  fliplr: 0.0
+  mosaic: 0.0
+  mixup: 0.0
+  copy_paste: 0.0
+  hsv_h: 0.015
+  hsv_s: 0.3
+  hsv_v: 0.2
+source_notes:
+- All 36 reshoot photos and their derivatives belong to bins_reshoot_20261118, Train
+  only. All facade parents already belong to Train. Original Val/Test remain byte-identical
+  known-source regression sets; original Test was inspected during development.
+- Fresh optimizer from remote best.pt; never resume a stripped checkpoint.
+warmup_bias_lr: 0.0

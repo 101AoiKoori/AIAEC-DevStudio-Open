@@ -16,6 +16,18 @@ from lab.features.e_bike.training.tests.test_grounded_plan import fixture
 
 
 class GroundedMultiBackgroundTest(unittest.TestCase):
+    def test_explicit_research_visibility_keeps_default_unchanged(self):
+        _,state,bg,vehicles=fixture()
+        actor=copy.deepcopy(state['parameters']['actors'][0]);actor.update(foot_x=342,foot_y=405)
+        state['parameters']['actors'].append(actor)
+        state['target']['vehicles'].append(copy.deepcopy(state['target']['vehicles'][0]))
+        with mock.patch.object(entry,'read_image',return_value=np.full((480,640,3),120,np.uint8)):
+            with self.assertRaisesRegex(ValueError,'visibility'):
+                entry.render_ground_state(state,[bg],vehicles)
+            _,objects,_,_=entry.render_ground_state(state,[bg],vehicles,minimum_visible_fraction=.55)
+        self.assertGreaterEqual(objects[0]['visible_fraction'],.55)
+        self.assertLess(objects[0]['visible_fraction'],.7)
+
     def custom_fixture(self):
         plan, state, bg, vehicles = fixture()
         bg['id'] = 'custom'
@@ -35,6 +47,9 @@ class GroundedMultiBackgroundTest(unittest.TestCase):
              mock.patch.object(entry, 'read_image', return_value=np.full((480, 640, 3), 120, np.uint8)):
             entry.validate_ground_plan(plan, [bg], vehicles, {})
             _, objects, masks, _ = entry.render_ground_state(state, [bg], vehicles)
+            _, geometry_objects, geometry_masks, _ = entry.render_ground_state(state, [bg], vehicles,render_rgb=False)
+        self.assertEqual(objects, geometry_objects)
+        self.assertTrue(all(np.array_equal(a,b) for a,b in zip(masks,geometry_masks)))
         self.assertEqual([obj['foot_xy'] for obj in objects], [[320, 400], [350, 405]])
         self.assertEqual(len(masks), 2)
         self.assertFalse(np.any(masks[0] & masks[1]))
@@ -43,6 +58,26 @@ class GroundedMultiBackgroundTest(unittest.TestCase):
         for obj, mask in zip(objects, masks):
             y, x = np.nonzero(mask)
             self.assertEqual(obj['bbox_xyxy'], [int(x.min()), int(y.min()), int(x.max()) + 1, int(y.max()) + 1])
+        self.assertEqual(objects[0]['occluded_by'][0]['object_id'], objects[1]['object_id'])
+        self.assertAlmostEqual(objects[0]['visible_fraction'] +
+                               sum(r['fraction'] for r in objects[0]['occluded_by']), 1.)
+
+    def test_mirror_reflects_asymmetric_silhouette_and_keeps_class(self):
+        plan, state, bg, vehicles = self.custom_fixture()
+        sprite = vehicles['upright'][0][1]
+        sprite[:30,15:,3] = 0
+        with mock.patch.object(entry, 'source_role', return_value=('train', None)), \
+             mock.patch.object(entry, 'read_image', return_value=np.full((480,640,3),120,np.uint8)):
+            _, first, first_masks, _ = entry.render_ground_state(state,[bg],vehicles)
+            state['parameters']['actors'][0]['mirrored'] = True
+            entry.validate_ground_plan(plan,[bg],vehicles,{})
+            _, second, second_masks, _ = entry.render_ground_state(state,[bg],vehicles)
+        self.assertEqual(first[0]['class'],second[0]['class'])
+        self.assertTrue(second[0]['mirrored'])
+        def crop(mask):
+            y,x=np.nonzero(mask)
+            return mask[y.min():y.max()+1,x.min():x.max()+1]
+        self.assertTrue(np.array_equal(crop(first_masks[0])[:,::-1],crop(second_masks[0])))
 
     def test_invalid_polygon_and_outside_contact_are_rejected(self):
         plan, state, bg, vehicles = self.custom_fixture()
@@ -95,9 +130,12 @@ class GroundedMultiBackgroundTest(unittest.TestCase):
             args = ['entry', '--output', 'datasets/samples/e_bike',
                     '--plan', str(plan_path.relative_to(entry.ROOT))]
             source_config = {'ground_background_manifest': str(manifest.relative_to(entry.ROOT)),
-                             'ground_vehicle_selection': str(entry.bike.SELECTION.relative_to(entry.ROOT))}
+                             'ground_vehicle_selection': str(entry.bike.SELECTION.relative_to(entry.ROOT)),
+                             'databases': {'frame_environment':
+                                           'datasets/annotated/common/sources/frame_environment.sqlite3'}}
             with mock.patch.object(sys, 'argv', args), \
                  mock.patch('datasets.scripts.common.config.load_task_config', return_value=({}, source_config)), \
+                 mock.patch.object(entry, 'bind_background_reviews', side_effect=lambda rows, *_: rows), \
                  mock.patch.object(entry.bike, 'sources', return_value=({}, vehicles)) as sources, \
                  mock.patch.object(entry, 'build_queue', return_value={}), \
                  mock.patch.object(entry, 'source_role', return_value=('train', None)), \

@@ -1,7 +1,7 @@
 """Generate review-pending fire-sticker candidates from marked building regions."""
 
 if __name__ == "__main__":
-    raise SystemExit("Legacy dataset CLI is retired; use datasets/scripts/fire/. Production remains paused.")
+    raise SystemExit("Legacy dataset CLI is retired; use datasets/scripts/fire/.")
 
 import argparse
 import json
@@ -156,7 +156,7 @@ def generate(source, sticker, output, count, seed):
 def main():
     parser = argparse.ArgumentParser(description='基于已确认或 AI 待审楼面区域生成火焰候选，结果须复核')
     parser.add_argument('--regions', required=True, help='含背景审核状态和落点的区域 JSON')
-    parser.add_argument('--sticker', default='datasets/raw/fire/team_assets/image1.png')
+    parser.add_argument('--sticker', default='Archive/Assets/working_sources/digital/fire/team_assets/image1.png')
     parser.add_argument('--output', required=True)
     parser.add_argument('--count', type=int, default=100)
     parser.add_argument('--seed', type=int, default=42)

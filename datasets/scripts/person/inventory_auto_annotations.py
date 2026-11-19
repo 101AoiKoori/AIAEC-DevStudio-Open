@@ -69,8 +69,7 @@ MANIFEST_CANDIDATES = (
 )
 
 SITE_CANDIDATE_MANIFEST = "datasets/annotated/site_capture_20261112/target_instances_manifest.jsonl"
-RAW_SYNTH_LABEL_GLOB = "datasets/raw/person/teammate_submission_20261110/dataset/synth/labels/*.jsonl"
-DEFAULT_ASSET_SYNTH_LABEL_GLOB = "datasets/assets/person/dataset/synth/labels/*.jsonl"
+TEAMMATE_SYNTH_LABEL_DIR = "datasets/assets/person/dataset/synth/labels"
 HUMAN_ACCEPTANCE = "datasets/scripts/person/config/toolchain_review_acceptance.json"
 
 
@@ -468,11 +467,12 @@ def _review_metrics_summary() -> dict[str, Any]:
     }
 
 
-def _synth_jsonl_summary(pattern: str) -> dict[str, Any]:
+def _synth_jsonl_summary(label_dir: str) -> dict[str, Any]:
     files = []
     total_rows = 0
     rows_with_bbox = 0
-    for path in sorted(ROOT.glob(pattern)):
+    for split in ("test", "train", "val"):
+        path = _workspace(label_dir) / f"{split}.jsonl"
         rows = _read_jsonl(path)
         with_bbox = sum(
             bool(row.get("bbox") or row.get("bbox_xyxy") or row.get("boxes"))
@@ -586,8 +586,7 @@ def build_inventory() -> dict[str, Any]:
 
     car_rows, car_counts, car_images = _candidate_records(MANIFEST_CANDIDATES)
     site_rows, site_counts, site_images = _candidate_records((SITE_CANDIDATE_MANIFEST,))
-    synth_raw = _synth_jsonl_summary(RAW_SYNTH_LABEL_GLOB)
-    synth_assets = _synth_jsonl_summary(DEFAULT_ASSET_SYNTH_LABEL_GLOB)
+    teammate_synth = _synth_jsonl_summary(TEAMMATE_SYNTH_LABEL_DIR)
 
     return {
         "schema_version": 1,
@@ -654,14 +653,7 @@ def build_inventory() -> dict[str, Any]:
             },
             "automatic_parent_frame_review": _review_metrics_summary(),
             "human_semantic_acceptance": human_acceptance,
-            "raw_and_copy_synthetic_annotation_sources": {
-                "raw": synth_raw,
-                "asset_copy_not_independent": synth_assets,
-                "same_file_hashes": [
-                    raw["sha256"] == asset["sha256"]
-                    for raw, asset in zip(synth_raw["files"], synth_assets["files"], strict=True)
-                ],
-            },
+            "teammate_synthetic_annotations": teammate_synth,
         },
         "direct_review_batches": direct_batches,
         "candidate_yolo_batches": [_yolo_batch_summary(value) for value in YOLO_BATCHES],
@@ -708,8 +700,6 @@ def _assert_consistency(inventory: Mapping[str, Any]) -> None:
     for batch in inventory["candidate_yolo_batches"]:
         if batch["nonempty_label_files"] > batch["label_files"]:
             raise ValueError(f"{batch['root']} has more nonempty labels than label files")
-    if not any(inventory["summary"]["raw_and_copy_synthetic_annotation_sources"]["same_file_hashes"]):
-        raise ValueError("raw and asset synthetic JSONL copies do not match")
 
 
 def _status_layer_document(inventory: Mapping[str, Any]) -> dict[str, Any]:

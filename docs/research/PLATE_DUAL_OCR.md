@@ -29,7 +29,7 @@
 | `datasets/exports/plate/provincial_ccpd/` | 省赛车牌识别数据 | 历史副本含检测、OCR、字符表及既有 split；原导出路径已清空 |
 | `datasets/exports/plate/provincial_synthetic/synthetic_train/` | 省赛第一轮合成数据 | 历史副本为第一轮合成数据，原导出路径已清空；不属于独立实拍验收 |
 | `datasets/exports/plate/provincial_synthetic/round2_multi_car/` | 省赛第二轮合成数据 | 历史副本为第二轮固定多车场景，原导出路径已清空 |
-| `datasets/raw/plate/provincial_source_pic/` | 省赛合成素材 | 五张合成底图/素材，保留文件名；不是五张独立现场评估样本 |
+| `Archive/Assets/working_sources/digital/plate/provincial_source_pic/` | 省赛合成素材 | 五张合成底图/素材，保留文件名；不是五张独立现场评估样本 |
 | `models/weights/plate/provincial/` | 省赛模型材料 | 检测、完整 CNN 检查点、Paddle v4 推理目录，共五个文件；供统一训练窗口和模型研究使用 |
 
 以上数据及模型属于 Git 忽略范围。`datasets/exports/` 下的副本已清空，其余素材和模型的状态以实际路径为准。来源工程没有提供足以确认这些具体数据副本及训练权重再分发许可的证据，许可与采集授权待核实；此前的本机复制不代表可公开分发。
@@ -53,7 +53,7 @@ Paddle 版本核对以部署配置和模型元数据为准，当前为 `PP-OCRv4
 在具有 PyTorch、OpenCV、Ultralytics、PaddlePaddle、PaddleOCR 3.x 的环境中，从仓库根目录运行：
 
 ```bash
-python lab/features/plate/inference/tests/run_plate_image.py datasets/raw/plate/待测图片.jpg
+python lab/features/plate/inference/tests/run_plate_image.py Archive/Assets/working_sources/digital/plate/team_assets/cp.png
 ```
 
 将示例图片替换为工作空间内的待测图片。命令加载三份当前本地模型，输出检测框、两路原始结果、分数及仲裁状态；`--province-test` 按 CCPD 清单回归真实照片，`--cnn-crop` 单独检查已裁剪图片的 CNN。单路检查不能替代双 OCR 验收。实验与 ROS 适配层导入同一个共享模块。

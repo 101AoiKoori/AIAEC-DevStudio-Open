@@ -1,0 +1,24 @@
+{
+  "blender_executable": "D:/ProgramFiles/Blender5.2/blender.exe",
+  "cycles_samples": 64,
+  "render_seed": 20261118,
+  "direct_review_manifest": "datasets/annotated/meter/real_meter_visual_manifest.jsonl",
+  "direct_capture_kinds": ["provided_frame_sequence_camera", "site_capture_camera", "waypoint_camera", "legacy_onboard_camera", "handheld_camera"],
+  "archive_before_replace": "Archive/technical/datasets/meter/sample_before_background_expansion_20261118",
+  "background_selection": {"split": "train", "frames_per_scene_route": 4},
+  "composites_per_foreground": 2,
+  "photometry": {
+    "saturation": {"native": 1.0, "low": 0.45, "very_low": 0.15},
+    "exposure": {"dark": 0.75, "normal": 1.0, "bright": 1.2},
+    "light_relation": {"foreground_darker": 0.78, "matched": 1.0, "foreground_brighter": 1.18}
+  },
+  "reading_fractions": [0, 0.2, 0.4, 0.6, 0.8, 1],
+  "camera_inventory": "datasets/annotated/meter/open_stage_20261118/camera_views.json",
+  "face_variants": {
+    "white": "datasets/raw/meter/targets/digital/station_face/face_white_printed.png",
+    "colored": "datasets/raw/meter/targets/digital/station_face/face_colored.png"
+  },
+  "face_evidence": "datasets/annotated/meter/material_variants/face_evidence.json",
+  "background_review": "datasets/annotated/meter/material_variants/background_review.json",
+  "shared_pool_manifest": "datasets/annotated/common/sources/background_pool_manifest.json"
+}

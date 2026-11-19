@@ -1,7 +1,7 @@
 """Task-local input discovery for the shared production guard."""
 
 if __name__ == "__main__":
-    raise SystemExit("Task helper is import-only; use the primary entry in datasets/scripts/sign/. Production remains paused.")
+    raise SystemExit("Task helper is import-only; use the primary entry in datasets/scripts/sign/.")
 
 import json
 from pathlib import Path

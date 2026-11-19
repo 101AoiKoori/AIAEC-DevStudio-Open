@@ -1,0 +1,18 @@
+{
+  "purpose": "research_input_only",
+  "seed": 2026111807,
+  "train_families_per_background": 8,
+  "holdout_families_per_background": 2,
+  "posture_swap": true,
+  "source_mirror_pairs": true,
+  "minimum_visible_fraction": 0.55,
+  "maximum_attempts_per_family": 120,
+  "hard_negative_count": 48,
+  "negative_candidate_limit": 240,
+  "real_crops_per_image": 2,
+  "old_inputs": "runs/e_bike/synthetic_short_inputs_20261118/manifest.json",
+  "initial_weights": "runs/e_bike/keypoint_control_20261118/training/weights/best.pt",
+  "epochs": 40,
+  "wall_seconds": 1200,
+  "scope": "Known foreground/background sources. New layout families and all their posture/mirror variants inherit one split. Old26 diagnostic images never enter new training crops or mining."
+}

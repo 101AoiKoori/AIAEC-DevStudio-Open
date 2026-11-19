@@ -40,8 +40,8 @@
         "kind": "explicit_arena_parameters"
       },
       "sources": [
-        "datasets/assets/blender/shared/arena_4m2_pbr_20261112/arena_master_user_20261113.blend",
-        "datasets/assets/blender/meter/v4_parametric_station_v2_20261113/station.blend"
+        "datasets/assets/blender/aiaec_dataset.blend",
+        "datasets/assets/blender/aiaec_dataset.blend#Meter Station"
       ],
       "parameters": {
         "temperature_fraction": 0.2,
@@ -58,7 +58,7 @@
     }
   ],
   "input_context": {
-    "station_face": "datasets/assets/blender/meter/v4_parametric_station_v2_20261113/face.png",
+    "station_face": "datasets/raw/meter/targets/digital/station_face/face.png",
     "background_registry_state": "shared_scene_candidate / active_candidate / approximate",
     "station_registry_state": "task_model_candidate / active_candidate / approximate",
     "face_and_scene_lineage": "synthetic fit; scene dimensions and physical tick correspondence are not measured",

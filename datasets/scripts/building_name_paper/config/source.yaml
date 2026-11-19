@@ -1,21 +1,67 @@
 task: building_name_paper
-blender_scene: datasets/assets/blender/fire/blender_buildings_v13/three_buildings.blend
+sample_manifest: datasets/samples/building_name_paper/manifest.json
+video_finetune_review: datasets/scripts/building_name_paper/config/video_finetune_review.json
+video_finetune_plan: datasets/scripts/building_name_paper/config/video_finetune_plan.json
+video_finetune_manifest: training_packages/building_name_paper/finetune_dataset/manifest.json
+target_working_manifest: datasets/annotated/common/sources/targets/building_name_paper/target_sources_manifest.json
+background_pool_manifest: datasets/annotated/common/sources/background_pool_manifest.json
+direct_capture_manifests:
+- datasets/annotated/car_real_capture_20261112/direct_real_manifest.json
+- datasets/annotated/common/sources/archive_real_capture.json
+blender_scene: datasets/assets/blender/aiaec_dataset.blend
 blender_collections: {A: 'A - 开心大厦', B: 'B - 锦绣大厦', C: 'C - 晨光大厦'}
+sample_recipe:
+  seed: 20261119
+  direct_split: train
+  additional_direct_records:
+  - 0463d4b4556329dac1d5e78fb535c73fa4a601a05a88d6fc3e3844b471999b03
+  - 65765779004b143229bed41f377b0d5789402ee9bc7ac0536c10273260b0c794
+  - 20d5f90f9d1cff5422aeb194532214f90fffead1961c547ad9f2c696048a7875
+  - 665220acda4f101087a35ee609455885dbda30de14d62109c607d5d4bf6cb657
+  composites_per_background: 6
+blender_view:
+  target_height_m: 0.23
+  frames_per_sweep: 81
+  transition_frames: 16
+  single:
+    azimuth_degrees: [-70, 45]
+    radius_m: [0.85, 1.02, 1.16]
+    camera_height_m: [0.14, 0.20, 0.23]
+    lens_mm: 42
+  global:
+    azimuth_degrees: [-50, 45]
+    radius_m: [1.45, 1.65, 1.85]
+    camera_height_m: [0.14, 0.20, 0.23]
+    lens_mm: 48
+  lighting:
+    world_color: [0.65, 0.65, 0.65]
+    world_strength: 0.8
+    paper_roughness: 1.0
+    paper_specular: 0.0
 status: configured_inputs_consumed_by_canonical_entry
-databases: {media_query: datasets/annotated/media_index/query_cache.sqlite3, blender_registry: datasets/blender_source_registry.sqlite3}
-roots: [datasets/raw/fire/archive_assets_legacy, datasets/raw/car_real_capture_20261112, datasets/assets/blender]
+databases: {media_query: datasets/annotated/media_index/query_cache.sqlite3, blender_registry: datasets/blender_source_registry.sqlite3, frame_environment: datasets/annotated/common/sources/frame_environment.sqlite3}
+roots: [Archive/Assets/working_sources/legacy/fire, Archive/Assets/captures/car_real_capture_20261112, datasets/assets/blender]
 records: [datasets/annotated/fire/building_name_paper_v4_car_sequence_review_20261113/manifest.json]
 selection: 查询现有数据库和清单，按任务、集合、角色及父来源选取；跨任务背景允许复用。
-font: datasets/assets/blender/fire/blender_buildings_v13/NotoSansSC.ttf
+font: datasets/raw/building_name_paper/targets/digital/typeface/NotoSansSC.ttf
 background_selection: production_plan_candidates
 background_parent_roots: [datasets/raw, Archive/Assets, datasets/assets/blender]
 rooftop_sources: datasets/scripts/building_name_paper/config/rooftop_sources.json
 combination_plan: datasets/scripts/building_name_paper/config/combination_plan.json
 production_plan: datasets/scripts/building_name_paper/config/production_plan.json
 blender_plan: datasets/scripts/building_name_paper/config/blender_plan.json
+hybrid_plan: datasets/scripts/building_name_paper/config/hybrid_plan.json
+full_real_test_review: datasets/scripts/building_name_paper/config/full_real_test_review.json
+full_recipe: datasets/scripts/building_name_paper/config/full_recipe.json
+full_plates: datasets/scripts/building_name_paper/config/full_plates.json
+full_render_plan: datasets/scripts/building_name_paper/config/full_render_plan.json
+full_train_plan: datasets/scripts/building_name_paper/config/full_train_plan.json
+full_val_plan: datasets/scripts/building_name_paper/config/full_val_plan.json
+full_test_plan: datasets/scripts/building_name_paper/config/full_test_plan.json
+detection_evaluation: datasets/scripts/building_name_paper/config/detection_evaluation.yaml
 direct_selection: datasets/scripts/building_name_paper/config/direct_selection.json
 current_scope:
-  direct_detection: two_complete_positive_and_three_complete_negative_records
+  direct_detection: selected_complete_frame_detections_from_current_database_for_each_split
   original_text_supervision: excluded_when_transcription_unknown
   replacement_text: generated_string_in_existing_paper_box
   excluded_fullframe_composites: previous_1200_plan_has_unknown_background_detection_coverage
@@ -36,10 +82,10 @@ pairing:
   composition_policy:
     target_source: blender_primary
     blender_priority: increased
-    blender_share_target: 0.40
-    target_components: [generated_text]
-    background_components: [three_buildings_scene]
-    note: 用户 2026-11-15 确认采用 20/40/40；三楼合景生成纸名，实拍纸框有限
+    allocation_recipe: datasets/scripts/building_name_paper/config/full_recipe.json
+    target_components: [building_meshes, paper_surface, generated_text]
+    background_components: [reviewed_real_ground, rendered_ground]
+    note: 当前预算及四分支分配读取 full_recipe，按实际清单统计；保留此前开发及评估接触。
   policy:
     parent_classes: [task_real, background]
     split_unit: parent_group
@@ -52,7 +98,7 @@ pairing:
     - id: tr_full_scene_paper
       class: task_real
       kind: parent_video
-      paths: [datasets/raw/site_capture_20261112/videos/full_scene.mp4]
+      paths: [Archive/Assets/captures/site_capture_20261112/videos/full_scene.mp4]
       evidence:
         - {manifest: datasets/annotated/site_capture_20261112/fire_name_v4_review/batch2/review_manifest.json}
       capture_session: unknown
@@ -63,13 +109,13 @@ pairing:
     - id: tr_car_real_paper
       class: task_real
       kind: parent_video
-      paths: [datasets/raw/car_real_capture_20261112/V_20261112_152304.mp4]
+      paths: [Archive/Assets/captures/car_real_capture_20261112/V_20261112_152304.mp4]
       evidence:
         - {manifest: datasets/annotated/fire/building_name_paper_v4_car_sequence_review_20261113/manifest.json}
       capture_session: unknown
       labels: {status: partial, note: 6 条记录/3 个手估纸框，纸框与文字待核}
       roles: [direct_target, geometry_reference]
-      split: {primary: val, status: proposed}
+      split: {primary: test, status: proposed}
       plan: null
     - id: tr_review_pool
       class: task_real
@@ -89,7 +135,7 @@ pairing:
     - id: tr_bnp_capture_val
       class: task_real
       kind: field_session
-      paths: [datasets/raw/fire/bnp_capture_20261116_val]
+      paths: [Archive/Assets/captures/building_name_paper/capture_20261116_val]
       evidence:
         - {note: 条件性补采；采后登记原视频/照片、纸框与全文真值}
       capture_session: planned
@@ -101,7 +147,7 @@ pairing:
     - id: tr_bnp_capture_test
       class: task_real
       kind: field_session
-      paths: [datasets/raw/fire/bnp_capture_20261116_test]
+      paths: [Archive/Assets/captures/building_name_paper/capture_20261116_test]
       evidence:
         - {note: 条件性补采；采后登记原视频/照片、纸框与全文真值}
       capture_session: planned
@@ -114,7 +160,7 @@ pairing:
     - id: bg_building_A
       class: background
       kind: parent_photo_batch
-      paths: [datasets/raw/fire/archive_assets_legacy/楼宇/开心大厦/照片]
+      paths: [Archive/Assets/working_sources/legacy/fire/楼宇/开心大厦/照片]
       evidence:
         - {manifest: datasets/annotated/fire/fire_sticker_v4_arena_handoff_20261113/fire_image_use_manifest_20261114.json}
       review: {state: candidate_empty, method: contact_sheet, accepted_by: null}
@@ -125,7 +171,7 @@ pairing:
     - id: bg_building_B
       class: background
       kind: parent_photo_batch
-      paths: [datasets/raw/fire/archive_assets_legacy/楼宇/锦绣大厦/照片]
+      paths: [Archive/Assets/working_sources/legacy/fire/楼宇/锦绣大厦/照片]
       evidence:
         - {manifest: datasets/annotated/fire/fire_sticker_v4_arena_handoff_20261113/fire_image_use_manifest_20261114.json}
       review: {state: candidate_empty, method: contact_sheet, accepted_by: null}
@@ -136,7 +182,7 @@ pairing:
     - id: bg_building_C
       class: background
       kind: parent_photo_batch
-      paths: [datasets/raw/fire/archive_assets_legacy/楼宇/晨光大厦/照片]
+      paths: [Archive/Assets/working_sources/legacy/fire/楼宇/晨光大厦/照片]
       evidence:
         - {manifest: datasets/annotated/fire/fire_sticker_v4_arena_handoff_20261113/fire_image_use_manifest_20261114.json}
       review: {state: candidate_empty, method: contact_sheet, accepted_by: null}
@@ -147,7 +193,7 @@ pairing:
     - id: bg_full_scene
       class: background
       kind: parent_video
-      paths: [datasets/raw/site_capture_20261112/videos/full_scene.mp4]
+      paths: [Archive/Assets/captures/site_capture_20261112/videos/full_scene.mp4]
       evidence:
         - {manifest: datasets/annotated/site_capture_20261112/fire_name_v4_review/source_gate_manifest.json}
       review: {state: candidate_empty, method: contact_sheet, accepted_by: null, note: 与 tr_full_scene_paper 同一父视频，同属 train}
@@ -158,7 +204,7 @@ pairing:
     - id: bg_site_003
       class: background
       kind: parent_video
-      paths: [datasets/raw/site_archive_legacy/场景/三楼与场地视频/三栋楼_垃圾桶与路口_003.mp4]
+      paths: [Archive/Assets/working_sources/legacy/site/场景/三楼与场地视频/三栋楼_垃圾桶与路口_003.mp4]
       evidence:
         - {manifest: datasets/annotated/mixed_scene/v4_compositing_backgrounds_20261113/manifest.json}
       review: {state: candidate_empty, method: contact_sheet, accepted_by: null}
@@ -169,7 +215,7 @@ pairing:
     - id: bg_site_005
       class: background
       kind: parent_video
-      paths: [datasets/raw/site_archive_legacy/场景/三楼与场地视频/三栋楼_路口及垃圾桶_005.mp4]
+      paths: [Archive/Assets/working_sources/legacy/site/场景/三楼与场地视频/三栋楼_路口及垃圾桶_005.mp4]
       evidence:
         - {manifest: datasets/annotated/mixed_scene/v4_compositing_backgrounds_20261113/manifest.json}
       review: {state: candidate_empty, method: contact_sheet, accepted_by: null}
@@ -180,7 +226,7 @@ pairing:
     - id: bg_site_009
       class: background
       kind: parent_video
-      paths: [datasets/raw/site_archive_legacy/场景/三楼与场地视频/三栋楼侧向扫描_009.mp4]
+      paths: [Archive/Assets/working_sources/legacy/site/场景/三楼与场地视频/三栋楼侧向扫描_009.mp4]
       evidence:
         - {manifest: datasets/annotated/mixed_scene/v4_compositing_backgrounds_20261113/manifest.json}
       review: {state: candidate_empty, method: contact_sheet, accepted_by: null}
@@ -191,7 +237,7 @@ pairing:
     - id: bg_site_012
       class: background
       kind: parent_video
-      paths: [datasets/raw/e_bike/archive_assets_legacy/视频/人物立牌正背面_电动车直立_倒伏和遮挡_场地扫描_012.mp4]
+      paths: [Archive/Assets/working_sources/legacy/e_bike/视频/人物立牌正背面_电动车直立_倒伏和遮挡_场地扫描_012.mp4]
       evidence:
         - {manifest: datasets/annotated/mixed_scene/v4_compositing_backgrounds_20261113/manifest.json}
       review: {state: candidate_empty, method: contact_sheet, accepted_by: null}
@@ -209,7 +255,7 @@ pairing:
   blender:
     - id: bl_three_buildings
       kind: blender_scene
-      path: datasets/assets/blender/fire/blender_buildings_v13/three_buildings.blend
+      path: datasets/assets/blender/aiaec_dataset.blend
       role: target_scene
       priority: primary
       split: {primary: shared, status: confirmed, same_source_note: 与 fire 共享母场景}
@@ -224,7 +270,7 @@ pairing:
       lighting: [normal, dark]
       amount: 30–60 张照片或 2 段短视频
       truth: [paper_box, full_text, building_id]
-      save_to: datasets/raw/fire/bnp_capture_20261116_val/
+      save_to: Archive/Assets/captures/building_name_paper/capture_20261116_val/
     - id: cap_bnp_test_20261116
       target_split: test
       reason: no_independent_parent_after_label_review
@@ -235,7 +281,7 @@ pairing:
       lighting: [normal, dark]
       amount: 30–60 张照片或 2 段短视频
       truth: [paper_box, full_text, building_id]
-      save_to: datasets/raw/fire/bnp_capture_20261116_test/
+      save_to: Archive/Assets/captures/building_name_paper/capture_20261116_test/
   plan_bindings:
     train:
       - datasets/scripts/building_name_paper/config/production_plan.json

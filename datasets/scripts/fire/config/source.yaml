@@ -1,56 +1,62 @@
 task: fire
-status: configured_inputs_consumed_by_canonical_entry
-databases: {media_query: datasets/annotated/media_index/query_cache.sqlite3, blender_registry: datasets/blender_source_registry.sqlite3}
-target_artwork_root: datasets/raw/fire/team_assets
-roots: [datasets/raw/fire/archive_assets_legacy, datasets/raw/car_real_capture_20261112, datasets/assets/blender]
-records: [datasets/annotated/fire/real_review_candidates_20261110/manifest.json]
+sample_manifest: datasets/samples/fire/manifest.json
+dataset_manifest: datasets/exports/fire/manifest.json
+sample_review: datasets/annotated/fire/current_sample_review/audit.json
+hard_negative_preview_config: datasets/scripts/fire/config/hard_negative_preview.json
+hard_negative_preview_manifest: datasets/samples/fire/hard_negative_preview/manifest.json
+hard_negative_real_review: datasets/annotated/fire/hard_negative_review/real_visual_review.jsonl
+negative_replacement_config: datasets/scripts/fire/config/negative_replacement.json
+training_preparation_config: datasets/scripts/fire/config/training_preparation.json
+fine_tune_plan: datasets/scripts/fire/config/reshoot_compact_finetune_plan.json
+fine_tune_manifest: training_packages/fire_sticker/dataset_finetune_compact/workspace_sources.json
+fine_tune_verification: training_packages/fire_sticker/dataset_finetune_compact/verification.json
+fine_tune_entry: datasets/scripts/fire/select_compact_finetune.py
+fine_tune_candidate_pool: training_packages/fire_sticker/dataset_finetune/workspace_sources.json
+fine_tune_candidate_plan: datasets/scripts/fire/config/reshoot_finetune_plan.json
+negative_replacement_review: datasets/annotated/fire/hard_negative_review/replacement_real_review.jsonl
+completed_renderer_verification: datasets/annotated/fire/production_inputs/completed_renderer_verification.json
+target_working_manifest: datasets/annotated/common/sources/targets/fire/target_sources_manifest.json
+background_pool_manifest: datasets/annotated/common/sources/background_pool_manifest.json
+blender_facade_background_manifest: datasets/annotated/common/sources/aiaec_fire_c_facade_20261117/manifest.json
+direct_capture_manifests:
+- datasets/annotated/car_real_capture_20261112/direct_real_manifest.json
+- datasets/annotated/common/sources/archive_real_capture.json
+status: first_round_recipe_materialized_ready_for_packaging
+databases:
+  media_query: datasets/annotated/media_index/query_cache.sqlite3
+  blender_registry: datasets/blender_source_registry.sqlite3
+  frame_environment: datasets/annotated/common/sources/frame_environment.sqlite3
+target_artwork_root: Archive/Assets/working_sources/digital/fire/team_assets
+roots:
+- Archive/Assets/working_sources/legacy/fire
+- Archive/Assets/captures/car_real_capture_20261112
+- datasets/assets/blender
+- datasets/raw/fire/targets
+records:
+- datasets/annotated/fire/facade_surface_review.jsonl
+- datasets/annotated/fire/facade_plane_review.jsonl
+- datasets/annotated/fire/hard_negative_review/replacement_real_review.jsonl
 selection: 火焰图案仅使用指定目录；背景可跨任务复用，记录父来源。
-scene: datasets/assets/blender/fire/blender_buildings_v13/three_buildings.blend
-target_artwork: datasets/raw/fire/team_assets/image1.png
+scene: datasets/assets/blender/aiaec_dataset.blend
+blender_scene_name: Fire Buildings
+target_artwork: Archive/Assets/working_sources/digital/fire/team_assets/image1.png
 production_plan: datasets/scripts/fire/config/production_plan.json
-current_supervision_scope: configured_crops_only
-excluded_supervision: full_original_photos_without_complete_target_labels
-real_facades:
-  relations: datasets/annotated/fire/fire_sticker_v4_arena_handoff_20261113/fire_image_use_manifest_20261114.json
-  task: fire_sticker
-  split: train
-  role: background
-  status: candidate
-  crop_xyxy: [1354, 1452, 2430, 2259]
-  source_image_size: [3472, 4640]
-  region_reference_size: [600, 450]
-  review_state: no_recognizable_target_in_crop_candidate
-  patches:
-    facade_A_04: [[180, 80], [220, 82], [220, 138], [180, 136]]
-    facade_B_51: [[318, 150], [334, 150], [334, 174], [318, 174]]
-    facade_C_33: [[230, 125], [248, 125], [248, 150], [230, 150]]
-  supported_counts: [0, 1]
-  augmentation:
-    contrast: [0.9, 1.1]
-    brightness: [-8.0, 8.0]
-    saturation: [0.8, 1.2]
-    patch_scale: [0.78, 0.88]
-candidate_pool:
-  inventory: datasets/annotated/fire/fire_sticker_v4_arena_handoff_20261113
-  gates:
-    - {file: facade_v4_gate_20261113.json, selections: 560}
-    - {file: render_batch_v4_gate_20261113.json, selections: 677}
-    - {file: distractor_v4_gate_20261113.json, selections: 216}
-    - {file: instance_gate_20261113.json, selections: 210}
-    - {file: real_legacy_v4_gate_20261113.json, selections: 197}
-  blocking_review: per-record AI observations exist; full-image target completeness and the multi-sticker branches stay unreviewed, so these gates are not training exports.
 pairing:
   schema_version: 1
-  status: draft
+  status: executable
   composition_policy:
-    target_source: blender_primary
+    target_source: real_and_synthetic
     blender_priority: increased
-    blender_share_target: 0.40
-    target_components: [fixed_flame_artwork]
-    background_components: [building_scene]
-    note: 用户 2026-11-15 确认采用 20/40/40；固定火焰图案为目标，楼宇模型与三楼合景提供背景
+    blender_share_target: 0.4
+    target_components:
+    - fixed_flame_artwork
+    background_components:
+    - building_scene
+    note: 用户 2026-11-18 授权 3000/300/300；直接实拍按原片实际数量，Blender 1200 中混合实景 240。
   policy:
-    parent_classes: [task_real, background]
+    parent_classes:
+    - task_real
+    - background
     split_unit: parent_group
     train_parent_cap: 0.8
     val_test_mode: reserve_only
@@ -58,313 +64,2082 @@ pairing:
     cross_task_duplicates: allowed_with_separate_labels
     same_source_splits: record_and_report
   task_real:
-    - id: tr_facade_A_photos_train
-      class: task_real
-      kind: parent_photo_batch
-      paths:
-        - datasets/raw/fire/archive_assets_legacy/楼宇/开心大厦/照片/另一侧斜视_整体_013.jpg
-        - datasets/raw/fire/archive_assets_legacy/楼宇/开心大厦/照片/正侧倾斜视图_整体_012.jpg
-      evidence:
-        - {manifest: datasets/annotated/fire/fire_sticker_v4_arena_handoff_20261113/fire_image_use_manifest_20261114.json}
-      capture_session: unknown
-      labels: {status: partial, note: 当前裁剪只支持 0/1 贴}
-      roles: [direct_target, composite_target, composite_background]
-      split: {primary: train, status: proposed}
-      plan: null
-    - id: tr_facade_A_photos_val
-      class: task_real
-      kind: parent_photo_batch
-      paths:
-        - datasets/raw/fire/archive_assets_legacy/楼宇/开心大厦/照片/正面_横向窗洞及底部开口_006.jpg
-        - datasets/raw/fire/archive_assets_legacy/楼宇/开心大厦/照片/远距离正面_整体_017.jpg
-      evidence:
-        - {manifest: datasets/annotated/fire/fire_sticker_v4_arena_handoff_20261113/fire_image_use_manifest_20261114.json}
-      capture_session: unknown
-      labels: {status: partial, note: 待完整标注与批次核对}
-      roles: [direct_target, composite_target, composite_background]
-      split: {primary: val, status: proposed}
-      plan: null
-    - id: tr_facade_A_photos_test
-      class: task_real
-      kind: parent_photo_batch
-      paths:
-        - datasets/raw/fire/archive_assets_legacy/楼宇/开心大厦/照片/正侧斜视_楼体整体_023.jpg
-        - datasets/raw/fire/archive_assets_legacy/楼宇/开心大厦/照片/正侧斜视_横向窗洞_007.jpg
-      evidence:
-        - {manifest: datasets/annotated/fire/fire_sticker_v4_arena_handoff_20261113/fire_image_use_manifest_20261114.json}
-      capture_session: unknown
-      labels: {status: partial, note: 待完整标注与批次核对}
-      roles: [direct_target, composite_target, composite_background]
-      split: {primary: test, status: proposed}
-      plan: null
-    - id: tr_facade_B_photos_train
-      class: task_real
-      kind: parent_photo_batch
-      paths:
-        - datasets/raw/fire/archive_assets_legacy/楼宇/锦绣大厦/照片/中距离斜视_楼体和格栅_004.jpg
-        - datasets/raw/fire/archive_assets_legacy/楼宇/锦绣大厦/照片/中距离斜视_楼体和格栅_006.jpg
-      evidence:
-        - {manifest: datasets/annotated/fire/fire_sticker_v4_arena_handoff_20261113/fire_image_use_manifest_20261114.json}
-      capture_session: unknown
-      labels: {status: partial, note: 当前裁剪只支持 0/1 贴}
-      roles: [direct_target, composite_target, composite_background]
-      split: {primary: train, status: proposed}
-      plan: null
-    - id: tr_facade_B_photos_val
-      class: task_real
-      kind: parent_photo_batch
-      paths:
-        - datasets/raw/fire/archive_assets_legacy/楼宇/锦绣大厦/照片/正面中景_中央竖格栅_007.jpg
-        - datasets/raw/fire/archive_assets_legacy/楼宇/锦绣大厦/照片/正面中远景_竖格栅与窗格_015.jpg
-      evidence:
-        - {manifest: datasets/annotated/fire/fire_sticker_v4_arena_handoff_20261113/fire_image_use_manifest_20261114.json}
-      capture_session: unknown
-      labels: {status: partial, note: 待完整标注与批次核对}
-      roles: [direct_target, composite_target, composite_background]
-      split: {primary: val, status: proposed}
-      plan: null
-    - id: tr_facade_B_photos_test
-      class: task_real
-      kind: parent_photo_batch
-      paths:
-        - datasets/raw/fire/archive_assets_legacy/楼宇/锦绣大厦/照片/较远正面_格栅和窗格_009.jpg
-        - datasets/raw/fire/archive_assets_legacy/楼宇/锦绣大厦/照片/正面_楼名与3张火焰纸贴_017.jpg
-      evidence:
-        - {manifest: datasets/annotated/fire/fire_sticker_v4_arena_handoff_20261113/fire_image_use_manifest_20261114.json}
-      capture_session: unknown
-      labels: {status: partial, note: 017 含 3 贴，多贴分支待标注}
-      roles: [direct_target, composite_target, composite_background]
-      split: {primary: test, status: proposed}
-      plan: null
-    - id: tr_facade_C_photos_train
-      class: task_real
-      kind: parent_photo_batch
-      paths:
-        - datasets/raw/fire/archive_assets_legacy/楼宇/晨光大厦/照片/正侧斜视_L形窗格立面_006.jpg
-        - datasets/raw/fire/archive_assets_legacy/楼宇/晨光大厦/照片/较近正侧斜视_窗格与入口_005.jpg
-      evidence:
-        - {manifest: datasets/annotated/fire/fire_sticker_v4_arena_handoff_20261113/fire_image_use_manifest_20261114.json}
-      capture_session: unknown
-      labels: {status: partial, note: 当前裁剪只支持 0/1 贴}
-      roles: [direct_target, composite_target, composite_background]
-      split: {primary: train, status: proposed}
-      plan: null
-    - id: tr_facade_C_photos_val
-      class: task_real
-      kind: parent_photo_batch
-      paths:
-        - datasets/raw/fire/archive_assets_legacy/楼宇/晨光大厦/照片/左侧_外墙小窗洞_022.jpg
-        - datasets/raw/fire/archive_assets_legacy/楼宇/晨光大厦/照片/斜视_L形墙面与窗口_019.jpg
-      evidence:
-        - {manifest: datasets/annotated/fire/fire_sticker_v4_arena_handoff_20261113/fire_image_use_manifest_20261114.json}
-      capture_session: unknown
-      labels: {status: partial, note: 待完整标注与批次核对}
-      roles: [direct_target, composite_target, composite_background]
-      split: {primary: val, status: proposed}
-      plan: null
-    - id: tr_facade_C_photos_test
-      class: task_real
-      kind: parent_photo_batch
-      paths:
-        - datasets/raw/fire/archive_assets_legacy/楼宇/晨光大厦/照片/较远平视_楼体前侧_015.jpg
-        - datasets/raw/fire/archive_assets_legacy/楼宇/晨光大厦/照片/远景_楼体前侧与前景_017.jpg
-      evidence:
-        - {manifest: datasets/annotated/fire/fire_sticker_v4_arena_handoff_20261113/fire_image_use_manifest_20261114.json}
-      capture_session: unknown
-      labels: {status: partial, note: 待完整标注与批次核对}
-      roles: [direct_target, composite_target, composite_background]
-      split: {primary: test, status: proposed}
-      plan: null
-    - id: tr_facade_video_A_001
-      class: task_real
-      kind: parent_video
-      paths: [datasets/raw/fire/archive_assets_legacy/楼宇/开心大厦/视频/开心楼正侧背面绕拍_001.mp4]
-      evidence:
-        - {manifest: datasets/annotated/fire/real_review_candidates_20261110/manifest.json}
-      capture_session: unknown
-      labels: {status: partial, note: 每视频 3 审核帧}
-      roles: [direct_target, geometry_reference]
-      split: {primary: train, status: proposed}
-      plan: null
-    - id: tr_facade_video_A_002
-      class: task_real
-      kind: parent_video
-      paths: [datasets/raw/fire/archive_assets_legacy/楼宇/开心大厦/视频/开心楼正侧背面绕拍_002.mp4]
-      evidence:
-        - {manifest: datasets/annotated/fire/real_review_candidates_20261110/manifest.json}
-      capture_session: unknown
-      labels: {status: partial, note: 每视频 3 审核帧}
-      roles: [direct_target, geometry_reference]
-      split: {primary: val, status: proposed}
-      plan: null
-    - id: tr_facade_video_B_001_002
-      class: task_real
-      kind: parent_video
-      paths:
-        - datasets/raw/fire/archive_assets_legacy/楼宇/锦绣大厦/视频/锦绣楼在室内地砖上的多面绕拍_001.mp4
-        - datasets/raw/fire/archive_assets_legacy/楼宇/锦绣大厦/视频/锦绣楼在室内地砖上的多面绕拍_002.mp4
-      evidence:
-        - {manifest: datasets/annotated/fire/real_review_candidates_20261110/manifest.json}
-      capture_session: unknown
-      labels: {status: partial, note: 每视频 3 审核帧}
-      roles: [direct_target, geometry_reference]
-      split: {primary: train, status: proposed}
-      plan: null
-    - id: tr_facade_video_B_003
-      class: task_real
-      kind: parent_video
-      paths: [datasets/raw/fire/archive_assets_legacy/楼宇/锦绣大厦/视频/锦绣楼在赛道上的多面绕拍_003.mp4]
-      evidence:
-        - {manifest: datasets/annotated/fire/real_review_candidates_20261110/manifest.json}
-      capture_session: unknown
-      labels: {status: partial, note: 每视频 3 审核帧}
-      roles: [direct_target, geometry_reference]
-      split: {primary: val, status: proposed}
-      plan: null
-    - id: tr_facade_video_B_004
-      class: task_real
-      kind: parent_video
-      paths: [datasets/raw/fire/archive_assets_legacy/楼宇/锦绣大厦/视频/锦绣楼在赛道上的多面绕拍_004.mp4]
-      evidence:
-        - {manifest: datasets/annotated/fire/real_review_candidates_20261110/manifest.json}
-      capture_session: unknown
-      labels: {status: partial, note: 每视频 3 审核帧}
-      roles: [direct_target, geometry_reference]
-      split: {primary: test, status: proposed}
-      plan: null
-    - id: tr_facade_video_C_001
-      class: task_real
-      kind: parent_video
-      paths: [datasets/raw/fire/archive_assets_legacy/楼宇/晨光大厦/视频/晨光楼环绕_正面和背面_001.mp4]
-      evidence:
-        - {manifest: datasets/annotated/fire/real_review_candidates_20261110/manifest.json}
-      capture_session: unknown
-      labels: {status: partial, note: 每视频 3 审核帧}
-      roles: [direct_target, geometry_reference]
-      split: {primary: train, status: proposed}
-      plan: null
-    - id: tr_facade_video_C_002
-      class: task_real
-      kind: parent_video
-      paths: [datasets/raw/fire/archive_assets_legacy/楼宇/晨光大厦/视频/晨光楼较高视角环绕_可见L形顶部_002.mp4]
-      evidence:
-        - {manifest: datasets/annotated/fire/real_review_candidates_20261110/manifest.json}
-      capture_session: unknown
-      labels: {status: partial, note: 每视频 3 审核帧}
-      roles: [direct_target, geometry_reference]
-      split: {primary: test, status: proposed}
-      plan: null
-    - id: tr_fire_review_pool
-      class: task_real
-      kind: parent_photo_batch
-      paths: [datasets/annotated/fire/real_review_candidates_20261110]
-      evidence:
-        - {manifest: datasets/annotated/fire/real_review_candidates_20261110/manifest.json}
-      capture_session: unknown
-      labels: {status: candidate, note: 63 条审核候选，覆盖 17 视频；按视频分 split 前不得入计划}
-      roles: [direct_target, composite_target]
-      split: {primary: unassigned, status: proposed}
-      plan: null
-    - id: tr_car_real_fire
-      class: task_real
-      kind: parent_video
-      paths: [datasets/raw/car_real_capture_20261112/V_20261112_152304.mp4]
-      evidence:
-        - {manifest: datasets/annotated/car_real_capture_20261112/segments_v1/segments.csv}
-      capture_session: unknown
-      labels: {status: partial, note: 9 个 fire_sticker 片段，标签待重建}
-      roles: [direct_target, composite_target, composite_background]
-      split: {primary: test, status: proposed}
-      plan: null
+  - id: real_bins_reshoot_20261118
+    class: task_real
+    kind: photo_session
+    paths:
+    - training_packages/waste_bin_state/Reshoot
+    parent_group: bins_reshoot_20261118
+    capture_session: same_session
+    physical_parent_group: bins_reshoot_20261118
+    roles: [empty_negative, mask_source, reference]
+    split:
+      primary: train
+      status: confirmed
+      action: selected
+    labels:
+      status: complete
+      scope: frame
+    review:
+      state: confirmed_empty
+      origin: machine
+      evidence: training_packages/fire_sticker/dataset_finetune/source_records/reshoot_review.json
+      note: 全部36张照片按fire完整空负复核；其他任务的物品贴与分类图标不是火焰目标。
+  - id: real_05eefb00de67
+    class: task_real
+    kind: parent_photo
+    paths:
+    - Archive/Assets/working_sources/legacy/fire/楼宇/晨光大厦/照片/正面_楼名纸条和1张火焰贴_001.jpg
+    parent_group: Archive/Assets/楼宇/晨光大厦/照片/正面_楼名纸条和1张火焰贴_001.jpg
+    capture_session: unknown
+    roles:
+    - direct_target
+    split:
+      primary: test
+      status: confirmed
+    labels:
+      status: complete
+      scope: frame
+    frame_id: 05eefb00de6751c4284e4d252d8f08ef39e3bd73d65f6fdb893cb9d03a9bb112
+  - id: real_07ae54c32fe3
+    class: task_real
+    kind: parent_photo
+    paths:
+    - Archive/Assets/working_sources/legacy/fire/楼宇/开心大厦/照片/底部局部_开口与底座_018.jpg
+    parent_group: Archive/Assets/楼宇/开心大厦/照片/底部局部_开口与底座_018.jpg
+    capture_session: unknown
+    roles:
+    - empty_negative
+    split:
+      primary: train
+      status: confirmed
+    labels:
+      status: complete
+      scope: frame
+    frame_id: 07ae54c32fe3169357028e31b69e401df505048d5e99726806219733e64cc688
+    review:
+      state: confirmed_empty
+      origin: machine
+      evidence: frame_environment fire empty_negative current full-frame label observation
+      frame_id: 07ae54c32fe3169357028e31b69e401df505048d5e99726806219733e64cc688
+  - id: real_08dc769d4a82
+    class: task_real
+    kind: parent_photo
+    paths:
+    - Archive/Assets/working_sources/legacy/fire/楼宇/锦绣大厦/照片/局部近景_底层窗格和侧面_005.jpg
+    parent_group: Archive/Assets/楼宇/锦绣大厦/照片/局部近景_底层窗格和侧面_005.jpg
+    capture_session: unknown
+    roles:
+    - empty_negative
+    split:
+      primary: train
+      status: confirmed
+    labels:
+      status: complete
+      scope: frame
+    frame_id: 08dc769d4a82b8859d1ed3936efb1b8dcb989a75798d01f1b7f47dbd89d3ba70
+    review:
+      state: confirmed_empty
+      origin: machine
+      evidence: frame_environment fire empty_negative current full-frame label observation
+      frame_id: 08dc769d4a82b8859d1ed3936efb1b8dcb989a75798d01f1b7f47dbd89d3ba70
+  - id: real_113d45ced4e7
+    class: task_real
+    kind: parent_photo
+    paths: &id001
+    - datasets/raw/shared/backgrounds/camera/另一侧斜视_整体_013__458ade8626/另一侧斜视_整体_013__91c7812dfc.jpg
+    parent_group: Archive/Assets/楼宇/开心大厦/照片/另一侧斜视_整体_013.jpg
+    capture_session: unknown
+    roles:
+    - empty_negative
+    split: &id002
+      primary: train
+      status: confirmed
+    labels: &id003
+      status: complete
+      scope: frame
+    frame_id: 113d45ced4e721ba82d5b59a01fcc31169793e5d57dd709e5975f6f6437acc85
+    review:
+      state: confirmed_empty
+      origin: machine
+      evidence: frame_environment fire empty_negative current full-frame label observation
+      frame_id: 113d45ced4e721ba82d5b59a01fcc31169793e5d57dd709e5975f6f6437acc85
+  - id: real_1555f50c316e
+    class: task_real
+    kind: parent_photo
+    paths: &id004
+    - Archive/Assets/working_sources/legacy/fire/楼宇/锦绣大厦/照片/远距离斜视_格栅和窗格_001.jpg
+    parent_group: Archive/Assets/楼宇/锦绣大厦/照片/远距离斜视_格栅和窗格_001.jpg
+    capture_session: unknown
+    roles:
+    - empty_negative
+    split: &id005
+      primary: test
+      status: confirmed
+    labels: &id006
+      status: complete
+      scope: frame
+    frame_id: 1555f50c316e9c679cdb9f69e4521a2be12cdd3a293c11c560ed39a5f6cb5f55
+    review:
+      state: confirmed_empty
+      origin: machine
+      evidence: frame_environment fire empty_negative current full-frame label observation
+      frame_id: 1555f50c316e9c679cdb9f69e4521a2be12cdd3a293c11c560ed39a5f6cb5f55
+  - id: real_16f4db11af67
+    class: task_real
+    kind: parent_video
+    paths:
+    - datasets/raw/shared/backgrounds/camera/full_scene__f1d1d71586/frame_009901__c809bf2da1.png
+    parent_group: datasets/raw/site_capture_20261112/videos/full_scene.mp4
+    capture_session: unknown
+    roles:
+    - direct_target
+    split:
+      primary: train
+      status: confirmed
+    labels:
+      status: complete
+      scope: frame
+    frame_id: 16f4db11af67edf385764280f705ccfda5933c595873d7ff0bcd95238f973b69
+  - id: real_189c41e28e81
+    class: task_real
+    kind: parent_photo
+    paths: &id007
+    - Archive/Assets/working_sources/legacy/fire/楼宇/晨光大厦/照片/较近正侧斜视_窗格与入口_005.jpg
+    parent_group: Archive/Assets/楼宇/晨光大厦/照片/较近正侧斜视_窗格与入口_005.jpg
+    capture_session: unknown
+    roles:
+    - empty_negative
+    split: &id008
+      primary: val
+      status: confirmed
+    labels: &id009
+      status: complete
+      scope: frame
+    frame_id: 189c41e28e81dd7ee15be40771f072c88e5687e5b0d8978fde1ea818407d65ba
+    review:
+      state: confirmed_empty
+      origin: machine
+      evidence: frame_environment fire empty_negative current full-frame label observation
+      frame_id: 189c41e28e81dd7ee15be40771f072c88e5687e5b0d8978fde1ea818407d65ba
+  - id: real_221ab6cd5892
+    class: task_real
+    kind: parent_photo
+    paths: &id010
+    - Archive/Assets/working_sources/legacy/fire/楼宇/晨光大厦/照片/斜视_L形墙面与窗口_019.jpg
+    parent_group: Archive/Assets/楼宇/晨光大厦/照片/斜视_L形墙面与窗口_019.jpg
+    capture_session: unknown
+    roles:
+    - empty_negative
+    split: &id011
+      primary: test
+      status: confirmed
+    labels: &id012
+      status: complete
+      scope: frame
+    frame_id: 221ab6cd5892a9997f9da4527ffffde329be29d1df7831daa2d402393e53ebc9
+    review:
+      state: confirmed_empty
+      origin: machine
+      evidence: frame_environment fire empty_negative current full-frame label observation
+      frame_id: 221ab6cd5892a9997f9da4527ffffde329be29d1df7831daa2d402393e53ebc9
+  - id: real_25bf2c4cccfb
+    class: task_real
+    kind: parent_photo
+    paths: &id013
+    - Archive/Assets/working_sources/legacy/fire/楼宇/开心大厦/照片/正侧斜视_横向窗洞_007.jpg
+    parent_group: Archive/Assets/楼宇/开心大厦/照片/正侧斜视_横向窗洞_007.jpg
+    capture_session: unknown
+    roles:
+    - empty_negative
+    split: &id014
+      primary: train
+      status: confirmed
+    labels: &id015
+      status: complete
+      scope: frame
+    frame_id: 25bf2c4cccfb9405d0632d5c5d2cee6a37aa707dc35242e8dce3b286cd4223e6
+    review:
+      state: confirmed_empty
+      origin: machine
+      evidence: frame_environment fire empty_negative current full-frame label observation
+      frame_id: 25bf2c4cccfb9405d0632d5c5d2cee6a37aa707dc35242e8dce3b286cd4223e6
+  - id: real_274174c8c1a1
+    class: task_real
+    kind: parent_photo
+    paths:
+    - Archive/Assets/working_sources/legacy/fire/楼宇/锦绣大厦/照片/近景_顶部窗格与中轴_013.jpg
+    parent_group: Archive/Assets/楼宇/锦绣大厦/照片/近景_顶部窗格与中轴_013.jpg
+    capture_session: unknown
+    roles:
+    - empty_negative
+    split:
+      primary: train
+      status: confirmed
+    labels:
+      status: complete
+      scope: frame
+    frame_id: 274174c8c1a11c8ee7b16d6efdf4c6b6739d1086eaa7d23f57b4ee9e045ad578
+    review:
+      state: confirmed_empty
+      origin: machine
+      evidence: frame_environment fire empty_negative current full-frame label observation
+      frame_id: 274174c8c1a11c8ee7b16d6efdf4c6b6739d1086eaa7d23f57b4ee9e045ad578
+  - id: real_2ebc80d29128
+    class: task_real
+    kind: parent_photo
+    paths:
+    - Archive/Assets/working_sources/legacy/fire/楼宇/晨光大厦/照片/正面_楼名和4张火焰纸贴_023.jpg
+    parent_group: Archive/Assets/楼宇/晨光大厦/照片/正面_楼名和4张火焰纸贴_023.jpg
+    capture_session: unknown
+    roles:
+    - direct_target
+    split:
+      primary: train
+      status: confirmed
+    labels:
+      status: complete
+      scope: frame
+    frame_id: 2ebc80d29128162007bf1bb36bfd05b10dc116baa950f10a3bddf327b7f486a8
+  - id: real_310e8eaa3f58
+    class: task_real
+    kind: parent_video
+    paths:
+    - datasets/raw/shared/backgrounds/camera/三栋楼_路口及垃圾桶_005__167890b926/junction_005_009__2e6441d1e8.jpg
+    parent_group: Archive/Assets/场景/三楼与场地视频/三栋楼_路口及垃圾桶_005.mp4
+    capture_session: unknown
+    roles:
+    - empty_negative
+    split:
+      primary: val
+      status: confirmed
+    labels:
+      status: complete
+      scope: frame
+    frame_id: 310e8eaa3f58c463ba398def897ccb5b6663acf11f7d694752b26fa55fab57da
+    review:
+      state: confirmed_empty
+      origin: machine
+      evidence: frame_environment fire empty_negative current full-frame label observation
+      frame_id: 310e8eaa3f58c463ba398def897ccb5b6663acf11f7d694752b26fa55fab57da
+  - id: real_31954ee6b7db
+    class: task_real
+    kind: parent_video
+    paths:
+    - datasets/raw/shared/backgrounds/camera/三栋楼_路口及垃圾桶_005__167890b926/junction_005_007__bd44e1e95d.jpg
+    parent_group: Archive/Assets/场景/三楼与场地视频/三栋楼_路口及垃圾桶_005.mp4
+    capture_session: unknown
+    roles:
+    - empty_negative
+    split:
+      primary: val
+      status: confirmed
+    labels:
+      status: complete
+      scope: frame
+    frame_id: 31954ee6b7dbf54075ccc7434c658a4509c274908e3b3a10fe3546376f3ad770
+    review:
+      state: confirmed_empty
+      origin: machine
+      evidence: frame_environment fire empty_negative current full-frame label observation
+      frame_id: 31954ee6b7dbf54075ccc7434c658a4509c274908e3b3a10fe3546376f3ad770
+  - id: real_3205a6ba8233
+    class: task_real
+    kind: parent_photo
+    paths: &id016
+    - datasets/raw/shared/backgrounds/camera/中距离斜视_楼体和格栅_004__3f6c9bef4c/中距离斜视_楼体和格栅_004__587fa452e5.jpg
+    parent_group: Archive/Assets/楼宇/锦绣大厦/照片/中距离斜视_楼体和格栅_004.jpg
+    capture_session: unknown
+    roles:
+    - empty_negative
+    split: &id017
+      primary: train
+      status: confirmed
+    labels: &id018
+      status: complete
+      scope: frame
+    frame_id: 3205a6ba8233f744b4f96064a0633cf6d0b78eda49a958ac18696499f545ed53
+    review:
+      state: confirmed_empty
+      origin: machine
+      evidence: frame_environment fire empty_negative current full-frame label observation
+      frame_id: 3205a6ba8233f744b4f96064a0633cf6d0b78eda49a958ac18696499f545ed53
+  - id: real_392e72eed039
+    class: task_real
+    kind: parent_video
+    paths:
+    - datasets/raw/shared/backgrounds/camera/三栋楼_路口及垃圾桶_005__167890b926/junction_005_002__03d68016af.jpg
+    parent_group: Archive/Assets/场景/三楼与场地视频/三栋楼_路口及垃圾桶_005.mp4
+    capture_session: unknown
+    roles:
+    - empty_negative
+    split:
+      primary: val
+      status: confirmed
+    labels:
+      status: complete
+      scope: frame
+    frame_id: 392e72eed0398b32175c6a4e93f3be06a23e001a51aa2168930fdfc8151c7704
+    review:
+      state: confirmed_empty
+      origin: machine
+      evidence: frame_environment fire empty_negative current full-frame label observation
+      frame_id: 392e72eed0398b32175c6a4e93f3be06a23e001a51aa2168930fdfc8151c7704
+  - id: real_3945d6ff1970
+    class: task_real
+    kind: parent_photo
+    paths:
+    - Archive/Assets/working_sources/legacy/fire/楼宇/晨光大厦/照片/高角度斜视_立面窗格_007.jpg
+    parent_group: Archive/Assets/楼宇/晨光大厦/照片/高角度斜视_立面窗格_007.jpg
+    capture_session: unknown
+    roles:
+    - empty_negative
+    split:
+      primary: train
+      status: confirmed
+    labels:
+      status: complete
+      scope: frame
+    frame_id: 3945d6ff19703d9742027c94c52ac86e6da9d7f983c9d891432c5ee18bfdef56
+    review:
+      state: confirmed_empty
+      origin: machine
+      evidence: frame_environment fire empty_negative current full-frame label observation
+      frame_id: 3945d6ff19703d9742027c94c52ac86e6da9d7f983c9d891432c5ee18bfdef56
+  - id: real_410886359be3
+    class: task_real
+    kind: parent_video
+    paths:
+    - datasets/raw/shared/backgrounds/camera/三栋楼_路口及垃圾桶_005__167890b926/junction_005_001__39a3323bd8.jpg
+    parent_group: Archive/Assets/场景/三楼与场地视频/三栋楼_路口及垃圾桶_005.mp4
+    capture_session: unknown
+    roles:
+    - empty_negative
+    split:
+      primary: val
+      status: confirmed
+    labels:
+      status: complete
+      scope: frame
+    frame_id: 410886359be3c1f36b76cae7649dec5892d97d108c1953a48871990d5ad0bffe
+    review:
+      state: confirmed_empty
+      origin: machine
+      evidence: frame_environment fire empty_negative current full-frame label observation
+      frame_id: 410886359be3c1f36b76cae7649dec5892d97d108c1953a48871990d5ad0bffe
+  - id: real_48356e853ef8
+    class: task_real
+    kind: parent_photo
+    paths:
+    - Archive/Assets/working_sources/legacy/fire/楼宇/锦绣大厦/照片/正侧斜视_与前图相近_012.jpg
+    parent_group: Archive/Assets/楼宇/锦绣大厦/照片/正侧斜视_与前图相近_012.jpg
+    capture_session: unknown
+    roles:
+    - empty_negative
+    split:
+      primary: train
+      status: confirmed
+    labels:
+      status: complete
+      scope: frame
+    frame_id: 48356e853ef85f5770e6b2fe35690c451a5f03347af0adfc4199a98a8e8eedab
+    review:
+      state: confirmed_empty
+      origin: machine
+      evidence: frame_environment fire empty_negative current full-frame label observation
+      frame_id: 48356e853ef85f5770e6b2fe35690c451a5f03347af0adfc4199a98a8e8eedab
+  - id: real_488b058b718f
+    class: task_real
+    kind: parent_photo
+    paths: &id019
+    - datasets/raw/shared/backgrounds/camera/正侧斜视_L形窗格立面_006__0eadcc29eb/正侧斜视_L形窗格立面_006__5dfdc96db4.jpg
+    parent_group: Archive/Assets/楼宇/晨光大厦/照片/正侧斜视_L形窗格立面_006.jpg
+    capture_session: unknown
+    roles:
+    - empty_negative
+    split: &id020
+      primary: train
+      status: confirmed
+    labels: &id021
+      status: complete
+      scope: frame
+    frame_id: 488b058b718f3469be111cc77b51490c0ee8cbb310cb53de65e597c1c66fe91e
+    review:
+      state: confirmed_empty
+      origin: machine
+      evidence: frame_environment fire empty_negative current full-frame label observation
+      frame_id: 488b058b718f3469be111cc77b51490c0ee8cbb310cb53de65e597c1c66fe91e
+  - id: real_498fbf4a5731
+    class: task_real
+    kind: parent_photo
+    paths:
+    - Archive/Assets/working_sources/legacy/fire/楼宇/锦绣大厦/照片/正面_楼名与3张火焰纸贴_017.jpg
+    parent_group: Archive/Assets/楼宇/锦绣大厦/照片/正面_楼名与3张火焰纸贴_017.jpg
+    capture_session: unknown
+    roles:
+    - direct_target
+    split:
+      primary: val
+      status: confirmed
+    labels:
+      status: complete
+      scope: frame
+    frame_id: 498fbf4a57311d433183c5fcf45567dbbe11c481f69a9fc802eaa7c557fb9950
+  - id: real_53d21dc0d427
+    class: task_real
+    kind: parent_photo
+    paths:
+    - Archive/Assets/working_sources/legacy/fire/楼宇/开心大厦/照片/远距离斜视_楼体与地面_022.jpg
+    parent_group: Archive/Assets/楼宇/开心大厦/照片/远距离斜视_楼体与地面_022.jpg
+    capture_session: unknown
+    roles:
+    - empty_negative
+    split:
+      primary: test
+      status: confirmed
+    labels:
+      status: complete
+      scope: frame
+    frame_id: 53d21dc0d4270ceaed9a0bfbccfa6c7e7c60e8546925da4a328444c29b6943c3
+    review:
+      state: confirmed_empty
+      origin: machine
+      evidence: frame_environment fire empty_negative current full-frame label observation
+      frame_id: 53d21dc0d4270ceaed9a0bfbccfa6c7e7c60e8546925da4a328444c29b6943c3
+  - id: real_54b001b0c4da
+    class: task_real
+    kind: parent_photo
+    paths:
+    - Archive/Assets/working_sources/legacy/fire/楼宇/晨光大厦/照片/背面_L形内侧与窗格_021.jpg
+    parent_group: Archive/Assets/楼宇/晨光大厦/照片/背面_L形内侧与窗格_021.jpg
+    capture_session: unknown
+    roles:
+    - empty_negative
+    split:
+      primary: train
+      status: confirmed
+    labels:
+      status: complete
+      scope: frame
+    frame_id: 54b001b0c4da08fdc0e728f8cbd4798a75aa31c45f182593e5a530b869c1f84d
+    review:
+      state: confirmed_empty
+      origin: machine
+      evidence: frame_environment fire empty_negative current full-frame label observation
+      frame_id: 54b001b0c4da08fdc0e728f8cbd4798a75aa31c45f182593e5a530b869c1f84d
+  - id: real_58c04ef8aca4
+    class: task_real
+    kind: parent_photo
+    paths:
+    - Archive/Assets/working_sources/legacy/fire/楼宇/锦绣大厦/照片/正面整体_竖格栅_010.jpg
+    parent_group: Archive/Assets/楼宇/锦绣大厦/照片/正面整体_竖格栅_010.jpg
+    capture_session: unknown
+    roles:
+    - empty_negative
+    split:
+      primary: val
+      status: confirmed
+    labels:
+      status: complete
+      scope: frame
+    frame_id: 58c04ef8aca482832c17c587c163ed44d29d8c8d905f5efca6bef52fc5c88c4c
+    review:
+      state: confirmed_empty
+      origin: machine
+      evidence: frame_environment fire empty_negative current full-frame label observation
+      frame_id: 58c04ef8aca482832c17c587c163ed44d29d8c8d905f5efca6bef52fc5c88c4c
+  - id: real_5bbcea340d73
+    class: task_real
+    kind: parent_photo
+    paths: &id022
+    - Archive/Assets/working_sources/legacy/fire/楼宇/开心大厦/照片/正面近景_窗口与底部_014.jpg
+    parent_group: Archive/Assets/楼宇/开心大厦/照片/正面近景_窗口与底部_014.jpg
+    capture_session: unknown
+    roles:
+    - empty_negative
+    split: &id023
+      primary: train
+      status: confirmed
+    labels: &id024
+      status: complete
+      scope: frame
+    frame_id: 5bbcea340d73ce79c2f089ecc90a298cf33bcce6eb090a4dd87e13af22c6de2d
+    review:
+      state: confirmed_empty
+      origin: machine
+      evidence: frame_environment fire empty_negative current full-frame label observation
+      frame_id: 5bbcea340d73ce79c2f089ecc90a298cf33bcce6eb090a4dd87e13af22c6de2d
+  - id: real_622b81646002
+    class: task_real
+    kind: parent_photo
+    paths:
+    - Archive/Assets/working_sources/legacy/fire/楼宇/开心大厦/照片/较近正侧斜视_层间细节_009.jpg
+    parent_group: Archive/Assets/楼宇/开心大厦/照片/较近正侧斜视_层间细节_009.jpg
+    capture_session: unknown
+    roles:
+    - empty_negative
+    split:
+      primary: train
+      status: confirmed
+    labels:
+      status: complete
+      scope: frame
+    frame_id: 622b816460020d564281eebb7863b6d2141e1e64adb1c97e3dfc02b2ec38ff4c
+    review:
+      state: confirmed_empty
+      origin: machine
+      evidence: frame_environment fire empty_negative current full-frame label observation
+      frame_id: 622b816460020d564281eebb7863b6d2141e1e64adb1c97e3dfc02b2ec38ff4c
+  - id: real_6972b4bdf745
+    class: task_real
+    kind: parent_video
+    paths:
+    - datasets/raw/shared/backgrounds/camera/三栋楼_路口及垃圾桶_005__167890b926/junction_005_015__95035e53f1.jpg
+    parent_group: Archive/Assets/场景/三楼与场地视频/三栋楼_路口及垃圾桶_005.mp4
+    capture_session: unknown
+    roles:
+    - empty_negative
+    split:
+      primary: val
+      status: confirmed
+    labels:
+      status: complete
+      scope: frame
+    frame_id: 6972b4bdf745dd8e976c3e93c9376998c0459656bd2b3f0019fe47e823e0b3bc
+    review:
+      state: confirmed_empty
+      origin: machine
+      evidence: frame_environment fire empty_negative current full-frame label observation
+      frame_id: 6972b4bdf745dd8e976c3e93c9376998c0459656bd2b3f0019fe47e823e0b3bc
+  - id: real_69a98204b1fd
+    class: task_real
+    kind: parent_photo
+    paths: &id025
+    - Archive/Assets/working_sources/legacy/fire/楼宇/开心大厦/照片/正面远景_楼体整体_025.jpg
+    parent_group: Archive/Assets/楼宇/开心大厦/照片/正面远景_楼体整体_025.jpg
+    capture_session: unknown
+    roles:
+    - empty_negative
+    split: &id026
+      primary: test
+      status: confirmed
+    labels: &id027
+      status: complete
+      scope: frame
+    frame_id: 69a98204b1fd165b6e62aff827248fa2145e430739acfc04530e847819bf8bb0
+    review:
+      state: confirmed_empty
+      origin: machine
+      evidence: frame_environment fire empty_negative current full-frame label observation
+      frame_id: 69a98204b1fd165b6e62aff827248fa2145e430739acfc04530e847819bf8bb0
+  - id: real_6a28ca83ee63
+    class: task_real
+    kind: parent_photo
+    paths: &id028
+    - Archive/Assets/working_sources/legacy/fire/楼宇/开心大厦/照片/正面_横向窗洞及底部开口_006.jpg
+    parent_group: Archive/Assets/楼宇/开心大厦/照片/正面_横向窗洞及底部开口_006.jpg
+    capture_session: unknown
+    roles:
+    - empty_negative
+    split: &id029
+      primary: val
+      status: confirmed
+    labels: &id030
+      status: complete
+      scope: frame
+    frame_id: 6a28ca83ee63f811289e0bf82cfdef44fa228f7cf74a2d35d508e8408f7d1e94
+    review:
+      state: confirmed_empty
+      origin: machine
+      evidence: frame_environment fire empty_negative current full-frame label observation
+      frame_id: 6a28ca83ee63f811289e0bf82cfdef44fa228f7cf74a2d35d508e8408f7d1e94
+  - id: real_717d4260a578
+    class: task_real
+    kind: parent_photo
+    paths:
+    - Archive/Assets/working_sources/legacy/fire/楼宇/锦绣大厦/照片/远距离斜视_格栅和窗格_003.jpg
+    parent_group: Archive/Assets/楼宇/锦绣大厦/照片/远距离斜视_格栅和窗格_003.jpg
+    capture_session: unknown
+    roles:
+    - empty_negative
+    split:
+      primary: test
+      status: confirmed
+    labels:
+      status: complete
+      scope: frame
+    frame_id: 717d4260a578c0859f7867047fd1b1de0492939d93a729e5d38139bc350fbfdb
+    review:
+      state: confirmed_empty
+      origin: machine
+      evidence: frame_environment fire empty_negative current full-frame label observation
+      frame_id: 717d4260a578c0859f7867047fd1b1de0492939d93a729e5d38139bc350fbfdb
+  - id: real_731b5aab3091
+    class: task_real
+    kind: parent_photo
+    paths: &id031
+    - Archive/Assets/working_sources/legacy/fire/楼宇/锦绣大厦/照片/中距离斜视_楼体和格栅_006.jpg
+    parent_group: Archive/Assets/楼宇/锦绣大厦/照片/中距离斜视_楼体和格栅_006.jpg
+    capture_session: unknown
+    roles:
+    - empty_negative
+    split: &id032
+      primary: train
+      status: confirmed
+    labels: &id033
+      status: complete
+      scope: frame
+    frame_id: 731b5aab3091d6773457eab1d65f864eb3dc00cbd0f509ef5174b462a3f43cae
+    review:
+      state: confirmed_empty
+      origin: machine
+      evidence: frame_environment fire empty_negative current full-frame label observation
+      frame_id: 731b5aab3091d6773457eab1d65f864eb3dc00cbd0f509ef5174b462a3f43cae
+  - id: real_919db90b7896
+    class: task_real
+    kind: parent_photo
+    paths: &id034
+    - Archive/Assets/working_sources/legacy/fire/楼宇/晨光大厦/照片/斜俯近景_窗口与墙体_008.jpg
+    parent_group: Archive/Assets/楼宇/晨光大厦/照片/斜俯近景_窗口与墙体_008.jpg
+    capture_session: unknown
+    roles:
+    - empty_negative
+    split: &id035
+      primary: train
+      status: confirmed
+    labels: &id036
+      status: complete
+      scope: frame
+    frame_id: 919db90b7896eff11d10fdf18af09a86c67f2af74fe27abcd99355504d3c4bbc
+    review:
+      state: confirmed_empty
+      origin: machine
+      evidence: frame_environment fire empty_negative current full-frame label observation
+      frame_id: 919db90b7896eff11d10fdf18af09a86c67f2af74fe27abcd99355504d3c4bbc
+  - id: real_92cd0dc88bbd
+    class: task_real
+    kind: parent_video
+    paths:
+    - datasets/raw/shared/backgrounds/camera/三栋楼_路口及垃圾桶_005__167890b926/junction_005_012__8ea0a353ac.jpg
+    parent_group: Archive/Assets/场景/三楼与场地视频/三栋楼_路口及垃圾桶_005.mp4
+    capture_session: unknown
+    roles:
+    - empty_negative
+    split:
+      primary: val
+      status: confirmed
+    labels:
+      status: complete
+      scope: frame
+    frame_id: 92cd0dc88bbd4d1fdeeba3bb85144c4353de6e67252bb973b8f5f8aa019a78d3
+    review:
+      state: confirmed_empty
+      origin: machine
+      evidence: frame_environment fire empty_negative current full-frame label observation
+      frame_id: 92cd0dc88bbd4d1fdeeba3bb85144c4353de6e67252bb973b8f5f8aa019a78d3
+  - id: real_92f30241dd5c
+    class: task_real
+    kind: parent_video
+    paths:
+    - datasets/raw/shared/backgrounds/camera/三栋楼_路口及垃圾桶_005__167890b926/junction_005_003__90c98bc0ea.jpg
+    parent_group: Archive/Assets/场景/三楼与场地视频/三栋楼_路口及垃圾桶_005.mp4
+    capture_session: unknown
+    roles:
+    - empty_negative
+    split:
+      primary: val
+      status: confirmed
+    labels:
+      status: complete
+      scope: frame
+    frame_id: 92f30241dd5c76184303fb0c1ae9946f1499786ec7f7e17ffc2ca25910c3f831
+    review:
+      state: confirmed_empty
+      origin: machine
+      evidence: frame_environment fire empty_negative current full-frame label observation
+      frame_id: 92f30241dd5c76184303fb0c1ae9946f1499786ec7f7e17ffc2ca25910c3f831
+  - id: real_946501aad9bc
+    class: task_real
+    kind: parent_video
+    paths:
+    - datasets/raw/shared/backgrounds/camera/三栋楼_路口及垃圾桶_005__167890b926/junction_005_017__e6a3c0f79b.jpg
+    parent_group: Archive/Assets/场景/三楼与场地视频/三栋楼_路口及垃圾桶_005.mp4
+    capture_session: unknown
+    roles:
+    - empty_negative
+    split:
+      primary: val
+      status: confirmed
+    labels:
+      status: complete
+      scope: frame
+    frame_id: 946501aad9bc9c60dd85cf8b7339044f85515f204c876bf26ccf563e0e47cbd2
+    review:
+      state: confirmed_empty
+      origin: machine
+      evidence: frame_environment fire empty_negative current full-frame label observation
+      frame_id: 946501aad9bc9c60dd85cf8b7339044f85515f204c876bf26ccf563e0e47cbd2
+  - id: real_9a3fced4dcad
+    class: task_real
+    kind: parent_video
+    paths:
+    - datasets/raw/shared/backgrounds/camera/三栋楼_路口及垃圾桶_005__167890b926/junction_005_006__02a65dfef2.jpg
+    parent_group: Archive/Assets/场景/三楼与场地视频/三栋楼_路口及垃圾桶_005.mp4
+    capture_session: unknown
+    roles:
+    - empty_negative
+    split:
+      primary: val
+      status: confirmed
+    labels:
+      status: complete
+      scope: frame
+    frame_id: 9a3fced4dcadeed96b6e967725281d407d60621736f4bcd8a1ef6509966040ec
+    review:
+      state: confirmed_empty
+      origin: machine
+      evidence: frame_environment fire empty_negative current full-frame label observation
+      frame_id: 9a3fced4dcadeed96b6e967725281d407d60621736f4bcd8a1ef6509966040ec
+  - id: real_9b69db70078b
+    class: task_real
+    kind: parent_photo
+    paths:
+    - Archive/Assets/working_sources/legacy/fire/楼宇/锦绣大厦/照片/正面中远景_竖格栅与窗格_015.jpg
+    parent_group: Archive/Assets/楼宇/锦绣大厦/照片/正面中远景_竖格栅与窗格_015.jpg
+    capture_session: unknown
+    roles:
+    - empty_negative
+    split:
+      primary: test
+      status: confirmed
+    labels:
+      status: complete
+      scope: frame
+    frame_id: 9b69db70078b4727bf7f3410370845730a78fc060910ec4047ceb14315c1abe3
+    review:
+      state: confirmed_empty
+      origin: machine
+      evidence: frame_environment fire empty_negative current full-frame label observation
+      frame_id: 9b69db70078b4727bf7f3410370845730a78fc060910ec4047ceb14315c1abe3
+  - id: real_a0d3a487d3e1
+    class: task_real
+    kind: parent_photo
+    paths:
+    - Archive/Assets/working_sources/legacy/fire/楼宇/开心大厦/照片/远距离正面_整体_017.jpg
+    parent_group: Archive/Assets/楼宇/开心大厦/照片/远距离正面_整体_017.jpg
+    capture_session: unknown
+    roles:
+    - empty_negative
+    split:
+      primary: val
+      status: confirmed
+    labels:
+      status: complete
+      scope: frame
+    frame_id: a0d3a487d3e1d3d052a4923670846f6e9dd32593eb5d09d935867846a07b6686
+    review:
+      state: confirmed_empty
+      origin: machine
+      evidence: frame_environment fire empty_negative current full-frame label observation
+      frame_id: a0d3a487d3e1d3d052a4923670846f6e9dd32593eb5d09d935867846a07b6686
+  - id: real_a216ca636fac
+    class: task_real
+    kind: parent_video
+    paths:
+    - datasets/raw/shared/backgrounds/camera/三栋楼_路口及垃圾桶_005__167890b926/junction_005_011__1d84314fd5.jpg
+    parent_group: Archive/Assets/场景/三楼与场地视频/三栋楼_路口及垃圾桶_005.mp4
+    capture_session: unknown
+    roles:
+    - empty_negative
+    split:
+      primary: val
+      status: confirmed
+    labels:
+      status: complete
+      scope: frame
+    frame_id: a216ca636fac990430443e4a775b62b89a0f388186aaff17a39f30622ebc76bf
+    review:
+      state: confirmed_empty
+      origin: machine
+      evidence: frame_environment fire empty_negative current full-frame label observation
+      frame_id: a216ca636fac990430443e4a775b62b89a0f388186aaff17a39f30622ebc76bf
+  - id: real_aa992d7bdea6
+    class: task_real
+    kind: parent_video
+    paths:
+    - datasets/raw/shared/backgrounds/camera/三栋楼_路口及垃圾桶_005__167890b926/junction_005_005__660fc5674a.jpg
+    parent_group: Archive/Assets/场景/三楼与场地视频/三栋楼_路口及垃圾桶_005.mp4
+    capture_session: unknown
+    roles:
+    - empty_negative
+    split:
+      primary: val
+      status: confirmed
+    labels:
+      status: complete
+      scope: frame
+    frame_id: aa992d7bdea6b03c941c840cb52b6364408e4e43fd3e8c409e6157e1513c0a96
+    review:
+      state: confirmed_empty
+      origin: machine
+      evidence: frame_environment fire empty_negative current full-frame label observation
+      frame_id: aa992d7bdea6b03c941c840cb52b6364408e4e43fd3e8c409e6157e1513c0a96
+  - id: real_b4b585ac6e5f
+    class: task_real
+    kind: parent_video
+    paths:
+    - datasets/raw/shared/backgrounds/camera/三栋楼_路口及垃圾桶_005__167890b926/junction_005_008__0617ec0d9d.jpg
+    parent_group: Archive/Assets/场景/三楼与场地视频/三栋楼_路口及垃圾桶_005.mp4
+    capture_session: unknown
+    roles:
+    - empty_negative
+    split:
+      primary: val
+      status: confirmed
+    labels:
+      status: complete
+      scope: frame
+    frame_id: b4b585ac6e5fdb686b9378a2af07e2a14c5a94158ea04d8bc7e7066fb1390ab8
+    review:
+      state: confirmed_empty
+      origin: machine
+      evidence: frame_environment fire empty_negative current full-frame label observation
+      frame_id: b4b585ac6e5fdb686b9378a2af07e2a14c5a94158ea04d8bc7e7066fb1390ab8
+  - id: real_b53b570dd3e5
+    class: task_real
+    kind: parent_photo
+    paths:
+    - Archive/Assets/working_sources/legacy/fire/楼宇/开心大厦/照片/底部近景_开口及底座_016.jpg
+    parent_group: Archive/Assets/楼宇/开心大厦/照片/底部近景_开口及底座_016.jpg
+    capture_session: unknown
+    roles:
+    - empty_negative
+    split:
+      primary: train
+      status: confirmed
+    labels:
+      status: complete
+      scope: frame
+    frame_id: b53b570dd3e5dc1576af46e7946a13b6339b2e3009e4cc9573a4c9e8338155af
+    review:
+      state: confirmed_empty
+      origin: machine
+      evidence: frame_environment fire empty_negative current full-frame label observation
+      frame_id: b53b570dd3e5dc1576af46e7946a13b6339b2e3009e4cc9573a4c9e8338155af
+  - id: real_b7404df8165e
+    class: task_real
+    kind: parent_photo
+    paths:
+    - Archive/Assets/working_sources/legacy/fire/楼宇/开心大厦/照片/正面_楼名_火焰_横向窗洞_004.jpg
+    parent_group: Archive/Assets/楼宇/开心大厦/照片/正面_楼名_火焰_横向窗洞_004.jpg
+    capture_session: unknown
+    roles:
+    - direct_target
+    split:
+      primary: train
+      status: confirmed
+    labels:
+      status: complete
+      scope: frame
+    frame_id: b7404df8165ea6374bfa23c029b8039cb4409d71431bcf8d38222e0f5b42f331
+  - id: real_baffbe618488
+    class: task_real
+    kind: parent_video
+    paths:
+    - datasets/raw/shared/backgrounds/camera/三栋楼_路口及垃圾桶_005__167890b926/junction_005_014__37eddf2e1b.jpg
+    parent_group: Archive/Assets/场景/三楼与场地视频/三栋楼_路口及垃圾桶_005.mp4
+    capture_session: unknown
+    roles:
+    - empty_negative
+    split:
+      primary: val
+      status: confirmed
+    labels:
+      status: complete
+      scope: frame
+    frame_id: baffbe6184884e377233f90c2ec7db2547eebd93cbf317107140e124fdbe9705
+    review:
+      state: confirmed_empty
+      origin: machine
+      evidence: frame_environment fire empty_negative current full-frame label observation
+      frame_id: baffbe6184884e377233f90c2ec7db2547eebd93cbf317107140e124fdbe9705
+  - id: real_baffcaa63a1b
+    class: task_real
+    kind: parent_video
+    paths:
+    - datasets/raw/shared/backgrounds/camera/三栋楼_路口及垃圾桶_005__167890b926/junction_005_019__f5becd2063.jpg
+    parent_group: Archive/Assets/场景/三楼与场地视频/三栋楼_路口及垃圾桶_005.mp4
+    capture_session: unknown
+    roles:
+    - empty_negative
+    split:
+      primary: val
+      status: confirmed
+    labels:
+      status: complete
+      scope: frame
+    frame_id: baffcaa63a1bf2c5a4a9cec1fd73fafa86d3fb25434759528bd4336e2a76bc23
+    review:
+      state: confirmed_empty
+      origin: machine
+      evidence: frame_environment fire empty_negative current full-frame label observation
+      frame_id: baffcaa63a1bf2c5a4a9cec1fd73fafa86d3fb25434759528bd4336e2a76bc23
+  - id: real_c8ab89990415
+    class: task_real
+    kind: parent_video
+    paths:
+    - datasets/raw/shared/backgrounds/camera/三栋楼_路口及垃圾桶_005__167890b926/junction_005_020__a9b31ea32e.jpg
+    parent_group: Archive/Assets/场景/三楼与场地视频/三栋楼_路口及垃圾桶_005.mp4
+    capture_session: unknown
+    roles:
+    - empty_negative
+    split:
+      primary: val
+      status: confirmed
+    labels:
+      status: complete
+      scope: frame
+    frame_id: c8ab8999041572a39bdd680cc557949bc99e04b5aa72c0cc84ffe02b42112693
+    review:
+      state: confirmed_empty
+      origin: machine
+      evidence: frame_environment fire empty_negative current full-frame label observation
+      frame_id: c8ab8999041572a39bdd680cc557949bc99e04b5aa72c0cc84ffe02b42112693
+  - id: real_ca034e5ac4ac
+    class: task_real
+    kind: parent_video
+    paths:
+    - datasets/raw/shared/backgrounds/camera/三栋楼_路口及垃圾桶_005__167890b926/junction_005_013__7e36f59ba1.jpg
+    parent_group: Archive/Assets/场景/三楼与场地视频/三栋楼_路口及垃圾桶_005.mp4
+    capture_session: unknown
+    roles:
+    - empty_negative
+    split:
+      primary: val
+      status: confirmed
+    labels:
+      status: complete
+      scope: frame
+    frame_id: ca034e5ac4ac0c7ea0c7caf501beaba629f83960e2d59a26dc67a2df7d580fff
+    review:
+      state: confirmed_empty
+      origin: machine
+      evidence: frame_environment fire empty_negative current full-frame label observation
+      frame_id: ca034e5ac4ac0c7ea0c7caf501beaba629f83960e2d59a26dc67a2df7d580fff
+  - id: real_cc0235f45aab
+    class: task_real
+    kind: parent_video
+    paths:
+    - datasets/raw/shared/backgrounds/camera/三栋楼_路口及垃圾桶_005__167890b926/junction_005_010__3d4e7b70da.jpg
+    parent_group: Archive/Assets/场景/三楼与场地视频/三栋楼_路口及垃圾桶_005.mp4
+    capture_session: unknown
+    roles:
+    - empty_negative
+    split:
+      primary: val
+      status: confirmed
+    labels:
+      status: complete
+      scope: frame
+    frame_id: cc0235f45aab30a5d26f2ab611aecd4363e0e1ee9b8aeb6223f6ae58f36c42b3
+    review:
+      state: confirmed_empty
+      origin: machine
+      evidence: frame_environment fire empty_negative current full-frame label observation
+      frame_id: cc0235f45aab30a5d26f2ab611aecd4363e0e1ee9b8aeb6223f6ae58f36c42b3
+  - id: real_d75e716b5560
+    class: task_real
+    kind: parent_photo
+    paths:
+    - Archive/Assets/working_sources/legacy/fire/楼宇/晨光大厦/照片/俯视_L形屋顶及立面_009.jpg
+    parent_group: Archive/Assets/楼宇/晨光大厦/照片/俯视_L形屋顶及立面_009.jpg
+    capture_session: unknown
+    roles:
+    - empty_negative
+    split:
+      primary: train
+      status: confirmed
+    labels:
+      status: complete
+      scope: frame
+    frame_id: d75e716b5560eaba0b0c0e768a29846f64cc6160685edd4fec143807a05b8a92
+    review:
+      state: confirmed_empty
+      origin: machine
+      evidence: frame_environment fire empty_negative current full-frame label observation
+      frame_id: d75e716b5560eaba0b0c0e768a29846f64cc6160685edd4fec143807a05b8a92
+  - id: real_d89627fdcd16
+    class: task_real
+    kind: parent_video
+    paths:
+    - datasets/raw/shared/backgrounds/camera/三栋楼_路口及垃圾桶_005__167890b926/junction_005_016__28f9ce0580.jpg
+    parent_group: Archive/Assets/场景/三楼与场地视频/三栋楼_路口及垃圾桶_005.mp4
+    capture_session: unknown
+    roles:
+    - empty_negative
+    split:
+      primary: val
+      status: confirmed
+    labels:
+      status: complete
+      scope: frame
+    frame_id: d89627fdcd16094e559e68582153abf870562eb01a82eb2f5318c63c477fcf41
+    review:
+      state: confirmed_empty
+      origin: machine
+      evidence: frame_environment fire empty_negative current full-frame label observation
+      frame_id: d89627fdcd16094e559e68582153abf870562eb01a82eb2f5318c63c477fcf41
+  - id: real_de4bc035158f
+    class: task_real
+    kind: parent_video
+    paths:
+    - datasets/raw/shared/backgrounds/camera/三栋楼_路口及垃圾桶_005__167890b926/junction_005_004__f8cc88d641.jpg
+    parent_group: Archive/Assets/场景/三楼与场地视频/三栋楼_路口及垃圾桶_005.mp4
+    capture_session: unknown
+    roles:
+    - empty_negative
+    split:
+      primary: val
+      status: confirmed
+    labels:
+      status: complete
+      scope: frame
+    frame_id: de4bc035158f3a2c673860d6f9b74f3ea9ed468c0551b5460a9268a39b34f27e
+    review:
+      state: confirmed_empty
+      origin: machine
+      evidence: frame_environment fire empty_negative current full-frame label observation
+      frame_id: de4bc035158f3a2c673860d6f9b74f3ea9ed468c0551b5460a9268a39b34f27e
+  - id: real_ded3e45e68dd
+    class: task_real
+    kind: parent_photo
+    paths: &id037
+    - Archive/Assets/working_sources/legacy/fire/楼宇/锦绣大厦/照片/正侧斜视_竖格栅及侧面_011.jpg
+    parent_group: Archive/Assets/楼宇/锦绣大厦/照片/正侧斜视_竖格栅及侧面_011.jpg
+    capture_session: unknown
+    roles:
+    - empty_negative
+    split: &id038
+      primary: train
+      status: confirmed
+    labels: &id039
+      status: complete
+      scope: frame
+    frame_id: ded3e45e68ddc6a9000472635f3754cf181dd97294e9473b0c112935dbdd6c7a
+    review:
+      state: confirmed_empty
+      origin: machine
+      evidence: frame_environment fire empty_negative current full-frame label observation
+      frame_id: ded3e45e68ddc6a9000472635f3754cf181dd97294e9473b0c112935dbdd6c7a
+  - id: real_ea605bd74722
+    class: task_real
+    kind: parent_video
+    paths:
+    - datasets/raw/shared/backgrounds/camera/三栋楼_路口及垃圾桶_005__167890b926/junction_005_018__96e4d11cfb.jpg
+    parent_group: Archive/Assets/场景/三楼与场地视频/三栋楼_路口及垃圾桶_005.mp4
+    capture_session: unknown
+    roles:
+    - empty_negative
+    split:
+      primary: val
+      status: confirmed
+    labels:
+      status: complete
+      scope: frame
+    frame_id: ea605bd74722493b52b03c5f58e6a365798a52d17427b1fde80b8ad746020def
+    review:
+      state: confirmed_empty
+      origin: machine
+      evidence: frame_environment fire empty_negative current full-frame label observation
+      frame_id: ea605bd74722493b52b03c5f58e6a365798a52d17427b1fde80b8ad746020def
+  - id: real_f0ed3594b6a8
+    class: task_real
+    kind: parent_photo
+    paths: &id040
+    - Archive/Assets/working_sources/legacy/fire/楼宇/晨光大厦/照片/左侧_外墙小窗洞_022.jpg
+    parent_group: Archive/Assets/楼宇/晨光大厦/照片/左侧_外墙小窗洞_022.jpg
+    capture_session: unknown
+    roles:
+    - empty_negative
+    split: &id041
+      primary: train
+      status: confirmed
+    labels: &id042
+      status: complete
+      scope: frame
+    frame_id: f0ed3594b6a8d1a43082ae7cb5b6c6a05ea1d8a9d9869dcff758d0a9554d5c98
+    review:
+      state: confirmed_empty
+      origin: machine
+      evidence: frame_environment fire empty_negative current full-frame label observation
+      frame_id: f0ed3594b6a8d1a43082ae7cb5b6c6a05ea1d8a9d9869dcff758d0a9554d5c98
+  - id: real_f6370bb4661b
+    class: task_real
+    kind: parent_photo
+    paths:
+    - Archive/Assets/working_sources/legacy/fire/楼宇/开心大厦/照片/背面_小窗洞和分层_003.jpg
+    parent_group: Archive/Assets/楼宇/开心大厦/照片/背面_小窗洞和分层_003.jpg
+    capture_session: unknown
+    roles:
+    - empty_negative
+    split:
+      primary: val
+      status: confirmed
+    labels:
+      status: complete
+      scope: frame
+    frame_id: f6370bb4661b297ae34b197c954dc730f15b318788d9acc10ff4bad90eaabe94
+    review:
+      state: confirmed_empty
+      origin: machine
+      evidence: frame_environment fire empty_negative current full-frame label observation
+      frame_id: f6370bb4661b297ae34b197c954dc730f15b318788d9acc10ff4bad90eaabe94
+  - id: real_ffed24136e0a
+    class: task_real
+    kind: parent_photo
+    paths: &id043
+    - Archive/Assets/working_sources/legacy/fire/楼宇/锦绣大厦/照片/正面中景_中央竖格栅_007.jpg
+    parent_group: Archive/Assets/楼宇/锦绣大厦/照片/正面中景_中央竖格栅_007.jpg
+    capture_session: unknown
+    roles:
+    - empty_negative
+    split: &id044
+      primary: val
+      status: confirmed
+    labels: &id045
+      status: complete
+      scope: frame
+    frame_id: ffed24136e0ab905575e487430836ba957cee9e74706186baa7cad3df6c3a814
+    review:
+      state: confirmed_empty
+      origin: machine
+      evidence: frame_environment fire empty_negative current full-frame label observation
+      frame_id: ffed24136e0ab905575e487430836ba957cee9e74706186baa7cad3df6c3a814
+  - id: hard_negative_068f6b927d6f
+    class: task_real
+    kind: parent_video
+    paths:
+    - datasets/raw/shared/backgrounds/camera/四色桶较低视角_灰绿闭盖_红蓝开盖_004__79b531f150/bins_004_003__ef1116a345.jpg
+    parent_group: Archive/Assets/垃圾桶/视频/四色桶较低视角_灰绿闭盖_红蓝开盖_004.mp4
+    capture_session: unknown
+    roles:
+    - empty_negative
+    split:
+      primary: val
+      status: confirmed
+    labels:
+      status: complete
+      scope: frame
+    frame_id: 068f6b927d6f57af281bdfbb32eeba82781ef1f33ea29b7ba520ef6964fb05d0
+    review:
+      state: confirmed_empty
+      origin: machine
+      evidence: datasets/annotated/fire/hard_negative_review/replacement_real_review.jsonl
+      distractor: red_orange_bin
+  - id: hard_negative_16309e4c21b9
+    class: task_real
+    kind: parent_video
+    paths:
+    - datasets/raw/shared/backgrounds/camera/四色桶较低视角_灰绿闭盖_红蓝开盖_004__79b531f150/bins_004_001__4745c0e78a.jpg
+    parent_group: Archive/Assets/垃圾桶/视频/四色桶较低视角_灰绿闭盖_红蓝开盖_004.mp4
+    capture_session: unknown
+    roles:
+    - empty_negative
+    split:
+      primary: val
+      status: confirmed
+    labels:
+      status: complete
+      scope: frame
+    frame_id: 16309e4c21b9fad0674b2a2511fb4b374fa5fa36d5ab10dbfc1675be8310bbcd
+    review:
+      state: confirmed_empty
+      origin: machine
+      evidence: datasets/annotated/fire/hard_negative_review/replacement_real_review.jsonl
+      distractor: red_orange_bin
+  - id: hard_negative_23ecdc290632
+    class: task_real
+    kind: parent_video
+    paths:
+    - datasets/raw/shared/backgrounds/camera/四色桶较低视角_灰绿闭盖_红蓝开盖_004__79b531f150/bins_004_013__ac75954ee3.jpg
+    parent_group: Archive/Assets/垃圾桶/视频/四色桶较低视角_灰绿闭盖_红蓝开盖_004.mp4
+    capture_session: unknown
+    roles:
+    - empty_negative
+    split:
+      primary: val
+      status: confirmed
+    labels:
+      status: complete
+      scope: frame
+    frame_id: 23ecdc290632de8807cfc3be866f0b968893d9d0a12ed298376990d130eba60e
+    review:
+      state: confirmed_empty
+      origin: machine
+      evidence: datasets/annotated/fire/hard_negative_review/replacement_real_review.jsonl
+      distractor: red_orange_bin
+  - id: hard_negative_49d6ab1cf4f0
+    class: task_real
+    kind: parent_video
+    paths:
+    - datasets/raw/shared/backgrounds/camera/四色桶较低视角_灰绿闭盖_红蓝开盖_004__79b531f150/bins_004_009__c74cbabad9.jpg
+    parent_group: Archive/Assets/垃圾桶/视频/四色桶较低视角_灰绿闭盖_红蓝开盖_004.mp4
+    capture_session: unknown
+    roles:
+    - empty_negative
+    split:
+      primary: val
+      status: confirmed
+    labels:
+      status: complete
+      scope: frame
+    frame_id: 49d6ab1cf4f01efd4c80efc54ce2c25137628a7f43a4cb2ae0706e9ad85fc1c6
+    review:
+      state: confirmed_empty
+      origin: machine
+      evidence: datasets/annotated/fire/hard_negative_review/replacement_real_review.jsonl
+      distractor: red_orange_bin
+  - id: hard_negative_64fab8cb60b3
+    class: task_real
+    kind: parent_video
+    paths:
+    - datasets/raw/shared/backgrounds/camera/四色桶较低视角_灰绿闭盖_红蓝开盖_004__79b531f150/bins_004_020__a7f7282322.jpg
+    parent_group: Archive/Assets/垃圾桶/视频/四色桶较低视角_灰绿闭盖_红蓝开盖_004.mp4
+    capture_session: unknown
+    roles:
+    - empty_negative
+    split:
+      primary: val
+      status: confirmed
+    labels:
+      status: complete
+      scope: frame
+    frame_id: 64fab8cb60b3fd728b503dd2a0bc5ff23679d961c4081dc194edca9f4a01abf3
+    review:
+      state: confirmed_empty
+      origin: machine
+      evidence: datasets/annotated/fire/hard_negative_review/replacement_real_review.jsonl
+      distractor: red_orange_bin
+  - id: hard_negative_651f8ca75aaa
+    class: task_real
+    kind: parent_video
+    paths:
+    - datasets/raw/shared/backgrounds/camera/四色桶较低视角_灰绿闭盖_红蓝开盖_004__79b531f150/bins_004_017__5cc1636b58.jpg
+    parent_group: Archive/Assets/垃圾桶/视频/四色桶较低视角_灰绿闭盖_红蓝开盖_004.mp4
+    capture_session: unknown
+    roles:
+    - empty_negative
+    split:
+      primary: val
+      status: confirmed
+    labels:
+      status: complete
+      scope: frame
+    frame_id: 651f8ca75aaada9f09000e530852fd1ea5e00034eaa639d8fb82a287d05b69f3
+    review:
+      state: confirmed_empty
+      origin: machine
+      evidence: datasets/annotated/fire/hard_negative_review/replacement_real_review.jsonl
+      distractor: red_orange_bin
+  - id: hard_negative_6ed5fc9d785b
+    class: task_real
+    kind: parent_video
+    paths:
+    - datasets/raw/shared/backgrounds/camera/四色桶较低视角_灰绿闭盖_红蓝开盖_004__79b531f150/bins_004_010__b936d07443.jpg
+    parent_group: Archive/Assets/垃圾桶/视频/四色桶较低视角_灰绿闭盖_红蓝开盖_004.mp4
+    capture_session: unknown
+    roles:
+    - empty_negative
+    split:
+      primary: val
+      status: confirmed
+    labels:
+      status: complete
+      scope: frame
+    frame_id: 6ed5fc9d785b2e35d3f43b2e2c2b0b3238e6072756c9e3302ea8fe6a0c666998
+    review:
+      state: confirmed_empty
+      origin: machine
+      evidence: datasets/annotated/fire/hard_negative_review/replacement_real_review.jsonl
+      distractor: red_orange_bin
+  - id: hard_negative_7a90104637bd
+    class: task_real
+    kind: parent_video
+    paths:
+    - datasets/raw/shared/backgrounds/camera/四色桶较低视角_灰绿闭盖_红蓝开盖_004__79b531f150/bins_004_002__a75c421c66.jpg
+    parent_group: Archive/Assets/垃圾桶/视频/四色桶较低视角_灰绿闭盖_红蓝开盖_004.mp4
+    capture_session: unknown
+    roles:
+    - empty_negative
+    split:
+      primary: val
+      status: confirmed
+    labels:
+      status: complete
+      scope: frame
+    frame_id: 7a90104637bda63ca008ed9ef46757676c98d29982edfe3391cdb8bd9fdd8c01
+    review:
+      state: confirmed_empty
+      origin: machine
+      evidence: datasets/annotated/fire/hard_negative_review/replacement_real_review.jsonl
+      distractor: red_orange_bin
+  - id: hard_negative_81b785cdb1bc
+    class: task_real
+    kind: parent_video
+    paths:
+    - datasets/raw/shared/backgrounds/camera/四色桶较低视角_灰绿闭盖_红蓝开盖_004__79b531f150/bins_004_011__4241d9bbf7.jpg
+    parent_group: Archive/Assets/垃圾桶/视频/四色桶较低视角_灰绿闭盖_红蓝开盖_004.mp4
+    capture_session: unknown
+    roles:
+    - empty_negative
+    split:
+      primary: val
+      status: confirmed
+    labels:
+      status: complete
+      scope: frame
+    frame_id: 81b785cdb1bc957b1956b06821bb1f2b3be26742fe85bee778ee86403e81b4f6
+    review:
+      state: confirmed_empty
+      origin: machine
+      evidence: datasets/annotated/fire/hard_negative_review/replacement_real_review.jsonl
+      distractor: red_orange_bin
+  - id: hard_negative_9c270deb788b
+    class: task_real
+    kind: parent_video
+    paths:
+    - datasets/raw/shared/backgrounds/camera/四色桶较低视角_灰绿闭盖_红蓝开盖_004__79b531f150/bins_004_018__e302af1e43.jpg
+    parent_group: Archive/Assets/垃圾桶/视频/四色桶较低视角_灰绿闭盖_红蓝开盖_004.mp4
+    capture_session: unknown
+    roles:
+    - empty_negative
+    split:
+      primary: val
+      status: confirmed
+    labels:
+      status: complete
+      scope: frame
+    frame_id: 9c270deb788b8d0caf673877293f2922ead0a692d202857e33476c00e0a01d1b
+    review:
+      state: confirmed_empty
+      origin: machine
+      evidence: datasets/annotated/fire/hard_negative_review/replacement_real_review.jsonl
+      distractor: red_orange_bin
+  - id: hard_negative_a07d7e2ebfe5
+    class: task_real
+    kind: parent_video
+    paths:
+    - datasets/raw/shared/backgrounds/camera/四色桶较低视角_灰绿闭盖_红蓝开盖_004__79b531f150/bins_004_014__7a67a78ff2.jpg
+    parent_group: Archive/Assets/垃圾桶/视频/四色桶较低视角_灰绿闭盖_红蓝开盖_004.mp4
+    capture_session: unknown
+    roles:
+    - empty_negative
+    split:
+      primary: val
+      status: confirmed
+    labels:
+      status: complete
+      scope: frame
+    frame_id: a07d7e2ebfe573c385d4ddde93c336658aa0bef9fa05a1ea219a19e176af043f
+    review:
+      state: confirmed_empty
+      origin: machine
+      evidence: datasets/annotated/fire/hard_negative_review/replacement_real_review.jsonl
+      distractor: red_orange_bin
+  - id: hard_negative_e2389c4fec15
+    class: task_real
+    kind: parent_video
+    paths:
+    - datasets/raw/shared/backgrounds/camera/四色桶较低视角_灰绿闭盖_红蓝开盖_004__79b531f150/bins_004_005__4664db261f.jpg
+    parent_group: Archive/Assets/垃圾桶/视频/四色桶较低视角_灰绿闭盖_红蓝开盖_004.mp4
+    capture_session: unknown
+    roles:
+    - empty_negative
+    split:
+      primary: val
+      status: confirmed
+    labels:
+      status: complete
+      scope: frame
+    frame_id: e2389c4fec1515ddb2a64b0ed0e96924b4666297b7908435807748036d05f925
+    review:
+      state: confirmed_empty
+      origin: machine
+      evidence: datasets/annotated/fire/hard_negative_review/replacement_real_review.jsonl
+      distractor: red_orange_bin
+  - id: hard_negative_e412b1ec1add
+    class: task_real
+    kind: parent_video
+    paths:
+    - datasets/raw/shared/backgrounds/camera/四色桶较低视角_灰绿闭盖_红蓝开盖_004__79b531f150/bins_004_007__d80ac71e8b.jpg
+    parent_group: Archive/Assets/垃圾桶/视频/四色桶较低视角_灰绿闭盖_红蓝开盖_004.mp4
+    capture_session: unknown
+    roles:
+    - empty_negative
+    split:
+      primary: val
+      status: confirmed
+    labels:
+      status: complete
+      scope: frame
+    frame_id: e412b1ec1add1e3567e9cced68f249b337d3f348002fe8a0f3d62ea10452b4b1
+    review:
+      state: confirmed_empty
+      origin: machine
+      evidence: datasets/annotated/fire/hard_negative_review/replacement_real_review.jsonl
+      distractor: red_orange_bin
+  - id: hard_negative_fb5a5c23695f
+    class: task_real
+    kind: parent_video
+    paths:
+    - datasets/raw/shared/backgrounds/camera/四色桶较低视角_灰绿闭盖_红蓝开盖_004__79b531f150/bins_004_006__61a414d86b.jpg
+    parent_group: Archive/Assets/垃圾桶/视频/四色桶较低视角_灰绿闭盖_红蓝开盖_004.mp4
+    capture_session: unknown
+    roles:
+    - empty_negative
+    split:
+      primary: val
+      status: confirmed
+    labels:
+      status: complete
+      scope: frame
+    frame_id: fb5a5c23695f17c2df31ca6d721f0ae728bd87163c9b119c75e686e151a0d325
+    review:
+      state: confirmed_empty
+      origin: machine
+      evidence: datasets/annotated/fire/hard_negative_review/replacement_real_review.jsonl
+      distractor: red_orange_bin
+  - id: hard_negative_fd7505fac8b1
+    class: task_real
+    kind: parent_video
+    paths:
+    - datasets/raw/shared/backgrounds/camera/四色桶较低视角_灰绿闭盖_红蓝开盖_004__79b531f150/bins_004_015__8f23ecb709.jpg
+    parent_group: Archive/Assets/垃圾桶/视频/四色桶较低视角_灰绿闭盖_红蓝开盖_004.mp4
+    capture_session: unknown
+    roles:
+    - empty_negative
+    split:
+      primary: val
+      status: confirmed
+    labels:
+      status: complete
+      scope: frame
+    frame_id: fd7505fac8b102e8c82838dabcd0641365ad66d77a4b97749f5edea2d677d390
+    review:
+      state: confirmed_empty
+      origin: machine
+      evidence: datasets/annotated/fire/hard_negative_review/replacement_real_review.jsonl
+      distractor: red_orange_bin
+  - id: hard_negative_661ce1301a00
+    class: task_real
+    kind: parent_video
+    paths:
+    - datasets/raw/fire/targets/camera/bin_video_007/frames/frame_000092.jpg
+    parent_group: Archive/Assets/垃圾桶/视频/浅色地面四色桶_灰绿闭盖_红蓝开盖_007.mp4
+    capture_session: unknown
+    roles:
+    - empty_negative
+    split:
+      primary: test
+      status: confirmed
+    labels:
+      status: complete
+      scope: frame
+    frame_id: 661ce1301a004936ff9a9ac4f1a825245f11f95bd6d375b1c4e31d7e219d8219
+    review:
+      state: confirmed_empty
+      origin: machine
+      evidence: datasets/annotated/fire/hard_negative_review/replacement_real_review.jsonl
+      distractor: red_orange_bin
+  - id: hard_negative_6a0180b79fe8
+    class: task_real
+    kind: parent_video
+    paths:
+    - datasets/raw/fire/targets/camera/bin_video_007/frames/frame_000308.jpg
+    parent_group: Archive/Assets/垃圾桶/视频/浅色地面四色桶_灰绿闭盖_红蓝开盖_007.mp4
+    capture_session: unknown
+    roles:
+    - empty_negative
+    split:
+      primary: test
+      status: confirmed
+    labels:
+      status: complete
+      scope: frame
+    frame_id: 6a0180b79fe828ea30affa6fcbb55df875f69bb71e09ff6b7453eb58762cc1a0
+    review:
+      state: confirmed_empty
+      origin: machine
+      evidence: datasets/annotated/fire/hard_negative_review/replacement_real_review.jsonl
+      distractor: red_orange_bin
+  - id: hard_negative_7ebef6dc4756
+    class: task_real
+    kind: parent_video
+    paths:
+    - datasets/raw/fire/targets/camera/bin_video_007/frames/frame_000265.jpg
+    parent_group: Archive/Assets/垃圾桶/视频/浅色地面四色桶_灰绿闭盖_红蓝开盖_007.mp4
+    capture_session: unknown
+    roles:
+    - empty_negative
+    split:
+      primary: test
+      status: confirmed
+    labels:
+      status: complete
+      scope: frame
+    frame_id: 7ebef6dc47566dd409a5e175093ae5ae8a6c5fc45a5005d7699a7143f1c53d9f
+    review:
+      state: confirmed_empty
+      origin: machine
+      evidence: datasets/annotated/fire/hard_negative_review/replacement_real_review.jsonl
+      distractor: red_orange_bin
+  - id: hard_negative_84c0db3034bc
+    class: task_real
+    kind: parent_video
+    paths:
+    - datasets/raw/fire/targets/camera/bin_video_007/frames/frame_000243.jpg
+    parent_group: Archive/Assets/垃圾桶/视频/浅色地面四色桶_灰绿闭盖_红蓝开盖_007.mp4
+    capture_session: unknown
+    roles:
+    - empty_negative
+    split:
+      primary: test
+      status: confirmed
+    labels:
+      status: complete
+      scope: frame
+    frame_id: 84c0db3034bc0d791ea0d11ddd85018f15cc74aaee8be3d5801a9f9ef824a2a3
+    review:
+      state: confirmed_empty
+      origin: machine
+      evidence: datasets/annotated/fire/hard_negative_review/replacement_real_review.jsonl
+      distractor: red_orange_bin
+  - id: hard_negative_918d50797389
+    class: task_real
+    kind: parent_video
+    paths:
+    - datasets/raw/fire/targets/camera/bin_video_007/frames/frame_000049.jpg
+    parent_group: Archive/Assets/垃圾桶/视频/浅色地面四色桶_灰绿闭盖_红蓝开盖_007.mp4
+    capture_session: unknown
+    roles:
+    - empty_negative
+    split:
+      primary: test
+      status: confirmed
+    labels:
+      status: complete
+      scope: frame
+    frame_id: 918d5079738926f54f4fb187bcef096b075cf101d567685b1ff284ba787458c9
+    review:
+      state: confirmed_empty
+      origin: machine
+      evidence: datasets/annotated/fire/hard_negative_review/replacement_real_review.jsonl
+      distractor: red_orange_bin
+  - id: hard_negative_9d6052e0ed8c
+    class: task_real
+    kind: parent_video
+    paths:
+    - datasets/raw/fire/targets/camera/bin_video_007/frames/frame_000028.jpg
+    parent_group: Archive/Assets/垃圾桶/视频/浅色地面四色桶_灰绿闭盖_红蓝开盖_007.mp4
+    capture_session: unknown
+    roles:
+    - empty_negative
+    split:
+      primary: test
+      status: confirmed
+    labels:
+      status: complete
+      scope: frame
+    frame_id: 9d6052e0ed8c6e050ab0b19655562c21439eaeccc316ea6f15c740ae1afd8fbd
+    review:
+      state: confirmed_empty
+      origin: machine
+      evidence: datasets/annotated/fire/hard_negative_review/replacement_real_review.jsonl
+      distractor: red_orange_bin
+  - id: hard_negative_add6bdfb11a1
+    class: task_real
+    kind: parent_video
+    paths:
+    - datasets/raw/fire/targets/camera/bin_video_007/frames/frame_000071.jpg
+    parent_group: Archive/Assets/垃圾桶/视频/浅色地面四色桶_灰绿闭盖_红蓝开盖_007.mp4
+    capture_session: unknown
+    roles:
+    - empty_negative
+    split:
+      primary: test
+      status: confirmed
+    labels:
+      status: complete
+      scope: frame
+    frame_id: add6bdfb11a1c3f15803dcd1eb85c72d3c5db06b7206a8b3f229c7ac7bc4c1cd
+    review:
+      state: confirmed_empty
+      origin: machine
+      evidence: datasets/annotated/fire/hard_negative_review/replacement_real_review.jsonl
+      distractor: red_orange_bin
+  - id: hard_negative_b8c2e6771193
+    class: task_real
+    kind: parent_video
+    paths:
+    - datasets/raw/fire/targets/camera/bin_video_007/frames/frame_000330.jpg
+    parent_group: Archive/Assets/垃圾桶/视频/浅色地面四色桶_灰绿闭盖_红蓝开盖_007.mp4
+    capture_session: unknown
+    roles:
+    - empty_negative
+    split:
+      primary: test
+      status: confirmed
+    labels:
+      status: complete
+      scope: frame
+    frame_id: b8c2e67711933494b500fa244428355719947b8d192904002d6c1205ab068253
+    review:
+      state: confirmed_empty
+      origin: machine
+      evidence: datasets/annotated/fire/hard_negative_review/replacement_real_review.jsonl
+      distractor: red_orange_bin
+  - id: hard_negative_bc9d7360c513
+    class: task_real
+    kind: parent_video
+    paths:
+    - datasets/raw/fire/targets/camera/bin_video_007/frames/frame_000135.jpg
+    parent_group: Archive/Assets/垃圾桶/视频/浅色地面四色桶_灰绿闭盖_红蓝开盖_007.mp4
+    capture_session: unknown
+    roles:
+    - empty_negative
+    split:
+      primary: test
+      status: confirmed
+    labels:
+      status: complete
+      scope: frame
+    frame_id: bc9d7360c513903617a1475617e78d84aa406d0a1017affab1041dde77a6d9a4
+    review:
+      state: confirmed_empty
+      origin: machine
+      evidence: datasets/annotated/fire/hard_negative_review/replacement_real_review.jsonl
+      distractor: red_orange_bin
+  - id: hard_negative_bdbbb4710462
+    class: task_real
+    kind: parent_video
+    paths:
+    - datasets/raw/fire/targets/camera/bin_video_007/frames/frame_000114.jpg
+    parent_group: Archive/Assets/垃圾桶/视频/浅色地面四色桶_灰绿闭盖_红蓝开盖_007.mp4
+    capture_session: unknown
+    roles:
+    - empty_negative
+    split:
+      primary: test
+      status: confirmed
+    labels:
+      status: complete
+      scope: frame
+    frame_id: bdbbb4710462a83ac2857c7a453ae73de735869bb5686f451bb6b911c8b062d4
+    review:
+      state: confirmed_empty
+      origin: machine
+      evidence: datasets/annotated/fire/hard_negative_review/replacement_real_review.jsonl
+      distractor: red_orange_bin
+  - id: hard_negative_e71fa6a7526e
+    class: task_real
+    kind: parent_video
+    paths:
+    - datasets/raw/fire/targets/camera/bin_video_007/frames/frame_000179.jpg
+    parent_group: Archive/Assets/垃圾桶/视频/浅色地面四色桶_灰绿闭盖_红蓝开盖_007.mp4
+    capture_session: unknown
+    roles:
+    - empty_negative
+    split:
+      primary: test
+      status: confirmed
+    labels:
+      status: complete
+      scope: frame
+    frame_id: e71fa6a7526eda447ad709daff9adff0a8f68fc807bc32d1648e5de172db589e
+    review:
+      state: confirmed_empty
+      origin: machine
+      evidence: datasets/annotated/fire/hard_negative_review/replacement_real_review.jsonl
+      distractor: red_orange_bin
+  - id: hard_negative_e983006256f3
+    class: task_real
+    kind: parent_video
+    paths:
+    - datasets/raw/fire/targets/camera/bin_video_007/frames/frame_000157.jpg
+    parent_group: Archive/Assets/垃圾桶/视频/浅色地面四色桶_灰绿闭盖_红蓝开盖_007.mp4
+    capture_session: unknown
+    roles:
+    - empty_negative
+    split:
+      primary: test
+      status: confirmed
+    labels:
+      status: complete
+      scope: frame
+    frame_id: e983006256f34116c4fcb7a559f15f2686d002cc9adb87b2a1e4f492692c621f
+    review:
+      state: confirmed_empty
+      origin: machine
+      evidence: datasets/annotated/fire/hard_negative_review/replacement_real_review.jsonl
+      distractor: red_orange_bin
+  - id: hard_negative_e9e12262dbc8
+    class: task_real
+    kind: parent_video
+    paths:
+    - datasets/raw/fire/targets/camera/bin_video_007/frames/frame_000200.jpg
+    parent_group: Archive/Assets/垃圾桶/视频/浅色地面四色桶_灰绿闭盖_红蓝开盖_007.mp4
+    capture_session: unknown
+    roles:
+    - empty_negative
+    split:
+      primary: test
+      status: confirmed
+    labels:
+      status: complete
+      scope: frame
+    frame_id: e9e12262dbc8108f90193d0c522786022392f996429febcb0135dd2861addf94
+    review:
+      state: confirmed_empty
+      origin: machine
+      evidence: datasets/annotated/fire/hard_negative_review/replacement_real_review.jsonl
+      distractor: red_orange_bin
+  - id: hard_negative_ed59eefdb632
+    class: task_real
+    kind: parent_video
+    paths:
+    - datasets/raw/fire/targets/camera/bin_video_007/frames/frame_000222.jpg
+    parent_group: Archive/Assets/垃圾桶/视频/浅色地面四色桶_灰绿闭盖_红蓝开盖_007.mp4
+    capture_session: unknown
+    roles:
+    - empty_negative
+    split:
+      primary: test
+      status: confirmed
+    labels:
+      status: complete
+      scope: frame
+    frame_id: ed59eefdb6328c4d698cf640c1c1a625b2d95eff72edf00356da86091138a30d
+    review:
+      state: confirmed_empty
+      origin: machine
+      evidence: datasets/annotated/fire/hard_negative_review/replacement_real_review.jsonl
+      distractor: red_orange_bin
+  - id: hard_negative_f5a907338555
+    class: task_real
+    kind: parent_video
+    paths:
+    - datasets/raw/fire/targets/camera/bin_video_007/frames/frame_000286.jpg
+    parent_group: Archive/Assets/垃圾桶/视频/浅色地面四色桶_灰绿闭盖_红蓝开盖_007.mp4
+    capture_session: unknown
+    roles:
+    - empty_negative
+    split:
+      primary: test
+      status: confirmed
+    labels:
+      status: complete
+      scope: frame
+    frame_id: f5a907338555fedba67ed615cf76a343cac1496963e70960bbc73c184a9a0bae
+    review:
+      state: confirmed_empty
+      origin: machine
+      evidence: datasets/annotated/fire/hard_negative_review/replacement_real_review.jsonl
+      distractor: red_orange_bin
   backgrounds:
-    - id: bg_site_003
-      class: background
-      kind: parent_video
-      paths: [datasets/raw/site_archive_legacy/场景/三楼与场地视频/三栋楼_垃圾桶与路口_003.mp4]
-      evidence:
-        - {manifest: datasets/annotated/mixed_scene/v4_compositing_backgrounds_20261113/manifest.json}
-      review: {state: candidate_empty, method: contact_sheet, accepted_by: null}
-      labels: {status: unknown}
-      roles: [composite_background]
-      split: {primary: train, status: proposed}
-      plan: null
-    - id: bg_site_005
-      class: background
-      kind: parent_video
-      paths: [datasets/raw/site_archive_legacy/场景/三楼与场地视频/三栋楼_路口及垃圾桶_005.mp4]
-      evidence:
-        - {manifest: datasets/annotated/mixed_scene/v4_compositing_backgrounds_20261113/manifest.json}
-      review: {state: candidate_empty, method: contact_sheet, accepted_by: null}
-      labels: {status: unknown}
-      roles: [composite_background]
-      split: {primary: val, status: proposed}
-      plan: null
-    - id: bg_site_009
-      class: background
-      kind: parent_video
-      paths: [datasets/raw/site_archive_legacy/场景/三楼与场地视频/三栋楼侧向扫描_009.mp4]
-      evidence:
-        - {manifest: datasets/annotated/mixed_scene/v4_compositing_backgrounds_20261113/manifest.json}
-      review: {state: candidate_empty, method: contact_sheet, accepted_by: null}
-      labels: {status: unknown}
-      roles: [composite_background]
-      split: {primary: test, status: proposed}
-      plan: null
-    - id: bg_site_012
-      class: background
-      kind: parent_video
-      paths: [datasets/raw/e_bike/archive_assets_legacy/视频/人物立牌正背面_电动车直立_倒伏和遮挡_场地扫描_012.mp4]
-      evidence:
-        - {manifest: datasets/annotated/mixed_scene/v4_compositing_backgrounds_20261113/manifest.json}
-      review: {state: candidate_empty, method: contact_sheet, accepted_by: null}
-      labels: {status: unknown}
-      roles: [composite_background]
-      split: {primary: val, status: proposed}
-      plan: null
-    - id: bg_ebike_003
-      class: background
-      kind: parent_video
-      paths: [datasets/raw/e_bike/archive_assets_legacy/视频/场地多辆电动车_直立与倒伏混合_较低视角_003.mp4]
-      evidence:
-        - {manifest: datasets/annotated/mixed_scene/v4_compositing_backgrounds_20261113/manifest.json}
-      review: {state: unknown, method: contact_sheet, accepted_by: null}
-      labels: {status: unknown}
-      roles: [composite_background]
-      split: {primary: test, status: proposed}
-      plan: null
-    - id: bg_waste_004
-      class: background
-      kind: parent_video
-      paths: [datasets/raw/waste_bin/archive_assets_legacy/视频/四色桶较低视角_灰绿闭盖_红蓝开盖_004.mp4]
-      evidence:
-        - {manifest: datasets/annotated/mixed_scene/v4_compositing_backgrounds_20261113/manifest.json}
-      review: {state: unknown, method: contact_sheet, accepted_by: null}
-      labels: {status: unknown}
-      roles: [composite_background]
-      split: {primary: test, status: proposed}
-      plan: null
+  - id: wall_113d45ced4e7
+    class: background
+    kind: parent_photo
+    paths: *id001
+    parent_group: Archive/Assets/楼宇/开心大厦/照片/另一侧斜视_整体_013.jpg
+    capture_session: unknown
+    roles:
+    - composite_background
+    split: *id002
+    labels: *id003
+    frame_id: 113d45ced4e721ba82d5b59a01fcc31169793e5d57dd709e5975f6f6437acc85
+  - id: wall_1555f50c316e
+    class: background
+    kind: parent_photo
+    paths: *id004
+    parent_group: Archive/Assets/楼宇/锦绣大厦/照片/远距离斜视_格栅和窗格_001.jpg
+    capture_session: unknown
+    roles:
+    - composite_background
+    split: *id005
+    labels: *id006
+    frame_id: 1555f50c316e9c679cdb9f69e4521a2be12cdd3a293c11c560ed39a5f6cb5f55
+  - id: wall_189c41e28e81
+    class: background
+    kind: parent_photo
+    paths: *id007
+    parent_group: Archive/Assets/楼宇/晨光大厦/照片/较近正侧斜视_窗格与入口_005.jpg
+    capture_session: unknown
+    roles:
+    - composite_background
+    split: *id008
+    labels: *id009
+    frame_id: 189c41e28e81dd7ee15be40771f072c88e5687e5b0d8978fde1ea818407d65ba
+  - id: wall_221ab6cd5892
+    class: background
+    kind: parent_photo
+    paths: *id010
+    parent_group: Archive/Assets/楼宇/晨光大厦/照片/斜视_L形墙面与窗口_019.jpg
+    capture_session: unknown
+    roles:
+    - composite_background
+    split: *id011
+    labels: *id012
+    frame_id: 221ab6cd5892a9997f9da4527ffffde329be29d1df7831daa2d402393e53ebc9
+  - id: wall_25bf2c4cccfb
+    class: background
+    kind: parent_photo
+    paths: *id013
+    parent_group: Archive/Assets/楼宇/开心大厦/照片/正侧斜视_横向窗洞_007.jpg
+    capture_session: unknown
+    roles:
+    - composite_background
+    split: *id014
+    labels: *id015
+    frame_id: 25bf2c4cccfb9405d0632d5c5d2cee6a37aa707dc35242e8dce3b286cd4223e6
+  - id: wall_3205a6ba8233
+    class: background
+    kind: parent_photo
+    paths: *id016
+    parent_group: Archive/Assets/楼宇/锦绣大厦/照片/中距离斜视_楼体和格栅_004.jpg
+    capture_session: unknown
+    roles:
+    - composite_background
+    split: *id017
+    labels: *id018
+    frame_id: 3205a6ba8233f744b4f96064a0633cf6d0b78eda49a958ac18696499f545ed53
+  - id: wall_488b058b718f
+    class: background
+    kind: parent_photo
+    paths: *id019
+    parent_group: Archive/Assets/楼宇/晨光大厦/照片/正侧斜视_L形窗格立面_006.jpg
+    capture_session: unknown
+    roles:
+    - composite_background
+    split: *id020
+    labels: *id021
+    frame_id: 488b058b718f3469be111cc77b51490c0ee8cbb310cb53de65e597c1c66fe91e
+  - id: wall_5bbcea340d73
+    class: background
+    kind: parent_photo
+    paths: *id022
+    parent_group: Archive/Assets/楼宇/开心大厦/照片/正面近景_窗口与底部_014.jpg
+    capture_session: unknown
+    roles:
+    - composite_background
+    split: *id023
+    labels: *id024
+    frame_id: 5bbcea340d73ce79c2f089ecc90a298cf33bcce6eb090a4dd87e13af22c6de2d
+  - id: wall_69a98204b1fd
+    class: background
+    kind: parent_photo
+    paths: *id025
+    parent_group: Archive/Assets/楼宇/开心大厦/照片/正面远景_楼体整体_025.jpg
+    capture_session: unknown
+    roles:
+    - composite_background
+    split: *id026
+    labels: *id027
+    frame_id: 69a98204b1fd165b6e62aff827248fa2145e430739acfc04530e847819bf8bb0
+  - id: wall_6a28ca83ee63
+    class: background
+    kind: parent_photo
+    paths: *id028
+    parent_group: Archive/Assets/楼宇/开心大厦/照片/正面_横向窗洞及底部开口_006.jpg
+    capture_session: unknown
+    roles:
+    - composite_background
+    split: *id029
+    labels: *id030
+    frame_id: 6a28ca83ee63f811289e0bf82cfdef44fa228f7cf74a2d35d508e8408f7d1e94
+  - id: wall_731b5aab3091
+    class: background
+    kind: parent_photo
+    paths: *id031
+    parent_group: Archive/Assets/楼宇/锦绣大厦/照片/中距离斜视_楼体和格栅_006.jpg
+    capture_session: unknown
+    roles:
+    - composite_background
+    split: *id032
+    labels: *id033
+    frame_id: 731b5aab3091d6773457eab1d65f864eb3dc00cbd0f509ef5174b462a3f43cae
+  - id: wall_919db90b7896
+    class: background
+    kind: parent_photo
+    paths: *id034
+    parent_group: Archive/Assets/楼宇/晨光大厦/照片/斜俯近景_窗口与墙体_008.jpg
+    capture_session: unknown
+    roles:
+    - composite_background
+    split: *id035
+    labels: *id036
+    frame_id: 919db90b7896eff11d10fdf18af09a86c67f2af74fe27abcd99355504d3c4bbc
+  - id: wall_ded3e45e68dd
+    class: background
+    kind: parent_photo
+    paths: *id037
+    parent_group: Archive/Assets/楼宇/锦绣大厦/照片/正侧斜视_竖格栅及侧面_011.jpg
+    capture_session: unknown
+    roles:
+    - composite_background
+    split: *id038
+    labels: *id039
+    frame_id: ded3e45e68ddc6a9000472635f3754cf181dd97294e9473b0c112935dbdd6c7a
+  - id: wall_f0ed3594b6a8
+    class: background
+    kind: parent_photo
+    paths: *id040
+    parent_group: Archive/Assets/楼宇/晨光大厦/照片/左侧_外墙小窗洞_022.jpg
+    capture_session: unknown
+    roles:
+    - composite_background
+    split: *id041
+    labels: *id042
+    frame_id: f0ed3594b6a8d1a43082ae7cb5b6c6a05ea1d8a9d9869dcff758d0a9554d5c98
+  - id: wall_ffed24136e0a
+    class: background
+    kind: parent_photo
+    paths: *id043
+    parent_group: Archive/Assets/楼宇/锦绣大厦/照片/正面中景_中央竖格栅_007.jpg
+    capture_session: unknown
+    roles:
+    - composite_background
+    split: *id044
+    labels: *id045
+    frame_id: ffed24136e0ab905575e487430836ba957cee9e74706186baa7cad3df6c3a814
   data_sources:
-    - id: ds_pattern
-      kind: fixed_artwork
-      path: datasets/raw/fire/team_assets/image1.png
-      parent_group: null
-      roles: [target_foreground]
-      split: {primary: shared, status: confirmed}
-    - id: ds_reference_photo
-      kind: fixed_artwork
-      path: datasets/raw/fire/team_assets/实拍.jpg
-      parent_group: null
-      roles: [material_reference]
-      split: {primary: shared, status: confirmed}
+  - id: ds_pattern
+    kind: fixed_artwork
+    path: Archive/Assets/working_sources/digital/fire/team_assets/image1.png
+    parent_group: null
+    roles:
+    - target_foreground
+    split:
+      primary: shared
+      status: confirmed
+  - id: ds_reference_photo
+    kind: fixed_artwork
+    path: Archive/Assets/captures/fire/reference/实拍.jpg
+    parent_group: null
+    roles:
+    - material_reference
+    split:
+      primary: shared
+      status: confirmed
   blender:
-    - id: bl_three_buildings
-      kind: blender_scene
-      path: datasets/assets/blender/fire/blender_buildings_v13/three_buildings.blend
-      role: target_scene
-      priority: primary
-      split: {primary: shared, status: confirmed, same_source_note: 与 building_name_paper 共享母场景}
+  - id: bl_three_buildings
+    kind: blender_scene
+    path: datasets/assets/blender/aiaec_dataset.blend
+    role: target_scene
+    priority: primary
+    split:
+      primary: train
+      status: confirmed
+      same_source_note: 同一母工程及其混合实景派生集中在 train；与其他任务共享母场景
   captures: []
   plan_bindings:
-    train: [datasets/scripts/fire/config/production_plan.json]
-    val: []
-    test: []
+    train:
+    - datasets/scripts/fire/config/full_train_plan.json
+    val:
+    - datasets/scripts/fire/config/full_val_plan.json
+    test:
+    - datasets/scripts/fire/config/full_test_plan.json
+  plan_alignment:
+    status: aligned
+    note: 逐图分配及墙面资格由当前逐图库维护；full_dataset_plan 编排当前产量。
+direct_query:
+  role: direct_target
+  source_splits:
+  - train
+  - val
+  - test
+  source_kinds:
+  - archive_camera_photo
+  - camera_photo
+  - video_frame
+composite_query:
+  role: composite_background
+  regions_kind: fire_paper_slot
+  source_splits:
+  - train
+  - val
+  - test
+  source_kinds:
+  - camera_photo
+  - archive_camera_photo
+building_aliases:
+  A: 开心大厦
+  B: 锦绣大厦
+  C: 晨光大厦
+frame_buildings:
+  16f4db11af67edf385764280f705ccfda5933c595873d7ff0bcd95238f973b69:
+    target_building: B
+    visible_buildings:
+    - B
+    - C
+camera_trajectory:
+  type: orange_peel
+  azimuth_deg:
+  - -30
+  - 0
+  - 30
+  camera_height_m:
+  - 0.12
+  - 0.17
+  - 0.22
+  radius_m: 0.97
+  span_distance_factor: 1.6
+  target_height_m: 0.216
+  focal_length_mm: 42
+  frames: 241
+sample_recipe:
+  seed: 431
+  counts:
+  - 0
+  - 1
+  - 3
+  tones:
+    normal:
+    - 0.94
+    - 1.02
+    dim:
+    - 0.5
+    - 0.62
+  max_image_side: 720
+  blender_samples: 16
+  device: OPTIX
+  blender_executable: D:/ProgramFiles/Blender5.2/blender.exe
+  sticker_size:
+    reference: facade_height
+    height_fraction:
+      A:
+      - 0.1
+      - 0.14
+      B:
+      - 0.09
+      - 0.13
+      C:
+      - 0.1
+      - 0.14
+    sampling: independent_uniform_per_instance
+    anchor_jitter_fraction: 0.055
+    placement_attempts: 96
+  wall_projection:
+    method: per_wall_homography
+    margin_source_px: 3.0
+    blender_offset_m: 0.00015
+  render_image_size:
+  - 480
+  - 640
+full_dataset_plan: datasets/scripts/fire/config/full_dataset_plan.json
+wall_plane_review: datasets/annotated/fire/facade_plane_review.jsonl
+hybrid_geometry_review: datasets/annotated/fire/hybrid_geometry_review.json
+full_production_plans:
+  train: datasets/scripts/fire/config/full_train_plan.json
+  val: datasets/scripts/fire/config/full_val_plan.json
+  test: datasets/scripts/fire/config/full_test_plan.json
+first_round_learning_plan: datasets/scripts/fire/config/first_round_learning.yaml

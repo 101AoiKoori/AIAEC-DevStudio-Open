@@ -26,7 +26,7 @@ class TestSignComposition(unittest.TestCase):
                  'augmentation': {'gain': 1.0}, 'conditions': ['positive'], 'max_count': 1,
                  'parameters': {'height': 200, 'left': 100, 'top': 200},
                  'sources': [path.relative_to(module.ROOT).as_posix(),
-                     'datasets/raw/site_archive_legacy/场景/综合视频/空场与场景物料_001.mp4',
+                     'Archive/Assets/working_sources/legacy/site/场景/综合视频/空场与场景物料_001.mp4',
                      (module.ANNOTATED / 'train_20.png').relative_to(module.ROOT).as_posix(),
                      origin['source'], module.SIGN_VIDEO]}
         plan = {'model_key': 'sign', 'target_split': 'train', 'constraints': {

@@ -1,6 +1,6 @@
 # 数据集父子源配对与分集预留设计
 
-> 状态：结构设计草案，2026-11-15。用户已决定：配对写入各任务 `source.yaml`；单父组任务补采独立场次；扩用共享背景池；val/test 先只预留父组、不定张数。本文提取需求、定义变量空间与结构、给出逐任务矩阵和补采清单；`pairing` 草案已按本结构写入八任务 `source.yaml`（`status: draft`），**未修改计划或配额**。
+> 2026-11-15 配对设计。逐任务矩阵和补采清单记录初始预留提议。当时只给 train 定预算，val/test 先预留父组。实际选源、计划绑定和冲突看各任务当前 `source.yaml`。已执行批次见[当前生产进度](DATASET_PRODUCTION.md#当前生产进度)。
 >
 > 编号命名空间、任务口径和计数单位见[编号与计数口径](ID_AND_COUNT_POLICY.md)；现有 R/V/BSL 编号冻结，新规则使用 `PAIR-RNN` / `PAIR-VNN`。
 
@@ -21,7 +21,7 @@
 | R11 | val/test 先只预留父组，不定张数 | 用户 2026-11-15 |
 | R12 | 结构需覆盖大量变量，结构化、矩阵化 | 用户 2026-11-15 |
 
-项目既有约束继续适用：不按帧数冒充独立来源；派生数据继承父来源；同一任务内不得把逐字节完全重复的样本分到不同监督集合；跨任务复用需记录实际范围；不提交数据、权重或凭据；生产和训练继续保持暂停。
+项目既有约束继续适用：不按帧数冒充独立来源；派生数据继承父来源；同一任务内不得把逐字节完全重复的样本分到不同监督集合；跨任务复用需记录实际范围；不提交数据、权重或凭据。
 
 ## 2. 变量空间
 
@@ -29,15 +29,15 @@
 
 | 层 | 回答的问题 | 本设计中的角色 |
 | --- | --- | --- |
-| 父源类别 | 这是本任务实拍，还是背景？ | 决定 split 预留、80% 上限、val/test 独立性 |
+| 父源类别 | 这是本任务实拍，还是背景？ | 帮助安排 split 并解释 val/test 的来源重叠；不决定素材能否开始制作 |
 | 组合轴状态 | 在同一 split 内要覆盖哪些视角、光照、颜色、楼面等？ | 决定合成状态和覆盖矩阵，不决定 split |
 | 数据源角色 | 合成时它是目标、遮挡物还是背景？ | 决定标签和图层，不单独算父组 |
 
-一个容易混淆的点：**遮罩、裁片、掩膜是数据源，不是新的父组**。它们继承原父组的 split；从 train 父组裁出的掩膜不能拿到 test 合成，除非明确记为同源复用。
+一个容易混淆的点：**遮罩、裁片、掩膜是数据源，不是新的父组**。它们保留原父组身份。跨 split 使用时记录同源复用，所得 test 用于同源诊断；需要独立来源评估时另选未接触父组。
 
-另一条判定规则：**父源类别按画面内容和任务用途判定，不按所在目录判定**。同一父视频对任务 A 可以是任务实拍（画面含 A 的目标），对任务 B 是背景（画面不含 B 的目标）；本任务目录里的空场属于背景，其他任务 raw 里含本任务目标的帧也可以属于任务实拍。目录只用于查找，不决定类别。
+父源类别随画面内容和任务用途登记。一个父视频可以为任务 A 提供完整实拍监督，为任务 B 提供可合成背景。`raw/<任务>/targets/` 可保存该任务的完整相机负例，已证实全帧无任务目标即按 `empty_negative` 查询。其他任务目录中的同帧也可凭本任务完整标签使用；当前资格与来源关系在逐图库查询。[原始来源定位](../datasets/README.md#原始来源定位)
 
-同一父视频可以同时提供任务实拍帧和背景帧（例如 `full_scene` 的人物段与空场段），但整段父视频只归一个 split；不同角色不改变父组归属，也不能把同一视频的不同帧分到不同 split 再声称独立。
+同一父视频可同时提供任务实拍帧和背景帧，例如 `full_scene` 的人物段与空场段。父组登记一个主 split，按计划复用到其他 split 时标明同源。针对父视频的组外评估按整段留出。
 
 ### 2.2 维度清单
 
@@ -57,7 +57,7 @@
 | 复用 | 跨任务、跨 split（同源）、派生自某父组 |
 | 证据 | manifest、record_index、JSON pointer、review 输出、计划路径 |
 | 数量 | 帧/图/实例/片段；只作基数，不作独立父组数 |
-| 计划绑定 | train/val/test 对应计划路径；当前 val/test 为空 |
+| 计划绑定 | train、val、test 各自的执行计划路径。未编制的 split 保留空值 |
 | 采集动作 | `selected`、`reserved`、`to_review`、`to_label`、`to_extract`、`to_capture`、`blocked` |
 
 ### 2.3 来源 × 用途矩阵
@@ -68,17 +68,17 @@
 | **背景** | 确认空场/负例图（如 300 张空街） | 数据源（图案/数字图/Blender 目标）+ 背景合成 |
 | **Blender 母场景** | 纯渲染背景或负例 | 背景层，或目标层（楼宇、站房、桶、贴纸场景） |
 
-30% 直接实拍 / 40% 实拍背景合成 / 30% Blender 是**基线**；其中 fire、building_name_paper、waste_bin_state、waste_sticker、meter 已按下一段调整，其余任务保持基线。split 分配是另一条轴：**先按父组把来源分到 train/val/test，再在每个 split 内跑组合轴和贝叶斯**。
+**开始分配 split 的最小输入**是任务、待用素材的帧身份或可定位路径、已知父来源，以及本批希望生成的 train/val/test 用途。父来源暂不确定时先登记 `unassigned` 和待核关系，仍可规划其他已知来源。对已有用途资格的未分配现货可直接编排批次，并按已知父来源选定 split。正式生成按本次所用帧核对目标标签、用途和放置空间。先记录各父组拟用于哪些集合，再按现有可行状态和成图预算编排；同一合格原帧可生成不同布局，来源类型比例见[来源组成](#410-来源组成)。
 
-2026-11-15 用户确认采用：fire、building_name_paper、waste_bin_state 采用 **20% 直接实拍 / 40% 实拍背景合成 / 40% Blender**，waste_sticker、meter 采用 **10% / 40% / 50%**；person、e_bike、sign 保持 30/40/30，目标数据源分别用数字图片、旋转掩膜、视频帧裁片。详见 4.10。
+**分配后的检查**按目的分层：训练批次核对选中图像的身份、标签、用途和图签；val 可用于同源调参，但要标明与 train 共享的父视频、物料或 Blender 母场景；只有声称独立来源 test 时才整组留出未接触父源。逐字节相同的最终样本不跨监督集合。来源数、80% 参考份额和未完成候选只提示覆盖与评估范围，不推迟已可行的制作。
 
 ## 3. `source.yaml` 配对结构
 
 ### 3.1 放置与权威
 
-- 每个任务 `config/source.yaml` 新增顶层 `pairing`；它是**父子源与 split 预留的权威记录**，计划编译时消费它。
-- 现有 `current_selection`、`production_plan` 保留；`pairing` 不替代批次清单和计划，只记录"哪个父组归哪个 split、扮演什么角色、证据在哪"。批次清单里的 `task_use_status` 继续保存逐图用途；`pairing` 汇总到父组级，二者用 `manifest` / `record_index` 关联，不另建第二来源台账。
-- 生成器只读取自己认识的键；新增 `pairing` 不改变现有入口。多数入口把 `source.yaml` 声明为配置输入，新增字段会改变输入哈希，使相应旧生产回执不再复用；未声明 `source.yaml` 的入口不受影响。生产暂停期间可接受，编译新计划时按实际入口重新登记。
+- 每个任务的 `config/source.yaml` 在 `pairing` 中维护父子来源、主 split、用途预留和证据路径。
+- `current_selection` 与 `production_plan` 指向当前选择及执行计划。批次清单保存逐图用途，通过 `manifest` 或 `record_index` 关联父组。
+- 批次回执绑定入口声明的配置与实际输入。编制新计划时读取对应任务的 `source.yaml`。
 - 一个父组在一个任务内只能有一个主 split；同源跨 split 用 `same_source_allowed_in` 明确列出，不能默认。
 
 ### 3.2 结构示例
@@ -104,7 +104,7 @@ pairing:
       class: task_real
       kind: parent_video
       paths:
-        - datasets/raw/site_capture_20261112/videos/person_standees.mp4
+        - Archive/Assets/captures/site_capture_20261112/videos/person_standees.mp4
       evidence:
         - {manifest: datasets/annotated/person/v4_multivideo_review_20261112/review_manifest.json, record_index: 0}
       capture_session: unknown
@@ -118,7 +118,7 @@ pairing:
       class: background
       kind: parent_video
       paths:
-        - datasets/raw/site_capture_20261112/videos/full_scene.mp4
+        - Archive/Assets/captures/site_capture_20261112/videos/full_scene.mp4
       evidence:
         - {manifest: datasets/annotated/mixed_scene/v4_compositing_backgrounds_20261113/manifest.json, record_index: 0}
       review: {state: candidate_empty, method: contact_sheet, accepted_by: null}
@@ -129,7 +129,7 @@ pairing:
   data_sources:
     - id: ds_identity_community_1
       kind: fixed_artwork
-      path: datasets/raw/person/team_assets/社区人员/1.png
+      path: Archive/Assets/working_sources/digital/person/team_assets/社区人员/1.png
       parent_group: null
       roles: [target_foreground]
       split: {primary: shared, status: confirmed}
@@ -150,7 +150,7 @@ pairing:
       lighting: [normal, dark, bright]
       amount: 2–3 分钟视频或 100–200 张照片
       truth: [fixture_box, view, truncation, placement]
-      save_to: datasets/raw/sign/capture_20261116_val/
+      save_to: Archive/Assets/captures/sign/capture_20261116_val/
   plan_bindings:
     train: [datasets/scripts/sign/config/production_plan.json]
     val: []
@@ -179,9 +179,9 @@ pairing:
 | `split.primary` | 是 | `train` / `val` / `test` / `shared` / `unassigned` |
 | `split.status` | 是 | `proposed` / `reserved` / `confirmed` |
 | `split.action` | 建议 | 采集动作：`selected` / `reserved` / `to_review` / `to_label` / `to_extract` / `to_capture` / `blocked`；计划补采占位用 `to_capture` |
-| `split.same_source_allowed_in` | 可选 | 只在单父组无法三向时使用；列出的 split 必须按同源解释 |
+| `split.same_source_allowed_in` | 可选 | 记录当前计划允许共享的 split，组外评估按该共享维度解释 |
 | `parent_group` | 派生数据源必填 | 指向 `task_real` 或 `background` 的父组 ID；固定图案/生成文字为 `null` |
-| `plan_bindings` | 可选 | 该 split 后续编译到哪份计划；当前 val/test 为空 |
+| `plan_bindings` | 可选 | 当前 split 关联的计划路径 |
 | `plan_alignment` | 可选 | 现有计划与 pairing split 的对齐状态：`status: aligned/stale/unknown`、`note` 和 `conflicts`；`stale` 表示现有计划仍消费其他 split 的父组，编译前必须重编或改 split |
 | `plan_alignment.conflicts` | 可选 | 逐条记录 `parent`、`plan`、`pairing_split`、`plan_use`；只作待决标记，不修改计划 |
 | `captures` | 可选 | 独立场次补采请求；字段按 6 节 |
@@ -192,17 +192,17 @@ pairing:
 | ID | 规则 |
 | --- | --- |
 | V1 | 一个父组在一个任务内只能有一个 `split.primary`；重复出现必须合并或明确不同角色 |
-| V2 | `task_real` 必须有标签状态和证据；无标签的实拍只能记为 `to_label`，不能直接进计划 |
-| V3 | 背景必须有审查状态；`confirmed_empty` 才能作空负例（`empty_negative`），`candidate_empty` 只能作待审背景或显式 `action: to_review`，不得提前赋予空负例角色；`contains_target` 只能作已标目标背景 |
-| V4 | 派生数据源必须继承父组 split；不能单独改到另一个 split |
+| V2 | `task_real` 先登记标签状态与证据；无标签素材可预分配 split 并记 `to_label`，补齐本次监督标签后再作为正式图签输出 |
+| V3 | 背景带任务范围内的语义证据。配对 checker 接受 `empty_negative` 的 `confirmed_empty`、`candidate_empty` 和 `candidate_complete_negative` 声明。正式空负例监督由接收任务按其识别范围检查整帧并确认证据，目录分类仅用于发现候选。 |
+| V4 | 派生数据继承父组关系，跨 split 使用沿用允许的同源范围。 |
 | V5 | 固定图案、生成文字、Blender 母场景用 `shared`；同一场景跨 split 记为同源，不算独立父组 |
-| V6 | 每个任务×角色的 train 父组数不超过合格父组的 80%；不足 5 个时报告实际数量 |
+| V6 | 80% 父组份额用于提示留源空间和报告当前覆盖；父组少或单父组时按现有可行来源继续制作，并标明同源评估范围。 |
 | V7 | `val_test_mode: reserve_only` 时不得在 `pairing` 写张数、预算或配额 |
 | V8 | 使用 `same_source_allowed_in` 的 split 必须在报告中标为同源，不能声称独立场次 |
 | V9 | 同一任务内逐字节完全重复的样本不得跨 train/val/test |
 | V10 | 跨任务复制同一图片允许，但每个任务保留自己的标签、类别表和用途；父组按任务分别计，不重复计独立来源 |
-| V11 | 每个 split 的合成计划只能消费分配给该 split 的父组；当前尚无自动 checker，编译前专项核对 |
-| V12 | 单父组任务若要求独立 val/test，必须登记 `captures`；未补采前只能同源预留；占位父组用 `capture_id` 关联采集请求 |
+| V11 | 计划列出每个 split 实际消费的父组；跨 split 同源使用明确登记，独立来源评估仅使用未接触父组。 |
+| V12 | 单父组可先制作 train 与标明同源的 val/test。需要独立来源结论时登记新场次或未接触父组；计划补采用 `capture_id` 关联采集请求。 |
 
 ## 4. 任务级配对矩阵
 
@@ -216,7 +216,7 @@ pairing:
 | building_name_paper | 1–2 / 1 | 不可 | 3+ / 1 | 可行 | 条件性 | 补标、补审 |
 | sign | 1 / 1 | 不可 | 4 / 4 | 可行（2/1/1） | **2 场** | 补采 |
 | waste_bin_state | 8 / 0 | 可行（3/2/3） | 1 / 1 | 不可 | 无 | 补标、扩池 |
-| waste_sticker | 1 / 1 | 不可 | 6 / 6 | 可行（2/2/2） | **2 场** | 补采、扩表面 |
+| waste_sticker | 1 / 1 | 不可 | 6 / 6 | 可行（2/2/2） | **2 场** | 为独立实拍预留场次，扩充可用贴纸背景 |
 | meter | 5 / 0 | 标签后可行 | 1–3 / 1 | 扩池后可行 | 条件性 | 补标、扩池 |
 
 “已审”是当前有审查或选定证据的父组；不是实际产量。详细容量见[父源容量与分配可行性](PARENT_SOURCE_CAPACITY.md)。
@@ -238,11 +238,11 @@ pairing:
 | bg_ebike_003 | background | e_bike 003 | 20 帧 | composite background | test | 待审 |
 | bg_waste_004 | background | waste_bin 004 | 20 帧 | composite background | test | 待审（人物 5 帧已拒） |
 | bg_car_real | background | CarReal 帧 | 2,773 帧 | composite background | test | 待审 |
-| occl_008/009 | background | e_bike 008/009 | 2 父视频/4 掩膜 | occluder | 008/009 train | 待标；用户确认 009 改 train，val/test 待 005/006 或同源预留 |
+| occl_008/009 | background | e_bike 008/009 | 2 父视频/4 掩膜 | occluder | 008/009 train | 待标。val/test 可从 005/006 选取，或登记同源预留 |
 | ds_identity_18 | data_source | 16 社区 + 2 非社区图案 | 18 | target foreground | shared | 固定物料 |
 | bl_arena_master/detailed | blender | 共享 arena | 2 场景 | background_scene | shared | 同源记录 |
 
-person 的 `tr_*` 未完成标签已在 source.yaml 标 `action: to_label`；`bg_full_scene`/`bg_001` 的 `candidate_empty` 不再带 `empty_negative`，改 `to_review`。用户确认 `occl_009` 改为 train 后，`plan_alignment` 已对齐；val/test 仍待 005/006 掩膜或同源预留。空场 300 仍需 `confirmed_empty` 后才能按配额生产。
+上表记录 2026-11-15 草案对人物父组的用途安排。已落盘 split 和当前出包见[生产进度](DATASET_PRODUCTION.md#当前生产进度)；空负例监督按逐图任务范围的无目标证据选择。
 
 ### 4.3 e_bike
 
@@ -309,8 +309,11 @@ person 的 `tr_*` 未完成标签已在 source.yaml 标 `action: to_label`；`bg
 | bg_site_003/005 | background | 共享池 | 40 帧 | composite background | train | 待审 |
 | bg_photo_batch | background | site_capture 车载图 | 2 张选定/160 张候选 | composite background | val | 待审 |
 | bg_ebike_003 | background | e_bike 003 | 20 帧 | composite background | test | 待审 |
-| bg_site_009/012/004 | background | 共享池 | 60 帧 | composite background | val/test | 待审 |
+| bg_site_009/012 | background | 共享池 009、012 | 复核按逐图回执 | composite background | 本批 Val | 已完成分集，已有独立 Val 小样 |
+| bg_waste_004 | background | bins004 同父视频 | 本次 21 张合格帧 | composite background | Val（已分配） | 跨任务已有 Val 接触 |
 | bl_arena_detailed | blender | arena detailed | 1 场景 | background_scene | shared | 无牌具三维模型 |
+
+禁行牌旧 inventory 的155条帧已复核，147条合格底图分为Train70、Val77，原有585张Train底图继续可用；`bins004`整父来源归Val。当前全量Train2500、Val300，分别2000／275框、500／75空负，使用344／67张底图或原帧、15／4个背景父组。集内及跨集无相同RGB图，背景父组无跨集交叉；前景仍共享同一牌具视频，Val为受控诊断。440张已接受小样保留。另4条主体帧合成用途受阻、4条落点未知的用途按现行资格使用。[全量审计](../datasets/annotated/sign/full_dataset_audit.json) · [155帧复核回执](../datasets/annotated/common/review/sign_background_155_20261118/recheck_receipt.json) Test另使用20张既有停车视频帧，300张／225框／75空负；19条历史待验证资格已补齐当前合成接触检查。其背景父组与本批Train／Val不交叉，已有跨任务及旧检查接触，前景共享，评价为回归诊断。
 
 ### 4.7 waste_bin_state
 
@@ -332,22 +335,22 @@ person 的 `tr_*` 未完成标签已在 source.yaml 标 `action: to_label`；`bg
 
 | ID | 类别 | 来源/父组 | 可用量 | 角色/用途 | 建议 split | 状态/动作 |
 | --- | --- | --- | ---: | --- | --- | --- |
-| tr_p22_capture | task_real | P22 + V 视频 | 42 帧/1 可用 | direct target | train | 已选 1 帧 |
+| tr_p22_capture | task_real | P22 + V 视频，同一采集组 | 32 张完整、11 张部分 | 同源回归 | 单列 | 另选四张回归，002016 用于历史候选包 |
 | tr_sticker_capture_val | task_real | 新场次 A | 待采 | direct/composite target | val | 待采 |
 | tr_sticker_capture_test | task_real | 新场次 B | 待采 | direct/composite target | test | 待采 |
-| bg_001 | background | 四色桶 001 | 1 视频 | surface/background | train | 待标 |
-| bg_004 | background | 四色桶 004 | 1 视频 | surface/background | train | 待标 |
-| bg_003 | background | 四色桶 003 | 1 视频 | surface/background | val | 待标 |
+| bg_001 | background | 四色桶 001 | 1 张本批实拍桶面 | surface/background | train | 已用于 45 张桶面叠贴 |
+| bg_004 | background | 四色桶 004 | 20 张合格桶面帧 | surface/background | Val（已整组绑定） | 已用于 80 张本域桶面合成 |
+| bg_003 | background | 四色桶 003 | 1 视频 | surface/background | train | 已选 0005 桶面 |
 | bg_005 | background | 灰桶关盖 005 | 1 视频 | background | val | 待标 |
 | bg_007 | background | 浅色地面 007 | 1 视频 | surface/background | test | 待标 |
 | bg_006 | background | 灰桶开盖 006 | 1 视频 | background | test | 待标 |
 | ds_surface_0002 | data_source | 001 的 0002 表面 | 1 表面（红桶） | surface | 继承 bg_001 → train | 派生 |
-| ds_surface_0005 | data_source | 003 的 0005 表面 | 1 表面（红桶） | surface | 继承 bg_003 → val | 派生 |
+| ds_surface_0005 | data_source | 003 的 0005 表面 | 1 表面（红桶） | surface | 继承 bg_003 → train | 已用于当前完整 Train 的 45 张桶面叠贴 |
 | ds_surface_007 | data_source | 007 的非红桶面 | 待提 | surface | 继承 bg_007 → test | 待提取 |
 | ds_24_patterns | data_source | `SourcePic` 24 张 | 24 | target foreground | shared | 固定 24 类 |
-| bl_sticker_animated | blender | 动画场景 + arena | 2 场景 | target scene + background | shared | 26 test 状态 |
+| bl_sticker_animated | blender | 统一工程的贴纸场景和场地 | 同一 Blender 基础资产 | target scene + background | 基础资产共享，布局按 split 留出 | 旧 26 状态单列诊断 |
 
-注意：表面是背景父组的派生数据源，必须继承父组 split。0005 表面来自 003 视频，所以 003 放 val 而不是 train；0002 表面随 001 放 train；非红桶面从 007 提，随 007 放 test。这样 train 背景父组为 001/004（2/6，33%），val 为 003/005，test 为 007/006，四色桶覆盖在每个 split 内保留。
+桶面继承父组的 split。旧 Train 子批使用 0002（父组 001）与 0005（父组 003）。2026-11-17 核对时，整桶混合已有两张合格 Train 实拍场地帧，来自 `full_scene.mp4` 与 `空场与场景物料_001.mp4`。Test 已整组绑定 `junction_005` 的 13 张合格实拍场地帧，用于整桶混合。Test 场地排除已用于 Train 的 `full_scene.mp4`。拍摄原帧、布局和产出图以各自身份计数。[分配回执](../datasets/annotated/waste_bin/whole_bin_ground_reuse_20261117/production_split_assignment_receipt.json) · [垃圾贴纸来源](../datasets/scripts/waste_sticker/config/source.yaml)
 
 ### 4.9 meter
 
@@ -363,26 +366,20 @@ person 的 `tr_*` 未完成标签已在 source.yaml 标 `action: to_label`；`bg
 | bg_site_pool | background | 共享池 | 60 帧 | composite background | val/test | 待审 |
 | bl_arena | blender | arena master | 1 场景 | background_scene | shared | 同源 |
 
-### 4.10 来源组成调整（用户 2026-11-15）
+### 4.10 来源组成
 
-| 任务 | 目标数据源 | Blender 角色 | 原来源组成 | 新来源组成 | Blender 上限 |
-| --- | --- | --- | --- | --- | ---: |
-| fire | 楼宇合景 + 固定火焰图案 | `primary` | 30/40/30 | 20/40/40 | 40% |
-| building_name_paper | 三楼合景 + 生成文字 | `primary` | 30/40/30 | 20/40/40 | 40% |
-| waste_bin_state | 桶模型 `waste_bin_pbr` | `primary` | 30/40/30 | 20/40/40 | 40% |
-| waste_sticker | 贴纸动画场景 | `primary` | 30/40/30 | 10/40/50 | 50% |
-| meter | 参数化站房 | `primary` | 30/40/30 | 10/40/50 | 50% |
-| person | `team_assets` 数字图片 | `background_only` | 30/40/30 | 不变 | 40% |
-| e_bike | 平视/环绕旋转掩膜 | `background_only` | 30/40/30 | 不变 | 40% |
-| sign | 牌具视频帧裁片 | `background_only` | 30/40/30 | 不变 | 40% |
+| 任务 | 目标数据源 | Blender 角色 | 直接实拍 / 实拍背景合成 / Blender | Blender 上限 |
+| --- | --- | --- | --- | ---: |
+| fire | 楼宇合景 + 固定火焰图案 | `primary` | 20/40/40 | 40% |
+| building_name_paper | 三楼合景 + 生成文字 | `primary` | 20/40/40 | 40% |
+| waste_bin_state | 桶模型 `waste_bin_pbr` | `primary` | 20/40/40 | 40% |
+| waste_sticker | 贴纸动画场景、贴纸图案和合格桶面 | `primary` | 0/30/70 | 70% |
+| meter | 参数化站房 | `primary` | 10/40/50 | 50% |
+| person | `team_assets` 数字图片 | `background_only` | 30/40/30 | 40% |
+| e_bike | 平视/环绕旋转掩膜 | `background_only` | 30/40/30 | 40% |
+| sign | 牌具视频帧裁片与已有完整实拍 | `background_only` | 0.36/67.64/32 | 40% |
 
-理由与边界：
-
-- 五个任务的 raw 实拍中，完整标签或可用父组有限（fire 直接样本全 blocked、bnp 仅 5 帧完整、waste_bin 无逐桶真值、sticker 仅 1 个带贴采集组、meter 无完整 Pose）；对应 Blender 模型和场景已就绪，因此把 Blender 提到任务上限。
-- 实拍背景合成仍保留 40%，用于跨背景多样性和负例；直接实拍降到 20% 或 10%，实际产量受可用标签限制，不能按份额虚构样本。
-- person、e_bike、sign 的目标数据源分别保持数字图片、旋转掩膜、视频帧裁片；Blender 只作背景，不作为目标来源。这三个任务不提高 Blender 份额。
-- `source.yaml` 的 `composition_policy` 记录上述方向；五个任务的 Blender 场景标 `priority: primary`，person/e_bike/sign 标 `priority: background_only`。目标与背景组件分别写入 `target_components` 和 `background_components`。
-- `config/full_train_allocation.yaml` 的 `source_mix` 已按 20/40/40 与 10/40/50 调整，`docs/FULL_TRAIN_PLAN_DESIGN.md` 已重新生成；组配额未变，生产计划尚未编译。份额已由用户确认采用；后续调整另行记录，不改变组配额。
+份额读取 [全量 train 分配配置](../config/full_train_allocation.yaml)。按当前标签和可行状态编排，实际占比随批次清单记录。场景的目标与背景组件分别登记在各任务 `source.yaml`。
 
 ## 5. 共享背景池扩用矩阵
 
@@ -397,88 +394,81 @@ person 的 `tr_*` 未完成标签已在 source.yaml 标 `action: to_label`；`bg
 | 场地多辆电动车_较低视角_003 | B-te | T-va | B-tr | B-tr | B-te | B-te | B-? | B-te |
 | 四色桶较低视角_004 | B-te | B-va | - | - | B-va | T-va | B-tr | - |
 
-矩阵是候选用途，不代表已审可用，也不代表当前 `source.yaml` 的 split；每个 `B-*` 需要对应任务的空场/目标完整性审查，`T-*` 需要任务标签。实际 split 以各任务 `source.yaml` 和 §4 表为准；矩阵待逐任务审查后再回写，当前不一致不回写为既成事实。共享池扩用后，各任务背景父组数增加，val/test 才有独立父组可用。
+矩阵记录初始用途提议。实际使用从各任务 `source.yaml` 和当前逐图记录查询。复用已有符合范围的记录；仅对本批选中且缺证据的素材，在入库时补相应任务字段。父组及 split 归属按实际记录。[背景图入库与复用](DATASET_DESIGN.md#背景图入库与复用)
 
 ## 6. 独立场次补采清单
 
-按用户决定，单父组任务补采独立场次。以下为补采请求：sign、waste_sticker 状态 `proposed`，meter、building_name_paper 状态 `conditional`（先补标，仍不足再采），均未执行。
+本节记录未来可能使用的独立采集占位。sign 保留补采计划。垃圾贴纸按[现行四路来源和分集设计](DATASET_DESIGN.md#垃圾贴纸数据设计)推进，识别失败需要真实成像条件时再定向补拍。meter 与 building_name_paper 先使用现有素材，按识别失败及实际需要决定补拍。
 
 | ID | 任务 | 目标 split | 拍摄对象 | 场景/摆位 | 视角 | 光照 | 数量/时长 | 真值 | 保存位置 |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| cap_sign_val_20261116 | sign | val | 禁止直行牌具 | 与现有视频不同的路口/白墙摆位 | 正、斜、侧、背 | 正常、暗、亮 | 2–3 分钟视频或 100–200 张照片 | 牌具框、视面、截断、摆位 | `datasets/raw/sign/capture_20261116_val/` |
-| cap_sign_test_20261116 | sign | test | 同上 | 第三种摆位/背景 | 正、斜、侧、背 | 正常、暗、亮 | 同上 | 同上 | `datasets/raw/sign/capture_20261116_test/` |
-| cap_sticker_val_20261116 | waste_sticker | val | 四色桶 + 24 类贴纸（每桶正面一张） | 与 P22 不同的桶位/背景 | 正、斜 | 正常、暗 | 30–60 帧/2–3 段短视频 | 每贴类别、桶 ID、桶色、开闭、可见框 | `datasets/raw/waste_bin/sticker_capture_20261116_val/` |
-| cap_sticker_test_20261116 | waste_sticker | test | 同上 | 第三种桶位/背景 | 正、斜 | 正常、暗、亮 | 同上 | 同上 | `datasets/raw/waste_bin/sticker_capture_20261116_test/` |
-| cap_meter_val_20261116 | meter | val | 实物温湿表/站房 | 与现有视频不同安装/读数 | 正、斜 | 正常、反光 | 2 段 1–2 分钟视频或 50–100 张 | 8 点、读数、可见性 | `datasets/raw/meter/capture_20261116_val/` |
-| cap_meter_test_20261116 | meter | test | 同上 | 第三种读数/反光 | 正、斜 | 正常、强反光 | 同上 | 同上 | `datasets/raw/meter/capture_20261116_test/` |
-| cap_bnp_val_20261116 | building_name_paper | val | 楼顶纸条（自定义名称） | 与现有纸框不同的楼/位置 | 正、斜 | 正常、暗 | 30–60 张/2 段视频 | 纸框、全文、楼号 | `datasets/raw/fire/bnp_capture_20261116_val/` |
-| cap_bnp_test_20261116 | building_name_paper | test | 同上 | 第三种楼/名称 | 正、斜 | 正常、暗 | 同上 | 同上 | `datasets/raw/fire/bnp_capture_20261116_test/` |
+| cap_sign_val_20261116 | sign | val | 禁止直行牌具 | 与现有视频不同的路口/白墙摆位 | 正、斜、侧、背 | 正常、暗、亮 | 2–3 分钟视频或 100–200 张照片 | 牌具框、视面、截断、摆位 | `Archive/Assets/captures/sign/capture_20261116_val/` |
+| cap_sign_test_20261116 | sign | test | 同上 | 第三种摆位/背景 | 正、斜、侧、背 | 正常、暗、亮 | 同上 | 同上 | `Archive/Assets/captures/sign/capture_20261116_test/` |
+| cap_sticker_val_20261116 | waste_sticker | val | 固定 24 类物品贴纸，可独立拍摄或复刻每桶正面下方一张贴纸的现场画面 | 与 P22 不同的布置、背景和贴纸位置 | 正、斜 | 正常、暗 | 30–60 帧/2–3 段短视频 | 每贴类别与可见框，有桶时另记可核桶 ID、桶色 | `Archive/Assets/captures/waste_sticker/sticker_capture_20261116_val/` |
+| cap_sticker_test_20261116 | waste_sticker | test | 同上 | 第三种布置、背景和贴纸位置 | 正、斜 | 正常、暗、亮 | 同上 | 同上 | `Archive/Assets/captures/waste_sticker/sticker_capture_20261116_test/` |
+| cap_meter_val_20261116 | meter | val | 实物温湿表/站房 | 与现有视频不同安装/读数 | 正、斜 | 正常、反光 | 2 段 1–2 分钟视频或 50–100 张 | 8 点、读数、可见性 | `Archive/Assets/captures/meter/capture_20261116_val/` |
+| cap_meter_test_20261116 | meter | test | 同上 | 第三种读数/反光 | 正、斜 | 正常、强反光 | 同上 | 同上 | `Archive/Assets/captures/meter/capture_20261116_test/` |
+| cap_bnp_val_20261116 | building_name_paper | val | 楼顶纸条（自定义名称） | 与现有纸框不同的楼/位置 | 正、斜 | 正常、暗 | 30–60 张/2 段视频 | 纸框、全文、楼号 | `Archive/Assets/captures/building_name_paper/capture_20261116_val/` |
+| cap_bnp_test_20261116 | building_name_paper | test | 同上 | 第三种楼/名称 | 正、斜 | 正常、暗 | 同上 | 同上 | `Archive/Assets/captures/building_name_paper/capture_20261116_test/` |
 
 说明：
 
 - 补采占位父组在 `source.yaml` 中用 `capture_session: planned` 和 `capture_id` 关联本表；采集完成并登记证据后才改 `proven`。派生掩膜等未生成的数据源同样标 `action: to_capture`，不得提前标 `confirmed`。
-- `sign`、`waste_sticker` 是当前明确的补采项：不补采则 val/test 只能与 train 同源。每任务至少两场独立采集，分别用于 val 和 test；同一场内的不同帧/视图仍算同一父组。
+- 用已合格的共享底图、Blender 和实拍素材推进合成和训练，入库端同期补判受影响的分支。实际漏检、混淆或完整任务失败需要真实条件时再定向补拍。近邻帧与同母场景渲染按实际父来源和用途记账。
 - `meter`、`building_name_paper` 标为条件性：先在现有视频/照片中补标 Pose、纸框与文字；如果审查后仍凑不出独立 val/test 父组，再按上表补采。
-- 每场采集保留原图/原视频、拍摄参数、摆位草图、真值文件和父组 ID；原件放入 `datasets/raw/`，不直接进训练导出。
+- 每场采集保留原图/原视频、拍摄参数、摆位草图、真值文件和父组 ID；原件按父批次放入 `Archive/Assets/captures/`，任务标注写到 `datasets/annotated/`，选用的目标或背景工作图进入对应的 `raw/` 目录。
 - 补采不改变现有 train 配额；val/test 张数仍待后续确定。
 
 ## 7. 跨任务复用与相同图片规则
 
-1. **同一任务内**：一个父组只能有一个主 split；其帧、裁剪、掩膜、增强、渲染都随父组走。逐字节完全重复的样本不得跨 train/val/test。
+1. **同一任务内**：父组有主 split，帧及派生保留父组关系；明显注明的同源复用以实际 split 和配对声明为准。逐字节完全重复的样本不得跨 train/val/test。同视频相邻帧及视觉近似帧的关系用于抽样和独立性统计，有效任务标签与用途资格仍按帧核对。
 2. **跨任务**：允许复制同一图片到多个任务；每个任务保留自己的标签、类别表、用途和审核状态。父组按任务分别计，不因复制变成新的独立来源。
-3. **同图不同模型**：一个图片对 person 是人物目标，对 e_bike 是背景或遮挡物；两份标签分别保存，不能合并成同一训练标签。
-4. **同源跨 split**：单父组任务允许 `same_source_allowed_in`，但必须在批次清单和报告中记为同源；不能声称独立场次、独立采集或独立测试。
-5. **评估解释**：如果任务 A 的 train 与任务 B 的 test 共享同一父组，B 的测试仍是对 B 模型未见过的像素，但两个任务的结果不能声称互相独立；跨任务比较时说明共享范围。
-6. **80% 账本**：按任务×角色统计 train 父组占比；同一父组跨任务使用时，分别计入各任务的账本，但跨任务合并账本要避免同一 Blender 母场景被各任务重复满额。
+3. **同图不同模型**：同一画面可以用人物标签训练 person，也可以给 e_bike 提供背景或遮挡物。每个模型读取自己的标签文件。
+4. **父源别名与历史接触**：用父视频散列、迁移记录和实际批次回执核齐同一物理父源的路径。当前 split 和技术资格随明确的本批用途登记，train、检查或旧评估中已使用的记录随父源保留。既有接触的 test 用途用于诊断，独立评估按未接触的来源计。
+5. **同源跨 split**按当前用途登记 `same_source_allowed_in`，在批次清单与报告里写明共享的是视频、场次、物料、背景还是其他父素材。
+6. **评估解释**核对待评模型的训练和既往诊断接触，按实际留出的维度解释。跨任务比较记录已知共享的父来源和角色。
+7. **80% 账本**：按任务×角色统计 train 父组占比。跨任务汇总时按 Blender 母场景归并实际用量。
 
 ## 8. 贝叶斯与计划接入
 
-- 每个 split 一份计划：`target_split: train | val | test`；`pairing` 的 `plan_bindings` 指向计划路径，当前 val/test 为空列表。
-- 2026-11-15 的 Blender 上调已写入 `config/full_train_allocation.yaml` 的 `source_mix`（fire/bnp/waste_bin 20/40/40，waste_sticker/meter 10/40/50）；编译逐 split 计划时按 split 重新分配，不照搬旧 30/40/30。
+- 可执行计划声明 `target_split: train | val | test`，`pairing.plan_bindings` 关联该 split 的计划。
+- `source_mix` 保存 train 的来源配额参考。编制各 split 时按实际来源和标签容量分配。
 - 计划 `strata` 的每一条至少声明：父组 ID、数据源、背景、组合轴状态、标签、配额上下限；分配器只在已声明 strata 内分额度。
-- 计划编译前先跑配对校核：父组是否属于该 split、派生是否继承、背景是否已审、同源是否记录、80% 是否满足。
-- 当前计划全部是 train（waste_sticker 另有 26 个 test 状态），val/test 预算未定；先只预留父组，不写张数。
-- `state_coverage` 仍按计划统计；val/test 计划编译后会分别出现在覆盖表中，不能用 train 的覆盖率代替。
+- 新编计划时运行配对校核，重点处理本次引用的父组、标签范围及已知冲突。预算按当批可行组合编制，80% 父组参考用于提示留源和报告覆盖。
+- 预留记录描述来源用途，预算写在相应执行计划里。人物已实际导出 train/val/test，其他任务按自己的计划和产物记录。
+- `state_coverage` 统计在任务目标及组合轴配置中明确登记的计划。实际覆盖与产量查具体批次的导出清单。
 - 跨任务 Blender 账本待实现；同一母场景（arena master、three_buildings、station、waste_bin_pbr）跨任务合计用量要按父场景汇总。
 
 ### 8.1 计划对齐与 checker 边界
 
-`source.yaml` 的 `pairing.plan_alignment` 记录现有计划与 pairing split 的冲突；`status: stale` 表示编译前必须重编计划或改 split，不能只改文档假装闭环。当前记录：
+`source.yaml` 的 `pairing.plan_alignment` 记录现有计划与 pairing split 的冲突；`status: stale` 标出历史计划的配对冲突。重编受影响的状态或修订该状态的 split，其他已合格状态继续生产。当前记录：
 
-- person：已按用户确认把 `occl_009` 改为 train，现有 train `production_plan.json` 已对齐；val/test 仍待 005/006 掩膜或同源预留。
-- sign：`bg_ebike_003`（test）、`bg_photo_batch`（val）仍被 train `production_plan.json` 消费。
-- waste_sticker：`bg_003`/`bg_005`（val）、`bg_006`（test）仍在 train `production_plan.json` 的背景批次中。
+- person 已登记 `full_train_plan_3000.json`、`val_plan_300.json` 和 `test_plan_300.json`。现行批次按已记录的背景父组切分，其他角色保留共享来源。
+- sign：当前全量背景按15个Train与4个Val及1个Test父组分集，具体路径见full_train_plan.json、full_val_plan.json、full_test_plan.json与全量清单；牌具前景共享，受控诊断范围随训练来源索引记录。
+- waste_sticker：四路完整数据已导出 1,800／240／240 张。Train 桶面使用 `bg_001`、`bg_003`，Train 整桶场地使用 `空场与场景物料_001`，Val 桶面使用 `bg_004`，Test 整桶场地使用 `junction_005`。共享固定图案和 Blender 基础资产按同源诊断报告。[导出审计](../datasets/exports/waste_sticker/audit.json)
 - waste_bin_state：`backgrounds.json` 的 10 train/2 val/2 test 全部同属 `full_scene.mp4`；pairing 只登记 train 主 split 和 `same_source_allowed_in`，val/test 不是独立父组。
 - e_bike：组合来源计划给 `bg_car_capture`（val）、`bg_legacy_001`（test）排了 train 份额，尚未重编译为逐 split 计划。
 
-V11（每个 split 的计划只能消费该 split 的父组）目前**没有**由 `source_pairing.py` 自动检查；checker 检查结构、角色枚举、`empty_negative` 的 `confirmed_empty` 条件、capture、路径、来源组成和 `plan_alignment` 结构，计划实际消费内容仍需专项核对。
+`source_pairing.py --check` 读取八任务的配对声明，检查结构、角色枚举、负例角色状态、capture、路径、来源组成及 `plan_alignment` 字段。格式有效的 `stale` 可通过。V11 的实际计划引用、逐图标签和跨 split 字节重复按受影响的实际批次核对。[现行入口限制](DATASET_PRODUCTION.md#现行入口限制与处理)
 
 其他未决：
 
-- 一个 `parent_video` 项含多段视频时，父组数和 80% 上限不能按项计算；当前 e_bike `tr_bike_005_006`、`tr_bike_004_007_010_011`，fire `tr_facade_video_B_001_002` 仍是合并项，编译前需拆开或另记账。
-- bnp 把三栋楼整体分到 train/val/test 与“楼面是组合轴”冲突（train 只剩 A 楼）；编译前需按楼内批次重新拆，文档不自行改 split。
-- 主检出另一窗口的 `source_ledger` 草图不作为第二套校验器或台账；用户已确认 `source_pairing.py` 为单一 checker，ledger 只作数据访问/实验。
+- 一个 `parent_video` 项含多段视频时，按实际父视频统计覆盖与 split。电动车 `tr_bike_005_006`、`tr_bike_004_007_010_011` 和火焰 `tr_facade_video_B_001_002` 的合并条目，按本批实际引用的视频逐一记账。
+- 楼名覆盖按实际楼面、布置和父源核算。按已合格场景运行可行分支，需独立楼面评估时按相应批次留出并记录覆盖范围。
+- 配对声明使用 `source_pairing.py --check` 校核。父组诊断查询使用 [source_ledger](BACKGROUND_SOURCE_LEDGER.md)。
 
 ## 9. 实施顺序
 
-1. **确认结构**：本文件的字段、枚举、校核规则和逐任务预留提议。
-2. **写入 `source.yaml`（已落盘草案）**：八任务 `pairing` 已按 3.2 添加，`status: draft`；每任务填入父组、split 提议、证据和动作，待结构确认后改为 `reserved`。
-3. **扩池审查**：按第 5 节矩阵，用现有审查工具筛查共享池视频在各任务中的背景资格；把 verdict、证据和轴值写回 `pairing.backgrounds`。
-4. **补采**：按第 6 节执行 sign、waste_sticker 两场独立采集；meter、bnp 视审查结果决定。
-5. **补标**：各任务按第 4 节动作补直接标签、掩膜、桶面、Pose、纸框。
-6. **编译逐 split 计划**：先 train，再 val/test；保持 80% 上限、同源记录和跨任务账本。
-7. **校核**：运行 `lab/scripts/contracts/source_pairing.py --check`；它校验 pairing 结构、角色枚举、`empty_negative` 的 `confirmed_empty` 条件、ID、`capture_id`、路径、来源组成和 `plan_alignment` 结构。V11 的计划实际消费内容仍待专项核对，任务×split×父组矩阵尚未实现；再跑 `state_coverage`、`full_plan_design` 和目录检查。
+1. 从现有 `source.yaml`、任务标签和查询索引选本批可用来源，记录角色、split、已知同源和判定依据。
+2. 已录入的适用背景直接参与配额。所需任务证据有缺项时，使用现有判定器或标签入口更新该项。确有本批所需的来源缺口时使用对应补采建议。
+3. 编译受影响的 split 计划，运行配对声明检查并核对本批实际引用。可行分支按任务入口生成或打包，清单记录组归属和产量。
 
 ## 10. 未决项
 
 - 第 4 节的逐任务 split 提议是否接受；特别是 person 用 012 作 val、CarReal 作 test，fire 按楼面内批次拆，waste_bin 视频 3/2/3。
-- 五任务的 20/40/40 与 10/40/50 来源份额已由用户确认采用，不再作为未决项；后续数值调整另行记录。
-- `plan_alignment.status: stale` 的 sign/waste_sticker/waste_bin_state/e_bike 需在编译前重编计划或改 split；V11 未自动检查。person 已把 `occl_009` 改为 train。
+- 电动车组合计划仍引用 val、test 的父组。桶开闭三个 split 共用 `full_scene.mp4`，按同源计划解释。编制相关批次时核对各自的 `plan_alignment`。
 - bnp 三栋楼整体分 split 与楼面组合轴冲突，需按楼内批次重新拆；e_bike/fire 的多视频合并 parent_video 项需拆父组。
-- `source_pairing.py` 为用户确认的单一 checker；`source_ledger` 草图只作数据访问/实验，不作为第二套校验器或台账。
-- 生产仍暂停；启动 person 有界批次前需用户明确恢复并同步 `DATASET_PRODUCTION.md` 状态。
 - meter、building_name_paper 的补采是否必要；若现有素材补标后能凑出独立父组，可取消。
 - 共享池矩阵中 `?` 的背景资格需要逐任务审查后才能确定。
 - 跨任务是否需要"全局未见场次"预留；若需要，当前按任务独立分 split 的方案不足。
-- `pairing` 的字段名、ID 前缀和 `lab/scripts/contracts/source_pairing.py` 的实现范围。
-- val/test 张数何时确定；当前按用户决定只预留父组。
+- 各任务的 val/test 张数按执行计划登记。尚无预算的任务先记录父组预留。

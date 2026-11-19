@@ -1382,6 +1382,112 @@ def _texture_floor_fallback(image_bgr: np.ndarray, shape: Tuple[int, int],
 # ------------------------------------------------------------- public surface
 
 
+def ground_perspective_cues(image_bgr: np.ndarray, surface_mask: np.ndarray) -> dict[str, Any]:
+    """Estimate image axes and a separate scale cue from lines near floor evidence.
+
+    A single observed line family gives an undirected image axis. Scale requires
+    two independently supported vanishing directions and a consistent horizon.
+    The contact quad supplies neither the axis nor the scale.
+    """
+    gray = _as_gray(image_bgr)
+    mask = np.asarray(surface_mask, dtype=bool)
+    if mask.shape != gray.shape:
+        raise ValueError("surface_mask must match the source image")
+    result = {
+        "coordinate_space": "source_image_pixels",
+        "direction": {"status": "unknown", "basis": "insufficient_floor_line_support", "confidence": None},
+        "scale": {"status": "unknown", "basis": "unconfirmed_ground_horizon", "confidence": None},
+    }
+    if not mask.any():
+        return result
+    height, width = gray.shape
+    diagonal = math.hypot(height, width)
+    near = cv2.distanceTransform((~mask).astype(np.uint8), cv2.DIST_L2, 5) < 0.045 * min(height, width)
+    supported = []
+    for segment in _segments(gray):
+        # A top-of-frame roof edge can border visible ground in an oblique view.
+        # Keep candidates that extend into the near field used for composition.
+        if max(segment["y1"], segment["y2"]) < 0.65 * height:
+            continue
+        start = (segment["x1"], segment["y1"])
+        end = (segment["x2"], segment["y2"])
+        pixels = np.rint(np.linspace(start, end, 21)).astype(np.intp)
+        x = np.clip(pixels[:, 0], 0, width - 1)
+        y = np.clip(pixels[:, 1], 0, height - 1)
+        fraction = float(near[y, x].mean())
+        if fraction >= 0.35:
+            supported.append({**segment, "length": segment["length"] * fraction})
+    if not supported:
+        return result
+    supported.sort(key=lambda segment: -segment["length"])
+    for lead in supported:
+        if lead["length"] < 0.10 * diagonal:
+            break
+        axes = [line for line in supported if line["length"] >= 0.045 * diagonal
+                and _angle_distance(lead["angle"], line["angle"]) <= math.radians(4)]
+        if not any(abs((line["mid_x"] - lead["mid_x"]) * lead["dir_y"]
+                       - (line["mid_y"] - lead["mid_y"]) * lead["dir_x"]) >= max(2, 0.004 * diagonal)
+                   for line in axes):
+            continue
+        angle = _circular_mean(np.array([line["angle"] for line in axes]),
+                               np.array([line["length"] for line in axes]))
+        result["direction"] = {
+            "status": "estimated", "basis": "ground_supported_line_axis", "confidence": "moderate",
+            "image_heading_deg": round(math.degrees(angle), 1) % 180,
+            "segment_count": len(axes),
+            "segments_xyxy": [[round(line[key], 1) for key in ("x1", "y1", "x2", "y2")] for line in axes[:6]],
+        }
+        break
+    groups = _cluster_directions(supported)
+    if len(groups) != 2:
+        return result
+    rng = np.random.default_rng(0)
+    families = [_vanishing_point(supported, group, rng, 200, _VP_FAR_LIMIT * diagonal) for group in groups]
+    if any(family is None or family["support"] < 0.18 * diagonal for family in families):
+        return result
+    line = _horizon_line(*families)
+    if line is None or abs(line[1]) < 0.2 or abs(math.degrees(math.atan(-line[0] / line[1]))) > 1.5:
+        return result
+    if line[1] < 0:
+        line = -line
+    rows, cols = np.nonzero(mask)
+    center_horizon = float(_horizon_row(line, (width - 1) / 2))
+    if not -0.02 * height <= center_horizon <= 0.85 * height:
+        return result
+    if np.percentile(line[0] * cols + line[1] * rows + line[2], 5) < 0.03 * height:
+        return result
+    result["scale"] = {
+        "status": "estimated", "basis": "ground_supported_vanishing_line", "confidence": "moderate",
+        "horizon_line_px": [float(value) for value in line],
+        "inlier_counts": [len(family["inliers"]) for family in families],
+    }
+    return result
+
+
+def contact_reference_quad(candidate_mask: np.ndarray) -> list[list[int]] | None:
+    """Fit a local reference rectangle entirely inside supported image pixels.
+
+    It is a coordinate reference, not an envelope for every contact island.
+    No rectangle is needed to use the original contact mask.
+    """
+    mask = np.asarray(candidate_mask, dtype=bool)
+    if mask.ndim != 2 or not mask.any():
+        return None
+    height, width = mask.shape
+    block = max(1, math.ceil(max(height, width) / 320))
+    rows, cols = height // block, width // block
+    inside = mask[:rows * block, :cols * block]
+    coarse = inside.reshape(rows, block, cols, block).all(axis=(1, 3))
+    bounds = _maximal_rectangle(coarse)
+    if bounds is None:
+        return None
+    top, bottom, left, right = bounds
+    x0, y0, x1, y1 = left * block, top * block, right * block - 1, bottom * block - 1
+    if x1 <= x0 or y1 <= y0:
+        return None
+    return [[x0, y0], [x1, y0], [x1, y1], [x0, y1]]
+
+
 def estimate_ground_plane(
     image_bgr: np.ndarray,
     *,

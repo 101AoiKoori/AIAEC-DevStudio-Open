@@ -101,7 +101,7 @@ class CameraToneTest(unittest.TestCase):
             (seq / 'ffmpeg.log').write_text(
                 '[showinfo] n: 0 pts: 0 pts_time:1.25\n'
                 '[showinfo] n: 1 pts: 0 pts_time:1.252\n', encoding='utf8')
-            video = 'datasets/raw/site_capture_20261112/videos/full_scene.mp4'
+            video = 'Archive/Assets/captures/site_capture_20261112/videos/full_scene.mp4'
             known = {'exposed_images': [], 'exposed_video_frames': [{'video': video, 'seconds': 1.0}]}
             images = [(seq / f'frame_{n:06}.png').relative_to(root).as_posix() for n in (1, 2)]
             report = make_preview(root, images, 'datasets/exports/mixed_scene/buffer', known=known)

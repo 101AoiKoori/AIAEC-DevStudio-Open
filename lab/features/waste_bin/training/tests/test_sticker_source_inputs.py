@@ -1,5 +1,6 @@
 """Read-only source binding and in-memory direct-real plan contracts."""
 import copy
+import json
 from pathlib import Path
 import sys
 import unittest
@@ -37,7 +38,13 @@ class StickerSourceInputTests(unittest.TestCase):
             select_direct_source(catalog, last['image'], 'train')
         first = next(row for row in catalog if row['frame_number'] == 2016)
         self.assertEqual(select_direct_source(catalog, first['image'], 'train')['record_index'], 1)
-        self.assertEqual(select_direct_source(catalog, first['image'], 'train', formal=True)['annotation']['annotation_level'], 'candidate')
+        with self.assertRaisesRegex(ValueError, 'eligible complete task label'):
+            select_direct_source(catalog, first['image'], 'train', formal=True)
+        _, config = load_task_config('waste_sticker')
+        plan = json.loads((ROOT / config['direct_real_plan']).read_text(encoding='utf8'))
+        selected = prepare_inputs(plan, catalog, formal=True)
+        self.assertEqual(set(selected), {'direct_002016'})
+        self.assertEqual(selected['direct_002016']['frame_environment']['role'], 'direct_target')
 
     def test_direct_plan_binds_annotation_and_parent_without_writing(self):
         catalog = real_source_catalog()

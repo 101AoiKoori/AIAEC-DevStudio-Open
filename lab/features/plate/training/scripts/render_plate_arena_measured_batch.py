@@ -26,13 +26,13 @@ def main():
     scene_dependencies = blender_external_dependencies(bpy) - {
         ROOT / "datasets/exports/plate/v4_far_composite_pilot_20261113/cutout.png",
         ROOT / "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_003927.png",
-        ROOT / "datasets/raw/site_capture_20261112/videos/full_scene.mp4",
-        ROOT / "datasets/assets/blender/plate/v4_arena_vehicle_20261113/arena_plate_working.blend",
+        ROOT / "Archive/Assets/captures/site_capture_20261112/videos/full_scene.mp4",
+        ROOT / "Archive/technical/revisions/plate/blender_sources_20261116/v4_arena_vehicle_20261113/arena_plate_working.blend",
     }
-    with generation_guard('plate_render_plate_arena_measured_batch', [ROOT / "datasets/exports/plate/v4_far_composite_pilot_20261113/cutout.png", ROOT / "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_003927.png", ROOT / "datasets/raw/site_capture_20261112/videos/full_scene.mp4", ROOT / "datasets/assets/blender/plate/v4_arena_vehicle_20261113/arena_plate_working.blend"] + sorted(scene_dependencies), [ROOT / "datasets/exports/plate/v4_arena_measured_batch_20261113"], {"script": 'render_plate_arena_measured_batch.py'}, code_paths=[Path(__file__), ROOT / "lab/features/plate/training/scripts/plate_guard_inputs.py"], procedural_inputs=[ROOT / "datasets/assets/blender/plate/v4_arena_vehicle_20261113/arena_plate_working.blend"] + sorted(scene_dependencies), root=ROOT) as run:
+    with generation_guard('plate_render_plate_arena_measured_batch', [ROOT / "datasets/exports/plate/v4_far_composite_pilot_20261113/cutout.png", ROOT / "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_003927.png", ROOT / "Archive/Assets/captures/site_capture_20261112/videos/full_scene.mp4", ROOT / "Archive/technical/revisions/plate/blender_sources_20261116/v4_arena_vehicle_20261113/arena_plate_working.blend"] + sorted(scene_dependencies), [ROOT / "datasets/exports/plate/v4_arena_measured_batch_20261113"], {"script": 'render_plate_arena_measured_batch.py'}, code_paths=[Path(__file__), ROOT / "lab/features/plate/training/scripts/plate_guard_inputs.py"], procedural_inputs=[ROOT / "Archive/technical/revisions/plate/blender_sources_20261116/v4_arena_vehicle_20261113/arena_plate_working.blend"] + sorted(scene_dependencies), root=ROOT) as run:
         if run.reused:
             return
-        WORKING = ROOT / "datasets/assets/blender/plate/v4_arena_vehicle_20261113/arena_plate_working.blend"
+        WORKING = ROOT / "Archive/technical/revisions/plate/blender_sources_20261116/v4_arena_vehicle_20261113/arena_plate_working.blend"
         CUTOUT = ROOT / "datasets/exports/plate/v4_far_composite_pilot_20261113/cutout.png"
         OUTPUT = ROOT / "datasets/exports/plate/v4_arena_measured_batch_20261113"
         SOURCE = "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_003927.png"

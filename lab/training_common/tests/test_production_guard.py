@@ -49,13 +49,252 @@ class ProductionGuardTests(unittest.TestCase):
         self.output.parent.mkdir(parents=True, exist_ok=True)
         self.output.write_text('result', encoding='utf8')
 
+    def history(self, operation='fixture-generation'):
+        with sqlite3.connect(str(fixtures.core.INDEX / 'production_state.sqlite3')) as db:
+            return db.execute('SELECT run_token,origin,receipt_json FROM production_receipt_history '
+                              'WHERE operation=? ORDER BY id', (operation,)).fetchall()
+
+    def test_receipt_history_tracks_completions_not_reuse_or_failure(self):
+        with guard.generation_guard(**self.args):
+            self.produce()
+        first = self.history()
+        self.assertEqual(len(first), 1)
+        self.assertTrue(first[0][0])
+        self.assertEqual(first[0][1], 'completed_run')
+
+        with guard.generation_guard(**self.args) as reused:
+            self.assertTrue(reused.reused)
+        self.assertEqual(self.history(), first)
+
+        changed = dict(self.args, parameters={'seed': 2})
+        with self.assertRaisesRegex(RuntimeError, 'fixture failure'):
+            with guard.generation_guard(**changed):
+                raise RuntimeError('fixture failure')
+        self.assertEqual(self.history(), first)
+        with guard.generation_guard(**changed):
+            self.produce()
+        second = self.history()
+        self.assertEqual(len(second), 2)
+        self.assertNotEqual(second[0][0], second[1][0])
+        self.assertEqual(second[0], first[0])
+        self.assertEqual(second[1][1], 'completed_run')
+        with sqlite3.connect(str(fixtures.core.INDEX / 'production_state.sqlite3')) as db:
+            latest = db.execute('SELECT receipt_json,running_json FROM production_operations WHERE operation=?',
+                                ('fixture-generation',)).fetchone()
+        self.assertEqual(latest, (second[1][2], None))
+        self.assertEqual(json.loads(second[0][2])['request']['parameters']['seed'], 1)
+        self.assertEqual(json.loads(second[1][2])['request']['parameters']['seed'], 2)
+
+    def test_existing_state_receipt_is_preserved_once_as_snapshot(self):
+        state_path = fixtures.core.INDEX / 'production_state.sqlite3'
+        with sqlite3.connect(str(state_path)) as db:
+            db.execute('CREATE TABLE production_operations '
+                       '(operation TEXT PRIMARY KEY, receipt_json TEXT, running_json TEXT)')
+            db.execute('INSERT INTO production_operations VALUES(?,?,?)',
+                       ('old', '{"known":true}', None))
+        with guard.generation_guard(**self.args):
+            self.produce()
+        self.assertEqual(self.history('old'), [(None, 'existing_snapshot', '{"known":true}')])
+        with guard.generation_guard(**self.args) as reused:
+            self.assertTrue(reused.reused)
+        self.assertEqual(self.history('old'), [(None, 'existing_snapshot', '{"known":true}')])
+
+    def test_receipt_history_and_latest_update_rollback_together(self):
+        with guard.generation_guard(**self.args):
+            self.produce()
+        first = self.history()
+        with sqlite3.connect(str(fixtures.core.INDEX / 'production_state.sqlite3')) as db:
+            db.execute('CREATE TRIGGER reject_receipt_update BEFORE UPDATE OF receipt_json '
+                       'ON production_operations BEGIN '
+                       "SELECT RAISE(ABORT, 'fixture update rejected'); END")
+        with self.assertRaisesRegex(sqlite3.IntegrityError, 'fixture update rejected'):
+            with guard.generation_guard(**dict(self.args, parameters={'seed': 2})):
+                self.produce()
+        self.assertEqual(self.history(), first)
+        with sqlite3.connect(str(fixtures.core.INDEX / 'production_state.sqlite3')) as db:
+            latest = db.execute('SELECT receipt_json,running_json FROM production_operations WHERE operation=?',
+                                ('fixture-generation',)).fetchone()
+        self.assertEqual(latest, (first[0][2], None))
+
+    def test_unplanned_replacement_requires_verifier_and_exposes_committed_token(self):
+        with guard.generation_guard(**self.args):
+            self.produce()
+        replacement = dict(self.args, replace_outputs=True, parameters={'seed': 2})
+        with self.assertRaisesRegex(ValueError, 'requires a production plan'):
+            with guard.generation_guard(**replacement):
+                self.fail('unverified replacement must not start')
+        calls = []
+        def verify(workspace, output_state, previous):
+            calls.append((workspace, output_state, previous))
+            self.assertEqual(workspace, self.root.resolve())
+            self.assertEqual(output_state[0]['path'], 'datasets/outputs/batch.txt')
+            self.assertEqual(previous['request']['parameters']['seed'], 1)
+            return True
+        with guard.generation_guard(**replacement, replace_verifier=verify) as run:
+            token = run.token
+            self.assertTrue(token)
+            self.assertFalse(guard.receipt_completed(self.root, 'fixture-generation', token))
+            self.output.write_text('replacement', encoding='utf8')
+        self.assertEqual(len(calls), 1)
+        self.assertEqual(run.token, '')
+        self.assertTrue(guard.receipt_completed(self.root, 'fixture-generation', token))
+        self.assertFalse(guard.receipt_completed(self.root, 'other', token))
+        self.assertEqual(len(self.history()), 2)
+
+    def test_verifier_rejects_and_must_not_change_output(self):
+        with guard.generation_guard(**self.args):
+            self.produce()
+        before = self.output.read_text(encoding='utf8')
+        replace = dict(self.args, replace_outputs=True)
+        for result in (False, None, 1):
+            with self.subTest(result=result), self.assertRaisesRegex(ValueError, 'did not approve'):
+                with guard.generation_guard(**replace, replace_verifier=lambda *_: result):
+                    self.fail('unapproved verifier must not start')
+        def mutate(_workspace, _state, _receipt):
+            self.output.write_text('modified by verifier', encoding='utf8')
+            return True
+        with self.assertRaisesRegex(ValueError, 'changed output state'):
+            with guard.generation_guard(**replace, replace_verifier=mutate):
+                self.fail('mutating verifier must not start')
+        self.assertNotEqual(self.output.read_text(encoding='utf8'), before)
+        self.assertEqual(len(self.history()), 1)
+
+    def test_receipt_lookup_is_read_only_and_does_not_guess_missing_state(self):
+        token = 'a' * 32
+        state = fixtures.core.INDEX / 'production_state.sqlite3'
+        with self.assertRaises(FileNotFoundError):
+            guard.receipt_completed(self.root, 'fixture-generation', token)
+        self.assertFalse(state.exists())
+        with sqlite3.connect(str(state)) as db:
+            db.execute('CREATE TABLE old_state (operation TEXT)')
+        with self.assertRaisesRegex(RuntimeError, 'history is unavailable'):
+            guard.receipt_completed(self.root, 'fixture-generation', token)
+        with sqlite3.connect(str(state)) as db:
+            self.assertIsNone(db.execute("SELECT 1 FROM sqlite_master WHERE name='production_receipt_history'").fetchone())
+        with self.assertRaises(ValueError):
+            guard.receipt_completed(self.root, 'fixture-generation', '../invalid')
+
+    def test_unplanned_child_replacement_is_rejected_before_verifier(self):
+        parent_args = dict(self.args, operation='parent', output_paths=['datasets/outputs/parent'])
+        child_args = dict(self.args, operation='child', output_paths=['datasets/outputs/parent/child.txt'],
+                          replace_outputs=True)
+        verifier = mock.Mock(return_value=True)
+        with self.assertRaisesRegex(RuntimeError, 'child production stage failed'):
+            with guard.generation_guard(**parent_args) as parent:
+                marker = self.root / 'datasets/outputs/parent/marker.txt'
+                marker.parent.mkdir(parents=True)
+                marker.write_text('x', encoding='utf8')
+                with mock.patch.dict(os.environ, parent.child_env(), clear=True):
+                    with self.assertRaisesRegex(ValueError, 'only supported by a top-level'):
+                        with guard.generation_guard(**child_args, replace_verifier=verifier):
+                            self.fail('child replacement must not start')
+        verifier.assert_not_called()
+
+    def test_active_operation_blocks_replacement_before_verifier(self):
+        verifier = mock.Mock(return_value=True)
+        with guard.generation_guard(**self.args) as first:
+            self.produce()
+            token = first.token
+            with self.assertRaisesRegex(RuntimeError, 'already in use'):
+                with guard.generation_guard(**dict(self.args, replace_outputs=True),
+                                            replace_verifier=verifier):
+                    self.fail('concurrent replacement must not start')
+            verifier.assert_not_called()
+            self.assertFalse(guard.receipt_completed(self.root, 'fixture-generation', token))
+        self.assertTrue(guard.receipt_completed(self.root, 'fixture-generation', token))
+
+    def test_replacement_exception_never_reports_completion(self):
+        with guard.generation_guard(**self.args):
+            self.produce()
+        with self.assertRaisesRegex(RuntimeError, 'interrupted'):
+            with guard.generation_guard(**dict(self.args, replace_outputs=True),
+                                        replace_verifier=lambda *_: True) as run:
+                token = run.token
+                raise RuntimeError('interrupted')
+        self.assertFalse(guard.receipt_completed(self.root, 'fixture-generation', token))
+        self.assertEqual(len(self.history()), 1)
+
+    def test_planned_replacement_keeps_verified_files_out_of_samples(self):
+        args, state = self.planned_args()
+        manual = self.root / 'datasets/outputs/batch/images/manual.png'
+        note = self.root / 'datasets/outputs/batch/manual-notes.txt'
+        image = self.root / 'datasets/outputs/batch/images/generated.jpg'
+        manual.parent.mkdir(parents=True)
+        manual.write_bytes(b'manual')
+        note.write_text('human', encoding='utf8')
+        def verify(workspace, _state, _previous):
+            return {'preserved_paths': [str(manual.relative_to(workspace)), str(note.relative_to(workspace))]}
+        with guard.generation_guard(**args, replace_outputs=True, replace_verifier=verify) as run:
+            with self.assertRaisesRegex(ValueError, 'preserved output cannot be recorded'):
+                run.record_sample('one', output=manual, sources=state['sources'],
+                                  parameters=state['parameters'], actual={'seed': 1})
+            image.write_bytes(b'generated')
+            run.record_sample('one', output=image, sources=state['sources'],
+                              parameters=state['parameters'], actual={'seed': 1})
+        with sqlite3.connect(str(fixtures.core.INDEX / 'production_state.sqlite3')) as db:
+            receipt = json.loads(db.execute('SELECT receipt_json FROM production_operations WHERE operation=?',
+                                            ('fixture-generation',)).fetchone()[0])
+        self.assertEqual([r['output'] for r in receipt['planned_samples']],
+                         ['datasets/outputs/batch/images/generated.jpg'])
+        self.assertEqual({r['path'] for r in receipt['preserved_outputs']},
+                         {'datasets/outputs/batch/images/manual.png',
+                          'datasets/outputs/batch/manual-notes.txt'})
+        self.assertEqual(manual.read_bytes(), b'manual')
+        self.assertEqual(note.read_text(encoding='utf8'), 'human')
+
+    def test_planned_replacement_rejects_invalid_preserved_paths(self):
+        args, _state = self.planned_args()
+        manual = self.root / 'datasets/outputs/batch/images/manual.png'
+        manual.parent.mkdir(parents=True)
+        manual.write_bytes(b'manual')
+        for result in (True, {'preserved_paths': ['../outside']},
+                       {'preserved_paths': ['datasets/outputs/batch/images/missing.png']},
+                       {'preserved_paths': ['datasets/outputs/batch/images']},
+                       {'preserved_paths': ['datasets/outputs/batch/images/manual.png'] * 2},
+                       {'preserved_paths': ['datasets/raw/camera/a.png']}):
+            with self.subTest(result=result), self.assertRaises((ValueError, TypeError)):
+                with guard.generation_guard(**args, replace_outputs=True,
+                                            replace_verifier=lambda *_: result):
+                    self.fail('invalid preserved output must not be admitted')
+        self.assertEqual(manual.read_bytes(), b'manual')
+
+    def test_planned_replacement_detects_preserved_content_change_even_if_stat_restored(self):
+        args, state = self.planned_args()
+        manual = self.root / 'datasets/outputs/batch/images/manual.png'
+        image = self.root / 'datasets/outputs/batch/images/generated.jpg'
+        manual.parent.mkdir(parents=True)
+        manual.write_bytes(b'original')
+        stat = manual.stat()
+        with self.assertRaisesRegex(ValueError, 'preserved output was removed or changed'):
+            with guard.generation_guard(**args, replace_outputs=True,
+                                        replace_verifier=lambda *_: {'preserved_paths': [str(manual)]}) as run:
+                token = run.token
+                image.write_bytes(b'generated')
+                run.record_sample('one', output=image, sources=state['sources'],
+                                  parameters=state['parameters'], actual={'seed': 1})
+                manual.write_bytes(b'overwrit')
+                os.utime(manual, ns=(stat.st_atime_ns, stat.st_mtime_ns))
+        self.assertFalse(guard.receipt_completed(self.root, 'fixture-generation', token))
+
+    def test_planned_replacement_without_verifier_remains_strict(self):
+        args, state = self.planned_args()
+        manual = self.root / 'datasets/outputs/batch/images/manual.png'
+        image = self.root / 'datasets/outputs/batch/images/generated.jpg'
+        manual.parent.mkdir(parents=True)
+        manual.write_bytes(b'manual')
+        with self.assertRaisesRegex(ValueError, 'output images do not match recorded samples'):
+            with guard.generation_guard(**args, replace_outputs=True) as run:
+                image.write_bytes(b'generated')
+                run.record_sample('one', output=image, sources=state['sources'],
+                                  parameters=state['parameters'], actual={'seed': 1})
+
     def test_relocated_task_rejects_old_output_and_missing_source_config(self):
         code = ['datasets/scripts/sign/generator.py']
         configs = ['datasets/scripts/sign/config/dataset.yaml',
                    'datasets/scripts/sign/config/source.yaml']
         args = dict(self.args, code_paths=code, procedural_inputs=configs,
                     output_paths=['runs/sign/old_batch'])
-        with self.assertRaisesRegex(ValueError, 'current sample or train/test/val'):
+        with self.assertRaisesRegex(ValueError, 'train/test/val'):
             with guard.generation_guard(**args):
                 self.fail('old output must not enter the production body')
         args.update(output_paths=['datasets/samples/sign'], procedural_inputs=configs[:1])
@@ -92,6 +331,9 @@ class ProductionGuardTests(unittest.TestCase):
 
     def test_planned_production_records_actual_and_auxiliary_and_reuses(self):
         args, state = self.planned_args()
+        context = {'task': 'person', 'coverage': 'unverified', 'executable': False,
+                   'crosses': [{'id': 'category_context', 'coverage': 'unverified'}]}
+        args['production_plan']['design_context'] = context
         image = self.root / 'datasets/outputs/batch/images/a.jpg'
         mask = self.root / 'datasets/outputs/batch/masks/a.png'
         with guard.generation_guard(**args) as run:
@@ -114,6 +356,7 @@ class ProductionGuardTests(unittest.TestCase):
         finally:
             db.close()
         self.assertEqual(receipt['planned_samples'][0]['actual']['seed'], 73)
+        self.assertEqual(receipt['request']['production_plan']['design_context'], context)
         self.assertEqual(len(receipt['planned_samples']), 1)
         with guard.generation_guard(**args) as run:
             self.assertTrue(run.reused)
@@ -340,6 +583,24 @@ class ProductionGuardTests(unittest.TestCase):
             with guard.generation_guard(**self.args):
                 pass
 
+    def test_precreated_empty_output_directory_is_not_an_existing_batch(self):
+        output = self.root / 'datasets/outputs/direct_batch'
+        output.mkdir(parents=True)
+        args = dict(self.args, operation='direct-batch', output_paths=['datasets/outputs/direct_batch'])
+        with guard.generation_guard(**args) as run:
+            self.assertFalse(run.reused)
+            (output / 'image.txt').write_text('result', encoding='utf8')
+        with guard.generation_guard(**args) as run:
+            self.assertTrue(run.reused)
+
+        untracked = self.root / 'datasets/outputs/untracked_batch'
+        untracked.mkdir()
+        (untracked / 'image.txt').write_text('untracked', encoding='utf8')
+        args = dict(self.args, operation='untracked-batch', output_paths=['datasets/outputs/untracked_batch'])
+        with self.assertRaisesRegex(ValueError, 'no matching complete receipt'):
+            with guard.generation_guard(**args):
+                pass
+
     def test_failure_missing_output_and_simultaneous_operation(self):
         with self.assertRaises(SystemExit):
             with guard.generation_guard(**self.args):
@@ -354,22 +615,28 @@ class ProductionGuardTests(unittest.TestCase):
                     pass
             self.produce()
 
-    def test_unindexed_input_and_stale_cache_refuse(self):
+    def test_unindexed_input_with_missing_cache_completes(self):
         extra = self.root / 'datasets/raw/camera/unindexed.png'
         extra.write_bytes(b'unindexed')
         args = dict(self.args, input_paths=['datasets/raw/camera/unindexed.png'], procedural_inputs=[])
-        with self.assertRaisesRegex(ValueError, 'refresh affected JSON partitions'):
-            with guard.generation_guard(**args):
-                pass
+        fixtures.cache.DATABASE.unlink()
+        with guard.generation_guard(**args) as run:
+            self.assertEqual(run.source_refs['datasets/raw/camera/unindexed.png'], [])
+            self.produce()
+        self.assertEqual(len(self.history()), 1)
+        self.assertFalse(fixtures.cache.DATABASE.exists())
+
+    def test_media_change_uses_actual_file_even_with_stale_cache(self):
+        with guard.generation_guard(**self.args):
+            self.produce()
         self.image.write_bytes(b'changed but not reindexed')
-        with self.assertRaisesRegex(ValueError, 'indexed media changed'):
-            with guard.generation_guard(**self.args):
-                pass
         shard = self.root / self.parts['datasets/raw/camera']['shard']
         shard.write_text(shard.read_text(encoding='utf8') + ' ', encoding='utf8')
-        with self.assertRaisesRegex(ValueError, 'stale'):
-            with guard.generation_guard(**self.args):
-                pass
+        with guard.generation_guard(**self.args) as run:
+            self.assertFalse(run.reused)
+            self.assertEqual(run.source_refs['datasets/raw/camera/a.png'], [])
+            self.produce()
+        self.assertEqual(len(self.history()), 2)
 
     def test_empty_directory_is_not_complete(self):
         args = dict(self.args, output_paths=['datasets/outputs/empty'])
@@ -386,7 +653,7 @@ class ProductionGuardTests(unittest.TestCase):
             self.image.write_bytes(b'in-place output')
         with guard.generation_guard(**args) as run:
             self.assertTrue(run.reused)
-            self.assertEqual(run.media_observations['datasets/raw/camera/a.png']['bytes'], len(b'fixture'))
+            self.assertEqual(run.media_observations['datasets/raw/camera/a.png']['bytes'], len(b'in-place output'))
 
     def test_indexed_media_without_claims_retains_observation(self):
         shard = self.root / self.parts['datasets/exports/derived']['evidence_shard']
@@ -482,12 +749,28 @@ class ProductionGuardTests(unittest.TestCase):
                                            ('old',)).fetchone(), ('{"saved":true}',))
         finally:
             state.close()
+        self.assertEqual(self.history('old'), [(None, 'existing_snapshot', '{"saved":true}')])
         db = fixtures.cache.connect(readonly=True)
         try:
-            self.assertIsNone(db.execute("select 1 from sqlite_master where type='table' "
-                                         "and name='production_operations'").fetchone())
+            self.assertEqual(db.execute('select receipt_json from production_operations where operation=?',
+                                        ('old',)).fetchone(), ('{"saved":true}',))
         finally:
             db.close()
+
+    def test_legacy_import_after_history_creation_preserves_snapshot(self):
+        with guard.generation_guard(**self.args):
+            self.produce()
+        db = fixtures.cache.connect()
+        try:
+            db.execute('create table production_operations '
+                       '(operation text primary key, receipt_json text, running_json text)')
+            db.execute('insert into production_operations values(?,?,?)', ('old', '{"saved":true}', None))
+            db.commit()
+        finally:
+            db.close()
+        with guard.generation_guard(**self.args) as reused:
+            self.assertTrue(reused.reused)
+        self.assertEqual(self.history('old'), [(None, 'existing_snapshot', '{"saved":true}')])
 
     def test_legacy_conflict_is_not_overwritten(self):
         with guard.generation_guard(**self.args):
@@ -501,9 +784,8 @@ class ProductionGuardTests(unittest.TestCase):
             db.commit()
         finally:
             db.close()
-        with self.assertRaisesRegex(ValueError, 'conflicting legacy operation receipt'):
-            with guard.generation_guard(**self.args):
-                self.fail('a conflicting legacy receipt must prevent execution')
+        with guard.generation_guard(**self.args) as run:
+            self.assertTrue(run.reused)
         db = sqlite3.connect(str(fixtures.core.INDEX / 'production_state.sqlite3'))
         try:
             receipt = db.execute('select receipt_json from production_operations where operation=?',
@@ -512,7 +794,7 @@ class ProductionGuardTests(unittest.TestCase):
         finally:
             db.close()
 
-    def test_index_query_code_changes_prevent_receipt_reuse(self):
+    def test_index_query_code_changes_do_not_prevent_receipt_reuse(self):
         with guard.generation_guard(**self.args):
             self.produce()
         with guard.generation_guard(**self.args) as run:
@@ -527,8 +809,7 @@ class ProductionGuardTests(unittest.TestCase):
                 return stat
             with mock.patch.object(Path, 'stat', autospec=True, side_effect=adjusted):
                 with guard.generation_guard(**self.args) as run:
-                    self.assertFalse(run.reused, name)
-                    self.produce()
+                    self.assertTrue(run.reused, name)
                 code, output, _ = self.fixture.call(['status'])
                 self.assertEqual(code, 0)
                 self.assertEqual(json.loads(output)['state'], 'ready')

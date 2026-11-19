@@ -31,7 +31,7 @@ if len(BG_IMAGES) != 45 or len(set(BG_IMAGES)) != 45:
     raise ValueError('Expected 45 unique previously unused master-scene views')
 VIEW_GROUPS = [image.stem for image in BG_IMAGES]
 FRAME = ROOT / 'datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_003927.png'
-VIDEO = ROOT / 'datasets/raw/site_capture_20261112/videos/full_scene.mp4'
+VIDEO = ROOT / 'Archive/Assets/captures/site_capture_20261112/videos/full_scene.mp4'
 OUT = ROOT / 'datasets/exports/plate/v4_master_test_background_composites_20261113'
 SCENE = 'datasets/assets/blender/shared/arena_4m2_pbr_20261112/arena_master_user_20261113.blend'
 SEED = 20261115

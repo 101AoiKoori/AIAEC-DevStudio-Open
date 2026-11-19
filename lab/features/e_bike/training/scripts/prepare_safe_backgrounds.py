@@ -13,8 +13,8 @@ from camera_tone import source_role  # noqa: E402
 from lab.training_common.production_guard import generation_guard  # noqa: E402
 from lab.scripts.data.v4_source_gate import build_queue  # noqa: E402
 
-VIDEO = 'datasets/raw/site_archive_legacy/场景/综合视频/空场与场景物料_001.mp4'
-PARENTS = [f'datasets/raw/person/teammate_submission_20261110/dataset/backgrounds/bg_{i:05d}_f{j:05d}.jpg'
+VIDEO = 'Archive/Assets/working_sources/legacy/site/场景/综合视频/空场与场景物料_001.mp4'
+PARENTS = [f'datasets/assets/person/dataset/backgrounds/bg_{i:05d}_f{j:05d}.jpg'
            for i, j in ((0, 1), (1, 4))]
 CROP = [800, 200, 1760, 920]
 

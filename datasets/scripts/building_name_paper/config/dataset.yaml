@@ -1,11 +1,13 @@
 task: building_name_paper
-status: canonical_entry_sources_connected_production_paused
+status: canonical_entry_sources_connected
 allocation: {required: true, engine: datasets/scripts/common/bayesian.py, weights: per_plan_design_assumptions}
-goal: 定位楼名纸条并读取可辨文字，关联所属楼宇。
-states: [有纸, 无纸, 单楼, 多楼, 不同名称, 偏航, 明暗, 饱和度, 反光, 裁边]
+goal: 定位整帧中可辨认的楼名纸条，逐纸标注检测框。
+states: [有纸, 无纸, 单楼, 多楼, 不同名称, 偏航, 明暗, 饱和度, 裁边]
 train_target_images: 3000
-source_mix_initial: {direct_real: 0.20, real_background_composite: 0.40, blender_background: 0.40}
+allocation_recipe: config/full_recipe.json
+split_target_images: {train: 3000, val: 300, test: 300}
 source_config: config/source.yaml
 sample_output: datasets/samples/building_name_paper
 dataset_output: datasets/exports/building_name_paper
+actual_manifest: datasets/exports/building_name_paper/manifest.json
 design_reference: docs/DATASET_DESIGN.md

@@ -1,7 +1,7 @@
 """Generate sticker images from explicit, planned toolkit states."""
 
 if __name__ == "__main__":
-    raise SystemExit("Task helper is import-only; use the primary entry in datasets/scripts/waste_bin_state or waste_sticker/. Production remains paused.")
+    raise SystemExit("Task helper is import-only; use the primary entry in datasets/scripts/waste_bin_state or waste_sticker/.")
 
 import argparse
 import json
@@ -20,7 +20,7 @@ sys.path.insert(0, str(WORKSPACE))
 from lab.training_common.production_guard import generation_guard
 
 
-def init_worker(root, cache, out, width, height, vehicle_scale):
+def init_worker(root, cache, out, width, height, vehicle_scale, *, icon_dir=None):
     """Initialize the workspace toolkit; also used by the flat sticker adapter."""
     global GEN, CFG, NAMES, OUT
     root, cache, OUT = Path(root), Path(cache), Path(out)
@@ -51,7 +51,7 @@ def init_worker(root, cache, out, width, height, vehicle_scale):
         raise ValueError('Expected 24 distinct source icons')
     CFG['negative']['distractors']['kinds'] = ['stain', 'scuff', 'tape']
     CFG['negative']['distractors']['kinds_single'] = ['stain', 'scuff', 'tape']
-    metas = GEN.prep_assets(str(root / CFG['paths']['icons']), str(cache))
+    metas = GEN.prep_assets(str(icon_dir or root / CFG['paths']['icons']), str(cache))
     if {m['name'] for m in metas} != set(NAMES):
         raise ValueError('Missing or unexpected source icons')
     assets = []

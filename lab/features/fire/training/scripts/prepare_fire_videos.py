@@ -72,7 +72,7 @@ def _prepare_groups(groups, output, fps, source_refs):
 
 def main():
     parser = argparse.ArgumentParser(description='按视频分组抽帧，结果需要标注复核')
-    parser.add_argument('--source', default='datasets/raw/fire/videos')
+    parser.add_argument('--source', default='Archive/Assets/captures/fire/videos')
     parser.add_argument('--output', required=True)
     parser.add_argument('--fps', type=float, default=1.0)
     args = parser.parse_args()

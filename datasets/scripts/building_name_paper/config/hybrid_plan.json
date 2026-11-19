@@ -1,0 +1,285 @@
+{
+  "schema_version": 1,
+  "model_key": "building_name_paper",
+  "target_split": "train",
+  "purpose": "Development sample of Blender buildings on low-view real plates; preserve unassigned origins and previous exposure",
+  "plates": [
+    {
+      "id": "P01_TL1",
+      "image": "Archive/Assets/captures/car_real_capture_20261112/P01_TL1.png",
+      "frame_id": "7678f4921b5222d7b4e6b65b7a273b14d00389d0afac3a3b4561217d3bc75378",
+      "content_sha256": "42239f127c35bec45bcce1563bad671763686aa209b5fd1e38d99006cdd0afb1",
+      "image_size": [
+        640,
+        480
+      ],
+      "parent_group": "Archive/Assets/CarRealPicture/V_20261112_152304.mp4",
+      "source_split": "test",
+      "road_parallel_segments_px": [
+        [
+          [
+            2,
+            443
+          ],
+          [
+            263,
+            300
+          ]
+        ],
+        [
+          [
+            635,
+            389
+          ],
+          [
+            395,
+            289
+          ]
+        ]
+      ],
+      "ground_polygon": [
+        [
+          0,
+          300
+        ],
+        [
+          639,
+          300
+        ],
+        [
+          639,
+          479
+        ],
+        [
+          0,
+          479
+        ]
+      ],
+      "anchor_candidates_px": [
+        [
+          350,
+          362
+        ],
+        [
+          360,
+          350
+        ],
+        [
+          340,
+          340
+        ],
+        [
+          350,
+          330
+        ]
+      ],
+      "focal_px_assumed": 600,
+      "white_reference_xyxy": [
+        253,
+        428,
+        267,
+        440
+      ],
+      "review": {
+        "method": "codex_visual_review",
+        "algorithm_version": "building_photo_ground_v1",
+        "note": "Whole original image inspected: no building-name paper. Ground footprint region excludes people, sign bases and bins. The traffic-light assembly is a background distractor; foreground buildings are nearer.",
+        "horizon_basis": "intersection of two receding road edges, assuming a level roll; focal length and metric camera height remain approximate",
+        "lighting_basis": "broad indoor ceiling illumination with soft shadows; main light above camera-left"
+      },
+      "forbidden_footprint_xyxy": [
+        [
+          118,
+          252,
+          217,
+          326
+        ],
+        [
+          386,
+          226,
+          402,
+          303
+        ]
+      ],
+      "known_evaluation_contact": {
+        "manifest": "datasets/annotated/car_real_capture_20261112/field_eval_v1/annotations_root.json",
+        "scope": "previously used vehicle capture; development sample, not an independent holdout"
+      }
+    },
+    {
+      "id": "P12_TL2",
+      "image": "Archive/Assets/captures/car_real_capture_20261112/P12_TL2.png",
+      "frame_id": "627182daa7cfd8f048ce3eb9d056563a3a35009e947973e636bc81f81cb01f6e",
+      "content_sha256": "207ee15889ae0a10801624f42e56ff634ffbeee3bb6f6fc499b742ead0c673ee",
+      "image_size": [
+        640,
+        480
+      ],
+      "parent_group": "Archive/Assets/CarRealPicture/V_20261112_152304.mp4",
+      "source_split": "test",
+      "road_parallel_segments_px": [
+        [
+          [
+            74,
+            477
+          ],
+          [
+            274,
+            327
+          ]
+        ],
+        [
+          [
+            638,
+            377
+          ],
+          [
+            522,
+            327
+          ]
+        ]
+      ],
+      "ground_polygon": [
+        [
+          0,
+          310
+        ],
+        [
+          639,
+          310
+        ],
+        [
+          639,
+          479
+        ],
+        [
+          0,
+          479
+        ]
+      ],
+      "anchor_candidates_px": [
+        [
+          370,
+          375
+        ],
+        [
+          370,
+          365
+        ],
+        [
+          360,
+          355
+        ],
+        [
+          365,
+          345
+        ],
+        [
+          340,
+          335
+        ],
+        [
+          335,
+          330
+        ],
+        [
+          350,
+          330
+        ],
+        [
+          345,
+          325
+        ],
+        [
+          360,
+          325
+        ],
+        [
+          350,
+          335
+        ]
+      ],
+      "focal_px_assumed": 600,
+      "white_reference_xyxy": [
+        277,
+        410,
+        290,
+        433
+      ],
+      "review": {
+        "method": "codex_visual_review",
+        "algorithm_version": "building_photo_ground_v1",
+        "note": "Whole original image inspected: no building-name paper. Ground footprint region excludes people, sign bases and bins. The traffic-light assembly is a background distractor; foreground buildings are nearer.",
+        "horizon_basis": "intersection of two receding road edges, assuming a level roll; focal length and metric camera height remain approximate",
+        "lighting_basis": "broad indoor ceiling illumination with soft shadows; main light above camera-left"
+      },
+      "forbidden_footprint_xyxy": [
+        [
+          0,
+          283,
+          140,
+          378
+        ],
+        [
+          250,
+          296,
+          280,
+          337
+        ],
+        [
+          499,
+          293,
+          529,
+          338
+        ]
+      ],
+      "known_evaluation_contact": {
+        "manifest": "datasets/annotated/car_real_capture_20261112/field_eval_v1/annotations_root.json",
+        "scope": "previously used vehicle capture; development sample, not an independent holdout"
+      }
+    }
+  ],
+  "combinations": [
+    "A",
+    "B",
+    "C",
+    "AB",
+    "AC",
+    "BC",
+    "ABC"
+  ],
+  "views": [
+    {
+      "id": "left_low",
+      "camera_height_m": 0.14,
+      "single_yaw_degrees": -70,
+      "multi_yaw_degrees": -50
+    },
+    {
+      "id": "front_level",
+      "camera_height_m": 0.2,
+      "single_yaw_degrees": 0,
+      "multi_yaw_degrees": 0
+    }
+  ],
+  "lighting": {
+    "world_color": [
+      0.65,
+      0.65,
+      0.65
+    ],
+    "world_strength": 0.7,
+    "area_offset_m": [
+      -0.6,
+      -0.3,
+      1.5
+    ],
+    "area_energy_w": 32,
+    "area_size_m": 1.5,
+    "shadow_strength": 0.85,
+    "foreground_blur_sigma_px": 0.45
+  },
+  "seed": 20261118,
+  "samples": 32,
+  "budget": 28
+}

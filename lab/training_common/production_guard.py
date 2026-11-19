@@ -1,4 +1,4 @@
-"""Reuse indexed inputs and persist operation receipts beside the query cache.
+"""Reserve actual inputs and outputs and persist operation receipts.
 
 production_state.sqlite3 is authoritative operation state, not a disposable
 query cache. Media catalog and manifest rows preserve file observations and
@@ -7,8 +7,9 @@ datasets/blender_source_registry.sqlite3.
 """
 from __future__ import annotations
 
-from contextlib import contextmanager
+from contextlib import closing, contextmanager
 from dataclasses import dataclass, field
+import hashlib
 import importlib.util
 import json
 import os
@@ -47,6 +48,7 @@ class ProductionRun:
     _states: dict = field(default_factory=dict)
     _state_counts: dict = field(default_factory=dict)
     _recorded_outputs: set = field(default_factory=set)
+    _preserved: dict = field(default_factory=dict)
 
     @property
     def plan(self):
@@ -57,6 +59,11 @@ class ProductionRun:
     def active(self):
         """Whether this run may still accept writes or start child operations."""
         return self._active and not self.reused and bool(self._token)
+
+    @property
+    def token(self):
+        """Run identity while active; callers must capture it before exiting."""
+        return self._token if self.active else ''
 
     def _invalidate(self):
         self._active = False
@@ -81,6 +88,8 @@ class ProductionRun:
         except (TypeError, OverflowError) as error:
             raise ValueError('sample sources and parameters must be finite JSON') from error
         relative = _paths(self._workspace, [output])[0]
+        if relative.casefold() in {path.casefold() for path in self._preserved}:
+            raise ValueError('preserved output cannot be recorded as a generated sample')
         path = self._workspace / relative
         if not any(_within(relative, scope) for scope in self._sample_outputs):
             raise ValueError('sample output is outside declared sample output paths')
@@ -99,13 +108,20 @@ class ProductionRun:
     def _check_samples(self, finished):
         if self._plan is None:
             return
+        for path, saved in self._preserved.items():
+            current = self._workspace / path
+            if (current.is_symlink() or not current.is_file() or
+                    not current.resolve().is_relative_to(self._workspace) or
+                    _file_digest(current) != saved['sha256']):
+                raise ValueError('preserved output was removed or changed: ' + path)
         actual = {state['id']: 0 for state in self._plan['strata']}
         for sample in self._samples:
             actual[sample['state_id']] += 1
         if any(actual[state['id']] != state['planned_count'] for state in self._plan['strata']):
             raise ValueError('actual sample counts do not match the production plan')
         all_images = {item['path']: item for item in finished if item.get('type') == 'file'
-                      and Path(item['path']).suffix.lower() in _cache.core.IMAGES}
+                      and Path(item['path']).suffix.lower() in _cache.core.IMAGES
+                      and item['path'] not in self._preserved}
         if any(not any(_within(path, scope) for scope in self._sample_outputs + self._auxiliary_outputs)
                for path in all_images):
             raise ValueError('output image is outside declared sample and auxiliary paths')
@@ -148,6 +164,30 @@ def _index(root):
     module.core.INDEX = module.core.ROOT / 'datasets/annotated/media_index'
     module.DATABASE = module.core.INDEX / 'query_cache.sqlite3'
     return module
+
+
+def receipt_completed(root, operation, token):
+    """Read whether a run committed; missing state raises rather than guessing.
+
+    The state store and receipt history must exist. This function never creates,
+    migrates, or writes either database, including when the query is negative.
+    """
+    if not isinstance(operation, str) or not operation.strip():
+        raise ValueError('operation must be a nonempty string')
+    if (not isinstance(token, str) or len(token) != 32 or
+            any(c not in '0123456789abcdef' for c in token)):
+        raise ValueError('token must be a lowercase 32-character hexadecimal run token')
+    state_path = _index(root).DATABASE.parent / 'production_state.sqlite3'
+    if not state_path.is_file():
+        raise FileNotFoundError('production state is missing: ' + str(state_path))
+    with closing(sqlite3.connect(state_path.resolve().as_uri() + '?mode=ro', uri=True)) as db:
+        table = db.execute("SELECT 1 FROM sqlite_master WHERE type='table' "
+                           "AND name='production_receipt_history'").fetchone()
+        if table is None:
+            raise RuntimeError('production receipt history is unavailable')
+        return db.execute('SELECT 1 FROM production_receipt_history '
+                          'WHERE operation=? AND run_token=? AND origin=?',
+                          (operation, token, 'completed_run')).fetchone() is not None
 
 
 def plan_production(declaration, root=None):
@@ -203,6 +243,17 @@ def _paths(root, paths):
     return sorted(result)
 
 
+def _file_digest(path):
+    digest = hashlib.sha256()
+    with path.open('rb') as stream:
+        while True:
+            block = stream.read(1024 * 1024)
+            if not block:
+                break
+            digest.update(block)
+    return digest.hexdigest()
+
+
 def _inventory(root, paths, require, *, nonempty=False):
     result = []
     for relative in paths:
@@ -229,31 +280,43 @@ def _inventory(root, paths, require, *, nonempty=False):
     return result
 
 
-def _sources(cache, db, paths, current_states):
+def _sources(cache, paths, states):
+    refs = {path: [] for path in paths}
+    observations = {path: {key: states[path][key] for key in ('path', 'bytes', 'modified_ns')}
+                    for path in paths}
+    try:
+        with closing(cache.connect(readonly=True)) as db:
+            cache.validated(db, True)
+            refs = _indexed_refs(cache, db, paths, observations)
+    except (OSError, ValueError, KeyError, TypeError, IndexError, sqlite3.Error):
+        pass
+    return refs, observations
+
+
+def _indexed_refs(cache, db, paths, current_states):
     core = cache.core
     refs = {path: [] for path in paths}
     by_key = {cache.path_key(path): path for path in paths}
     if len(by_key) != len(paths):
         raise ValueError('media paths differ only by filesystem case')
-    observations = {path: [] for path in paths}
+    current = set()
     keys = list(by_key)
     for offset in range(0, len(keys), 400):
         chunk = keys[offset:offset + 400]
         placeholders = ','.join('?' for _ in chunk)
-        for key, raw, descriptor in db.execute(
-                'SELECT m.path_key,m.item_json,p.descriptor FROM media m JOIN partitions p ON p.name=m.partition_name '
-                'WHERE m.path_key IN (' + placeholders + ')', chunk):
-            part = json.loads(descriptor)
-            if part['source_present'] and not core.lifecycle_reason(part['name']):
-                item = json.loads(raw)
-                observations[by_key[key]].append({k: item.get(k) for k in ('id', 'path', 'bytes', 'modified_ns')})
+        for key, raw in db.execute('SELECT path_key,item_json FROM media '
+                                   f'WHERE path_key IN ({placeholders})', chunk):
+            item = json.loads(raw)
+            state = current_states[by_key[key]]
+            if all(item.get(field) == state[field] for field in ('bytes', 'modified_ns')):
+                current.add(by_key[key])
         rows = db.execute('SELECT e.path_key,e.entry_json,p.descriptor,r.shared_json FROM evidence e '
                           'JOIN partitions p ON p.name=e.partition_name '
                           'LEFT JOIN manifest_rows r ON r.id=e.manifest_row_id '
                           'WHERE e.path_key IN (' + placeholders + ') ORDER BY e.id', chunk)
         for key, raw, descriptor, shared in rows:
             part = json.loads(descriptor)
-            if not part['source_present'] or core.lifecycle_reason(part['name']):
+            if not part['source_present'] or core.lifecycle_reason(part['name']) or by_key[key] not in current:
                 continue
             entry = json.loads(raw)
             if shared is not None:
@@ -263,29 +326,12 @@ def _sources(cache, db, paths, current_states):
                     continue
                 refs[by_key[key]].append({k: record[k] for k in
                     ('manifest', 'record_index', 'relation', 'reference_field', 'subject_paths') if k in record})
-    missing = [path for key, path in by_key.items()
-               if not observations[path] or core.lifecycle_reason(path)]
-    if missing:
-        raise ValueError('media missing from current index: ' + ', '.join(missing) +
-                         '; refresh affected JSON partitions and sync SQLite')
-    selected = {}
-    for path, candidates in observations.items():
-        state = current_states[path]
-        selected[path] = next((item for item in candidates if item['bytes'] == state['bytes'] and
-                               item['modified_ns'] == state['modified_ns']), candidates[0])
-    return refs, selected
+    return refs
 
 
 def _overlap(a, b):
     return a == b or a.startswith(b + '/') or b.startswith(a + '/')
 
-
-def _index_code_state():
-    result = []
-    for name in ('media_index.py', 'media_index_sqlite.py'):
-        stat = (_MEDIA / name).stat()
-        result.append({'path': 'lab/scripts/media/' + name, 'bytes': stat.st_size, 'modified_ns': stat.st_mtime_ns})
-    return result
 
 
 def _within(path, root):
@@ -305,78 +351,73 @@ def _alive(cache, reservation):
     return cache.core.process_exists(reservation['pid']) is not False
 
 
-def _prepare_state(db, cache):
-    """Migrate legacy receipts durably before dropping the rebuildable copy."""
-    state_path = cache.DATABASE.parent / 'production_state.sqlite3'
-    db.execute('ATTACH DATABASE ? AS production_state', (str(state_path),))
-    db.execute('BEGIN IMMEDIATE')
+def _legacy_receipts(cache):
     try:
-        db.execute('CREATE TABLE IF NOT EXISTS production_state.production_operations ('
+        with closing(cache.connect(readonly=True)) as db:
+            if db.execute("SELECT 1 FROM sqlite_master WHERE type='table' "
+                          "AND name='production_operations'").fetchone():
+                return list(db.execute('SELECT operation,receipt_json,running_json '
+                                       'FROM production_operations ORDER BY operation'))
+    except (OSError, ValueError, sqlite3.Error):
+        pass
+    return None
+
+
+def _prepare_state(db, cache):
+    """Import available legacy receipts once, leaving their source untouched."""
+    try:
+        db.execute('CREATE TABLE IF NOT EXISTS production_operations ('
                    'operation TEXT PRIMARY KEY, receipt_json TEXT, running_json TEXT)')
-        db.execute('CREATE TABLE IF NOT EXISTS production_state.migrations '
+        db.execute('CREATE TABLE IF NOT EXISTS migrations '
                    '(name TEXT PRIMARY KEY, legacy_rows_json TEXT NOT NULL)')
-        legacy = db.execute("SELECT 1 FROM main.sqlite_master WHERE type='table' "
-                            "AND name='production_operations'").fetchone()
-        if legacy:
-            rows = list(db.execute('SELECT operation,receipt_json,running_json '
-                                   'FROM main.production_operations ORDER BY operation'))
+        history_exists = db.execute("SELECT 1 FROM sqlite_master WHERE type='table' "
+                                    "AND name='production_receipt_history'").fetchone()
+        db.execute('CREATE TABLE IF NOT EXISTS production_receipt_history ('
+                   'id INTEGER PRIMARY KEY, operation TEXT NOT NULL, run_token TEXT UNIQUE, '
+                   'origin TEXT NOT NULL, receipt_json TEXT NOT NULL)')
+        marker = db.execute("SELECT 1 FROM migrations WHERE name='cache_operations_v1'").fetchone()
+        rows = _legacy_receipts(cache) if marker is None else None
+        if rows is not None:
             encoded = json.dumps(rows, ensure_ascii=False, separators=(',', ':'))
-            marker = db.execute("SELECT legacy_rows_json FROM production_state.migrations "
-                                "WHERE name='cache_operations_v1'").fetchone()
-            if marker and marker[0] != encoded:
-                raise ValueError('legacy operation table differs from recorded migration; refusing overwrite')
-            if not marker:
-                for operation, receipt, running in rows:
-                    current = db.execute('SELECT receipt_json,running_json FROM '
-                                         'production_state.production_operations WHERE operation=?',
-                                         (operation,)).fetchone()
-                    if current is not None and current != (receipt, running):
-                        raise ValueError('conflicting legacy operation receipt: ' + operation)
-                    db.execute('INSERT OR IGNORE INTO production_state.production_operations '
-                               '(operation,receipt_json,running_json) VALUES(?,?,?)',
-                               (operation, receipt, running))
-                db.execute('INSERT INTO production_state.migrations VALUES(?,?)',
-                           ('cache_operations_v1', encoded))
+            for operation, receipt, running in rows:
+                inserted = db.execute('INSERT OR IGNORE INTO production_operations '
+                                      '(operation,receipt_json,running_json) VALUES(?,?,?)',
+                                      (operation, receipt, running)).rowcount
+                if history_exists and inserted and receipt is not None:
+                    db.execute('INSERT INTO production_receipt_history '
+                               '(operation,run_token,origin,receipt_json) VALUES(?,?,?,?)',
+                               (operation, None, 'existing_snapshot', receipt))
+            db.execute('INSERT INTO migrations VALUES(?,?)', ('cache_operations_v1', encoded))
+        if not history_exists:
+            # The old schema contains only the latest receipt. Preserve exactly
+            # that known snapshot without inventing its original run or date.
+            db.execute('INSERT INTO production_receipt_history '
+                       '(operation,run_token,origin,receipt_json) '
+                       "SELECT operation,NULL,'existing_snapshot',receipt_json "
+                       'FROM production_operations WHERE receipt_json IS NOT NULL')
         db.commit()
     except BaseException:
         db.rollback()
         raise
-    if legacy:
-        # The authoritative copy and its verification marker are already committed.
-        with db:
-            db.execute('DROP TABLE main.production_operations')
 
 
 @contextmanager
-def _transaction(cache, *, validate=True):
-    if not cache.DATABASE.is_file():
-        raise ValueError('SQLite cache missing; refresh JSON partitions and sync SQLite')
-    with cache.cache_guard():
-        if not cache.DATABASE.is_file():
-            raise ValueError('SQLite cache missing; refresh JSON partitions and sync SQLite')
-        db = cache.connect()
-        try:
-            db.execute('BEGIN IMMEDIATE')
-            if validate:
-                cache.validated(db, False)
-            db.commit()
-            _prepare_state(db, cache)
-            db.execute('BEGIN IMMEDIATE')
-            if validate:
-                cache.validated(db, False)
+def _transaction(cache):
+    state_path = cache.DATABASE.parent / 'production_state.sqlite3'
+    state_path.parent.mkdir(parents=True, exist_ok=True)
+    with closing(sqlite3.connect(state_path, timeout=60)) as db:
+        db.execute('BEGIN IMMEDIATE')
+        _prepare_state(db, cache)
+        db.execute('BEGIN IMMEDIATE')
+        with db:
             yield db
-            db.commit()
-        except BaseException:
-            db.rollback()
-            raise
-        finally:
-            db.close()
 
 
 @contextmanager
 def _generation_guard(operation, input_paths, output_paths, parameters, *, code_paths=(),
                       procedural_inputs=(), inplace_paths=(), adopt_outputs=(), dependency_paths=(), root=None,
-                      plan=None, declaration=None, sample_output_paths=(), auxiliary_output_paths=()):
+                      plan=None, declaration=None, sample_output_paths=(), auxiliary_output_paths=(),
+                      replace_outputs=False, replace_verifier=None):
     """Yield a run; honor ``run.reused`` before invoking the wrapped operation.
 
     Procedural/configuration inputs must be explicitly named and are not given
@@ -405,6 +446,12 @@ def _generation_guard(operation, input_paths, output_paths, parameters, *, code_
     auxiliary = _paths(workspace, auxiliary_output_paths)
     if plan is not None and (not outputs or inplace or adopted):
         raise ValueError('planned production requires outputs and does not support inplace or adopted outputs')
+    if replace_verifier is not None and (not replace_outputs or not callable(replace_verifier)):
+        raise ValueError('replace_verifier requires an explicit replacement')
+    if replace_outputs and plan is None and replace_verifier is None:
+        raise ValueError('output replacement requires a production plan')
+    if replace_verifier is not None and (not outputs or inplace or adopted):
+        raise ValueError('verified replacement requires separate declared outputs')
     if plan is not None:
         if not samples or any(not any(_within(path, out) for out in outputs) for path in samples + auxiliary):
             raise ValueError('sample and auxiliary paths must be inside declared outputs; sample paths are required')
@@ -444,7 +491,6 @@ def _generation_guard(operation, input_paths, output_paths, parameters, *, code_
     guard_stat = Path(__file__).stat()
     guard_code = {'path': 'lab/training_common/production_guard.py', 'bytes': guard_stat.st_size,
                   'modified_ns': guard_stat.st_mtime_ns}
-    index_code = _index_code_state()
     media_suffixes = cache.core.IMAGES | cache.core.VIDEOS | {'.npz'}
     undeclared = [p for p in inputs if p not in procedural]
     if any(not (workspace / p).is_file() for p in undeclared):
@@ -454,7 +500,8 @@ def _generation_guard(operation, input_paths, output_paths, parameters, *, code_
                                     not any(_within(path, dep) for dep in dependencies)})
     token = uuid.uuid4().hex
     with _transaction(cache) as db:
-        rows = list(db.execute('SELECT operation,receipt_json,running_json FROM production_state.production_operations'))
+        rows = list(db.execute('SELECT operation,running_json FROM production_operations '
+                               'WHERE running_json IS NOT NULL'))
         parent_name = os.environ.get('AEC_PRODUCTION_PARENT_OPERATION')
         parent_token = os.environ.get('AEC_PRODUCTION_PARENT_TOKEN')
         if bool(parent_name) != bool(parent_token):
@@ -462,7 +509,7 @@ def _generation_guard(operation, input_paths, output_paths, parameters, *, code_
         parent = None
         if parent_name:
             row = next((row for row in rows if row[0] == parent_name), None)
-            parent = json.loads(row[2]) if row and row[2] else None
+            parent = json.loads(row[1]) if row and row[1] else None
             if (not parent or parent.get('token') != parent_token or not _alive(cache, parent) or
                     parent.get('parent_token') or parent_name == operation or 'input_state' not in parent):
                 raise ValueError('invalid or inactive parent production operation')
@@ -479,6 +526,8 @@ def _generation_guard(operation, input_paths, output_paths, parameters, *, code_
         staged = [p for p in inputs if parent and any(_within(p, out) for out in parent['outputs']) and
                   input_inventory.get(p) != prior.get(p)]
         if parent:
+            if replace_outputs:
+                raise ValueError('output replacement is only supported by a top-level production run')
             if plan is not None:
                 planner = 'lab/training_common/bayesian_allocation.py'
                 if planner not in parent['code_paths']:
@@ -502,37 +551,57 @@ def _generation_guard(operation, input_paths, output_paths, parameters, *, code_
         staged_media = [p for p in media if any(_within(p, root) for root in staged)]
         staged_info = {p: {'parent_operation': parent_name, 'parent_source_refs': parent['source_refs']}
                        for p in staged}
-        previous = None
-        for name, receipt_json, running_json in rows:
-            receipt = json.loads(receipt_json) if receipt_json else None
+        previous_row = db.execute('SELECT receipt_json FROM production_operations '
+                                  'WHERE operation=?', (operation,)).fetchone()
+        previous = json.loads(previous_row[0]) if previous_row and previous_row[0] else None
+        for name, running_json in rows:
             running = json.loads(running_json) if running_json else None
-            if name == operation:
-                previous = receipt
             if running and _alive(cache, running) and name != parent_name:
                 if name == operation or any(_overlap(a, b) for a in outputs for b in running['outputs']):
                     raise RuntimeError('production operation or output is already in use: ' + name)
         output_state = _inventory(workspace, outputs, False)
+        preserved = {}
+        if replace_verifier is not None:
+            # Verifier is trusted adapter code: it checks ownership, collisions
+            # and recovery boundaries; this guard does not remove or move files.
+            # Copies prevent it from changing admission data by mutating inputs.
+            snapshot = json.loads(json.dumps(output_state, ensure_ascii=False))
+            receipt_copy = json.loads(json.dumps(previous, ensure_ascii=False)) if previous is not None else None
+            verification = replace_verifier(workspace, snapshot, receipt_copy)
+            if plan is None:
+                if verification is not True:
+                    raise ValueError('replacement verifier did not approve output ownership')
+            else:
+                if (not isinstance(verification, dict) or set(verification) != {'preserved_paths'} or
+                        not isinstance(verification['preserved_paths'], list) or
+                        any(not isinstance(p, str) for p in verification['preserved_paths'])):
+                    raise ValueError('planned replacement verifier must return preserved_paths list')
+                paths = _paths(workspace, verification['preserved_paths'])
+                if len({p.casefold() for p in paths}) != len(paths):
+                    raise ValueError('preserved output paths differ only by case')
+                observed = {item['path']: item for item in output_state if item.get('type') == 'file'}
+                for path in paths:
+                    if path not in observed or not any(_within(path, out) for out in outputs):
+                        raise ValueError('preserved output must be a file in declared outputs: ' + path)
+                    preserved[path] = {'path': path, 'sha256': _file_digest(workspace / path)}
+            if _inventory(workspace, outputs, False) != output_state:
+                raise ValueError('replacement verifier changed output state')
         any_output = any(not x.get('missing') for x in output_state)
-        if any_output and not parent:
+        if all(
+                item.get('missing') or (item.get('type') == 'directory' and item['path'] in outputs)
+                or (plan is not None and item.get('type') == 'file' and
+                    any(item['path'] == out + '/.gitkeep' for out in outputs))
+                for item in output_state):
+            any_output = False
+        if any_output and not parent and not replace_outputs:
             expected = previous['outputs'] if previous else []
             allowed = inplace + (adopted if not previous else [])
             if _outside_inplace(output_state, allowed) != _outside_inplace(expected, allowed):
                 raise ValueError('existing outputs have no matching complete receipt; explicit adoption required')
-        refs, observations = _sources(cache, db, [p for p in media if p not in staged_media], states)
+        refs, observations = _sources(cache, [p for p in media if p not in staged_media], states)
         refs.update({p: [] for p in staged_media})
-        for path, observation in observations.items():
-            state = states[path]
-            if observation['bytes'] == state['bytes'] and observation['modified_ns'] == state['modified_ns']:
-                continue
-            old_post = {item['path']: item for item in previous.get('post_inputs', [])} if previous else {}
-            recognized_inplace = (previous and any(_within(path, p) for p in inplace) and
-                                  previous['outputs'] == output_state and old_post.get(path) == state and
-                                  previous.get('media_observations', {}).get(path) == observation)
-            if not recognized_inplace:
-                raise ValueError('indexed media changed: ' + path +
-                                 '; refresh affected JSON partitions and sync SQLite')
         request = {'inputs': inputs_state, 'code': code_state, 'parameters': params,
-                   'guard_code': guard_code, 'index_code': index_code, 'procedural_inputs': procedural,
+                   'guard_code': guard_code, 'procedural_inputs': procedural,
                    'dependency_paths': dependencies, 'output_paths': outputs,
                    'inplace_paths': inplace, 'adopt_outputs': adopted}
         if plan is not None:
@@ -543,14 +612,14 @@ def _generation_guard(operation, input_paths, output_paths, parameters, *, code_
             request['sample_output_paths'] = samples
             request['auxiliary_output_paths'] = auxiliary
         comparable = dict(previous['request'], inputs=previous.get('post_inputs', previous['request']['inputs'])) if previous else None
-        if not parent and previous and comparable == request and previous['outputs'] == output_state:
+        if not replace_outputs and not parent and previous and comparable == request and previous['outputs'] == output_state:
             run = ProductionRun(True, refs, observations, previous.get('result'))
         else:
             reservation = {'token': token, 'pid': os.getpid(), 'host': socket.gethostname(), 'outputs': outputs,
                            'code_paths': code, 'code_state': code_state, 'input_state': inputs_state, 'source_refs': refs,
                            'prior_outputs': output_state, 'parent_token': parent_token, 'stages': [],
                            'parameters': params}
-            db.execute('INSERT INTO production_state.production_operations(operation,running_json) VALUES(?,?) '
+            db.execute('INSERT INTO production_operations(operation,running_json) VALUES(?,?) '
                        'ON CONFLICT(operation) DO UPDATE SET running_json=excluded.running_json',
                        (operation, json.dumps(reservation, ensure_ascii=False)))
             run = ProductionRun(False, refs, observations, staged_inputs=staged_info,
@@ -560,6 +629,7 @@ def _generation_guard(operation, input_paths, output_paths, parameters, *, code_
         run._outputs = outputs
         run._sample_outputs = samples
         run._auxiliary_outputs = auxiliary
+        run._preserved = preserved
         if plan is not None:
             run._states = {row['id']: row for row in plan['strata']}
             run._state_counts = {state_id: 0 for state_id in run._states}
@@ -581,8 +651,6 @@ def _generation_guard(operation, input_paths, output_paths, parameters, *, code_
         new_guard_stat = Path(__file__).stat()
         if (new_guard_stat.st_size, new_guard_stat.st_mtime_ns) != (guard_stat.st_size, guard_stat.st_mtime_ns):
             raise ValueError('production guard code changed; completion not recorded')
-        if _index_code_state() != index_code:
-            raise ValueError('index query code changed; completion not recorded')
         finished = _inventory(workspace, outputs, True, nonempty=True)
         run._check_samples(finished)
         if plan is not None:
@@ -590,7 +658,7 @@ def _generation_guard(operation, input_paths, output_paths, parameters, *, code_
             if request['planner_code'] != {'bytes': planner_stat.st_size, 'modified_ns': planner_stat.st_mtime_ns}:
                 raise ValueError('production planner code changed; completion not recorded')
         with _transaction(cache) as db:
-            current = db.execute('SELECT running_json FROM production_state.production_operations WHERE operation=?', (operation,)).fetchone()
+            current = db.execute('SELECT running_json FROM production_operations WHERE operation=?', (operation,)).fetchone()
             if not current or not current[0] or json.loads(current[0])['token'] != token:
                 raise RuntimeError('production reservation changed; completion not recorded')
             current_run = json.loads(current[0])
@@ -607,8 +675,10 @@ def _generation_guard(operation, input_paths, output_paths, parameters, *, code_
                        'adopted_output_state': current_run['prior_outputs'] if adopted else []}
             if plan is not None:
                 receipt['planned_samples'] = run._samples
+                if run._preserved:
+                    receipt['preserved_outputs'] = list(run._preserved.values())
             if parent:
-                parent_row = db.execute('SELECT running_json FROM production_state.production_operations WHERE operation=?', (parent_name,)).fetchone()
+                parent_row = db.execute('SELECT running_json FROM production_operations WHERE operation=?', (parent_name,)).fetchone()
                 parent_running = json.loads(parent_row[0]) if parent_row and parent_row[0] else None
                 if not parent_running or parent_running['token'] != parent_token or not _alive(cache, parent_running):
                     raise RuntimeError('parent production ended; child completion not recorded')
@@ -617,26 +687,30 @@ def _generation_guard(operation, input_paths, output_paths, parameters, *, code_
                 if plan is not None:
                     stage['planned_samples'] = run._samples
                 parent_running['stages'].append(stage)
-                db.execute('UPDATE production_state.production_operations SET running_json=? WHERE operation=?',
+                db.execute('UPDATE production_operations SET running_json=? WHERE operation=?',
                            (json.dumps(parent_running, ensure_ascii=False), parent_name))
-                db.execute('UPDATE production_state.production_operations SET running_json=NULL WHERE operation=?', (operation,))
+                db.execute('UPDATE production_operations SET running_json=NULL WHERE operation=?', (operation,))
             else:
-                db.execute('UPDATE production_state.production_operations SET receipt_json=?,running_json=NULL WHERE operation=?',
-                           (json.dumps(receipt, ensure_ascii=False), operation))
+                encoded_receipt = json.dumps(receipt, ensure_ascii=False)
+                db.execute('INSERT INTO production_receipt_history '
+                           '(operation,run_token,origin,receipt_json) VALUES(?,?,?,?)',
+                           (operation, token, 'completed_run', encoded_receipt))
+                db.execute('UPDATE production_operations SET receipt_json=?,running_json=NULL WHERE operation=?',
+                           (encoded_receipt, operation))
     except BaseException:
         # Failure is never a completion; preserve any prior receipt for audit.
         try:
-            with _transaction(cache, validate=False) as db:
-                current = db.execute('SELECT running_json FROM production_state.production_operations WHERE operation=?', (operation,)).fetchone()
+            with _transaction(cache) as db:
+                current = db.execute('SELECT running_json FROM production_operations WHERE operation=?', (operation,)).fetchone()
                 if current and current[0] and json.loads(current[0])['token'] == token:
-                    db.execute('UPDATE production_state.production_operations SET running_json=NULL WHERE operation=?', (operation,))
+                    db.execute('UPDATE production_operations SET running_json=NULL WHERE operation=?', (operation,))
                 if parent:
-                    row = db.execute('SELECT running_json FROM production_state.production_operations WHERE operation=?', (parent_name,)).fetchone()
+                    row = db.execute('SELECT running_json FROM production_operations WHERE operation=?', (parent_name,)).fetchone()
                     if row and row[0]:
                         parent_running = json.loads(row[0])
                         if parent_running['token'] == parent_token:
                             parent_running['stage_failed'] = True
-                            db.execute('UPDATE production_state.production_operations SET running_json=? WHERE operation=?',
+                            db.execute('UPDATE production_operations SET running_json=? WHERE operation=?',
                                        (json.dumps(parent_running, ensure_ascii=False), parent_name))
         except Exception:
             pass
@@ -647,20 +721,21 @@ def _generation_guard(operation, input_paths, output_paths, parameters, *, code_
 
 def _mark_parent_failed(cache, name, token):
     """Record child admission failures after the admission transaction rolls back."""
-    with _transaction(cache, validate=False) as db:
-        row = db.execute('SELECT running_json FROM production_state.production_operations WHERE operation=?',
+    with _transaction(cache) as db:
+        row = db.execute('SELECT running_json FROM production_operations WHERE operation=?',
                          (name,)).fetchone()
         parent = json.loads(row[0]) if row and row[0] else None
         if parent and parent.get('token') == token and _alive(cache, parent):
             parent['stage_failed'] = True
-            db.execute('UPDATE production_state.production_operations SET running_json=? WHERE operation=?',
+            db.execute('UPDATE production_operations SET running_json=? WHERE operation=?',
                        (json.dumps(parent, ensure_ascii=False), name))
 
 
 @contextmanager
 def generation_guard(operation, input_paths, output_paths, parameters, *, code_paths=(),
                      procedural_inputs=(), inplace_paths=(), adopt_outputs=(), dependency_paths=(), root=None,
-                     production_plan=None, sample_output_paths=(), auxiliary_output_paths=()):
+                     production_plan=None, sample_output_paths=(), auxiliary_output_paths=(),
+                     replace_outputs=False, replace_verifier=None):
     """Guard an operation; failures under a valid parent also fail that parent.
 
     Before entering a parent guard, adapters must read and validate each child
@@ -668,6 +743,14 @@ def generation_guard(operation, input_paths, output_paths, parameters, *, code_p
     by the child's operation. They must declare the plan file as an input and
     the allocator in code_paths. Parent reuse happens before a child starts;
     a child cannot detect a declaration omitted by a reused parent.
+
+    For an unplanned top-level replacement, a trusted replace_verifier must
+    return True. For a planned replacement it must return a dictionary with
+    only ``preserved_paths``: a list of existing output file paths to retain.
+    The verifier receives (workspace, output_state, previous_receipt) without
+    modifying outputs. The guard checks retained file hashes at completion,
+    but cannot prevent adapter writes: the caller must preflight name clashes
+    and use staging/recovery. No verifier preserves the planned default checks.
     """
     try:
         plan = declaration = None
@@ -678,7 +761,8 @@ def generation_guard(operation, input_paths, output_paths, parameters, *, code_p
                                procedural_inputs=procedural_inputs, inplace_paths=inplace_paths,
                                adopt_outputs=adopt_outputs, dependency_paths=dependency_paths, root=root,
                                plan=plan, declaration=declaration, sample_output_paths=sample_output_paths,
-                               auxiliary_output_paths=auxiliary_output_paths) as run:
+                               auxiliary_output_paths=auxiliary_output_paths, replace_outputs=replace_outputs,
+                               replace_verifier=replace_verifier) as run:
             yield run
     except BaseException:
         name = os.environ.get('AEC_PRODUCTION_PARENT_OPERATION')

@@ -1,10 +1,8 @@
 # 站房仪表：开源项目分析与可实施方案
 
-> 本文提及的部分本地素材、数据和历史运行产物未随本仓库提供；相关名称保留用于说明来源和实验背景。
-
 研究日期：2026-11-03。按用户确认的现场范围，站房识别对象为同一表盘中的温度计与湿度计，温度、湿度各 7 分，共 14 分。输出图需逐一圈出刻度，标出指针和原点。现有手持近景、小车相机平视照片和固定读数实拍视频，可用于实物参考、标定、训练及合成场景基底；历史合成训练、验证和测试数据共享渲染来源，原导出已清空；完整识别链尚未完成验收。
 
-**温湿度表实拍（2026-11-09 收到）**：原图为 [仪表盘实拍照片](../../Archive/Assets/仪表/照片/手持倾斜近景_表盘_双针_外壳与反光_001.jpg)，4096×2304，拍摄设备和曝光参数未记录。照片中可辨“deli 得力”和“No.9011”，同一圆形表盘有两个分离轴心和两根黑色指针；温度区标有 −30～50 °C，湿度区标有 0～100 %RH。照片包含表盘旋转、一定倾斜、手部遮挡边缘和灯具在表面形成的高亮反射，可用于确定外观、坐标标注和采集条件。以上范围只对应照片中的这只表；精确分度、各刻度坐标、指针读数真值及不同观察姿态下的误差尚未核对。
+**温湿度表实拍（2026-11-09 收到）**：原图为 仪表盘实拍照片（历史路径 `Archive/Assets/仪表/照片/手持倾斜近景_表盘_双针_外壳与反光_001.jpg`，来源已迁出，见[数据区迁出记录](../../datasets/README.md#来源资产已迁出2026-11-19)），4096×2304，拍摄设备和曝光参数未记录。照片中可辨“deli 得力”和“No.9011”，同一圆形表盘有两个分离轴心和两根黑色指针；温度区标有 −30～50 °C，湿度区标有 0～100 %RH。照片包含表盘旋转、一定倾斜、手部遮挡边缘和灯具在表面形成的高亮反射，可用于确定外观、坐标标注和采集条件。以上范围只对应照片中的这只表；精确分度、各刻度坐标、指针读数真值及不同观察姿态下的误差尚未核对。
 
 **当前唯一开发路线（2026-11-06 用户确认）**：单个双针 YOLO Pose + OpenCV 几何及赛前人工刻度映射，详细流程与数据设计见第 6、7、14 节。既有开源调查、PDF 图像及纯 OpenCV 原型记录见[归档研究](../../refs/archive/METER_RESEARCH.md)。V3 已训练，合成验证和实拍诊断结果见[同场地实拍诊断](FIELD_EVALUATION_V3_20261112.md)。完整读数及整套模型加载指标仍待验收。
 
@@ -12,7 +10,7 @@
 
 ## 按车载实拍重做合成数据
 
-**当前生产暂停。** 仪表唯一当前数据集位于 `datasets/exports/meter/` 下的 `train/`、`test/`、`val/`；唯一当前小样位于 `datasets/samples/meter/`；数据集和小样脚本入口位于 `datasets/scripts/meter/`。不随意建立版本目录。上述目录已建立；渲染与合成入口已消费本任务 `config/source.yaml`、`render_plan.json` 和 `production_plan.json`，已接通字段与排除项见[脚本入口说明](../../datasets/scripts/README.md)。研究使用已登记的 Blender 场景、车载照片及视频，关键点可见性或实物刻度对应未确认时不输出完整 Pose 真值。来源、组合与数据状态见[V4 数据制作方案](../DATASET_DESIGN.md#v4-八项任务数据集设计)。
+**当前任务状态见[生产进度](../DATASET_PRODUCTION.md#当前生产进度)。** 仪表唯一当前数据集位于 `datasets/exports/meter/` 下的 `train/`、`test/`、`val/`；唯一当前小样位于 `datasets/samples/meter/`；数据集和小样脚本入口位于 `datasets/scripts/meter/`。不随意建立版本目录。上述目录已建立；渲染与合成入口已消费本任务 `config/source.yaml`、`render_plan.json` 和 `production_plan.json`，已接通字段与排除项见[脚本入口说明](../../datasets/scripts/README.md)。研究使用已登记的 Blender 场景、车载照片及视频，关键点可见性或实物刻度对应未确认时不输出完整 Pose 真值。来源与组合方法见[V4 数据制作方案](../DATASET_DESIGN.md#v4-八项任务数据集设计)。
 
 仪表配置的目标结构是由 [`source.yaml`](../../datasets/scripts/meter/config/source.yaml) 记录来源范围，由 [`dataset.yaml`](../../datasets/scripts/meter/config/dataset.yaml) 记录任务目标、状态并引用来源配置；两份文件已建立，现有仪表入口按任务字段读取它们，来源清单按实际任务范围核实。贝叶斯分配、透视合成等共用能力按公共自研库组织，仪表脚本保留任务逻辑；目前已有 `lab/training_common/bayesian_allocation.py` 并被仪表规划脚本调用，历史图像增强入口仍直接使用 OpenCV 透视操作，不能认为共用库及新入口已完成接线。
 
@@ -47,9 +45,9 @@ Blender 入口 `render_meter_candidates.py` 的 `--station-v4` 使用新版装�
 
 生成表盘旧 v1 配置的温度与湿度刻线取点不一致，保留用于复现旧预览。新 v2 配置将四点统一取各自量程刻线远离轴心的外端，已重建站房地标并生成两张 640×480 配对小样（`datasets/exports/meter/station_v4_outer_tick_pair_pilot_20261112/manifest.json`）。这些点是生成贴图上的目视估计，实际车载尺度下细针和刻线可见性仍未知；该批为开发回归，不含完整 Pose 真值。实拍的实体与贴图精确配准仍待核实。
 
-原站房配对渲染命令使用旧输出路径和旧入口参数，不能作为当前数据集或小样入口。生产仍暂停；正式样本须核对纹理、点位、可见性和集合归属。
+原站房配对渲染命令使用旧输出路径和旧入口参数，不能作为当前数据集或小样入口。正式样本须核对纹理、点位、可见性和集合归属。
 
-装配角、投影尺寸档、照明对照及资料清单见[站房制作配方](../DATASET_PRODUCTION.md#温湿度表与数显电表)。本轮生产和训练暂停；每个模型只有一次训练机会，重训或微调未确定，不安排常规开发验证、模型验证或最终测试选模。已有 V3 模型和记录保持原位。
+装配角、投影尺寸档、照明对照及资料清单见[站房制作配方](../DATASET_RECIPES.md#温湿度表与数显电表)。旧方案曾设想每模型仅训练一次且不安排验证；当前按[训练与微调流程](../TRAINING_WORKFLOW.md#训练与微调的失败驱动闭环)安排基线，后续依据实际失败与用户指定预算补数据或微调。已有 V3 模型和记录保持原位。
 
 ### 数显电表的 ROI 与 OCR
 
@@ -57,9 +55,9 @@ Blender 入口 `render_meter_candidates.py` 的 `--station-v4` 使用新版装�
 
 OCR 复用现有可用引擎，输出按数显读数格式检查。结果单独记录原始字符串、状态和 ROI，过曝、遮挡、窗口偏移或数字不清时输出未知。温度、湿度和电表各自保留有效状态。电表方案的实现、ROI 标定和现场读数验证待完成。
 
-[站房 Blender 原型](../../datasets/assets/blender/meter/blender_9011_station_v4_tilt65_640_preview/meter_9011_power_meter_station.blend)在既有 9011 表盘下方保留黑色电表箱体、支脚和数显窗。表盘随安装支点后仰，数字窗 ROI 独立固定。[原型生成器](../../lab/features/meter/training/scripts/build_power_meter_station_prototype.py)的 `--ground-angle-deg` 接受 60°–70° 对地夹角。新原型对地角实算约 65°，三个预览均为 640×480；正面表盘投影宽约 87 像素，八点和数显窗四角均在画面内。投影入画不等于关键点可见性或刻度真值已核准；与车载参考相比，线缆、场景物料和窗光仍需补充。[车载视角](../../datasets/assets/blender/meter/blender_9011_station_v4_tilt65_640_preview/prototype_vehicle_front.png) · [右侧测角](../../datasets/assets/blender/meter/blender_9011_station_v4_tilt65_640_preview/prototype_right_side.png) · [投影记录](../../datasets/assets/blender/meter/blender_9011_station_v4_tilt65_640_preview/prototype_manifest.json)
+[归档站房 Blender 原型](../../Archive/technical/revisions/meter/blender_sources_20261116/blender_9011_station_v4_tilt65_640_preview/meter_9011_power_meter_station.blend)在既有 9011 表盘下方保留黑色电表箱体、支脚和数显窗。表盘随安装支点后仰，数字窗 ROI 独立固定。[原型生成器](../../lab/features/meter/training/scripts/build_power_meter_station_prototype.py)的 `--ground-angle-deg` 接受 60°–70° 对地夹角。新原型对地角实算约 65°，三个预览均为 640×480；正面表盘投影宽约 87 像素，八点和数显窗四角均在画面内。投影入画不等于关键点可见性或刻度真值已核准；与车载参考相比，线缆、场景物料和窗光仍需补充。[车载视角](../../Archive/technical/revisions/meter/blender_sources_20261116/blender_9011_station_v4_tilt65_640_preview/prototype_vehicle_front.png) · [右侧测角](../../Archive/technical/revisions/meter/blender_sources_20261116/blender_9011_station_v4_tilt65_640_preview/prototype_right_side.png) · [投影记录](../../Archive/technical/revisions/meter/blender_sources_20261116/blender_9011_station_v4_tilt65_640_preview/prototype_manifest.json)
 
-室内场景按现有车载画面加入深色地面、轨道标线、白墙、围板、带窗帘的侧窗和矩形顶灯。矩形顶灯及侧窗光参与反射和阴影，World 使用已打包的程序生成室内环境球做补光。右侧正交图隔离布景，用于核对安装角和接地。[斜视预览](../../datasets/assets/blender/meter/blender_9011_station_v4_tilt65_640_preview/prototype_three_quarter.png)
+室内场景按现有车载画面加入深色地面、轨道标线、白墙、围板、带窗帘的侧窗和矩形顶灯。矩形顶灯及侧窗光参与反射和阴影，World 使用已打包的程序生成室内环境球做补光。右侧正交图隔离布景，用于核对安装角和接地。[斜视预览](../../Archive/technical/revisions/meter/blender_sources_20261116/blender_9011_station_v4_tilt65_640_preview/prototype_three_quarter.png)
 
 屏幕四角可作为合成 ROI 参考，示例数字用于审图。样本设计覆盖清晰、偏斜、反光、过曝及裁切的显示窗，并改变示例读数。真实 OCR 效果使用已入库、读数可核对的画面检查。
 
@@ -117,7 +115,7 @@ OCR 复用现有可用引擎，输出按数显读数格式检查。结果单独�
 
 ### 分阶段采集
 
-已有手持近景、小车相机平视照片和 `datasets/raw/meter/仪表盘实拍视频.mp4`。视频解码为竖屏 2160×3840，拍摄期间指针保持同一状态，拍摄设备和距离未记录。`datasets/annotated/meter/real_video_validation_v1/` 保存从同一视频抽取的 10 帧、清单和标注候选，9.0、9.5、10.0 秒帧带候选叠加图；其余 7 帧自动配准未通过。9.0 秒基准帧的刻度检测得到 323 条候选线段，包含重复、误检与漏检；表框、关键点和投影均未独立复核，读数未知。该目录当前只用于后续标注，不能作为逐刻度或读数精度真值，也没有导出 YOLO 验证标签。使用 `lab/features/meter/training/scripts/prepare_real_meter_validation.py` 可生成新目录，输出目录必须不存在。整段视频及其派生帧属于同一来源分组。
+已有手持近景、小车相机平视照片和 `Archive/Assets/captures/meter/仪表盘实拍视频.mp4`。视频解码为竖屏 2160×3840，拍摄期间指针保持同一状态，拍摄设备和距离未记录。`datasets/annotated/meter/real_video_validation_v1/` 保存从同一视频抽取的 10 帧、清单和标注候选，9.0、9.5、10.0 秒帧带候选叠加图；其余 7 帧自动配准未通过。9.0 秒基准帧的刻度检测得到 323 条候选线段，包含重复、误检与漏检；表框、关键点和投影均未独立复核，读数未知。该目录当前只用于后续标注，不能作为逐刻度或读数精度真值，也没有导出 YOLO 验证标签。使用 `lab/features/meter/training/scripts/prepare_real_meter_validation.py` 可生成新目录，输出目录必须不存在。整段视频及其派生帧属于同一来源分组。
 
 1. **静态标定**：从视频的正视片段选择清晰帧，核对两个轴心、全部可见刻度和端点，建立坐标与数值映射。
 2. **视角检查**：从不同距离、俯仰与偏航片段抽帧，检查定位、配准、指针与刻度标注；保留模糊、遮挡或反光导致的未知状态。
@@ -155,7 +153,7 @@ OCR 复用现有可用引擎，输出按数显读数格式检查。结果单独�
 
 ### 主刻度方程与候选线生成
 
-从 PDF 图人工选出 9 条温度主刻度角度，按每段十等分计算预测角 `θ(k,j)=θk+(θ(k+1)-θk)×j/10`，半径同样插值。每个预测角附近在 ±1° 内搜索暗线，且要求相邻候选角间距处于实验设定范围，避免重复分配。脚本为 `lab/features/meter/inference/scripts/calibrate_pdf_ticks.py`，运行 `python lab/features/meter/inference/scripts/calibrate_pdf_ticks.py --image datasets/raw/meter/pdf/page15-005.jpg --ticks lab/features/meter/inference/config/pdf_ticks.json --output lab/features/meter/inference/outputs/proposed_ticks.json`。目前 81 条温度候选可逐项复现，候选相邻角差约 2.59–3.44°。
+从 PDF 图人工选出 9 条温度主刻度角度，按每段十等分计算预测角 `θ(k,j)=θk+(θ(k+1)-θk)×j/10`，半径同样插值。每个预测角附近在 ±1° 内搜索暗线，且要求相邻候选角间距处于实验设定范围，避免重复分配。脚本为 `lab/features/meter/inference/scripts/calibrate_pdf_ticks.py`，运行 `python lab/features/meter/inference/scripts/calibrate_pdf_ticks.py --image Archive/Assets/working_sources/reference/meter/pdf/page15-005.jpg --ticks lab/features/meter/inference/config/pdf_ticks.json --output lab/features/meter/inference/outputs/proposed_ticks.json`。目前 81 条温度候选可逐项复现，候选相邻角差约 2.59–3.44°。
 
 这是对本图人工锚点的分段近似，不是透视恢复或实物表盘通用校准。暗线搜索也可能吸附文字、针或阴影；每条仍待人工核实。湿度候选按图像轴心计算相邻角差约 2.79–7.39°，目前不能确认其来自真实不均匀刻度、透视、图像误差或候选错误，尚不能以等间距假设证明对应关系。首版计算仍按用户指定预设等分，需以实拍表盘的实测结果复核；对本 PDF 样本的湿度候选不得当作已验证标定。
 
@@ -248,7 +246,7 @@ PDF 第 15 页的单张照片曾用于 16 张增强流程检查；参考点取�
 
 76 张已有双针四点的图通过选定贴图的 SIFT/RANSAC 配准补齐四个估计端点；用 13 张已知 Blender 投影的底图检查，端点最大误差约 0.214 像素。这是生成素材内部的坐标一致性检查，端点原始位置本身仍是估计。使用 `lab/features/meter/training/scripts/prepare_meter_rendered_sources.py` 和 `complete_meter_source_endpoints.py` 整理底图；素材和对应来源清单不提交 Git。SIFT 用于准备合成图端点标签。
 
-生成前运行 `python lab/features/meter/training/scripts/audit_meter_source_quality.py --sources datasets/annotated/meter/rendered_base_v1 --face datasets/assets/blender/meter/blender_9011_reference/face_generated.png`，得到 `quality_report.json`。当前对所选贴图采样 80 个温度外圈和 27 个湿度圈候选刻线位置，结合两针中后段的局部灰度对比度筛选；89 张底图中 60 张通过，29 张保留但不参与采样。源图最低对比度阈值为温度刻线中位数 35、湿度刻线中位数 25、两针中后段对比度中位数各 35（灰度 0—255）；增强后分别要求至少 30、20、30，不合格的变换重新采样。该指标只能作为减轻冲淡的启发式，**不能证明每一条刻线都清楚**，还需看审核图。源图有任何修改后必须重新生成质量报告并重新生成数据。
+生成前运行 `python lab/features/meter/training/scripts/audit_meter_source_quality.py --sources datasets/annotated/meter/rendered_base_v1 --face Archive/technical/revisions/meter/blender_sources_20261116/blender_9011_reference/face_generated.png`，得到 `quality_report.json`。当前对所选贴图采样 80 个温度外圈和 27 个湿度圈候选刻线位置，结合两针中后段的局部灰度对比度筛选；89 张底图中 60 张通过，29 张保留但不参与采样。源图最低对比度阈值为温度刻线中位数 35、湿度刻线中位数 25、两针中后段对比度中位数各 35（灰度 0—255）；增强后分别要求至少 30、20、30，不合格的变换重新采样。该指标只能作为减轻冲淡的启发式，**不能证明每一条刻线都清楚**，还需看审核图。源图有任何修改后必须重新生成质量报告并重新生成数据。
 
 历史批次使用 `generate_meter_from_renders.py` 和 `datasets/annotated/meter/rendered_base_v1`；该入口尚未接通当前数据集和小样目录。默认输出目录必须不存在；对该生成器创建且清单、来源、数量及文件名均匹配的已有数据，显式加入 `--overwrite-existing` 可原地重建。重建期间既有审计报告标为失效，完成后应重新审计。`--count` 应是 10 的倍数，按 80／10／10 输出。生成器用同一单应矩阵变换图像、表框和八点，记录来源、划分、矩阵和角度；附加合成范围为俯仰／偏航 ±14°、画面转角 ±8°，并检查完整入镜。投影是对已有图像进行平面近似，不能重新生成针的深度视差、阴影或真实玻璃反射；针位组合受 89 张底图限制。光照使用底图现有照明与轻微亮度变化。
 

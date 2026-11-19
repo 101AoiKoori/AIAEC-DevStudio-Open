@@ -5,7 +5,7 @@ It is not a training export, independent test, or proof of annotation quality.
 """
 
 if __name__ == "__main__":
-    raise SystemExit("Legacy dataset CLI is retired; use datasets/scripts/waste_bin_state or waste_sticker/. Production remains paused.")
+    raise SystemExit("Legacy dataset CLI is retired; use datasets/scripts/waste_bin_state or waste_sticker/.")
 
 import argparse
 import json
@@ -19,10 +19,10 @@ ROOT = Path(__file__).resolve().parents[5]
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from bin_render_contract import decode_mask
 
-BACKGROUND = ROOT / 'datasets/raw/car_real_capture_20261112/P09_B1.png'
+BACKGROUND = ROOT / 'Archive/Assets/captures/car_real_capture_20261112/P09_B1.png'
 ANNOTATIONS = ROOT / 'datasets/annotated/car_real_capture_20261112/field_eval_v1/annotations_root.json'
 RENDER = ROOT / 'datasets/exports/waste_bin/v4_photo_markings_preview'
-STICKER = ROOT / 'datasets/raw/waste_bin/toolkit/SourcePic/纽扣电池.png'
+STICKER = ROOT / 'Archive/Assets/working_sources/digital/waste_sticker/toolkit/SourcePic/纽扣电池.png'
 TASKS = ROOT / 'config/perception_tasks.json'
 
 

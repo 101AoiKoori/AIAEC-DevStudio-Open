@@ -5,7 +5,7 @@ cannot be inferred from a seed or counted as planned coverage.
 """
 
 if __name__ == "__main__":
-    raise SystemExit("Legacy dataset CLI is retired; use datasets/scripts/waste_bin_state or waste_sticker/. Production remains paused.")
+    raise SystemExit("Legacy dataset CLI is retired; use datasets/scripts/waste_bin_state or waste_sticker/.")
 
 import argparse
 import json
@@ -26,7 +26,7 @@ import generate_stickers as existing
 
 
 CONSTRAINTS = {'paper_short_side_min_px': 120, 'image_margin_px': 2, 'max_attempts': 40}
-TOOLKIT = 'datasets/raw/waste_bin/toolkit'
+TOOLKIT = 'Archive/Assets/working_sources/digital/waste_sticker/toolkit'
 
 
 def validate_plan(plan, names):

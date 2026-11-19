@@ -99,7 +99,7 @@
         "Archive/Assets/场景/三楼与场地视频/三栋楼_路口及垃圾桶_005.mp4",
         "datasets/annotated/sign/sam2_fixture_candidates_20261110/train_20.png",
         "datasets/annotated/sign/video_candidates_20261110/images/sign_0299.png",
-        "datasets/raw/sign/archive_assets_legacy/视频/禁止直行牌视频.mp4"
+        "Archive/Assets/working_sources/legacy/sign/视频/禁止直行牌视频.mp4"
       ]
     }
   ],
@@ -156,7 +156,7 @@
     {
       "image": "datasets/annotated/sign/sam2_fixture_candidates_20261110/train_20.png",
       "parent_image": "datasets/annotated/sign/video_candidates_20261110/images/sign_0299.png",
-      "parent_video": "datasets/raw/sign/archive_assets_legacy/视频/禁止直行牌视频.mp4",
+      "parent_video": "Archive/Assets/working_sources/legacy/sign/视频/禁止直行牌视频.mp4",
       "source_kind": "derived_mask",
       "source_records": [
         {
@@ -191,7 +191,7 @@
     },
     {
       "image": "datasets/annotated/sign/video_candidates_20261110/images/sign_0299.png",
-      "parent_video": "datasets/raw/sign/archive_assets_legacy/视频/禁止直行牌视频.mp4",
+      "parent_video": "Archive/Assets/working_sources/legacy/sign/视频/禁止直行牌视频.mp4",
       "source_frame": 299,
       "seconds_approx": 9.983769514640995,
       "source_kind": "provided_video_frame",
@@ -220,7 +220,7 @@
     {
       "image": "datasets/annotated/sign/v4_training_backgrounds_20261112/images/background_01.png",
       "parent_image": "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_000163.png",
-      "parent_video": "datasets/raw/site_capture_20261112/videos/full_scene.mp4",
+      "parent_video": "Archive/Assets/captures/site_capture_20261112/videos/full_scene.mp4",
       "source_time_seconds": 5.4,
       "source_kind": "provided_video_frame",
       "source_records": [
@@ -245,7 +245,7 @@
     {
       "image": "datasets/annotated/sign/v4_training_backgrounds_20261112/images/background_02.png",
       "parent_image": "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_004359.png",
-      "parent_video": "datasets/raw/site_capture_20261112/videos/full_scene.mp4",
+      "parent_video": "Archive/Assets/captures/site_capture_20261112/videos/full_scene.mp4",
       "source_time_seconds": 145.400533,
       "source_kind": "provided_video_frame",
       "source_records": [
@@ -270,7 +270,7 @@
     {
       "image": "datasets/annotated/sign/v4_training_backgrounds_20261112/images/background_03.png",
       "parent_image": "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_005751.png",
-      "parent_video": "datasets/raw/site_capture_20261112/videos/full_scene.mp4",
+      "parent_video": "Archive/Assets/captures/site_capture_20261112/videos/full_scene.mp4",
       "source_time_seconds": 191.820633,
       "source_kind": "provided_video_frame",
       "source_records": [
@@ -295,7 +295,7 @@
     {
       "image": "datasets/annotated/sign/v4_training_backgrounds_20261112/images/background_seq_000091.png",
       "parent_image": "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_000091.png",
-      "parent_video": "datasets/raw/site_capture_20261112/videos/full_scene.mp4",
+      "parent_video": "Archive/Assets/captures/site_capture_20261112/videos/full_scene.mp4",
       "source_time_seconds": 3.0,
       "source_kind": "provided_video_frame",
       "source_records": [
@@ -320,7 +320,7 @@
     {
       "image": "datasets/annotated/sign/v4_training_backgrounds_20261112/images/background_seq_002188.png",
       "parent_image": "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_002188.png",
-      "parent_video": "datasets/raw/site_capture_20261112/videos/full_scene.mp4",
+      "parent_video": "Archive/Assets/captures/site_capture_20261112/videos/full_scene.mp4",
       "source_time_seconds": 72.993467,
       "source_kind": "provided_video_frame",
       "source_records": [
@@ -345,7 +345,7 @@
     {
       "image": "datasets/annotated/sign/v4_training_backgrounds_20261112/images/background_seq_004887.png",
       "parent_image": "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_004887.png",
-      "parent_video": "datasets/raw/site_capture_20261112/videos/full_scene.mp4",
+      "parent_video": "Archive/Assets/captures/site_capture_20261112/videos/full_scene.mp4",
       "source_time_seconds": 163.000533,
       "source_kind": "provided_video_frame",
       "source_records": [
@@ -370,7 +370,7 @@
     {
       "image": "datasets/annotated/sign/v4_training_backgrounds_20261112/images/background_seq_005277.png",
       "parent_image": "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_005277.png",
-      "parent_video": "datasets/raw/site_capture_20261112/videos/full_scene.mp4",
+      "parent_video": "Archive/Assets/captures/site_capture_20261112/videos/full_scene.mp4",
       "source_time_seconds": 176.000533,
       "source_kind": "provided_video_frame",
       "source_records": [
@@ -395,7 +395,7 @@
     {
       "image": "datasets/annotated/sign/v4_training_backgrounds_20261112/images/background_seq_005397.png",
       "parent_image": "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_005397.png",
-      "parent_video": "datasets/raw/site_capture_20261112/videos/full_scene.mp4",
+      "parent_video": "Archive/Assets/captures/site_capture_20261112/videos/full_scene.mp4",
       "source_time_seconds": 180.000533,
       "source_kind": "provided_video_frame",
       "source_records": [
@@ -420,7 +420,7 @@
     {
       "image": "datasets/annotated/sign/v4_training_backgrounds_20261112/images/background_seq_005996.png",
       "parent_image": "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_005996.png",
-      "parent_video": "datasets/raw/site_capture_20261112/videos/full_scene.mp4",
+      "parent_video": "Archive/Assets/captures/site_capture_20261112/videos/full_scene.mp4",
       "source_time_seconds": 199.9873,
       "source_kind": "provided_video_frame",
       "source_records": [
@@ -445,7 +445,7 @@
     {
       "image": "datasets/annotated/sign/v4_training_backgrounds_20261112/images/background_seq_006236.png",
       "parent_image": "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_006236.png",
-      "parent_video": "datasets/raw/site_capture_20261112/videos/full_scene.mp4",
+      "parent_video": "Archive/Assets/captures/site_capture_20261112/videos/full_scene.mp4",
       "source_time_seconds": 207.9873,
       "source_kind": "provided_video_frame",
       "source_records": [
@@ -470,7 +470,7 @@
     {
       "image": "datasets/annotated/sign/v4_training_backgrounds_20261112/images/background_seq_007045.png",
       "parent_image": "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_007045.png",
-      "parent_video": "datasets/raw/site_capture_20261112/videos/full_scene.mp4",
+      "parent_video": "Archive/Assets/captures/site_capture_20261112/videos/full_scene.mp4",
       "source_time_seconds": 234.992733,
       "source_kind": "provided_video_frame",
       "source_records": [
@@ -495,7 +495,7 @@
     {
       "image": "datasets/annotated/sign/v4_training_backgrounds_20261112/images/background_seq_008185.png",
       "parent_image": "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_008185.png",
-      "parent_video": "datasets/raw/site_capture_20261112/videos/full_scene.mp4",
+      "parent_video": "Archive/Assets/captures/site_capture_20261112/videos/full_scene.mp4",
       "source_time_seconds": 273.013056,
       "source_kind": "provided_video_frame",
       "source_records": [
@@ -520,7 +520,7 @@
     {
       "image": "datasets/annotated/sign/v4_training_backgrounds_20261112/images/background_seq_008485.png",
       "parent_image": "datasets/annotated/site_capture_20261112/sequence_640_v1/full_scene/frame_008485.png",
-      "parent_video": "datasets/raw/site_capture_20261112/videos/full_scene.mp4",
+      "parent_video": "Archive/Assets/captures/site_capture_20261112/videos/full_scene.mp4",
       "source_time_seconds": 283.013056,
       "source_kind": "provided_video_frame",
       "source_records": [
@@ -566,7 +566,7 @@
       },
       {
         "role": "target_foreground",
-        "parent": "datasets/raw/sign/archive_assets_legacy/视频/禁止直行牌视频.mp4",
+        "parent": "Archive/Assets/working_sources/legacy/sign/视频/禁止直行牌视频.mp4",
         "planned_images": 1
       }
     ],
