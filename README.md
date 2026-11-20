@@ -56,6 +56,8 @@ V4 数据任务先看[当前生产进度](docs/DATASET_PRODUCTION.md#当前生�
 
 八项任务的数据规模、回传训练指标与微调得失见[2026-11-19 数据集与模型训练阶段报告](docs/research/DATASET_MODEL_REPORT_20261119.md)，附实际清单与运行回执的聚合摘要。
 
+跨工作空间的设计、推理入口、历史版本、置信度前后对照及 11 月 20 日新增观察见[视觉识别资料与版本对照](docs/CROSS_WORKSPACE_VISION_STATUS_20261120.md)。
+
 ## 先做什么
 
 1. 阅读 [任务矩阵](docs/TASK_MATRIX.md)、[小车接入](docs/ROBOT_SETUP.md) 和 [双电脑离线交付](docs/OFFLINE_DEPLOY.md)。
