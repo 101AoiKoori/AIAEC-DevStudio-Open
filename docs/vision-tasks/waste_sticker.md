@@ -1,4 +1,9 @@
-# 垃圾物品贴纸识别
+# 垃圾物品贴纸分类与桶体归属
+
+**设计分类：载体与空间归属。** 停车点图像 → 24 类物品贴纸框 → 关联所在桶。桶的固有分类标志和白条是干扰物，投放规则在关联之后执行。
+
+**验证问题。** 在真实白卡尺寸、桶面反光和不同视角下检查误报与小目标召回，并保留贴纸与桶的关联证据。
+
 
 ## 定义与作用范围
 
@@ -32,3 +37,18 @@
 ## 障碍、取舍与验证
 
 相机轨迹和材质拟真可便宜地生成类别组合，但改善合成验证分数后仍要看实拍的类别混淆、纸卡漏检和白块误报。复用已有真实桶面和实体纸卡能降低三维重建与补拍成本，也使可用贴面和独立父来源成为数据容量的约束。现场优先比较同一停车图上的逐类正确数、漏检、误报和四贴齐全率，再拆分定位、类别、归属及投放判定。用桶框裁图能缩小白线干扰范围，需另计桶框偏移导致纸卡被裁掉的代价。
+
+## 实验结果与证据范围
+
+| 对照与样本范围 | 已记录结果 | 结论与采用状态 |
+| --- | --- | --- |
+| DevStudio，固定 360 张挑战 Test | FP 162→31，FN 5→7 | 保召回候选仍有漏检代价，未替换原 best。 |
+| VisualRecognition，300 张工程 Val 与路线诊断 | 工程 Val mAP50–95 86.80%→99.43%，路线 20 个真框的正确数 14→9 | 工程验证和真实路线呈相反趋势，旧 best 留作默认对照。 |
+| VisualRecognition 当前纸卡合成 v002 | Train 299／工程 Val 83，960 输入下短边中位数 22.1→37.8 px | 这是数据尺度变化，新集合尚未训练。 |
+
+## 实现与复核路径
+
+- **任务契约。** 从识别需求定位业务输出，再按学习目标核对监督字段及有效范围，按组合轴查相应对照条件。[识别需求](../../config/perception_tasks.json) · [学习目标](../../config/task_targets.yaml) · [组合轴](../../config/combination_axes.yaml)
+- **数据到模型。** 从该任务的来源配置追踪当前输入，由任务脚本生成图签及清单，再由训练入口读取数据。试验所用快照以当次记录为准。[数据来源配置](../../datasets/scripts/waste_sticker/config/source.yaml) · [任务制作说明](../../datasets/scripts/waste_sticker/README.md) · [V4 训练入口](../../lab/features/waste_bin/training/scripts/train_waste_sticker_v4.py)
+- **结果复核。** DevStudio 的数值回查对应评估分集和阶段报告。VisualRecognition 的本地记录按本篇的任务状态与实验路径复查。[V4 阶段报告](../research/DATASET_MODEL_REPORT_20261119.md) · [跨工作区记录口径](README.md#资料与时间范围)
+- **VisualRecognition 记录。** `waste_sticker/experiments/v001_trajectory_dataset_finetune/r002_checkpoint_comparison/run.json` 记录机位轨迹训练对照，`waste_sticker/datasets/v002_real_bin_card_composite/dataset.json` 记录新纸卡尺度批次。

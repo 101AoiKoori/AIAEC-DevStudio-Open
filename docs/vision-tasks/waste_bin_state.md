@@ -1,4 +1,9 @@
-# 垃圾桶开闭识别
+# 垃圾桶逐实例定位与盖态判断
+
+**设计分类：实体姿态与开闭。** 近景四桶原图 → 整桶框 → 原图桶口局部证据 → 每桶开、闭或未知。桶色及最终投放判断由对应步骤处理。
+
+**验证问题。** 在固定机位下检查保留桶口像素能否改善盖沿判态，同时分开报告漏桶、背景误框和开闭错分。
+
 
 ## 定义与作用范围
 
@@ -31,3 +36,18 @@ VisualRecognition 现场路线先定位单类整桶，在原图按桶框裁取�
 ## 障碍、取舍与验证
 
 固定停车机位限制了识别空间，选四桶可以抑制孤立设备误框。排序只能在候选框数超过四个时使用，不能补回漏检的桶，四框数量也不能单独保证四个实例均正确。现场测试应区分错框、漏框、盖态错和整组成功率，另查空场、低机位开盖和红灰桶的难例。23 张留出帧来自同一视频，因此 23/23 的结果支撑该段复测。现有 58 张渲染样本没有在相同留出中体现增益，重建背景和盖板的成本应与新独立场次中的误差一起衡量。
+
+## 实验结果与证据范围
+
+| 对照与样本范围 | 已记录结果 | 结论与采用状态 |
+| --- | --- | --- |
+| DevStudio 同一 253 张 Test，基线 → 实拍主导候选 | 整图全对 225/253→193/253，额外框 2→43 | 保留基线。 |
+| VisualRecognition，同一留出视频 23 张／92 桶 | 直接两类框 22/23 → 原图裁块 23/23，裁块定位与判态 92/92 | 结果适用于该视频；仅实拍与加 58 张渲染图的裁块方案在此打平。 |
+| VisualRecognition，18 张另一 waypoint 空图 | 旧检测器 20 个误框 → v004 试用检测器 0 个 | 原现场误报帧缺原片，试用包仍需现场复测。 |
+
+## 实现与复核路径
+
+- **任务契约。** 从识别需求定位业务输出，再按学习目标核对监督字段及有效范围，按组合轴查相应对照条件。[识别需求](../../config/perception_tasks.json) · [学习目标](../../config/task_targets.yaml) · [组合轴](../../config/combination_axes.yaml)
+- **数据到模型。** 从该任务的来源配置追踪当前输入，由任务脚本生成图签及清单，再由训练入口读取数据。试验所用快照以当次记录为准。[数据来源配置](../../datasets/scripts/waste_bin_state/config/source.yaml) · [任务制作说明](../../datasets/scripts/waste_bin_state/README.md) · [V4 训练入口](../../lab/features/waste_bin/training/scripts/train_waste_bin_state_v4.py)
+- **结果复核。** DevStudio 的数值回查对应评估分集和阶段报告。VisualRecognition 的本地记录按本篇的任务状态与实验路径复查。[V4 阶段报告](../research/DATASET_MODEL_REPORT_20261119.md) · [跨工作区记录口径](README.md#资料与时间范围)
+- **VisualRecognition 记录。** `waste_bin_state/experiments/v003_separated_bin_state/comparison.json` 对照裁块方案，`waste_bin_state/experiments/v001_detector_background_retrain/experiment.json` 记录背景检测器重训。两条记录分别对应状态头和检测器。

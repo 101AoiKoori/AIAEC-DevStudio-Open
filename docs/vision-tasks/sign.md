@@ -1,4 +1,9 @@
-# 禁止直行牌具识别
+# 禁行牌具定位与路线决策输入
+
+**设计分类：固定图案与实例。** 路口观察图像 → 牌具可见框与可靠状态 → 结合标定位置供导航选择路线。检测单位为牌面、立杆和底座组成的单一牌具。
+
+**验证问题。** 将牌具定位质量、观察位置归属和实际路线选择分开验证，重点记录低反差背面、近景截断和普通立杆。
+
 
 ## 定义与作用范围
 
@@ -33,3 +38,18 @@ Tobin 等的域随机化研究为改变机位、照明、背景和干扰提供�
 ## 障碍、取舍与验证
 
 牌具尺寸小且杆结构通用，扩大合成量的收益取决于场景与干扰是否真正多样。现有 V4 测试支撑其覆盖范围内的检测表现，普通信号杆、低机位截断和路线门控仍需分别验证。现场按两个位置记录物体检出、位置判定、普通杆误报，以及看不全或识别失败时的停车结果。固定机位连续帧应按采集段汇总相关性，避免把同一次摆放当作多次独立试验。
+
+## 实验结果与证据范围
+
+| 对照与样本范围 | 已记录结果 | 结论与采用状态 |
+| --- | --- | --- |
+| DevStudio V3 同场地诊断，11 条计分记录 | 6 TP／6 FP／2 FN | 低反差背面与截断出现失败。 |
+| DevStudio V4，300 张 Test，conf 0.25 | 225 TP／0 FP／0 FN | 样本与 V3 诊断不同，分集缺普通信号杆专项，现场路线选择另验。 |
+| VisualRecognition 冻结权重与新增实拍 | 22 对首批加 247 对连续帧图签，尚未训练 | 保持现有权重，新增素材的效果尚未评估。 |
+
+## 实现与复核路径
+
+- **任务契约。** 从识别需求定位业务输出，再按学习目标核对监督字段及有效范围，按组合轴查相应对照条件。[识别需求](../../config/perception_tasks.json) · [学习目标](../../config/task_targets.yaml) · [组合轴](../../config/combination_axes.yaml)
+- **数据到模型。** 从该任务的来源配置追踪当前输入，由任务脚本生成图签及清单，再由训练入口读取数据。试验所用快照以当次记录为准。[数据来源配置](../../datasets/scripts/sign/config/source.yaml) · [任务制作说明](../../datasets/scripts/sign/README.md) · [V4 训练入口](../../lab/features/sign/training/scripts/train_sign_v4.py)
+- **结果复核。** DevStudio 的数值回查对应评估分集和阶段报告。VisualRecognition 的本地记录按本篇的任务状态与实验路径复查。[V4 阶段报告](../research/DATASET_MODEL_REPORT_20261119.md) · [跨工作区记录口径](README.md#资料与时间范围)
+- **VisualRecognition 记录。** `sign/models/v001_formal_selected/model.json` 定位冻结权重，`sign/datasets/v001_real_capture_review/dataset.json` 和 `sign/datasets/v001_real_route_stationary_review/dataset.json` 分别记录两批实拍数据。

@@ -1,4 +1,9 @@
-# 楼名纸条识别
+# 楼名纸条的停点定位与文字读取边界
+
+**设计分类：载体与空间归属。** 停点楼面图 → 纸条框 → 文字转录 → 对应楼体。纸条可定位、字符可读和楼体可归属分别记录。
+
+**验证问题。** 在斜视、蓝车顶及空背景干扰下验证纸条检测，并量化从广场景覆盖转向固定停点的得失。
+
 
 ## 定义与作用范围
 
@@ -32,3 +37,17 @@
 ## 障碍、取舍与验证
 
 路过时的微小目标会让裁块成为有意义的工程候选。历史探索用六个重叠裁块在一张图补回两个远处纸条，但正式 Val 选出的高分支阈值在独立车载图中没有新增检出，降低阈值还会带来额外误框。固定停点近拍使单次整图识别更贴合现场运行预算，节省裁块合并、阈值调试和额外推理。v004 在旧 Test 的宽松匹配召回与框精度存在取舍，0.70 时严格 IoU 0.90 的检出从 274/334 降到 174/334，旧样本回放对照说明框精度值得单列。定位验收分别记录近距检出、同纸重框、同框误报和框精度。涉及文字或逐楼计数时，另以字符真值和观察覆盖验证。
+
+## 实验结果与证据范围
+
+| 对照与样本范围 | 已记录结果 | 结论与采用状态 |
+| --- | --- | --- |
+| DevStudio，21 张新同场景 Val 与 300 张旧 Test，conf 0.25 | 整图全对分别由 10/21→18/21、268/300→264/300 | 微调在新机位获益，旧分集整图结果下降。 |
+| VisualRecognition，四次通行 20 张原图，640 输入，conf 0.70 | 12 个纸条均检出，8 张停车负图均无误报 | 现选停点方案。这组数据只覆盖纸条检测，转录和楼名归属各需相应证据。 |
+
+## 实现与复核路径
+
+- **任务契约。** 从识别需求定位业务输出，再按学习目标核对监督字段及有效范围，按组合轴查相应对照条件。[识别需求](../../config/perception_tasks.json) · [学习目标](../../config/task_targets.yaml) · [组合轴](../../config/combination_axes.yaml)
+- **数据到模型。** 从该任务的来源配置追踪当前输入，由任务脚本生成图签及清单，再由训练入口读取数据。试验所用快照以当次记录为准。[数据来源配置](../../datasets/scripts/building_name_paper/config/source.yaml) · [任务制作说明](../../datasets/scripts/building_name_paper/README.md) · [V4 训练入口](../../lab/features/fire/training/scripts/train_building_name_paper_v4.py)
+- **结果复核。** DevStudio 的数值回查对应评估分集和阶段报告。VisualRecognition 的本地记录按本篇的任务状态与实验路径复查。[V4 阶段报告](../research/DATASET_MODEL_REPORT_20261119.md) · [跨工作区记录口径](README.md#资料与时间范围)
+- **VisualRecognition 记录。** `building_name_paper/models/v001_vehicle_selected/model.json` 固定选用快照和推理口径，`building_name_paper/experiments/v004_real_paper_finetune/r007_selected_snapshot_check/run.json` 记录停点复测。
